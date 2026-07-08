@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 43537,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/43537",
+ "title": "Add Windows 9x/ME (lack of) support information to README.TX",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "type-feature",
+  "docs"
+ ],
+ "created_at": "2006-06-22T18:36:34Z",
+ "closed_at": "2006-07-24T05:06:07Z",
+ "body": "BPO | [1510853](https://bugs.python.org/issue1510853)\n--- | :---\nNosy | @loewis, @akuchling, @birkenfeld, @devdanzin\nFiles | <li>[msi.p](https://bugs.python.org/file8273/msi.p \"Uploaded as application/octet-stream at 2006-06-22.18:36:34 by @devdanzin\"): Suggested patch for Tools/msi/msi.py</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = 'https://github.com/akuchling'\nclosed_at = <Date 2006-07-24.05:06:07.000>\ncreated_at = <Date 2006-06-22.18:36:34.000>\nlabels = ['type-feature', 'docs']\ntitle = 'Add Windows 9x/ME (lack of) support information to README.TX'\nupdated_at = <Date 2006-07-24.05:06:07.000>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2006-07-24.05:06:07.000>\nactor = 'loewis'\nassignee = 'akuchling'\nclosed = True\nclosed_date = None\ncloser = None\ncomponents = ['Documentation']\ncreation = <Date 2006-06-22.18:36:34.000>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['8273']\nhgrepos = []\nissue_num = 1510853\nkeywords = []\nmessage_count = 3.0\nmessages = ['54839', '54840', '54841']\nnosy_count = 4.0\nnosy_names = ['loewis', 'akuchling', 'georg.brandl', 'ajaksu2']\npr_nums = []\npriority = 'normal'\nresolution = 'accepted'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'enhancement'\nurl = 'https://bugs.python.org/issue1510853'\nversions = []\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2006-06-22T18:36:34Z",
+   "body": "I suggest that following informative note should be\nadded as a new sub-section in README.TXT's \"Unsupported\nsystems\" (which really needs mentioning MacOS 9). The\nsub-section idea regards README.TXT only talking about\nalready unsupported platforms. \n\nMotivation:\nAs one of the few Windows 98 users that program in\nPython AND installed the 2.5 beta1, I was greeted by\n[Tools/msi/msi.py](https://github.com/python/cpython/blob/main/Tools/msi/msi.py)'s warning message. However, no further\ninformation was available in the downloaded release or\nin the online beta documents (What's New, release\nnotes, etc.).\n\nBest regards,\nDaniel Diniz\n\n\n\\-----\nWarning on install in Windows 98 and Windows Me\n\nFollowing Microsoft's closing of Extended Support for\nWindows 98/ME (July 11, 2006), Python 2.6 will stop\nsupporting these platforms. Python development and\nmaintainability becomes easier (and more reliable) when\nplatform specific code targeting OSes with few users\nand no dedicated expert developers is taken out. The\nvendor also warns that the OS versions listed above\n\"can expose customers to security risks\" and recommends\nupgrade. For a more detailed discussion regarding\nno-longer-supported and resupporting platforms, as well\nas a list of platforms that became or will be\nunsupported, see PEP-11.\n\nCurrent behavior\nThe Python 2.5 installer presents a warning message on\nthose systems: \"Warning: Python 2.5.x is the last\nPython release for Windows 9x.\"\n\nSuggested readings\nPEP-11: Removing support for little used platforms\n(http://www.python.org/dev/peps/pep-0011)\nEnd of support for Windows 98, Windows Me, and Windows\nXP Service Pack 1\n(http://www.microsoft.com/windows/support/endofsupport.mspx)\n\nCopyright\n    This document has been placed in the public domain.\n\n\\------"
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2006-06-22T18:59:51Z",
+   "body": "Logged In: YES \nuser_id=849994\n\nAndrew?"
+  },
+  {
+   "author": "61337411-43fc-4a9c-b8d5-4060aede66d0",
+   "created_at": "2006-07-24T05:06:07Z",
+   "body": "Logged In: YES \nuser_id=21627\n\nThanks for the suggestion. I added the text (in some form)\nto README in r50794."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "90baf024-6604-450d-8341-d796fe6858f3"
+  }
+ ],
+ "fetch_errors": null
+}

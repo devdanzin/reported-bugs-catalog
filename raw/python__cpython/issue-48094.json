@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 48094,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/48094",
+ "title": "Script: find untested C functions",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "type-feature",
+  "tests"
+ ],
+ "created_at": "2008-09-12T01:32:06Z",
+ "closed_at": "2009-02-11T04:13:27Z",
+ "body": "BPO | [3844](https://bugs.python.org/issue3844)\n--- | :---\nNosy | @devdanzin\nFiles | <li>[ccoverage.py](https://bugs.python.org/file11469/ccoverage.py \"Uploaded as text/plain at 2008-09-12.01:32:03 by @devdanzin\"): Script that lists C functions not covered by the test suite</li><li>[uncovered.txt](https://bugs.python.org/file11471/uncovered.txt \"Uploaded as text/plain at 2008-09-12.01:40:55 by @devdanzin\"): Output from ccoverage on 3.0</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2009-02-11.04:13:26.542>\ncreated_at = <Date 2008-09-12.01:32:06.499>\nlabels = ['invalid', 'type-feature', 'tests']\ntitle = 'Script: find untested C functions'\nupdated_at = <Date 2009-02-11.04:13:26.541>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2009-02-11.04:13:26.541>\nactor = 'ajaksu2'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2009-02-11.04:13:26.542>\ncloser = 'ajaksu2'\ncomponents = ['Tests']\ncreation = <Date 2008-09-12.01:32:06.499>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['11469', '11471']\nhgrepos = []\nissue_num = 3844\nkeywords = []\nmessage_count = 3.0\nmessages = ['73073', '73075', '81622']\nnosy_count = 1.0\nnosy_names = ['ajaksu2']\npr_nums = []\npriority = 'normal'\nresolution = 'not a bug'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'enhancement'\nurl = 'https://bugs.python.org/issue3844'\nversions = ['Python 2.6', 'Python 3.0']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-09-12T01:32:03Z",
+   "body": "The attached script reports C functions not flexed by unittests. It\nneeds a 'coverage' build and a run of the tests. Coverage data is then\npassed to gcov and those functions with zero calls written to a text\nfile, grouped by source file.\n\nIt's also pretty ugly.\n\nReviews/suggestions are most welcome :)\n\nI'm finishing a related script that patches the source with 'printf's,\nso any false positives are easy to spot and it's clear when some action\nor test exercises a previously untested C function. It already works,\nbut is much uglier then this one ;)"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-09-12T01:40:55Z",
+   "body": "Here's example output of a run against 3.0. The number after a function\nname is its length in lines (as gcov counts them :).\n\nFalse positives include:\n./Objects/weakrefobject.c gc_clear\n./Modules/readline.c on_completion_display_matches_hook"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-02-11T04:13:26Z",
+   "body": "Closing: resource available externally (\nhttp://bazaar.launchpad.net/~ajaksu/ccoverage/trunk/files )"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "90baf024-6604-450d-8341-d796fe6858f3"
+  }
+ ],
+ "fetch_errors": null
+}

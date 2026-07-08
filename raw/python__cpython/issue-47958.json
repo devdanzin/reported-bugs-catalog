@@ -1,0 +1,90 @@
+{
+ "repo": "python/cpython",
+ "number": 47958,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/47958",
+ "title": "os.urandom(1.1): infinite loop",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "type-bug",
+  "stdlib",
+  "easy"
+ ],
+ "created_at": "2008-08-27T23:30:12Z",
+ "closed_at": "2008-09-02T05:36:36Z",
+ "body": "BPO | [3708](https://bugs.python.org/issue3708)\n--- | :---\nNosy | @gpshead, @amauryfa, @pitrou, @devdanzin, @benjaminp\nFiles | <li>[urandom.diff](https://bugs.python.org/file11277/urandom.diff \"Uploaded as text/plain at 2008-08-27.23:30:11 by @devdanzin\"): Check len(bytes) against int(n)</li><li>[urandom-float-and-close.diff](https://bugs.python.org/file11281/urandom-float-and-close.diff \"Uploaded as text/plain at 2008-08-28.06:00:34 by @gpshead\"): fix os.urandom infinite loop when passed a non integral float</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = 'https://github.com/gpshead'\nclosed_at = <Date 2008-09-02.05:36:35.825>\ncreated_at = <Date 2008-08-27.23:30:11.865>\nlabels = ['easy', 'type-bug', 'library']\ntitle = 'os.urandom(1.1): infinite loop'\nupdated_at = <Date 2008-09-18.22:53:36.436>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2008-09-18.22:53:36.436>\nactor = 'rpetrov'\nassignee = 'gregory.p.smith'\nclosed = True\nclosed_date = <Date 2008-09-02.05:36:35.825>\ncloser = 'gregory.p.smith'\ncomponents = ['Library (Lib)']\ncreation = <Date 2008-08-27.23:30:11.865>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['11277', '11281']\nhgrepos = []\nissue_num = 3708\nkeywords = ['patch', 'easy']\nmessage_count = 12.0\nmessages = ['72050', '72064', '72065', '72074', '72107', '72109', '72117', '72291', '72314', '72791', '72794', '73407']\nnosy_count = 6.0\nnosy_names = ['gregory.p.smith', 'amaury.forgeotdarc', 'pitrou', 'ajaksu2', 'benjamin.peterson', 'rpetrov']\npr_nums = []\npriority = 'normal'\nresolution = 'accepted'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'behavior'\nurl = 'https://bugs.python.org/issue3708'\nversions = ['Python 2.6']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-27T23:30:11Z",
+   "body": "Calling os.urandom(1 + float(x)) ends in a infinite loop due to a naive\ncondition check:\n\n```py\nwhile len(bytes) < n:\n    bytes += read(_urandomfd, n - len(bytes))\n```\n\n\nTrivial patch attached."
+  },
+  {
+   "author": "gpshead",
+   "created_at": "2008-08-28T05:42:07Z",
+   "body": "i'll fix this and add a unit test."
+  },
+  {
+   "author": "gpshead",
+   "created_at": "2008-08-28T06:00:35Z",
+   "body": "better patch with tests attached, no explicit int conversion is done.\n\ni also wrapped the use of the fd returned by open with a try: finally:\nto avoid any chance of a leak and renamed the bytes variable to bs to\nmatch whats in py3k and avoid overriding the builtin type."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2008-08-28T09:40:31Z",
+   "body": "The explicit int() conversion looked saner to me, rather than passing a\nfloat argument to read().\nBy the way, is there a reason this code still uses os.open rather than\nthe builtin io.open?"
+  },
+  {
+   "author": "gpshead",
+   "created_at": "2008-08-28T19:30:29Z",
+   "body": "if i did \n\n```py\n n = int(n)\n```\n\n\nthat would change the API to allow bytes/unicode to be passed in which\nis not something i want.  i don't even like that it allows floats.\n\nby not doing the int conversion at all, a DeprecationWarning is raised\nby the read() about the argument being a float which I figure it not a\nbad thing given that the API really should only accept ints...\n\nfwiw, daniel's patch would still cause this deprecation warning from\nread so I guess using while len(bs) \\< int(n): isn't that bad either. \nbut it would allow a string such as '0' to be passed in as an argument\nwithout an exception..."
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-28T19:50:55Z",
+   "body": "Gregory,\nIMHO your patch is better in all aspects.\n\nRegarding my patch, the API wouldn't change at all, as the source reads:\n        while len(bytes) \\< int(n):\n            bytes += read(_urandomfd, n - len(bytes))\n\nSo \"n - len(bytes)\" restricts the API to what it was before. But it\nwould call int() for each loop iteration :/\n\n@pitrou: My patch still passed the float to read (to keep the current\nbehavior, warning included), but if doing that can be considered a bug,\nlet's get rid of the DeprecationWarning by passing an int."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2008-08-29T00:25:53Z",
+   "body": "Le jeudi 28 ao\u00fbt 2008 \u00e0 19:30 +0000, Gregory P. Smith a \u00e9crit :\n> if i did \n> \n>  n = int(n)\n> \n> that would change the API to allow bytes/unicode to be passed in which\n> is not something i want.\n\nOk, I hadn't thought about that. You convinced me."
+  },
+  {
+   "author": "amauryfa",
+   "created_at": "2008-09-01T20:08:59Z",
+   "body": "The patch looks fine to me as well."
+  },
+  {
+   "author": "gpshead",
+   "created_at": "2008-09-02T05:36:36Z",
+   "body": "committed to trunk r66142"
+  },
+  {
+   "author": "benjaminp",
+   "created_at": "2008-09-08T21:46:38Z",
+   "body": "Gregory, could you merge this into py3k, please?"
+  },
+  {
+   "author": "benjaminp",
+   "created_at": "2008-09-08T22:06:28Z",
+   "body": "Apparently this isn't an issue in py3k, so no worries! :)"
+  },
+  {
+   "author": "d8d5aad8-e55b-4500-a3a0-9ea982d771ff",
+   "created_at": "2008-09-18T22:53:35Z",
+   "body": "It seems to me that test case will fail on windows and vms platforms.\nThe case contain os.urandom(1.1) but in posixmodule.c for urandon\nfunctions (windows and vms) exits:\n  PyArg_ParseTuple(args, \"i:urandom\", &howMany))\n\n./python.exe -c 'import os; print \"%s\" %(os.urandom(1.9))' =\\>\n-c:1: DeprecationWarning: integer argument expected, got float"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "gpshead"
+  }
+ ],
+ "fetch_errors": null
+}

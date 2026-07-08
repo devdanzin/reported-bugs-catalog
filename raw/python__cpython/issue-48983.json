@@ -1,0 +1,94 @@
+{
+ "repo": "python/cpython",
+ "number": 48983,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/48983",
+ "title": "Add a \"decode to declared encoding\" version of urlopen to urllib",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "type-feature",
+  "stdlib"
+ ],
+ "created_at": "2008-12-23T21:44:14Z",
+ "closed_at": "2021-12-10T19:52:52Z",
+ "body": "BPO | [4733](https://bugs.python.org/issue4733)\n--- | :---\nNosy | @orsenthil, @vstinner, @tiran, @devdanzin, @ezio-melotti, @merwok, @vadmium, @serhiy-storchaka\nFiles | <li>[urlopen_text.diff](https://bugs.python.org/file12437/urlopen_text.diff \"Uploaded as text/plain at 2008-12-23.21:44:06 by @devdanzin\"): Adds a urlopen_text function, docs and tests</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = 'https://github.com/orsenthil'\nclosed_at = <Date 2021-12-10.19:52:51.555>\ncreated_at = <Date 2008-12-23.21:44:13.573>\nlabels = ['type-feature', 'library']\ntitle = 'Add a \"decode to declared encoding\" version of urlopen to urllib'\nupdated_at = <Date 2021-12-10.19:52:51.555>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2021-12-10.19:52:51.555>\nactor = 'ajaksu2'\nassignee = 'orsenthil'\nclosed = True\nclosed_date = <Date 2021-12-10.19:52:51.555>\ncloser = 'ajaksu2'\ncomponents = ['Library (Lib)']\ncreation = <Date 2008-12-23.21:44:13.573>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['12437']\nhgrepos = []\nissue_num = 4733\nkeywords = ['patch']\nmessage_count = 13.0\nmessages = ['78250', '78255', '110832', '116187', '121425', '146002', '146003', '146005', '146092', '161768', '171356', '348624', '408246']\nnosy_count = 9.0\nnosy_names = ['orsenthil', 'vstinner', 'christian.heimes', 'ajaksu2', 'ezio.melotti', 'eric.araujo', 'mastrodomenico', 'martin.panter', 'serhiy.storchaka']\npr_nums = []\npriority = 'normal'\nresolution = 'rejected'\nstage = 'resolved'\nstatus = 'closed'\nsuperseder = None\ntype = 'enhancement'\nurl = 'https://bugs.python.org/issue4733'\nversions = ['Python 3.4']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-12-23T21:44:06Z",
+   "body": "This patch adds a version of urlopen that uses available encoding\ninformation to return strings instead of bytes.\n\nThe main goal is to provide a shortcut for users that don't want to\nhandle the decoding in the easy cases[1]. One added benefit it that the\nfailures of such a function would be make it clear why 2.x style \"str is\neither bytes or text\" is flawed for network IO.\n\nCurrently, charset detection simply uses addinfourl.get_charset(), but\noptionally checking for HTTP headers might be more robust.\n\n[1]\nhttp://groups.google.com/group/comp.lang.python/browse_thread/thread/b88239182f368505\n[Executive summary]\nGlenn G. Chappell wrote:\n    \"2to3 doesn't catch it, and, in any case, why should read() return \nbytes, not string?\"\n\nCarl Banks wrote:\n    It returns bytes because it doesn't know what encoding to use.\n    [...]\n    HOWEVER... [...] It's reasonable that IF a url request's\n\"Content-type\" is text, and/or the \"Content-encoding\"  is given, for\nurllib to have an option to automatically decode and return a string\ninstead of bytes.\n\nChristian Heimes wrote:\n    There is no generic and simple way to detect the encoding of a\nremote site. Sometimes the encoding is mentioned in the HTTP header,\nsometimes it's embedded in the \\<head\\> section of the HTML document.\n\nDaniel Diniz wrote:\n    [... A] \"decode to declared HTTP header encoding\" version of urlopen\ncould be useful to give some users the output they want (text from\nnetwork io) or to make it clear why bytes is the safe way.\n[/Executive summary]"
+  },
+  {
+   "author": "tiran",
+   "created_at": "2008-12-24T02:25:57Z",
+   "body": "Thx, I'll review the patch after Christmas."
+  },
+  {
+   "author": "83d2e70e-e599-4a04-b820-3814bbdb9bef",
+   "created_at": "2010-07-19T23:07:07Z",
+   "body": "Christian, Daniel, I take it that you're both still interested in this?"
+  },
+  {
+   "author": "83d2e70e-e599-4a04-b820-3814bbdb9bef",
+   "created_at": "2010-09-12T13:01:02Z",
+   "body": "Senthil: could you review the attached patch please?"
+  },
+  {
+   "author": "merwok",
+   "created_at": "2010-11-18T02:33:11Z",
+   "body": "I think the patch should be updated to benefit from new facilities in the io module instead of monkey-patching methods. The doc and tests are still good."
+  },
+  {
+   "author": "ezio-melotti",
+   "created_at": "2011-10-20T02:58:31Z",
+   "body": "> Christian Heimes wrote:\r\n>   There is no generic and simple way to detect the encoding of a\r\n>   remote site. Sometimes the encoding is mentioned in the HTTP header,\r\n>   sometimes it's embedded in the \\<head\\> section of the HTML document.\r\n\r\nFWIW for HTML pages the encoding can be specified in at least 3 places:\r\n* the HTTP headers: e.g. \"content-type: text/html; charset=utf-8\";\r\n* the XML declaration: e.g. \"\\<?xml version=\"1.0\" encoding=\"utf-8\" ?\\>\";\r\n* the \\<meta\\> tag: e.g. \"\\<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"\\>\r\n\r\nBrowsers usually follow this order while searching the encoding, meaning that HTTP headers have the highest priority.  The XML declaration is sometimes (mis)used in (X)HTML pages.\r\n\r\nAnyway, since urlopen() is a generic function that can download anything, it shouldn't look at XML declarations and meta tags -- that's something parsers should take care of.\r\n\r\n```pycon\nRegarding the implementation, wouldn't having a new method on the file-like object returned by urlopen better?\r\nMaybe something like:\r\n>>> page = urlopen(some_url)\r\n>>> page.encoding  # get the encoding from the HTTP headers\r\n'utf-8'\r\n>>> page.decode()  # same as page.read().decode(page.encoding)\r\n'...'\n```\n\r\n\r\nThe advantage of having these as new methods/attribute is that you can pass the 'page' around and other functions can get back the decoded content if/when they need to.  OTOH other file-like objects don't have similar methods, so it might get a bit confusing."
+  },
+  {
+   "author": "ezio-melotti",
+   "created_at": "2011-10-20T03:40:26Z",
+   "body": "page.decode_content() might be a better name, and would avoid confusion with the bytes.decode() method."
+  },
+  {
+   "author": "orsenthil",
+   "created_at": "2011-10-20T03:52:04Z",
+   "body": "- page.encoding is a good idea.\r\n\r\n- page.decode_content sounds definitely better than page.decode which can be confusing as page is not a bytes object, but a file-like object.\r\n\r\nI am thinking if an attribute to urlopen would be better? Not exactly the mode like attribute of the builtin open, but something like decoded=False\r\n\r\nThe downside is that the attr is now for the implementation detail of the method in py3k and upside is it gives an idea to users as what return value they can/should expect."
+  },
+  {
+   "author": "merwok",
+   "created_at": "2011-10-21T14:57:54Z",
+   "body": "I\u2019m not sure real HTML (i.e. sent as text/html) should have an XML prolog honored.  For XML, there\u2019s http://tools.ietf.org/html/rfc3023"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2012-05-28T11:16:37Z",
+   "body": "If you add the encoding parameter, you should also add at least errors and newline parameters. And why not just use io.TextIOWrapper?\r\n\r\npage.decode_content() bad that compels to read and to decode at once all of the data, while io.TextIOWrapper returns a file-like object and allows you to read line-by-line or by other pieces."
+  },
+  {
+   "author": "883ac9b2-2ace-460f-a89c-358b6a4a6d65",
+   "created_at": "2012-09-26T19:25:05Z",
+   "body": "FYI, the exact algorithm for determining the encoding of HTML documents is http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#determining-the-character-encoding\r\n\r\nThere are lots of different algorithms documented all over the intertubes for determining HTML encoding; the one above is the one used by browsers.\r\n\r\nBut that should only be used as part of a full HTML parsing library (e.g. https://code.google.com/p/html5lib/), urlopen should not attempt to do encoding sniffing from the data transferred."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2019-07-29T11:37:45Z",
+   "body": "This feature request seems to be controversial: there is no clear consensus on which encoding should be used. I suggest to simply close the issue.\r\n\r\nIn the meanwhile, since this issue is far from being \"newcomer friendly\", I remove the \"Easy\" label."
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2021-12-10T19:52:52Z",
+   "body": "As Victor notes, this is a controversial issue. And I'll add that the need for this feature seems not to have been brought up up in over a decade. So I'm closing this."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "90baf024-6604-450d-8341-d796fe6858f3"
+  }
+ ],
+ "fetch_errors": null
+}

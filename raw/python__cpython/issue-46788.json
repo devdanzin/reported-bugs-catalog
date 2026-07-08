@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 46788,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/46788",
+ "title": "itertools.permutations docstring is misleading",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "type-bug",
+  "stdlib"
+ ],
+ "created_at": "2008-04-02T10:48:03Z",
+ "closed_at": "2008-06-10T12:48:36Z",
+ "body": "BPO | [2536](https://bugs.python.org/issue2536)\n--- | :---\nNosy | @birkenfeld, @rhettinger, @devdanzin\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2008-06-10.12:48:35.753>\ncreated_at = <Date 2008-04-02.10:48:02.519>\nlabels = ['type-bug', 'library']\ntitle = 'itertools.permutations docstring is misleading'\nupdated_at = <Date 2008-06-10.12:48:35.652>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2008-06-10.12:48:35.652>\nactor = 'georg.brandl'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2008-06-10.12:48:35.753>\ncloser = 'georg.brandl'\ncomponents = ['Library (Lib)']\ncreation = <Date 2008-04-02.10:48:02.519>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = []\nhgrepos = []\nissue_num = 2536\nkeywords = []\nmessage_count = 2.0\nmessages = ['64846', '67902']\nnosy_count = 3.0\nnosy_names = ['georg.brandl', 'rhettinger', 'ajaksu2']\npr_nums = []\npriority = 'normal'\nresolution = 'fixed'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'behavior'\nurl = 'https://bugs.python.org/issue2536'\nversions = ['Python 2.6']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-04-02T10:48:02Z",
+   "body": "Currently, [Modules/itertoolsmodule.c](https://github.com/python/cpython/blob/main/Modules/itertoolsmodule.c) lines 2471-2475 are:\n\nPyDoc_STRVAR(permutations_doc,\n\"permutations(iterables[, r]) --\\> permutations object\\\\n\\\\\n\\\\n\\\\\nReturn successive r-length permutations of elements in the iterable.\\\\n\\\\n\\\\\npermutations(range(4), 3) --\\> (0,1,2), (0,1,3), (0,2,3), (1,2,3)\");\n\nbut that describes  behavior of itertools.combinations. The correct\nexample is in a comment on line 2254 of the same file:\n\n'permutations(range(3), 2) --\\> (0,1) (0,2) (1,0) (1,2) (2,0) (2,1)'\n\n\nI used \"misleading\" instead of \"wrong\" because the current docstring\ndoes show a subset of the real output and could be said to be\nincomplete. If that is the case, I suggest being explicit:\n\n'permutations(range(4), 3) --\\> (0, 1, 2), (0, 1, 3), (0, 2, 1), (0, 2,\n3), (0, 3, 1), (0, 3, 2), (1, 0, 2), (1, 0, 3), (1, 2, 0), (1, 2, 3),\n(1, 3, 0), (1, 3, 2), (2, 0, 1), (2, 0, 3), (2, 1, 0), (2, 1, 3), (2, 3,\n0), (2, 3, 1), (3, 0, 1), (3, 0, 2), (3, 1, 0), (3, 1, 2), (3, 2, 0),\n(3, 2, 1)'"
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2008-06-10T12:48:28Z",
+   "body": "Fixed in r64067."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "birkenfeld"
+  }
+ ],
+ "fetch_errors": null
+}

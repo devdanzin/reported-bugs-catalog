@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 50230,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/50230",
+ "title": "Add bug tracker tasks to PEP 101",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "type-feature",
+  "docs"
+ ],
+ "created_at": "2009-05-09T19:24:24Z",
+ "closed_at": "2009-05-17T22:07:24Z",
+ "body": "BPO | [5980](https://bugs.python.org/issue5980)\n--- | :---\nNosy | @loewis, @birkenfeld, @terryjreedy, @devdanzin\nFiles | <li>[bugtracker.diff](https://bugs.python.org/file13944/bugtracker.diff \"Uploaded as text/plain at 2009-05-09.19:24:22 by @devdanzin\")</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = 'https://github.com/birkenfeld'\nclosed_at = <Date 2009-05-17.22:07:23.867>\ncreated_at = <Date 2009-05-09.19:24:23.848>\nlabels = ['type-feature', 'docs']\ntitle = 'Add bug tracker tasks to PEP 101'\nupdated_at = <Date 2009-05-17.22:07:23.866>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2009-05-17.22:07:23.866>\nactor = 'georg.brandl'\nassignee = 'georg.brandl'\nclosed = True\nclosed_date = <Date 2009-05-17.22:07:23.867>\ncloser = 'georg.brandl'\ncomponents = ['Documentation']\ncreation = <Date 2009-05-09.19:24:23.848>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['13944']\nhgrepos = []\nissue_num = 5980\nkeywords = ['patch']\nmessage_count = 5.0\nmessages = ['87508', '87833', '87834', '87952', '88008']\nnosy_count = 4.0\nnosy_names = ['loewis', 'georg.brandl', 'terry.reedy', 'ajaksu2']\npr_nums = []\npriority = 'low'\nresolution = 'accepted'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'enhancement'\nurl = 'https://bugs.python.org/issue5980'\nversions = []\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-05-09T19:24:23Z",
+   "body": "This patch would add the following bug tracker tasks to PEP-101 (Doing\r\nPython Releases 101):\r\n - Add version X.Y+1 as when version X.Y enters alpha.\r\n\r\n - Change non-doc RFEs to version X.Y+1 when version X.Y enters beta.\r\n\r\n - Update 'behavior' issues from versions that your release make\r\n   unsupported to the next supported version.\r\n\r\n - Review open issues, as this might find lurking showstopper bugs,\r\n   besides reminding people to fix the easy ones they forgot about.\r\n\r\nThese are the changes mentioned in\r\nhttp://psf.upfronthosting.co.za/roundup/meta/issue283\r\n\r\nHowever, I'm tempted to update PEP-3 (Guidelines for Handling Bug\r\nReports) instead, adding these (and the blocker \\<-\\> deferred flips) as\r\ntracker janitors' tasks.\r\n\r\nWhat do you think?"
+  },
+  {
+   "author": "terryjreedy",
+   "created_at": "2009-05-15T20:28:17Z",
+   "body": "Would these tasks, whereever documented, be entirely manual or partly\r\nautomated?  I just fixed new feature request bpo-5975 which originally\r\nselected 2.5,2.6,3.0.  It would be nice if the tracker automatically\r\nrejected such invalid selections and selected 2.7/3.2 instead."
+  },
+  {
+   "author": "terryjreedy",
+   "created_at": "2009-05-15T20:30:18Z",
+   "body": "I of course agree that these tasks should be listed somewhere, but have\r\nno opinion on which PEP, if not both."
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-05-17T02:55:19Z",
+   "body": "We sure could have helpers for updating RFEs and bugs to correct\r\nversions. They could be scripts for bulk updating and/or per-issue UI\r\nshortcuts for Developers. I'll open a meta-tracker RFE for this.\r\n\r\nCorrecting user reports and requests is also possible, but I'd like to\r\nwork on help tooltips and maybe a bug report/RFE wizard first: I'm\r\nafraid that on the absence of good explanations/tips, such corrections\r\nmight annoy and discourage reporters. Anyway, I\"ll open a ticket for\r\nthis too :)\r\n\r\nThanks for the feedback!"
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2009-05-17T22:07:24Z",
+   "body": "Applied in r72756."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "birkenfeld"
+  }
+ ],
+ "fetch_errors": null
+}

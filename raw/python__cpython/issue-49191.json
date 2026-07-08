@@ -1,0 +1,84 @@
+{
+ "repo": "python/cpython",
+ "number": 49191,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/49191",
+ "title": "Tell GCC Py_DECREF is unlikely to call the destructor",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "performance",
+  "interpreter-core"
+ ],
+ "created_at": "2009-01-14T02:10:30Z",
+ "closed_at": "2010-09-05T12:59:27Z",
+ "body": "BPO | [4941](https://bugs.python.org/issue4941)\n--- | :---\nNosy | @loewis, @pitrou, @devdanzin\nFiles | <li>[pybench.txt](https://bugs.python.org/file12732/pybench.txt \"Uploaded as text/plain at 2009-01-14.02:42:28 by @pitrou\")</li><li>[likely_decref.diff](https://bugs.python.org/file12813/likely_decref.diff \"Uploaded as text/plain at 2009-01-20.22:44:00 by @devdanzin\"): New version of the Py_DECREF patch</li><li>[likely_object.diff](https://bugs.python.org/file12814/likely_object.diff \"Uploaded as text/plain at 2009-01-20.22:44:50 by @devdanzin\"): This one only defines likely/unlikely</li><li>[ceval_exception.diff](https://bugs.python.org/file12815/ceval_exception.diff \"Uploaded as text/plain at 2009-01-20.22:46:30 by @devdanzin\"): Adds hints to END_FINALLY</li><li>[ceval_tuple_unpack.diff](https://bugs.python.org/file12816/ceval_tuple_unpack.diff \"Uploaded as text/plain at 2009-01-20.22:48:18 by @devdanzin\"): Adds hints to UNPACK_SEQUENCE, probably bogus outside of pybench</li><li>[ceval_function.diff](https://bugs.python.org/file12817/ceval_function.diff \"Uploaded as text/plain at 2009-01-20.22:49:33 by @devdanzin\"): Adds hints to CALL_FUNCTION_*, certainly bogus outside pybench</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2010-09-05.12:59:26.714>\ncreated_at = <Date 2009-01-14.02:10:29.928>\nlabels = ['interpreter-core', 'performance']\ntitle = 'Tell GCC Py_DECREF is unlikely to call the destructor'\nupdated_at = <Date 2010-09-05.12:59:26.712>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2010-09-05.12:59:26.712>\nactor = 'pitrou'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2010-09-05.12:59:26.714>\ncloser = 'pitrou'\ncomponents = ['Interpreter Core']\ncreation = <Date 2009-01-14.02:10:29.928>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['12732', '12813', '12814', '12815', '12816', '12817']\nhgrepos = []\nissue_num = 4941\nkeywords = ['patch']\nmessage_count = 11.0\nmessages = ['79821', '79822', '79831', '79834', '79851', '79983', '79987', '80288', '80290', '80569', '115644']\nnosy_count = 6.0\nnosy_names = ['loewis', 'collinwinter', 'pitrou', 'ajaksu2', 'jyasskin', 'blaisorblade']\npr_nums = []\npriority = 'normal'\nresolution = 'rejected'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'performance'\nurl = 'https://bugs.python.org/issue4941'\nversions = ['Python 3.0', 'Python 3.1']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-01-14T02:10:23Z",
+   "body": "As suggested by Paolo Giarrusso, add a \"likely()\" to Py_DECREF, telling\nGCC it doesn't call the destructor in the common path.\n\nThis optimization seems to interact well with bpo-4896 and to be slower on\ntop of bpo-4753 on my system. Patching ceval.c instead of object.h seems to\ngive the same result, FWIW. Benchmarks most welcome :)\n\nPaolo Giarrusso wrote:\n\"Anyway, yesterday I was looking at the assembly and I realized that\nGCC optimizes the case where Py_DECREF calls the destructor! Since I\ndon't have time for this, can you hint GCC for the better by adding\nunlikely() to Py_DECREF, at least (or maybe only) for ceval.c, or\nmaybe even only for the main interpreter?\"\n\npybench:\n    Rounds: 10\n    Warp:   10\n    Timer:  time.time\n\n    Machine Details:\n       Platform ID:    Linux-2.6.24-23-generic-i686-with-debian-lenny-sid\n       Processor:      Intel Celeron M 410\n\n    Python:\n       Implementation: CPython\n       Executable:     /home/ajaksu/py3k/python\n       Version:        3.1.0\n       Compiler:       GCC 4.2.4 (Ubuntu 4.2.4-1ubuntu3)\n       Bits:           32bit\n       Build:          Jan 13 2009 23:40:05 (#py3k:68571M)\n       Unicode:        UCS2\n\n\nTest                             minimum run-time        average  run-time\n                                 this    other   diff    this    other \n diff\n\\-------------------------------------------------------------------------------\n          BuiltinFunctionCalls:   147ms   163ms   -9.7%   148ms   164ms\n -10.0%\n           BuiltinMethodLookup:   138ms   154ms  -10.3%   139ms   155ms\n -10.6%\n                 CompareFloats:   185ms   191ms   -3.4%   185ms   192ms\n  -3.4%\n         CompareFloatsIntegers:   304ms   294ms   +3.1%   304ms   296ms\n  +2.7%\n               CompareIntegers:   287ms   281ms   +2.0%   288ms   281ms\n  +2.3%\n        CompareInternedStrings:   189ms   217ms  -12.7%   192ms   217ms\n -11.7%\n                  CompareLongs:   167ms   162ms   +3.3%   168ms   162ms\n  +3.3%\n                CompareStrings:   152ms   178ms  -14.2%   156ms   179ms\n -12.7%\n    ComplexPythonFunctionCalls:   192ms   202ms   -5.1%   193ms   206ms\n  -6.2%\n                 ConcatStrings:   325ms   327ms   -0.7%   326ms   330ms\n  -1.1%\n               CreateInstances:   200ms   209ms   -4.4%   204ms   210ms\n  -2.9%\n            CreateNewInstances:   149ms   156ms   -4.4%   151ms   161ms\n  -5.8%\n       CreateStringsWithConcat:   255ms   272ms   -6.1%   258ms   275ms\n  -6.3%\n                  DictCreation:   145ms   151ms   -4.0%   146ms   154ms\n  -5.3%\n             DictWithFloatKeys:   209ms   224ms   -6.8%   209ms   224ms\n  -6.7%\n           DictWithIntegerKeys:   170ms   185ms   -8.0%   171ms   187ms\n  -8.3%\n            DictWithStringKeys:   155ms   172ms  -10.1%   156ms   173ms\n -10.2%\n                      ForLoops:   162ms   183ms  -11.7%   162ms   183ms\n -11.4%\n                    IfThenElse:   189ms   217ms  -12.7%   190ms   219ms\n -13.1%\n                   ListSlicing:   156ms   156ms   -0.3%   156ms   158ms\n  -1.0%\n                NestedForLoops:   199ms   219ms   -9.1%   201ms   220ms\n  -8.6%\n      NestedListComprehensions:   222ms   245ms   -9.5%   228ms   251ms\n  -9.2%\n          NormalClassAttribute:   352ms   376ms   -6.2%   353ms   378ms\n  -6.6%\n       NormalInstanceAttribute:   188ms   212ms  -11.1%   191ms   215ms\n -11.3%\n           PythonFunctionCalls:   173ms   192ms   -9.6%   174ms   193ms\n  -9.7%\n             PythonMethodCalls:   213ms   226ms   -5.6%   214ms   227ms\n  -5.8%\n                     Recursion:   275ms   295ms   -7.0%   276ms   296ms\n  -7.0%\n                  SecondImport:   158ms   158ms   +0.2%   160ms   160ms\n  +0.1%\n           SecondPackageImport:   164ms   168ms   -2.2%   166ms   170ms\n  -2.8%\n         SecondSubmoduleImport:   221ms   226ms   -2.4%   223ms   229ms\n  -2.9%\n       SimpleComplexArithmetic:   143ms   166ms  -13.5%   144ms   166ms\n -13.4%\n        SimpleDictManipulation:   269ms   296ms   -9.2%   270ms   297ms\n  -9.0%\n         SimpleFloatArithmetic:   150ms   177ms  -15.3%   151ms   196ms\n -23.2%\n      SimpleIntFloatArithmetic:   200ms   226ms  -11.4%   203ms   232ms\n -12.4%\n       SimpleIntegerArithmetic:   200ms   226ms  -11.4%   202ms   235ms\n -13.9%\n      SimpleListComprehensions:   186ms   211ms  -12.0%   193ms   218ms\n -11.5%\n        SimpleListManipulation:   161ms   180ms  -10.6%   161ms   181ms\n -10.9%\n          SimpleLongArithmetic:   137ms   159ms  -14.0%   137ms   162ms\n -15.2%\n                    SmallLists:   197ms   209ms   -5.6%   201ms   210ms\n  -4.2%\n                   SmallTuples:   215ms   234ms   -8.2%   216ms   236ms\n  -8.2%\n         SpecialClassAttribute:   544ms   566ms   -4.0%   549ms   571ms\n  -3.7%\n      SpecialInstanceAttribute:   188ms   211ms  -11.0%   190ms   214ms\n -11.0%\n                StringMappings:   432ms   439ms   -1.6%   433ms   441ms\n  -1.9%\n              StringPredicates:   183ms   198ms   -7.8%   183ms   199ms\n  -7.9%\n                 StringSlicing:   304ms   317ms   -4.2%   310ms   321ms\n  -3.3%\n                     TryExcept:   138ms   154ms  -10.5%   139ms   155ms\n -10.4%\n                    TryFinally:   149ms   156ms   -4.8%   151ms   159ms\n  -5.1%\n                TryRaiseExcept:    76ms    78ms   -2.3%    77ms    82ms\n  -6.3%\n                  TupleSlicing:   254ms   254ms   -0.2%   254ms   257ms\n  -1.0%\n                   WithFinally:   204ms   207ms   -1.1%   206ms   209ms\n  -1.1%\n               WithRaiseExcept:   187ms   190ms   -2.0%   188ms   192ms\n  -2.2%\n\\-------------------------------------------------------------------------------\nTotals:                         10557ms 11266ms   -6.3% 10647ms 11397ms\n  -6.6%\n\n(this=likely_object.pybench, other=classic_opcode.pybench)"
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2009-01-14T02:42:28Z",
+   "body": "I get a slowdown here (results attached). Many objects are shortlived in\nPython, so I'm not sure the approach is valid anyway."
+  },
+  {
+   "author": "834d531c-78e9-420a-9522-3d165033349e",
+   "created_at": "2009-01-14T05:23:01Z",
+   "body": "If speedup on other machines are confirmed, a slowdown of less than 2%\nshould be acceptable (it's also similar to the statistic noise I have on\nmy machine - it's a pity pybench does not calculate the standard\ndeviation of the execution time).\n\nIt is true that many objects are short lived, and that makes\ngenerational GC work, but the patch is about another point. Do most\nrefcount decrements lead to garbage collection? That's a completely\ndifferent question. And I don't think that popping a function call\nargument usually leads to a destructor invocation, for instance, unless\nthe argument is a temporary. The same reasoning holds for most other\nopcodes.\n\nThe simplest way to check this is to look at the compilation output with\nProfile-Guided Optimization active and verify which branch is optimized.\n\nHaving said that, the slowdown you get (on your Athlon X2 3600+) might\nbe due to a higher cost in case of failed static prediction, since that\nleads to 2 jumps.\n\nThis code leads to 0 or 1 jump:\n\n```c\nif (likely(cond)) {\n  destructor\n}\n```\n\n\nwhile with unlikely, one runs through either 0 or 2 jumps. The second\njump is unconditional, so it has a much smaller delay (the decode unit\nhas to tell the fetch unit to fetch another instruction). However, in\nthat case one has to invoke anyway the destructor through a virtual\ncall, which is much more expensive."
+  },
+  {
+   "author": "61337411-43fc-4a9c-b8d5-4060aede66d0",
+   "created_at": "2009-01-14T06:28:55Z",
+   "body": "I dislike about this patch that there are two different else cases\n(giving the trivial macro definition); there should only be one such case."
+  },
+  {
+   "author": "834d531c-78e9-420a-9522-3d165033349e",
+   "created_at": "2009-01-14T11:45:11Z",
+   "body": "Also, GCC 2.95 does not support the construct, GCC 2.96 is required.\nSo, I'd suggest defining likely/unlikely unconditionally and using this,\nwhich leads to less code overall:\n\n\\#  if (__GNUC__ \\< 2) || ((__GNUC__ == 2) && (__GNUC_MINOR__ \\<= 95))\n\\#  define \\_\\_builtin_expect(exp, prediction)  (exp)\n\\#  endif\n\nThis is the simplest way to code this, assuming that ICC defines\n\\_\\_GNUC__, and my reference guide tells \"yes, it defines \\_\\_GNUC__ and\n\\_\\_INTEL_COMPILER\"."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2009-01-16T23:02:34Z",
+   "body": "You could also test this principle with a few opcodes in ceval.c.\nEspecially, the error cases in LOAD_FAST, LOAD_GLOBAL etc. could be\nflagged as unlikely."
+  },
+  {
+   "author": "834d531c-78e9-420a-9522-3d165033349e",
+   "created_at": "2009-01-16T23:41:42Z",
+   "body": "Yep, agreed. It could be quite cool to rely on \\_\\_attribute__((cold)) to\nmark format_exc_check_arg(), but that only works with newer gcc's. I\nguess I'll add many likely() by hand - in some cases GCC might already\nget it right, but the heuristics used to choose the likely path\nstatically are quite arguable and subject to change. Also, on other\narchs such hints might have a bigger impact on the generated code.\n\nI'll give a look at that not earlier than February, or you're welcome to\ntry this. However, at least on x86, an \"if (successCondition) {\nsuccess(); dispatch(); } failure();\" will be probably compiled to\nassembly like follows, equivalent to adding likely to the test:\n\nevaluate successCondition\nif_false goto err:\ncall to success();\ndispatch next instrutions.\n\nerr:\ncall to failure();"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-01-20T22:44:00Z",
+   "body": "New version of the patch, as well as one that doesn't touch Py_DECREF\nbut defines likely and unlikely. Then, three ceval patches that result\nin small speedups (2% to 8% here), but don't play well together (neither\nwith the Py_DECREF one).\n\nSince I get speedups for some changes and slowdowns when more than one\nis applied, I suspect my system is hitting some limitation (register\nstavation?) and contributing more noise that signal :/"
+  },
+  {
+   "author": "5969680d-a065-4b5f-9706-8216692d995a",
+   "created_at": "2009-01-20T22:57:12Z",
+   "body": "Minor comments on likely_object.diff:\n* Py_LIKELY() and Py_UNLIKELY() would be better spellings than likely()\nand unlikely().\n* The definitions should go in pyport.h instead of object.h\n* Usually don't put spaces after the \"#\".\n* Probably #if the definitions of Py_LIKELY and Py_UNLIKELY instead of\n\\_\\_builtin_expect so new compilers can easily add their own definitions."
+  },
+  {
+   "author": "834d531c-78e9-420a-9522-3d165033349e",
+   "created_at": "2009-01-26T11:53:13Z",
+   "body": ">Probably #if the definitions of Py_LIKELY and Py_UNLIKELY instead of\n\\_\\_builtin_expect so new compilers can easily add their own definitions.\n\nThis was done in the first version, but with the currently supported\ncompilers it's simpler to do like that, because both GCC and ICC support\nthe same \\_\\_builtin_expect syntax, so you get less code this way.\n\nAnyway, the code was \"inspired\" from the Linux kernel which only\nsupports those two compilers, so anybody more knowledgeable is welcome\nto suggest how to express this with other compilers."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2010-09-05T12:59:26Z",
+   "body": "The whole approach doesn't seem to bear much fruit. I tried to apply again likely_decref.diff and got a 0% performance change on 3.2 (on a Core i3 processor)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pitrou"
+  }
+ ],
+ "fetch_errors": null
+}

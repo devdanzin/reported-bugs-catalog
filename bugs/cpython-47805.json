@@ -1,0 +1,37 @@
+{
+ "bug_id": "cpython-47805",
+ "title": "Regression: nested exceptions crash (Cannot recover from stack overflow)",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#47805"
+ ],
+ "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [
+  "90baf024-6604-450d-8341-d796fe6858f3"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-47805.json"
+ ],
+ "n_artifacts": 1
+}

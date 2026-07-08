@@ -213,9 +213,31 @@ def load_crtk_overrides():
                 f"crtk-umbrella:{r['section']}")
 
 
+BPO_SELF = set()   # (repo, number) of ajaksu2/devdanzin-created bpo bugs -> filed_by self
+
+
+def load_bpo_overrides():
+    """Ancient bpo issues CREATED by ajaksu2 (=devdanzin). GitHub shows the
+    migration-bot as author, so author-based filed_by is wrong -> force 'self'.
+    Real crash/hang bugs -> manual (bpo-era, pre-tool); features/docs/junk ->
+    non-bug (excluded from counts, like the OTHER_OSS decision)."""
+    try:
+        rows = json.load(open(os.path.join(os.path.dirname(OUT), "bpo_ajaksu2.json")))
+    except FileNotFoundError:
+        return
+    for r in rows:
+        key = ("python/cpython", r["number"])
+        BPO_SELF.add(key)
+        if r["category"] == "bug":
+            OVERRIDES[key] = ("manual", "", "high", "bpo-ajaksu2")
+        else:
+            OVERRIDES[key] = ("non-bug", "", "high", "bpo-ajaksu2-nonbug")
+
+
 def main():
     load_oom_overrides()
     load_crtk_overrides()
+    load_bpo_overrides()
     rows = []
     for f in sorted(glob.glob(os.path.join(RAW, "*", "*.json"))):
         d = json.load(open(f))
@@ -225,7 +247,8 @@ def main():
             "repo": d["repo"], "number": d["number"], "type": d["type"],
             "url": d["url"], "title": (d.get("title") or "")[:120],
             "state": d["state"], "author": d["author"],
-            "filed_by": "self" if d["author"] == "devdanzin" else "maintainer",
+            "filed_by": ("self" if d["author"] == "devdanzin"
+                         or (d["repo"], d["number"]) in BPO_SELF else "maintainer"),
             "labels": d["labels"],
             "tool": tool, "mode": mode, "confidence": conf, "reason": reason,
             "needs_review": "REVIEW" in reason,

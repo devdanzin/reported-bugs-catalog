@@ -1,0 +1,79 @@
+{
+ "repo": "python/cpython",
+ "number": 47916,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/47916",
+ "title": "atexit.register with bad input segfaults on exit",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "release-blocker",
+  "type-crash"
+ ],
+ "created_at": "2008-08-24T20:39:11Z",
+ "closed_at": "2008-09-23T00:53:09Z",
+ "body": "BPO | [3666](https://bugs.python.org/issue3666)\n--- | :---\nNosy | @smontanaro, @tiran, @devdanzin\nFiles | <li>[atexit.diff](https://bugs.python.org/file11519/atexit.diff \"Uploaded as text/plain at 2008-09-18.14:16:48 by @smontanaro\")</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = 'https://github.com/smontanaro'\nclosed_at = <Date 2008-09-23.00:53:09.287>\ncreated_at = <Date 2008-08-24.20:39:11.492>\nlabels = ['type-crash', 'release-blocker']\ntitle = 'atexit.register with bad input segfaults on exit'\nupdated_at = <Date 2008-09-23.00:53:09.286>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2008-09-23.00:53:09.286>\nactor = 'skip.montanaro'\nassignee = 'skip.montanaro'\nclosed = True\nclosed_date = <Date 2008-09-23.00:53:09.287>\ncloser = 'skip.montanaro'\ncomponents = []\ncreation = <Date 2008-08-24.20:39:11.492>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['11519']\nhgrepos = []\nissue_num = 3666\nkeywords = ['patch']\nmessage_count = 10.0\nmessages = ['71862', '71866', '71872', '73376', '73378', '73381', '73384', '73590', '73591', '73610']\nnosy_count = 3.0\nnosy_names = ['skip.montanaro', 'christian.heimes', 'ajaksu2']\npr_nums = []\npriority = 'release blocker'\nresolution = 'fixed'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'crash'\nurl = 'https://bugs.python.org/issue3666'\nversions = ['Python 3.0']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-24T20:39:11Z",
+   "body": "The following crashes the interpreter on exit:\n\n```py\nimport sys, atexit; atexit.register(lambda: 1, 0, 0, (x for x in (1,2)),\n0, 0); sys.exit()\n```\n\n\nFound with Fusil."
+  },
+  {
+   "author": "tiran",
+   "created_at": "2008-08-24T20:53:23Z",
+   "body": "I'm getting hundreds of lines\n\nFatal Python error: PyThreadState_Get: no current thread\n\nThe Python process segfaults in call_ll_exitfuncs -\\> atexit_cleanup() -\\>\natexit_clear() -\\>  atexit_delete_cb -\\> Py_DECREF(cb-\\>args)"
+  },
+  {
+   "author": "tiran",
+   "created_at": "2008-08-24T21:10:03Z",
+   "body": "I was able to trace the error to its apartment. During the cleanup\ngen_del calls PyErr_Fetch() which fails in PyThreadState_GET().\n\nConclusion:\nThe atexit cleanup method must be called much earlier.\ncall_ll_exitfunc() is too late. I suggest a new function that calls\natexit_cleanup() right after atexit_callfuncs()."
+  },
+  {
+   "author": "smontanaro",
+   "created_at": "2008-09-18T12:07:31Z",
+   "body": "Why not just have atexit_callfuncs call atexit_cleanup at the end of its\nexecution?"
+  },
+  {
+   "author": "smontanaro",
+   "created_at": "2008-09-18T12:21:22Z",
+   "body": "The attached patch causes an exception to print\nat exit on my Mac:\n\n```pycon\n>>> import sys, atexit\n>>> atexit.register(lambda: 1, 0, 0, (x for x in (1,2)), 0, 0)\n<function <lambda> at 0x5c91e0>\n>>> sys.exit()\nError in atexit._run_exitfuncs:\nTypeError: print_exception(): Exception expected for value, str found\n```\n\n\nWithout the patch I get the same TypeError but it's\nfollowed by a Bus error.\n\nI don't know if the patch is right or wrong, better or worse than the\nstatus quo, but I'll toss it out there for consideration.  It\ncertainly seems to subscribe to Christian's theme of calling\natexit_cleanup() earlier."
+  },
+  {
+   "author": "tiran",
+   "created_at": "2008-09-18T13:27:29Z",
+   "body": "Skip:\nI suggest you move the cleanup call before PyErr_Restore(). The current\ncode doesn't re-raise exception raised in the cleanup function."
+  },
+  {
+   "author": "smontanaro",
+   "created_at": "2008-09-18T14:16:48Z",
+   "body": "New patch.  This also makes the various atexit_*\nfunctions static."
+  },
+  {
+   "author": "smontanaro",
+   "created_at": "2008-09-22T19:45:20Z",
+   "body": "I've taken this ticket.  Can someone please review and give\nit a thumbs up or thumbs down?"
+  },
+  {
+   "author": "tiran",
+   "created_at": "2008-09-22T20:11:22Z",
+   "body": "\\*thumbs up\\*"
+  },
+  {
+   "author": "smontanaro",
+   "created_at": "2008-09-23T00:53:09Z",
+   "body": "Checked in as revision 66562."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "smontanaro"
+  }
+ ],
+ "fetch_errors": null
+}

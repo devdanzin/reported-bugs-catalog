@@ -1,0 +1,116 @@
+[
+ {
+  "number": 49649,
+  "title": "wer",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 50088,
+  "title": "Test issue",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 46788,
+  "title": "itertools.permutations docstring is misleading",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 47912,
+  "title": "_fileio._FileIO segfaults",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 47916,
+  "title": "atexit.register with bad input segfaults on exit",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 43537,
+  "title": "Add Windows 9x/ME (lack of) support information to README.TX",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 47911,
+  "title": "sys.call_tracing segfaults",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 50230,
+  "title": "Add bug tracker tasks to PEP 101",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 50266,
+  "title": "Use shipped zlib if the system version is bad",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 46422,
+  "title": "Adding DOCTYPE and \"html\", \"body\" tags to SimpleHTTPServer",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 47805,
+  "title": "Regression: nested exceptions crash (Cannot recover from stack overflow)",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 48094,
+  "title": "Script: find untested C functions",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 47914,
+  "title": "Pickler.dump from a badly initialized Pickler segfaults",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 48983,
+  "title": "Add a \"decode to declared encoding\" version of urlopen to urllib",
+  "state": "closed",
+  "category": "non-bug"
+ },
+ {
+  "number": 46928,
+  "title": "email/message.py [Message.get_content_type]: Trivial regex hangs on pathological input",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 47958,
+  "title": "os.urandom(1.1): infinite loop",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 47903,
+  "title": "segfault calling sys.excepthook with non-Exception argument",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 47944,
+  "title": "Undetected error in _struct.pack_into",
+  "state": "closed",
+  "category": "bug"
+ },
+ {
+  "number": 49191,
+  "title": "Tell GCC Py_DECREF is unlikely to call the destructor",
+  "state": "closed",
+  "category": "non-bug"
+ }
+]

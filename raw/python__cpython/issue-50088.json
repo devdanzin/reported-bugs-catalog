@@ -1,0 +1,41 @@
+{
+ "repo": "python/cpython",
+ "number": 50088,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/50088",
+ "title": "Test issue",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [],
+ "created_at": "2009-04-25T11:35:19Z",
+ "closed_at": "2009-04-25T11:37:23Z",
+ "body": "BPO | [5838](https://bugs.python.org/issue5838)\n--- | :---\nNosy | @mdickinson, @devdanzin\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2009-04-25.11:37:22.754>\ncreated_at = <Date 2009-04-25.11:35:19.036>\nlabels = []\ntitle = 'Test issue'\nupdated_at = <Date 2009-04-25.11:41:13.859>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2009-04-25.11:41:13.859>\nactor = 'mark.dickinson'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2009-04-25.11:37:22.754>\ncloser = 'ajaksu2'\ncomponents = []\ncreation = <Date 2009-04-25.11:35:19.036>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = []\nhgrepos = []\nissue_num = 5838\nkeywords = []\nmessage_count = 3.0\nmessages = ['86472', '86475', '86478']\nnosy_count = 2.0\nnosy_names = ['mark.dickinson', 'ajaksu2']\npr_nums = []\npriority = 'normal'\nresolution = None\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = None\nurl = 'https://bugs.python.org/issue5838'\nversions = []\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-04-25T11:35:19Z",
+   "body": "Seems like submitting is broken?"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-04-25T11:37:23Z",
+   "body": "OK, no so broken then :)"
+  },
+  {
+   "author": "mdickinson",
+   "created_at": "2009-04-25T11:41:14Z",
+   "body": "Does submitting still work if you select some components?"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "90baf024-6604-450d-8341-d796fe6858f3"
+  }
+ ],
+ "fetch_errors": null
+}

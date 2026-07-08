@@ -164,6 +164,8 @@ def main():
         b_conf = best["confidence"] if best else "low"
         b_review = bool(best and best.get("needs_review"))
         b_reason = best["reason"] if b_review else None
+        if tool == "non-bug":   # bpo-era features/docs/junk — excluded from counts
+            continue
         # primary artifact = lowest-numbered issue else lowest PR
         primary = (issues or prs)[0]
         key = (repo, primary["number"])

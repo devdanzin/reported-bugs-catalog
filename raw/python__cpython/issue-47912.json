@@ -1,0 +1,60 @@
+{
+ "repo": "python/cpython",
+ "number": 47912,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/47912",
+ "title": "_fileio._FileIO segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "interpreter-core",
+  "release-blocker",
+  "type-crash"
+ ],
+ "created_at": "2008-08-24T19:37:10Z",
+ "closed_at": "2008-08-24T22:08:24Z",
+ "body": "BPO | [3662](https://bugs.python.org/issue3662)\n--- | :---\nNosy | @amauryfa, @tiran, @devdanzin, @benjaminp\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2008-08-24.22:08:24.091>\ncreated_at = <Date 2008-08-24.19:37:10.434>\nlabels = ['interpreter-core', 'type-crash', 'release-blocker']\ntitle = '_fileio._FileIO segfaults'\nupdated_at = <Date 2008-08-24.22:08:24.067>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2008-08-24.22:08:24.067>\nactor = 'nnorwitz'\nassignee = 'nnorwitz'\nclosed = True\nclosed_date = <Date 2008-08-24.22:08:24.091>\ncloser = 'nnorwitz'\ncomponents = ['Interpreter Core']\ncreation = <Date 2008-08-24.19:37:10.434>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = []\nhgrepos = []\nissue_num = 3662\nkeywords = ['needs review']\nmessage_count = 6.0\nmessages = ['71854', '71858', '71874', '71876', '71877', '71892']\nnosy_count = 5.0\nnosy_names = ['nnorwitz', 'amaury.forgeotdarc', 'christian.heimes', 'ajaksu2', 'benjamin.peterson']\npr_nums = []\npriority = 'release blocker'\nresolution = 'fixed'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'crash'\nurl = 'https://bugs.python.org/issue3662'\nversions = ['Python 2.6', 'Python 3.0']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-24T19:37:10Z",
+   "body": "This snippet causes a segfault from fileio_init calling PyMem_Free:\n    \nimport \\_fileio; \\_fileio.\\_FileIO(\"1\",0, 0 )\n\nFound using Fusil\n\n[Switching to Thread -1210070848 (LWP 10184)]\n0x0805f5ff in \\_PyObject_DebugCheckAddress (p=0xb7b2f0e8) at\n[Objects/obmalloc.c:1461](https://github.com/python/cpython/blob/main/Objects/obmalloc.c#L1461)\n1461                    if (tail[i] != FORBIDDENBYTE) {\n(gdb) backtrace\n0  0x0805f5ff in \\_PyObject_DebugCheckAddress (p=0xb7b2f0e8) at\n[Objects/obmalloc.c:1461](https://github.com/python/cpython/blob/main/Objects/obmalloc.c#L1461)\n1  0x0805f3c4 in \\_PyObject_DebugFree (p=0xb7b2f0e8) at\n[Objects/obmalloc.c:1375](https://github.com/python/cpython/blob/main/Objects/obmalloc.c#L1375)\n2  0x0805de07 in PyMem_Free (p=0xb7b2f0e8) at [Objects/object.c:1693](https://github.com/python/cpython/blob/main/Objects/object.c#L1693)\n3  0x0810afa9 in fileio_init (oself=0xb7b18238, args=0xb7b815b4,\nkwds=0x0) at ./Modules/_fileio.c:281\n4  0x0806bdd0 in type_call (type=0x81d3760, args=0xb7b815b4, kwds=0x0)\nat [Objects/typeobject.c:650](https://github.com/python/cpython/blob/main/Objects/typeobject.c#L650)\n5  0x08118ec5 in PyObject_Call (func=0x81d3760, arg=0xb7b815b4, kw=0x0)\nat [Objects/abstract.c:2181](https://github.com/python/cpython/blob/main/Objects/abstract.c#L2181)\n6  0x080b42a5 in do_call (func=0x81d3760, pp_stack=0xbfab5c84, na=3,\nnk=0) at [Python/ceval.c:3616](https://github.com/python/cpython/blob/main/Python/ceval.c#L3616)\n7  0x080b394a in call_function (pp_stack=0xbfab5c84, oparg=3) at\n[Python/ceval.c:3426](https://github.com/python/cpython/blob/main/Python/ceval.c#L3426)\n8  0x080ae8d2 in PyEval_EvalFrameEx (f=0x829bb14, throwflag=0) at\n[Python/ceval.c:2205](https://github.com/python/cpython/blob/main/Python/ceval.c#L2205)\n9  0x080b1c24 in PyEval_EvalCodeEx (co=0xb7b5b9e8, globals=0xb7fcc5d4,\nlocals=0xb7fcc5d4, args=0x0, argcount=0, kws=0x0,\n    kwcount=0, defs=0x0, defcount=0, kwdefs=0x0, closure=0x0) at\n[Python/ceval.c:2840](https://github.com/python/cpython/blob/main/Python/ceval.c#L2840)\n10 0x080a69cb in PyEval_EvalCode (co=0xb7b5b9e8, globals=0xb7fcc5d4,\nlocals=0xb7fcc5d4) at [Python/ceval.c:519](https://github.com/python/cpython/blob/main/Python/ceval.c#L519)\n11 0x080df64b in run_mod (mod=0x82a2ac0, filename=0x819e3be \"\\<string\\>\",\nglobals=0xb7fcc5d4, locals=0xb7fcc5d4,\n    flags=0xbfab6060, arena=0x82b1060) at [Python/pythonrun.c:1560](https://github.com/python/cpython/blob/main/Python/pythonrun.c#L1560)\n12 0x080df393 in PyRun_StringFlags (str=0x8203fd8 \"import \\_fileio;\n\\_fileio.\\_FileIO('1',0, 0 )\\\\n\", start=257,\n    globals=0xb7fcc5d4, locals=0xb7fcc5d4, flags=0xbfab6060) at\n[Python/pythonrun.c:1494](https://github.com/python/cpython/blob/main/Python/pythonrun.c#L1494)\n13 0x080ddd37 in PyRun_SimpleStringFlags (command=0x8203fd8 \"import\n\\_fileio; \\_fileio.\\_FileIO('1',0, 0 )\\\\n\",\n    flags=0xbfab6060) at [Python/pythonrun.c:1073](https://github.com/python/cpython/blob/main/Python/pythonrun.c#L1073)\n14 0x080ef5ca in Py_Main (argc=2, argv=0xb7f9e028) at [Modules/main.c:533](https://github.com/python/cpython/blob/main/Modules/main.c#L533)\n15 0x0805a689 in main (argc=2, argv=0xbfab71b4) at ./Modules/python.c:57"
+  },
+  {
+   "author": "tiran",
+   "created_at": "2008-08-24T20:06:58Z",
+   "body": "The FileIO construct segfaults because PyArg_ParseTupleAndKeywords()\nsets name to an invalid but non NULL value. PyMem_Free() tries to\ndeallocate name but fails.\n\nSuggestion: Either appy this patch or change\nPyArg_ParseTupleAndKeyword()'s behavior for 'e'.\n\nIndex: [Modules/_fileio.c](https://github.com/python/cpython/blob/main/Modules/_fileio.c)\n\\===================================================================\n```diff\n--- Modules/_fileio.c   (Revision 66010)\n+++ Modules/_fileio.c   (Arbeitskopie)\n@@ -174,8 +174,10 @@\n                if (!PyArg_ParseTupleAndKeywords(args, kwds, \"et|si:fileio\",\n                                                 kwlist,\n                                                \nPy_FileSystemDefaultEncoding,\n-                                                &name, &mode, &closefd))\n+                                                &name, &mode, &closefd)) {\n+                       name = NULL;\n                        goto error;\n+                       }\n            }\n        }\n```"
+  },
+  {
+   "author": "amauryfa",
+   "created_at": "2008-08-24T21:16:27Z",
+   "body": "The \"goto error\" is not necessary here. Nothing has been allocated at\nthis point, and \"return -1\" is enough.\n\nIndex: [Modules/_fileio.c](https://github.com/python/cpython/blob/main/Modules/_fileio.c)\n\\===================================================================\n```diff\n--- Modules/_fileio.c   (revision 65957)\n+++ Modules/_fileio.c   (working copy)\n@@ -175,7 +175,7 @@\n                                                 kwlist,\n                                                \nPy_FileSystemDefaultEncoding,\n                                                 &name, &mode, &closefd))\n-                       goto error;\n+                       return -1;\n            }\n        }\n```"
+  },
+  {
+   "author": "tiran",
+   "created_at": "2008-08-24T21:20:10Z",
+   "body": "You are right. But I'd rather keep the name = NULL assignment or add a\ncomment. In the future somebody may alter the function and resurrect the\nbug accidentally."
+  },
+  {
+   "author": "benjaminp",
+   "created_at": "2008-08-24T21:22:19Z",
+   "body": "It won't be resurrected for long if we write a test. :)"
+  },
+  {
+   "author": "d21744ff-f396-4c71-955e-7dbd2e886779",
+   "created_at": "2008-08-24T22:08:24Z",
+   "body": "Daniel, thanks for running the fuzzer!  It would be great if you could\nkeep running it and find any more problems before releasing 2.6 and 3.0.\n\nI agree with Benjamin and Amaury.  PyArg_ParseTupleAndKeywords()\nshouldn't update the pointer if it failed.  Given the test, it's\nunlikely for this to create a problem in the future.  Either as a crash\nor as a memory leak.\n\nCommitted revision 66018. (2.6)\nCommitted revision 66019. (3.0)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "d21744ff-f396-4c71-955e-7dbd2e886779"
+  }
+ ],
+ "fetch_errors": null
+}

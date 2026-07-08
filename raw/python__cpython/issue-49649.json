@@ -1,0 +1,36 @@
+{
+ "repo": "python/cpython",
+ "number": 49649,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/49649",
+ "title": "wer",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [],
+ "created_at": "2009-03-01T15:26:41Z",
+ "closed_at": "2009-03-01T15:27:36Z",
+ "body": "BPO | [5399](https://bugs.python.org/issue5399)\n--- | :---\nNosy | @devdanzin\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2009-03-01.15:27:36.084>\ncreated_at = <Date 2009-03-01.15:26:41.195>\nlabels = ['invalid']\ntitle = 'wer'\nupdated_at = <Date 2009-03-01.15:27:36.083>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2009-03-01.15:27:36.083>\nactor = 'ajaksu2'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2009-03-01.15:27:36.084>\ncloser = 'ajaksu2'\ncomponents = []\ncreation = <Date 2009-03-01.15:26:41.195>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = []\nhgrepos = []\nissue_num = 5399\nkeywords = []\nmessage_count = 2.0\nmessages = ['82965', '82966']\nnosy_count = 1.0\nnosy_names = ['ajaksu2']\npr_nums = []\npriority = 'normal'\nresolution = 'not a bug'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = None\nurl = 'https://bugs.python.org/issue5399'\nversions = []\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-03-01T15:26:41Z",
+   "body": "234"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-03-01T15:27:36Z",
+   "body": "Gah, script running amok, sorry!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "90baf024-6604-450d-8341-d796fe6858f3"
+  }
+ ],
+ "fetch_errors": null
+}

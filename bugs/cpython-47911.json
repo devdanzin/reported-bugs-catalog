@@ -1,0 +1,38 @@
+{
+ "bug_id": "cpython-47911",
+ "title": "sys.call_tracing segfaults",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#47911"
+ ],
+ "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "release-blocker",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [
+  "90baf024-6604-450d-8341-d796fe6858f3"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-47911.json"
+ ],
+ "n_artifacts": 1
+}

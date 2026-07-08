@@ -1,0 +1,59 @@
+{
+ "repo": "python/cpython",
+ "number": 46928,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/46928",
+ "title": "email/message.py [Message.get_content_type]: Trivial regex hangs on pathological input",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "performance",
+  "stdlib"
+ ],
+ "created_at": "2008-04-23T17:00:16Z",
+ "closed_at": "2008-08-15T21:03:57Z",
+ "body": "BPO | [2676](https://bugs.python.org/issue2676)\n--- | :---\nNosy | @warsaw, @pitrou, @jackdied, @devdanzin\nFiles | <li>[message.py.patch](https://bugs.python.org/file10079/message.py.patch \"Uploaded as text/plain at 2008-04-23.17:00:13 by @devdanzin\")</li><li>[email.message.diff](https://bugs.python.org/file11022/email.message.diff \"Uploaded as text/plain at 2008-08-01.04:38:15 by @jackdied\")</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = 'https://github.com/warsaw'\nclosed_at = <Date 2008-08-15.21:03:57.374>\ncreated_at = <Date 2008-04-23.17:00:15.651>\nlabels = ['library', 'performance']\ntitle = 'email/message.py [Message.get_content_type]: Trivial regex hangs on pathological input'\nupdated_at = <Date 2008-08-16.10:31:53.211>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2008-08-16.10:31:53.211>\nactor = 'pitrou'\nassignee = 'barry'\nclosed = True\nclosed_date = <Date 2008-08-15.21:03:57.374>\ncloser = 'pitrou'\ncomponents = ['Library (Lib)']\ncreation = <Date 2008-04-23.17:00:15.651>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['10079', '11022']\nhgrepos = []\nissue_num = 2676\nkeywords = ['patch']\nmessage_count = 6.0\nmessages = ['65702', '70541', '71168', '71183', '71193', '71207']\nnosy_count = 4.0\nnosy_names = ['barry', 'pitrou', 'jackdied', 'ajaksu2']\npr_nums = []\npriority = 'high'\nresolution = 'fixed'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'resource usage'\nurl = 'https://bugs.python.org/issue2676'\nversions = ['Python 2.6', 'Python 3.0']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-04-23T17:00:13Z",
+   "body": "[Reported by Alberto Casado Mart\u00edn [1]]\n\nMessage.get_content_type() hangs when very large values are split by the\nregex:\nctype = paramre.split(value)[0].lower().strip() #line 439\n\nparamre comes from line 26:\nparamre = re.compile(r'\\\\s*;\\\\s*')\n\nUnless the full fledged parser cited in the comment before line 26 is in\nthe works, I suggest splitting the string by \";\" to get exactly the same\nbehavior in a more reliable way.\n\n\n[1] http://mail.python.org/pipermail/python-dev/2008-April/078840.html"
+  },
+  {
+   "author": "jackdied",
+   "created_at": "2008-08-01T04:38:15Z",
+   "body": "Augmented version of Daniel's patch.\n\nThis makes an internal function that does the same work.  It uses\ntxt.find() instead of split() or partition() because for pathologically\nlong strings find() is noticeably faster.  It also does the strip()\nbefore the lower() which helps with evilly long strings.\n\nI didn't remove the module global \"paramre\" because an external module\nmight be using it.  I did update its comment.\n\nDo bugfixes get applied to 2.6 or 3.0?  I'm a bit out of practice."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2008-08-15T10:30:53Z",
+   "body": "This should really be fixed. Hanging on a rather normal email message\n(not a theoretical example) is not right."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2008-08-15T21:03:57Z",
+   "body": "Fixed in r65700. Thanks for the report!"
+  },
+  {
+   "author": "jackdied",
+   "created_at": "2008-08-16T02:52:42Z",
+   "body": "Antoine, I looked at your patch and I'm not sure why you applied it\ninstead of applying mine (or saying +1 on me applying my patch).\n\nYours uses str.partition which I pointed out is sub-optimal (same big-Oh\nbut with a larger constant factor) and also adds a function that returns\ntwo things, one of which is thrown away after having a str.strip\nperformed on it.\n\nIf my patch was deficient please let me know."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2008-08-16T10:31:52Z",
+   "body": "Hi Jack,\n\n> Antoine, I looked at your patch and I'm not sure why you applied it\n> instead of applying mine (or saying +1 on me applying my patch).\n> \n> Yours uses str.partition which I pointed out is sub-optimal (same big-Oh\n> but with a larger constant factor) and also adds a function that returns\n> two things, one of which is thrown away after having a str.strip\n> performed on it.\n\nI added that function so that the header splitting facility is\nexplicitly exposed as an internal API, as was the case with the regular\nexpression. I tried to mimick the behaviour of the regex as closely as\npossible, which meant returning two things as well :-)\n\nI think the point of the issue is to remove the pathological\n(exponential) behaviour when parsing some headers, not to try to squeeze\nout the last microseconds out of content-type parsing (which shouldn't\nbe, IMO, the limiting factor in email handling performance as soon as\nit's not super-linear).\n\nThat said, I've timed the function against the regular expression and\nthe former is always faster, even for tiny strings (e.g. \"a;b\").\n\nYour patch was keeping the regular expression as a module-level constant\nwhile replacing all uses of it with a function, which I found a bit\nstrange (I don't think people are using paramre from the outside since\nit's not documented, it's an internal not public API IMO). I also found\nit strange to devote a docstring to the discussion of a performance\ndetail. But I don't have any strong feeling against it either, so you\ncan still apply it if you think it's important performance-wise.\n\nRegards\n\nAntoine."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pitrou"
+  }
+ ],
+ "fetch_errors": null
+}

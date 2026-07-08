@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 50266,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/50266",
+ "title": "Use shipped zlib if the system version is bad",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "type-feature",
+  "build"
+ ],
+ "created_at": "2009-05-14T02:05:46Z",
+ "closed_at": "2009-05-14T03:33:23Z",
+ "body": "BPO | [6016](https://bugs.python.org/issue6016)\n--- | :---\nNosy | @devdanzin\nFiles | <li>[zlib_setup.diff](https://bugs.python.org/file13980/zlib_setup.diff \"Uploaded as text/plain at 2009-05-14.02:05:42 by @devdanzin\"): Patch against trunk, seems to apply fine on py3k.</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2009-05-14.03:33:22.800>\ncreated_at = <Date 2009-05-14.02:05:46.172>\nlabels = ['type-feature', 'invalid', 'build']\ntitle = 'Use shipped zlib if the system version is bad'\nupdated_at = <Date 2009-05-14.03:33:22.605>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2009-05-14.03:33:22.605>\nactor = 'ajaksu2'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2009-05-14.03:33:22.800>\ncloser = 'ajaksu2'\ncomponents = ['Build']\ncreation = <Date 2009-05-14.02:05:46.172>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['13980']\nhgrepos = []\nissue_num = 6016\nkeywords = ['patch']\nmessage_count = 2.0\nmessages = ['87727', '87728']\nnosy_count = 1.0\nnosy_names = ['ajaksu2']\npr_nums = []\npriority = 'normal'\nresolution = 'not a bug'\nstage = 'resolved'\nstatus = 'closed'\nsuperseder = None\ntype = 'enhancement'\nurl = 'https://bugs.python.org/issue6016'\nversions = ['Python 2.7', 'Python 3.2']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-05-14T02:05:41Z",
+   "body": "The attached patch makes setup.py use the shipped zlib.h in\r\n[Modules/zlib/](https://github.com/python/cpython/blob/main/Modules/zlib) when a bogus zlib.h is found by find_file.\r\n\r\nHowever, I couldn't test it (nor make it work) when a system zlib is\r\nmissing (no time right now). Can we build the shipped zlib and link\r\nagainst it?"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-05-14T03:33:22Z",
+   "body": "We'd be asking for trouble with this: incompatible shipped and system\r\nversions or having to build the shipped version. All that for working\r\naround the rare case where the user doesn't have a valid zlib makes no\r\nsense :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "90baf024-6604-450d-8341-d796fe6858f3"
+  }
+ ],
+ "fetch_errors": null
+}

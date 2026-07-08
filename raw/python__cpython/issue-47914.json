@@ -1,0 +1,84 @@
+{
+ "repo": "python/cpython",
+ "number": 47914,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/47914",
+ "title": "Pickler.dump from a badly initialized Pickler segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "release-blocker",
+  "type-crash"
+ ],
+ "created_at": "2008-08-24T20:26:34Z",
+ "closed_at": "2008-10-17T20:16:14Z",
+ "body": "BPO | [3664](https://bugs.python.org/issue3664)\n--- | :---\nNosy | @warsaw, @jcea, @amauryfa, @tiran, @devdanzin, @avassalotti\nFiles | <li>[_pickle.c](https://bugs.python.org/file11704/_pickle.c \"Uploaded as text/x-csrc at 2008-10-04.22:54:15 by @avassalotti\")</li><li>[issue3664_fix.diff](https://bugs.python.org/file11814/issue3664_fix.diff \"Uploaded as text/plain at 2008-10-17.05:10:08 by @avassalotti\")</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = 'https://github.com/avassalotti'\nclosed_at = <Date 2008-10-17.20:16:14.183>\ncreated_at = <Date 2008-08-24.20:26:34.495>\nlabels = ['type-crash', 'release-blocker']\ntitle = 'Pickler.dump from a badly initialized Pickler segfaults'\nupdated_at = <Date 2008-10-17.20:16:14.182>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2008-10-17.20:16:14.182>\nactor = 'amaury.forgeotdarc'\nassignee = 'alexandre.vassalotti'\nclosed = True\nclosed_date = <Date 2008-10-17.20:16:14.183>\ncloser = 'amaury.forgeotdarc'\ncomponents = []\ncreation = <Date 2008-08-24.20:26:34.495>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['11704', '11814']\nhgrepos = []\nissue_num = 3664\nkeywords = ['patch']\nmessage_count = 11.0\nmessages = ['71860', '71863', '71938', '71942', '74164', '74327', '74888', '74896', '74898', '74902', '74936']\nnosy_count = 6.0\nnosy_names = ['barry', 'jcea', 'amaury.forgeotdarc', 'christian.heimes', 'ajaksu2', 'alexandre.vassalotti']\npr_nums = []\npriority = 'release blocker'\nresolution = 'fixed'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'crash'\nurl = 'https://bugs.python.org/issue3664'\nversions = ['Python 3.0']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-24T20:26:34Z",
+   "body": "This script segfaults:\n##\nimport \\_pickle\nobj = \\_pickle.Pickler(open(\"/bin/ls\")) #can be open(__file__) for scripts\ntry: obj.\\_\\_init__('pouet', 87)\nexcept Exception as err: pass\n\n```py\nobj.dump(0)\n###\n```\n\n\n\n[Switching to Thread -1210775360 (LWP 19096)]\n0xb79fbf91 in pickler_write (self=0xb7a2fe4c, s=0xbff441a1 \"...\", n=2)\n    at /home/ajaksu/py3k/Modules/_pickle.c:442\n442                 memcpy(self-\\>write_buf + self-\\>buf_size, s, n);\n(gdb) backtrace\n#0  0xb79fbf91 in pickler_write (self=0xb7a2fe4c, s=0xbff441a1 \"...\",\n    n=2) at /home/ajaksu/py3k/Modules/_pickle.c:442\n#1  0xb7a00a8c in dump (self=0xb7a2fe4c, obj=0x81fbd78) at\n/home/ajaksu/py3k/Modules/_pickle.c:2288\n#2  0xb7a00bb8 in Pickler_dump (self=0xb7a2fe4c, args=0xb7b30034) at\n/home/ajaksu/py3k/Modules/_pickle.c:2328\n#3  0x081626b1 in PyCFunction_Call (func=0xb796c3ec, arg=0xb7b30034,\nkw=0x0) at [Objects/methodobject.c:81](https://github.com/python/cpython/blob/main/Objects/methodobject.c#L81)\n#4  0x080b378f in call_function (pp_stack=0xbff442e4, oparg=1) at\n[Python/ceval.c:3403](https://github.com/python/cpython/blob/main/Python/ceval.c#L3403)\n#5  0x080ae8d2 in PyEval_EvalFrameEx (f=0x829bafc, throwflag=0) at\n[Python/ceval.c:2205](https://github.com/python/cpython/blob/main/Python/ceval.c#L2205)\n#6  0x080b1c24 in PyEval_EvalCodeEx (co=0xb7acf2c8, globals=0xb7a9a8f4,\nlocals=0xb7a9a8f4, args=0x0, argcount=0, kws=0x0,\n    kwcount=0, defs=0x0, defcount=0, kwdefs=0x0, closure=0x0) at\n[Python/ceval.c:2840](https://github.com/python/cpython/blob/main/Python/ceval.c#L2840)\n\nFound using Fusil."
+  },
+  {
+   "author": "tiran",
+   "created_at": "2008-08-24T20:44:11Z",
+   "body": "pickler_write() has no check for self-\\>write_buf == NULL\n\nSuggested patch:\n\\===================================================================\n```c\n--- Modules/_pickle.c   (Revision 66010)\n+++ Modules/_pickle.c   (Arbeitskopie)\n@@ -421,6 +421,10 @@\n {\n     PyObject *data, *result;\n\n+    if (self->write_buf == NULL) {\n+        PyErr_SetString(PyExc_SystemError, \"Invalid write buffer\");\n+        return -1;\n+    }\n     if (s == NULL) {\n         if (!(self->buf_size))\n             return 0;\n```"
+  },
+  {
+   "author": "avassalotti",
+   "created_at": "2008-08-25T15:25:45Z",
+   "body": "Oh, that's nasty. Recalling \\_\\_init__ with bad arguments breaks the\ninternal invariants as it clears the Pickler's content before parsing\nthe arguments. I suspect that Unpickler is vulnerable too.\n\nAdding a NULL check in pickler_write will only fix this particular\nexample. I could probably find another crash example that doesn't use\npickler_write."
+  },
+  {
+   "author": "avassalotti",
+   "created_at": "2008-08-25T16:00:02Z",
+   "body": "Unpickler looks safe as Unpickler_load() checks if Unpickler was\nproperly initialized. And only Pickler_dump is vulnerable right now (new\nmethods, if any, exposed for bpo-3385 will have to take into account\nthis vulnerability)."
+  },
+  {
+   "author": "avassalotti",
+   "created_at": "2008-10-02T14:36:28Z",
+   "body": "I will try to find time next weekend to fix this (and other pickle \nblockers)."
+  },
+  {
+   "author": "avassalotti",
+   "created_at": "2008-10-04T22:54:14Z",
+   "body": "Here's the fix. The added check in Pickler_dump should prevent any\nsegfaults due to \\_\\_init__() errors. \n\nI also added the check proposed by Christian as a safe-guard in case a\ncore developer adds a new method that doesn't check if the object was\nproperly initialized."
+  },
+  {
+   "author": "warsaw",
+   "created_at": "2008-10-17T01:34:45Z",
+   "body": "Rather than attach a full \\_pickle.c file, please generate a unified diff\nwith just your changes.  The patch should include a test for the\ncrashing condition.  If you can upload that I'll try to accept it for\nrc3.  Deferring for now."
+  },
+  {
+   "author": "avassalotti",
+   "created_at": "2008-10-17T05:10:08Z",
+   "body": "Oops. I must have been quite tired when I submitted that.\n\nHere's the patch for the fix and the test case."
+  },
+  {
+   "author": "amauryfa",
+   "created_at": "2008-10-17T07:49:00Z",
+   "body": "The patch is fine."
+  },
+  {
+   "author": "warsaw",
+   "created_at": "2008-10-17T11:52:42Z",
+   "body": "Amaury, please apply the patch and close the issue.  Thanks!"
+  },
+  {
+   "author": "amauryfa",
+   "created_at": "2008-10-17T20:16:14Z",
+   "body": "Committed r66963."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "amauryfa"
+  }
+ ],
+ "fetch_errors": null
+}

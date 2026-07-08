@@ -1,0 +1,64 @@
+{
+ "repo": "python/cpython",
+ "number": 47805,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/47805",
+ "title": "Regression: nested exceptions crash (Cannot recover from stack overflow)",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2008-08-14T19:03:35Z",
+ "closed_at": "2011-12-24T22:52:20Z",
+ "body": "BPO | [3555](https://bugs.python.org/issue3555)\n--- | :---\nNosy | @gvanrossum, @terryjreedy, @pitrou, @devdanzin\nFiles | <li>[nester.py](https://bugs.python.org/file11218/nester.py \"Uploaded as text/plain at 2008-08-22.18:00:21 by @devdanzin\"): Creates a file with lots of nesting function calls from except blocks</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2011-12-24.22:52:20.134>\ncreated_at = <Date 2008-08-14.19:03:34.735>\nlabels = ['interpreter-core', 'type-crash']\ntitle = 'Regression: nested exceptions crash (Cannot recover from stack overflow)'\nupdated_at = <Date 2011-12-24.22:52:20.131>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2011-12-24.22:52:20.131>\nactor = 'terry.reedy'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2011-12-24.22:52:20.134>\ncloser = 'terry.reedy'\ncomponents = ['Interpreter Core']\ncreation = <Date 2008-08-14.19:03:34.735>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['11218']\nhgrepos = []\nissue_num = 3555\nkeywords = []\nmessage_count = 7.0\nmessages = ['71141', '71148', '71154', '71155', '71761', '95383', '150240']\nnosy_count = 5.0\nnosy_names = ['gvanrossum', 'terry.reedy', 'pitrou', 'ajaksu2', 'kaizhu']\npr_nums = []\npriority = 'normal'\nresolution = 'duplicate'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'crash'\nurl = 'https://bugs.python.org/issue3555'\nversions = ['Python 3.3']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-14T19:03:34Z",
+   "body": "The following code works[1] on trunk and 2.5.1, but crashes with \"Fatal\nPython error: Cannot recover from stack overflow,\" on py3k as of rev65676:\n\n######\n\\# Python 3.0b2+ (py3k:65676, Aug 14 2008, 14:37:38)\n\\# [GCC 4.1.3 20070929 (prerelease) (Ubuntu 4.1.2-16ubuntu2)] on linux2\n\n```py\nimport sys\n\ndef overflower():\n    try:\n        return overflower()\n    except:\n        return sys.exc_info()\n\n\ndef f():\n      try:\n          return f()\n      except:\n          return overflower()\n\nf()\n######\n```\n\n\nCatching RuntimeError crashes, letting it be raised avoids the crash.\nAdding \"finally: return overflower()\" along with a non\nRuntimeError-catching except also gives a Fatal Python error.\n\nA smaller test case for hitting the overflow in py3k would be \"def f():\n[...] except: return f()\", but that hangs in an (desirable?) infinite\nloop in 2.5 and trunk. \n\n\n[1] \"Works\" as in \"doesn't crash\", but both the code above and the\ninfinite loop hit bpo-2548 when run on a debug build of trunk. Calling\noverflower() alone in trunk hits the \"undetected error\" discussed in\nthat issue, but works fine in py3k."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2008-08-14T20:07:10Z",
+   "body": "I'm no expert in recursion checking inside the Python interpreter, but\nlooking at the code for \\_Py_CheckRecursiveCall(), I don't think it is a\nbug but a feature.\n\nHere how I understand it. When the recursion level exceeds the normal\nrecursion limit (let's call the latter N), a RuntimeError is raised and\nthe normal recursion check is temporarily disabled (by setting\ntstate-\\>overflowed) so that Python can run some recovery code (e.g. an\nexcept statement with a function call to log the problem), and another\nrecursion check is put in place that is triggered at N+50. When the\nlatter check triggers, the interpreter prints the aforementioned\nPy_FatalError and bails out.\n\nThis is actually what happens in your example: when the normal recursion\nlimit is hit and a RuntimeError is raised, you immediately catch the\nexception and run into a second infinite loop while the normal recursion\ncheck is temporarily disabled: the N+50 check then does its job.\n\nHere is a simpler way to showcase this behaviour, without any nested\nexceptions:\n\n```py\ndef f():\n    try:\n        return f()\n    except:\n        pass\n    f()\n\nf()\n```\n\n\n\nCan someone else comment on this?"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-14T21:17:28Z",
+   "body": "Antoine,\n\nThanks for your analysis. I still believe this is a regression for the\ncase described, but take my opinion with a grain of salt :)\n\n>\\> looking at the code for \\_Py_CheckRecursiveCall(), I don't think it \n>\\> is a bug but a feature.\n\nIt does seem to be working as designed, if that is a desirable behavior\nthen this issue should be closed.\n\n> This is actually what happens in your example: when the normal\n> recursion limit is hit and a RuntimeError is raised, you \n> immediately catch the exception and run into a second infinite\n> loop while the normal recursion check is temporarily disabled:\n> the N+50 check then does its job.\n\nExcept that it wasn't an infinite loop in 2.5 and isn't in trunk: it\nterminates on overflower's except. That's why I think this is a\nregression. Besides being different behavior, it seems weird to bail out\non a recursion issue instead of dealing with it.\n\nYour showcase is a better way of getting an infinite loop in trunk than\nthe one I mentioned, but AFAIK we are more comfortable with infinite\nloops than with fatal errors."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2008-08-14T21:29:12Z",
+   "body": "> Except that it wasn't an infinite loop in 2.5 and isn't in trunk: it\n> terminates on overflower's except.\n\nThat's because the stated behaviour is only implemented in 3.0 and not\nin 2.x. I'm not sure what motivated it, but you are the first one to\ncomplain about it. If you think it is a regression, I think you should\nopen a thread on the python-dev mailing-list about it."
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-22T18:00:21Z",
+   "body": "Antoine,\nAll the cases I could find would be more \"test\" than \"use\" cases. Given\nthat most ways to abort I find in 3.0 are related to \"undetected error\"s\nin trunk, I'm almost convinced that 3.0 is right here :)\n\nMy last worry is that it'd be kinda easy to get Fatal errors from\nsane-ish functions and deeply nested input:\n\\============\n```py\nclass rec:\n    def __str__(self):\n        return str(self)\n\ndef overflower(x):\n    try:\n        return overflower(x)\n    except:\n        print (x)\n\nlist_rec = [100000000001]\nfor _ in range(12): list_rec = [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[list_rec]]]]]]]]]]]]]]]]]]]]]]]]]\n]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]\n\nstr_rec = rec()\n\noverflower(1) # OK\noverflower(list_rec) # Aborts\noverflower(str_rec) # Aborts\n```\n\n============\n\nThanks for the feedback!\nAttached is a file that shows how trunk is doing something weird when it\nworks (besides the other reported issues that arise from that)."
+  },
+  {
+   "author": "54f903ae-9f23-46ad-88dd-da1ca57b7cf8",
+   "created_at": "2009-11-17T11:55:14Z",
+   "body": "just submitted a nearly identical bug (bpo-7338) b4 checking for this one.\r\n so u think it works correctly up to the 2nd N+50 check.  can someone\r\ngive a reason y we should crash after that instead of throwing a\r\nfallback RuntimeError?"
+  },
+  {
+   "author": "terryjreedy",
+   "created_at": "2011-12-24T22:52:20Z",
+   "body": "This is one of four essentially duplicate issues bpo-6028, bpo-7338, bpo-13644.\r\nbpo-6028 has a proposed patch."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "terryjreedy"
+  }
+ ],
+ "fetch_errors": null
+}

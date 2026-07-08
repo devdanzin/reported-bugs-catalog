@@ -1,0 +1,65 @@
+{
+ "repo": "python/cpython",
+ "number": 47903,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/47903",
+ "title": "segfault calling sys.excepthook with non-Exception argument",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "interpreter-core",
+  "release-blocker",
+  "type-crash"
+ ],
+ "created_at": "2008-08-23T16:55:54Z",
+ "closed_at": "2008-08-23T20:08:23Z",
+ "body": "BPO | [3653](https://bugs.python.org/issue3653)\n--- | :---\nNosy | @birkenfeld, @pitrou, @vstinner, @devdanzin, @benjaminp\nFiles | <li>[print_exception.patch](https://bugs.python.org/file11229/print_exception.patch \"Uploaded as text/plain at 2008-08-23.16:55:52 by @devdanzin\"): Victor Stinner's patch for checking that value is an Exception (pythonrun.c)</li><li>[use_unraiseable.patch](https://bugs.python.org/file11231/use_unraiseable.patch \"Uploaded as text/plain at 2008-08-23.20:46:11 by @benjaminp\")</li><li>[use_unraiseable_better.patch](https://bugs.python.org/file11234/use_unraiseable_better.patch \"Uploaded as text/plain at 2008-08-24.14:35:16 by @benjaminp\")</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2008-08-23.20:08:22.897>\ncreated_at = <Date 2008-08-23.16:55:53.808>\nlabels = ['interpreter-core', 'type-crash', 'release-blocker']\ntitle = 'segfault calling sys.excepthook with non-Exception argument'\nupdated_at = <Date 2008-09-01.14:34:48.687>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2008-09-01.14:34:48.687>\nactor = 'georg.brandl'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2008-08-23.20:08:22.897>\ncloser = 'benjamin.peterson'\ncomponents = ['Interpreter Core']\ncreation = <Date 2008-08-23.16:55:53.808>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['11229', '11231', '11234']\nhgrepos = []\nissue_num = 3653\nkeywords = ['patch', 'needs review']\nmessage_count = 7.0\nmessages = ['71807', '71811', '71812', '71815', '71816', '71833', '72254']\nnosy_count = 5.0\nnosy_names = ['georg.brandl', 'pitrou', 'vstinner', 'ajaksu2', 'benjamin.peterson']\npr_nums = []\npriority = 'release blocker'\nresolution = 'fixed'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'crash'\nurl = 'https://bugs.python.org/issue3653'\nversions = ['Python 3.0']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-23T16:55:51Z",
+   "body": "Calling sys.excepthook(1,'1',1) crashes 3.0:\n\n```pycon\nPython 3.0b3+ (py3k:65987, Aug 23 2008, 10:04:31)\n[GCC 4.1.3 20070929 (prerelease) (Ubuntu 4.1.2-16ubuntu2)] on linux2\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n>>> import sys; sys.excepthook(1,'1',1)\nSegmentation fault\n```\n\n\ngdb points at \"PyException_GetTraceback  at [Objects/exceptions.c:265](https://github.com/python/cpython/blob/main/Objects/exceptions.c#L265)\n265         Py_XINCREF(base_self-\\>traceback);\"\n\nThis was found by Fusil and Victor Stinner (haypo) sent me a patch (see\nattachment).\n\nThanks bpeterson for triaging :)\n\nPS: I also think that bpo-3643 should be targeted to 3.0, as the\nunderlying issue is the same, it would be an easy way to segfault\npython3.0 and has a clean patch available."
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2008-08-23T19:55:09Z",
+   "body": "Patch looks good."
+  },
+  {
+   "author": "benjaminp",
+   "created_at": "2008-08-23T20:08:23Z",
+   "body": "Ok. Applied in r65998."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2008-08-23T20:36:33Z",
+   "body": "The patch should probably used PyErr_Format() followed by\nPyErr_WriteUnraisable()."
+  },
+  {
+   "author": "benjaminp",
+   "created_at": "2008-08-23T20:46:11Z",
+   "body": "Attaching new patch..."
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2008-08-24T08:37:48Z",
+   "body": "PyErr_Format sets the new exception and returns NULL though."
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2008-09-01T14:34:49Z",
+   "body": "I think you need to clear the exception again before returning."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "benjaminp"
+  }
+ ],
+ "fetch_errors": null
+}

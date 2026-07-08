@@ -1,0 +1,88 @@
+{
+ "repo": "python/cpython",
+ "number": 47944,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/47944",
+ "title": "Undetected error in _struct.pack_into",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "extension-modules"
+ ],
+ "created_at": "2008-08-27T04:29:51Z",
+ "closed_at": "2009-02-13T11:07:41Z",
+ "body": "BPO | [3694](https://bugs.python.org/issue3694)\n--- | :---\nNosy | @birkenfeld, @amauryfa, @mdickinson, @pitrou, @devdanzin\nFiles | <li>[s26.diff](https://bugs.python.org/file11267/s26.diff \"Uploaded as text/plain at 2008-08-27.08:47:28 by @birkenfeld\")</li><li>[s30.diff](https://bugs.python.org/file11268/s30.diff \"Uploaded as text/plain at 2008-08-27.08:47:36 by @birkenfeld\")</li><li>[pynumber_assizet_py3k.diff](https://bugs.python.org/file13027/pynumber_assizet_py3k.diff \"Uploaded as text/plain at 2009-02-11.15:04:19 by @devdanzin\"): PyLong_AsSsize_t -> PyNumber_AsSsize_t for 3.x</li><li>[pynumber_assizet_trunk.diff](https://bugs.python.org/file13028/pynumber_assizet_trunk.diff \"Uploaded as text/plain at 2009-02-11.15:06:32 by @devdanzin\"): Test case for trunk</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = None\nclosed_at = <Date 2009-02-13.11:07:40.661>\ncreated_at = <Date 2008-08-27.04:29:50.746>\nlabels = ['extension-modules']\ntitle = 'Undetected error in _struct.pack_into'\nupdated_at = <Date 2009-02-16.02:43:22.530>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2009-02-16.02:43:22.530>\nactor = 'ajaksu2'\nassignee = 'none'\nclosed = True\nclosed_date = <Date 2009-02-13.11:07:40.661>\ncloser = 'georg.brandl'\ncomponents = ['Extension Modules']\ncreation = <Date 2008-08-27.04:29:50.746>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['11267', '11268', '13027', '13028']\nhgrepos = []\nissue_num = 3694\nkeywords = ['patch']\nmessage_count = 12.0\nmessages = ['72005', '72014', '72015', '72016', '81574', '81575', '81592', '81600', '81648', '81907', '81911', '82209']\nnosy_count = 5.0\nnosy_names = ['georg.brandl', 'amaury.forgeotdarc', 'mark.dickinson', 'pitrou', 'ajaksu2']\npr_nums = []\npriority = 'normal'\nresolution = 'fixed'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = None\nurl = 'https://bugs.python.org/issue3694'\nversions = ['Python 2.6', 'Python 3.0']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-08-27T04:29:47Z",
+   "body": "The following code leads to XXX Undetected errors in debug builds of\ntrunk and 3.0:\n\n```py\nimport _struct\n_struct.pack_into(b\"8\", bytearray(1), None)\n```\n\n\nBesides that, there's something fishy happening in non-debug builds: \n\n```pycon\n2.6:\n>>> _struct.pack_into(b\"8\", bytearray(1), None);\n>>> _struct.pack_into(b\"8\", bytearray(1), None);\n>>> import sys\nTraceback (most recent call last):\n  File \"<stdin>\", line 1, in <module>\nTypeError: an integer is required\n\n3.0:\n>>> _struct.pack_into(b\"8\", bytearray(1), None)\n>>> _struct.pack_into(b\"8\", bytearray(1), None)\nSystemError: Objects/longobject.c:433: bad argument to internal function\n```\n\n\n\nFound with Fusil."
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2008-08-27T08:44:41Z",
+   "body": "The problem is that, unlike PyInt_AsSsize_t, PyLong_AsSsize_t expects\nits argument to already be a long object and else raises the SystemError.\n\nIt should probably behave like PyInt_AsSsize_t and raise the TypeError\nsince in 3.0 it's used in many places where PyInt_AsSsize_t was used."
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2008-08-27T08:47:28Z",
+   "body": "The attached patches at least correct the XXX undetected error."
+  },
+  {
+   "author": "amauryfa",
+   "created_at": "2008-08-27T09:26:28Z",
+   "body": "Isn't PyNumber_AsSsize_t designed for this purpose?"
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2009-02-10T18:26:29Z",
+   "body": "Yes, PyNumber_AsSsize_t() should be used instead."
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2009-02-10T18:27:06Z",
+   "body": "Oh, and a test should be added :)"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-02-10T19:59:49Z",
+   "body": "Here's a patch with test for 3.x. Erm, I have no idea if that's all that\nis necessary :)\n\nDoes this have the potential to break existing code?"
+  },
+  {
+   "author": "pitrou",
+   "created_at": "2009-02-10T21:08:04Z",
+   "body": "Well, a patch for 2.6 should be provided as well. Besides,\nPyExc_OverflowError is probably a better choice than PyExc_IndexError\n(but I'm not sure on this one)."
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-02-11T15:04:20Z",
+   "body": "Looks like both Undetected errors were corrected by Victor's patches,\nwhich Benjamin committed around rev66693, so trunk only needs a test.\nHere are the patches.\n\nI think IndexError fits better (and matches trunk), as the issue is that\nNone is passed as \"offset\", which should be an Integral. If you\ndisagree, I'll modify the patch. Is PyErr_Format'ing the exception desired? \n\nBTW, there's a warning in \\_struct.c:180 -\\> warning: \u2018get_ulong\u2019 defined\nbut not used, should I open a new issue?"
+  },
+  {
+   "author": "birkenfeld",
+   "created_at": "2009-02-13T11:07:41Z",
+   "body": "Applied in r69577, r69578."
+  },
+  {
+   "author": "mdickinson",
+   "created_at": "2009-02-13T11:57:52Z",
+   "body": "> BTW, there's a warning in \\_struct.c:180 -\\> warning: \u2018get_ulong\u2019\n> defined but not used, should I open a new issue?\n\nSure.  Please could you add me to the nosy list if you do.\n\nIn my opinion, the struct module \\*really* needs an overhaul, especially\nfor py3k; there's a lot of inconsistency in the behaviour with respect\nto different integer types, and there's a lot of code that seems to be\nthere purely for backwards compatibility that could be removed for 3.1\n(and probably for 2.7 as well):  for example, allowing floats when\npacking integer types, and allowing overflow to wraparound rather than\nraising an exception.\n\nWould it be worth opening a general 'overhaul the struct module' issue\nand marking all the current struct bugs as dependencies for this issue?"
+  },
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2009-02-16T02:43:22Z",
+   "body": ">\\> BTW, there's a warning in \\_struct.c:180 -\\> warning: 'get_ulong'\n>\\> defined but not used, should I open a new issue?\n>\n> Sure.  Please could you add me to the nosy list if you do.\n\nOK, should do that soon.\n\n> In my opinion, the struct module \\*really* needs an overhaul, especially\n> for py3k; there's a lot of inconsistency in the behaviour with respect\n> to different integer types, and there's a lot of code that seems to be\n> there purely for backwards compatibility that could be removed for 3.1\n> (and probably for 2.7 as well):  for example, allowing floats when\n> packing integer types, and allowing overflow to wraparound rather than\n> raising an exception.\n\nThis one looks bad: bpo-2590.\n\n> Would it be worth opening a general 'overhaul the struct module' issue\n> and marking all the current struct bugs as dependencies for this issue?\n\nI can't judge on the merit of struct's shortcomings, but I'll propose\nthe 'umbrella issue'  idea for other targets (socket, HTMLParser,\netc.) on python-dev and can suggest one for struct too."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "birkenfeld"
+  }
+ ],
+ "fetch_errors": null
+}

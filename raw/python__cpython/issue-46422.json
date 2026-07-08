@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 46422,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/46422",
+ "title": "Adding DOCTYPE and \"html\", \"body\" tags to SimpleHTTPServer",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "90baf024-6604-450d-8341-d796fe6858f3",
+ "author_association": "MANNEQUIN",
+ "labels": [
+  "type-feature",
+  "stdlib"
+ ],
+ "created_at": "2008-02-23T17:28:05Z",
+ "closed_at": "2008-02-28T14:03:34Z",
+ "body": "BPO | [2169](https://bugs.python.org/issue2169)\n--- | :---\nNosy | @akuchling, @devdanzin\nFiles | <li>[SimpleHTTP_doctype_tags.diff](https://bugs.python.org/file9508/SimpleHTTP_doctype_tags.diff \"Uploaded as text/plain at 2008-02-23.17:28:04 by @devdanzin\")</li>\n\n<sup>*Note: these values reflect the state of the issue at the time it was migrated and might not reflect the current state.*</sup>\n\n<details><summary>Show more details</summary><p>\n\nGitHub fields:\n```python\nassignee = 'https://github.com/akuchling'\nclosed_at = <Date 2008-02-28.14:03:33.517>\ncreated_at = <Date 2008-02-23.17:28:04.849>\nlabels = ['type-feature', 'library']\ntitle = 'Adding DOCTYPE and \"html\", \"body\" tags to SimpleHTTPServer'\nupdated_at = <Date 2008-02-28.14:03:33.515>\nuser = 'https://github.com/devdanzin'\n```\n\nbugs.python.org fields:\n```python\nactivity = <Date 2008-02-28.14:03:33.515>\nactor = 'akuchling'\nassignee = 'akuchling'\nclosed = True\nclosed_date = <Date 2008-02-28.14:03:33.517>\ncloser = 'akuchling'\ncomponents = ['Library (Lib)']\ncreation = <Date 2008-02-23.17:28:04.849>\ncreator = 'ajaksu2'\ndependencies = []\nfiles = ['9508']\nhgrepos = []\nissue_num = 2169\nkeywords = []\nmessage_count = 2.0\nmessages = ['62780', '63093']\nnosy_count = 2.0\nnosy_names = ['akuchling', 'ajaksu2']\npr_nums = []\npriority = 'normal'\nresolution = 'accepted'\nstage = None\nstatus = 'closed'\nsuperseder = None\ntype = 'enhancement'\nurl = 'https://bugs.python.org/issue2169'\nversions = ['Python 2.6', 'Python 3.0']\n```\n\n</p></details>\n",
+ "comments": [
+  {
+   "author": "90baf024-6604-450d-8341-d796fe6858f3",
+   "created_at": "2008-02-23T17:28:04Z",
+   "body": "This small patch adds a HTML 3.2 doctype, a \\<html\\> and a \\<body\\> tags.\nShould work on py3k.\n\nThis patch only accomplishes a \"Tentatively Valid HTML 3.2\" result.\nAdding information on  encoding would make that more conclusive, but\nIMHO wrong too."
+  },
+  {
+   "author": "akuchling",
+   "created_at": "2008-02-28T14:03:33Z",
+   "body": "Applied to 2.6 in rev. 61105; it will be merged up to 3.0 at some point.\nThanks for the patch!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "akuchling"
+  }
+ ],
+ "fetch_errors": null
+}
