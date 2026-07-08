@@ -8,7 +8,14 @@
  "issues": [
   "python/cpython#146250"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146251",
+  "python/cpython#146517",
+  "python/cpython#146519"
+ ],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
  "gists": [
   "1c1e9ba549c26332c387b23406c84ad5"
  ],
@@ -18,7 +25,9 @@
  ],
  "filed_by": "maintainer",
  "filers": [
-  "brijkapadia"
+  "aisk",
+  "brijkapadia",
+  "miss-islington"
  ],
  "status": "closed/fixed",
  "confidence": "high",
@@ -26,7 +35,10 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146250.json"
+  "raw/python__cpython/issue-146250.json",
+  "raw/python__cpython/pull-146251.json",
+  "raw/python__cpython/pull-146517.json",
+  "raw/python__cpython/pull-146519.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 151767,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151767",
+ "title": "gh-151673: Fix crash in warnings.warn() under memory pressure",
+ "state": "open",
+ "state_reason": null,
+ "author": "Ijtihed",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-20T05:38:13Z",
+ "closed_at": null,
+ "body": "When `warnings.warn()` runs while every allocation is failing `setup_context()` took the `f == NULL` branch and called `PyUnicode_FromString(\"<sys>\")` without checking the result. The resulting NULL filename was then passed to `Py_DECREF` either by `do_warn()` on the success path or by `setup_context()`'s own `handle_error:` label (which used `Py_DECREF`, not `Py_XDECREF`). This caused a segfault.\r\n\r\nThe fix initialize the output references up front then check the `\"<sys>\"` allocation and use `Py_XDECREF` in the error path.\r\n\r\nFixes #151673\n\n<!-- gh-issue-number: gh-151673 -->\n* Issue: gh-151673\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2026-06-20T05:38:18Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "Ijtihed",
+   "created_at": "2026-06-20T06:06:24Z",
+   "body": "the ci failure was preexisting on main. i can update branch when needed"
+  },
+  {
+   "author": "Ijtihed",
+   "created_at": "2026-06-26T05:51:53Z",
+   "body": "r? @StanFromIreland "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151673",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

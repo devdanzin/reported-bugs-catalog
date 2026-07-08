@@ -1,0 +1,37 @@
+{
+ "repo": "python/cpython",
+ "number": 129771,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/129771",
+ "title": "gh-129766: Fix crash on calling `warnings._release_lock` with no lock",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-02-07T07:42:30Z",
+ "closed_at": "2025-02-07T09:59:54Z",
+ "body": "After:\r\n\r\n```python\r\n>>> import warnings\r\n>>> warnings._release_lock()\r\nTraceback (most recent call last):\r\n  File \"<python-input-1>\", line 1, in <module>\r\n    warnings._release_lock()\r\n    ~~~~~~~~~~~~~~~~~~~~~~^^\r\nRuntimeError: cannot release un-acquired lock\r\n```\r\n\r\nRefs https://github.com/python/cpython/pull/128386\r\nRefs https://github.com/python/cpython/issues/128384\r\n\r\n<!-- gh-issue-number: gh-129766 -->\r\n* Issue: gh-129766\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/129766",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ae132edc296d27c6ed04fe4d400c67e3cfb622e8",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

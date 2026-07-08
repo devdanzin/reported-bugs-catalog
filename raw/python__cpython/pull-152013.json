@@ -1,0 +1,48 @@
+{
+ "repo": "python/cpython",
+ "number": 152013,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152013",
+ "title": "gh-151763: Fix `_interpreters.capture_exception` crash on memory errors",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting core review",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
+  "needs backport to 3.15"
+ ],
+ "created_at": "2026-06-23T14:32:47Z",
+ "closed_at": "2026-06-23T16:41:57Z",
+ "body": "It actually had two possible crashes:\r\n1. Rereferencing `NULL` in `_PyXI_FreeExcInfo(info);`\r\n2. No setting memory exception on `PyMem_RawCalloc` failure\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2026-06-23T16:41:57Z",
+   "body": "Oh, I missed it :)\r\nYes, they can copy ideas from my solution. I will close my PR."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151843",
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

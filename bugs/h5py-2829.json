@@ -11,6 +11,9 @@
  "prs": [
   "h5py/h5py#2847"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [],
  "filed_by": "self+maintainer",

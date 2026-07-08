@@ -1,0 +1,33 @@
+{
+ "repo": "python/cpython",
+ "number": 151826,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151826",
+ "title": "gh-151818: Fix double-free in _CALL_LIST_APPEND on allocation failure",
+ "state": "open",
+ "state_reason": null,
+ "author": "timurmamedov1",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-21T01:39:10Z",
+ "closed_at": null,
+ "body": "`_CALL_LIST_APPEND` stole the `arg` stackref via `PyStackRef_AsPyObjectSteal` and passed it to `_PyList_AppendTakeRef`. When the list's backing array failed to grow, `_PyList_AppendTakeRef` decref'd the item, but the stale stackref remained on the value stack. `exception_unwind` then closed it a second time. Double-free on debug builds (`_Py_NegativeRefcount`), segfault on release builds.\r\n\r\n**Fix:** Give `_PyList_AppendTakeRef` a separate reference via `Py_NewRef` and close the stackref explicitly on success. On the error path the stackref still holds a valid reference, so the exception unwinder can safely close it.\r\n\r\nThis trades one extra `Py_INCREF` on the hot path for correct error handling. The sibling ops (`LIST_APPEND`, `SET_ADD`, `MAP_ADD`) avoid this by using `ERROR_IF` which drops dead inputs, but `_CALL_LIST_APPEND` has additional live inputs (`callable`, `self`) that prevent using `ERROR_IF` directly.\r\n\r\nRelated to gh-151119 / gh-151538 (different bug in the same op - missing eval-stack sync), but this is a distinct bug as noted by @devdanzin.\r\n\r\n<!-- gh-issue-number: gh-151818 -->\r\n* Issue: gh-151818\r\n<!-- /gh-issue-number -->",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151818",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "tonghuaroot"
+  }
+ ],
+ "fetch_errors": null
+}

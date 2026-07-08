@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 152269,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152269",
+ "title": "[3.15] gh-152156: Fix a crash in `interpeters.create` under limited memory conditions (GH-152163)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-26T11:42:17Z",
+ "closed_at": "2026-06-26T12:11:14Z",
+ "body": "(cherry picked from commit 3ad66bf10dbb929bcf8efd889e56a9b9068319ca)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\n\n<!-- gh-issue-number: gh-152156 -->\n* Issue: gh-152156\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152156",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152163",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "62842c9ff592114ade3049d6a85aea031b783beb",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

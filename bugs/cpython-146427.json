@@ -8,10 +8,19 @@
  "issues": [
   "python/cpython#146427"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146428"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
+  "awaiting review",
   "extension-modules",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
+  "needs backport to 3.15",
   "topic-subinterpreters",
   "type-crash"
  ],
@@ -25,7 +34,8 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146427.json"
+  "raw/python__cpython/issue-146427.json",
+  "raw/python__cpython/pull-146428.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

@@ -9,18 +9,29 @@
   "python/cpython#130999"
  ],
  "prs": [
-  "python/cpython#131001"
+  "python/cpython#131001",
+  "python/cpython#135019",
+  "python/cpython#135020",
+  "python/cpython#135030"
  ],
+ "n_prs": 4,
+ "n_backports": 2,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "3.13",
   "3.14",
+  "skip news",
   "stdlib",
+  "tests",
   "topic-repl",
   "type-bug"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "ambv",
+  "miss-islington"
+ ],
  "status": "closed/fixed",
  "confidence": "low",
  "needs_review": true,
@@ -28,7 +39,10 @@
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-130999.json",
-  "raw/python__cpython/pull-131001.json"
+  "raw/python__cpython/pull-131001.json",
+  "raw/python__cpython/pull-135019.json",
+  "raw/python__cpython/pull-135020.json",
+  "raw/python__cpython/pull-135030.json"
  ],
- "n_artifacts": 2
+ "n_artifacts": 5
 }

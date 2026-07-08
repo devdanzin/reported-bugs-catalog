@@ -1,0 +1,33 @@
+{
+ "repo": "python/cpython",
+ "number": 132579,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132579",
+ "title": "gh-132474: optimize rounding of int's for large negative ndigits",
+ "state": "closed",
+ "state_reason": null,
+ "author": "skirpichev",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2025-04-16T07:07:10Z",
+ "closed_at": "2025-10-10T03:49:00Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n<!-- gh-issue-number: gh-132474 -->\r\n* Issue: gh-132474\r\n<!-- /gh-issue-number -->\r\n\r\n-----------\r\n\r\nBenchmark 1 (``0`` coming for ``ndigits <= -5``):\r\n| Benchmark          | ref     | patch                |\r\n|--------------------|:-------:|:--------------------:|\r\n| round(17000, -1)   | 515 ns  | 573 ns: 1.11x slower |\r\n| round(17000, -2)   | 495 ns  | 545 ns: 1.10x slower |\r\n| round(17000, -3)   | 565 ns  | 592 ns: 1.05x slower |\r\n| round(17000, -4)   | 674 ns  | 708 ns: 1.05x slower |\r\n| round(17000, -5)   | 560 ns  | 635 ns: 1.13x slower |\r\n| round(17000, -6)   | 564 ns  | 616 ns: 1.09x slower |\r\n| round(17000, -7)   | 608 ns  | 647 ns: 1.06x slower |\r\n| round(17000, -8)   | 563 ns  | 233 ns: 2.42x faster |\r\n| round(17000, -9)   | 612 ns  | 240 ns: 2.55x faster |\r\n| round(17000, -10)  | 663 ns  | 232 ns: 2.86x faster |\r\n| round(17000, -20)  | 979 ns  | 233 ns: 4.21x faster |\r\n| round(17000, -50)  | 1.47 us | 233 ns: 6.30x faster |\r\n| round(17000, -100) | 1.95 us | 234 ns: 8.33x faster |\r\n| Geometric mean     | (ref)   | 1.81x faster         |\r\n\r\nBenchmark 2 (here ``round(2**d, -5) != 0`` for ``d>=20``):\r\n| Benchmark         | ref    | patch                |\r\n|-------------------|:------:|:--------------------:|\r\n| round(2**5, -5)   | 527 ns | 232 ns: 2.27x faster |\r\n| round(2**7, -5)   | 531 ns | 233 ns: 2.28x faster |\r\n| round(2**10, -5)  | 557 ns | 621 ns: 1.11x slower |\r\n| round(2**15, -5)  | 558 ns | 623 ns: 1.12x slower |\r\n| round(2**20, -5)  | 672 ns | 730 ns: 1.09x slower |\r\n| round(2**25, -5)  | 753 ns | 784 ns: 1.04x slower |\r\n| round(2**30, -5)  | 811 ns | 843 ns: 1.04x slower |\r\n| round(2**50, -5)  | 797 ns | 830 ns: 1.04x slower |\r\n| round(2**100, -5) | 871 ns | 912 ns: 1.05x slower |\r\n| Geometric mean    | (ref)  | 1.14x faster         |\r\n\r\n<details>\r\n\r\n```py\r\n# bench1.py\r\nimport pyperf\r\nrunner = pyperf.Runner()\r\nd = 17000\r\nfor n in list(range(1, 11)) + [20, 50, 100]:\r\n    n = -n\r\n    s = f\"round({d}, {n})\"\r\n    runner.bench_func(s, round, d, n)\r\n```\r\n\r\n```py\r\n# bench2.py\r\nimport math\r\nimport pyperf\r\nrunner = pyperf.Runner()\r\nn = -5\r\nfor d in [5, 7, 10, 15, 20, 25, 30, 50, 100]:\r\n    x = 1<<d\r\n    s = f\"round(2**{d}, {n})\"\r\n    runner.bench_func(s, round, x, n)\r\n```\r\n\r\n</details>\r\n\r\n- issue thread has several other variants for cutoff\r\n- here is gmpy2 code (recently corrected): https://github.com/aleaxit/gmpy/blob/e58796a9f53787cdc28db895ec7bb6aaaed7b778/src/gmpy2_mpz_misc.c#L270-L272\r\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132474",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "skirpichev"
+  }
+ ],
+ "fetch_errors": null
+}

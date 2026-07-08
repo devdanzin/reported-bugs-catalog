@@ -1,0 +1,77 @@
+{
+ "repo": "python/cpython",
+ "number": 135430,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/135430",
+ "title": "gh-135410: Fix `test_memoryio` refleak buildbots",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "tests",
+  "awaiting merge",
+  "skip news",
+  "DO-NOT-MERGE"
+ ],
+ "created_at": "2025-06-12T13:40:38Z",
+ "closed_at": "2025-06-13T00:06:59Z",
+ "body": "The problem is that we were testing both `_pyio.StringIO` and `_io.StringIO`. The former, in `_pyio`, isn't really thread-safe (but it doesn't *crash*, and that's what we care about). I'm not sure why it only revealed itself on the refleak buildbots, but it's probably something about the threads being slower.\r\n\r\nAnyways, I'm fixing this by only testing the C implementation of `StringIO`. Making the Python version thread-safe is a separate project that we shouldn't deal with here. I also changed the `assertIsNone` to an `if` that actually raises the exception, so we get a better traceback when dealing with failures.\n\n<!-- gh-issue-number: gh-135410 -->\n* Issue: gh-135410\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-12T14:32:05Z",
+   "body": "!buildbot nogil refleak"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-06-12T14:32:09Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @ZeroIntensity for commit b6f2011f67c8c791a3dae247da81919b47edfc7c :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F135430%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `nogil refleak`\n\nThe builders matched are:\n- `s390x Fedora Rawhide NoGIL refleaks PR`\n- `AMD64 CentOS9 NoGIL Refleaks PR`\n- `aarch64 Fedora Rawhide NoGIL refleaks PR`\n- `PPC64LE Fedora Rawhide NoGIL refleaks PR`\n- `AMD64 Fedora Rawhide NoGIL refleaks PR`\n"
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-06-12T15:25:15Z",
+   "body": "> The problem is that we were testing both _pyio.StringIO and _io.StringIO. The former, in _pyio, isn't really thread-safe (but it doesn't crash, and that's what we care about)\r\n\r\nSorry for challenging your changes recently, but why don\u2019t we ensure consistent behavior between the pure Python and C versions?\r\nCan we first focus on preventing the segmentation fault, rather than introducing behavioral differences between the two implementations? And just document it that we do not gurentee the thread safe?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-06-12T15:43:11Z",
+   "body": "Please hold on: \"IMO this change was merged too quickly and I suggest to revert it.\" https://github.com/python/cpython/pull/135412#issuecomment-2967347502"
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-06-12T15:59:24Z",
+   "body": "> Sorry for challenging your changes recently, but why don\u2019t we ensure consistent behavior between the pure Python and C versions?\r\n\r\nThe pure Python will not crash the interpreter while the C implementation can crash and the easiest way to fix the latter is to add critical section. We are trying to fix thread safety in regard to avoid being able to crash the interpreter. \r\n\r\nAnother somewhat related is https://github.com/python/cpython/issues/130095 where abc's pure Python implementation is not thread safe but it cannot crash the interp so we aren't actively fixing that, rather skipping the pure python tests of it. \r\n\r\nAs for performance, critical sections are optimized for case where single thread acquires it so it is minimal, trying to write to same StringIO object would perform worse but that's not something users should do or we should try to optimize for.\r\n\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-12T17:21:40Z",
+   "body": "> Sorry for challenging your changes recently\r\n\r\nNo worries, I don't take it personally :)\r\n\r\n> Can we first focus on preventing the segmentation fault, rather than introducing behavioral differences between the two implementations? And just document it that we do not gurentee the thread safe?\r\n\r\nThat's effectively what I was trying to do. #135412 was trying to solely fix the segfault. Unfortunately, the only easy way to do that is by slapping a critical section onto `__next__`, which incidentally makes it work pretty sane across threads. I'm not a huge fan of it either, but I can't think of a different way to do this.\r\n\r\nI agree with Kumar that this probably won't be noticeable for single-threaded code. I pushed back on locking `TextIOWrapper.__next__` a few weeks ago because of performance, but the reality is that critical sections are quite fast when they're uncontended. "
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-06-12T18:11:38Z",
+   "body": ">The pure Python will not crash the interpreter while the C implementation can crash and the easiest way to fix the latter is to add critical section. We are trying to fix thread safety in regard to avoid being able to crash the interpreter.\r\n\r\nI know pure Python code doesn\u2019t crash the interpreter, but that\u2019s not the point. The problem is that it behaves differently from the C implementation: the Python version is not thread-safe, while the C version is. We should aim for consistent behavior between them and consider what we\u2019ve done so far toward that goal. That\u2019s why I suggested we revisit our approach to make the behavior consistent between the pure Python and C implementations."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-13T00:06:59Z",
+   "body": "Closing now that the original change has been reverted."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/135410",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

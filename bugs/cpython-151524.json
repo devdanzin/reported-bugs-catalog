@@ -8,12 +8,19 @@
  "issues": [
   "python/cpython#151524"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#151525"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "330026d6a4c40048c771a61f706ac75e"
  ],
  "labels": [
+  "awaiting changes",
   "interpreter-core",
+  "skip news",
   "type-bug"
  ],
  "filed_by": "maintainer",
@@ -26,7 +33,8 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-151524.json"
+  "raw/python__cpython/issue-151524.json",
+  "raw/python__cpython/pull-151525.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

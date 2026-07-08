@@ -1,0 +1,87 @@
+{
+ "repo": "python/cpython",
+ "number": 132212,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132212",
+ "title": "gh-132176: Fix crash on `type()` when `tuple` subclass passed as `bases`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-04-07T09:51:33Z",
+ "closed_at": "2025-04-15T11:13:51Z",
+ "body": "\n\n<!-- gh-issue-number: gh-132176 -->\n* Issue: gh-132176\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-15T11:02:31Z",
+   "body": "Thank you, @vstinner for your help!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-15T11:13:55Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-15T11:14:29Z",
+   "body": "[GH-132548](https://github.com/python/cpython/pull/132548) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-04-15T11:39:30Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **aarch64 Fedora Stable LTO + PGO 3.x** (tier-2) has failed when building commit b6c552f9e614bab4acf21584baed997f57e74114.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/524/builds/7381) and take a look at the build logs.\n4. Check if the failure is related to this commit (b6c552f9e614bab4acf21584baed997f57e74114) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/524/builds/7381\n\n\n\nSummary of the results of the build (if available):\n\n\n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nremote: Enumerating objects: 13, done.        \nremote: Counting objects:   7% (1/13)        \nremote: Counting objects:  15% (2/13)        \nremote: Counting objects:  23% (3/13)        \nremote: Counting objects:  30% (4/13)        \nremote: Counting objects:  38% (5/13)        \nremote: Counting objects:  46% (6/13)        \nremote: Counting objects:  53% (7/13)        \nremote: Counting objects:  61% (8/13)        \nremote: Counting objects:  69% (9/13)        \nremote: Counting objects:  76% (10/13)        \nremote: Counting objects:  84% (11/13)        \nremote: Counting objects:  92% (12/13)        \nremote: Counting objects: 100% (13/13)        \nremote: Counting objects: 100% (13/13), done.        \nremote: Compressing objects:  20% (1/5)        \nremote: Compressing objects:  40% (2/5)        \nremote: Compressing objects:  60% (3/5)        \nremote: Compressing objects:  80% (4/5)        \nremote: Compressing objects: 100% (5/5)        \nremote: Compressing objects: 100% (5/5), done.        \nremote: Total 7 (delta 6), reused 3 (delta 2), pack-reused 0 (from 0)        \nFrom https://github.com/python/cpython\n * branch                    main       -> FETCH_HEAD\nNote: switching to 'b6c552f9e614bab4acf21584baed997f57e74114'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at b6c552f9e61 gh-132176: Fix crash on `type()` when `tuple` subclass passed as `bases` (#132212)\nSwitched to and reset branch 'main'\n\nfind: \u2018build\u2019: No such file or directory\nfind: \u2018build\u2019: No such file or directory\nfind: \u2018build\u2019: No such file or directory\nfind: \u2018build\u2019: No such file or directory\nmake[2]: [Makefile:3311: clean-retain-profile] Error 1 (ignored)\nPython/ceval.c: In function \u2018_PyEvalFramePushAndInit_Ex\u2019:\nPython/ceval.c:1852:38: warning: \u2018stack_array\u2019 may be used uninitialized [-Wmaybe-uninitialized]\n 1852 |     _PyInterpreterFrame *new_frame = _PyEvalFramePushAndInit(\n      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~\n 1853 |         tstate, func, locals,\n      |         ~~~~~~~~~~~~~~~~~~~~~         \n 1854 |         newargs, nargs, kwnames, previous\n      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n 1855 |     );\n      |     ~                                 \nPython/ceval.c:1775:1: note: by argument 4 of type \u2018const union _PyStackRef *\u2019 to \u2018_PyEvalFramePushAndInit\u2019 declared here\n 1775 | _PyEvalFramePushAndInit(PyThreadState *tstate, _PyStackRef func,\n      | ^~~~~~~~~~~~~~~~~~~~~~~\nPython/ceval.c:1821:17: note: \u2018stack_array\u2019 declared here\n 1821 |     _PyStackRef stack_array[8];\n      |                 ^~~~~~~~~~~\nar: unable to copy file 'libpython3.14.a'; reason: No space left on device\nmake[2]: *** [Makefile:1149: libpython3.14.a] Error 1\nmake[1]: *** [Makefile:981: profile-gen-stamp] Error 2\nmake: *** [Makefile:993: profile-run-stamp] Error 2\n```\n\n</details>\n"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-04-15T11:43:52Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 Windows11 Non-Debug 3.x** (tier-1) has failed when building commit b6c552f9e614bab4acf21584baed997f57e74114.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/914/builds/4825) and take a look at the build logs.\n4. Check if the failure is related to this commit (b6c552f9e614bab4acf21584baed997f57e74114) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/914/builds/4825\n\nFailed tests:\n\n- test_wmi\n\nFailed subtests:\n\n- test_wmi_query_repeated - test.test_wmi.WmiTests.test_wmi_query_repeated\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"b:\\uildarea\\3.x.ware-win11.nondebug\\build\\Lib\\test\\test_wmi.py\", line 41, in test_wmi_query_repeated\n    self.test_wmi_query_os_version()\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"b:\\uildarea\\3.x.ware-win11.nondebug\\build\\Lib\\test\\test_wmi.py\", line 30, in test_wmi_query_os_version\n    self.assertEqual(1, len(r))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^\nAssertionError: 1 != 2\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-04-15T12:27:44Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **aarch64 Fedora Stable LTO 3.13** (tier-2) has failed when building commit 6d48194d9f14b7d6a5ee069a7bd269c124c17d59.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1399/builds/646) and take a look at the build logs.\n4. Check if the failure is related to this commit (6d48194d9f14b7d6a5ee069a7bd269c124c17d59) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1399/builds/646\n\n\n\nSummary of the results of the build (if available):\n\n\n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nremote: Enumerating objects: 7, done.        \nremote: Counting objects:  20% (1/5)        \nremote: Counting objects:  40% (2/5)        \nremote: Counting objects:  60% (3/5)        \nremote: Counting objects:  80% (4/5)        \nremote: Counting objects: 100% (5/5)        \nremote: Counting objects: 100% (5/5), done.        \nremote: Compressing objects:  50% (1/2)        \nremote: Compressing objects: 100% (2/2)        \nremote: Compressing objects: 100% (2/2), done.        \nremote: Total 7 (delta 3), reused 3 (delta 3), pack-reused 2 (from 1)        \nFrom https://github.com/python/cpython\n * branch                    3.13       -> FETCH_HEAD\nNote: switching to '6d48194d9f14b7d6a5ee069a7bd269c124c17d59'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 6d48194d9f1 [3.13] gh-132176: Fix crash on `type()` when `tuple` subclass passed as `bases` (GH-132212) (#132548)\nSwitched to and reset branch '3.13'\n\nIn function \u2018hashtable_key_from_2_strings\u2019,\n    inlined from \u2018_extensions_cache_find_unlocked\u2019 at Python/import.c:1264:17:\nPython/import.c:1177:5: warning: \u2018strncpy\u2019 output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]\n 1177 |     strncpy(key, str1_data, str1_len);\n      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nPython/import.c:1163:27: note: length computed here\n 1163 |     Py_ssize_t str1_len = strlen(str1_data);\n      |                           ^~~~~~~~~~~~~~~~~\nar: unable to copy file 'libpython3.13.a'; reason: No space left on device\nmake: *** [Makefile:1061: libpython3.13.a] Error 1\n```\n\n</details>\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-15T13:27:28Z",
+   "body": "aarch64 Fedora Stable LTO + PGO 3.x and aarch64 Fedora Stable LTO 3.13 failed because their disk is full, see: https://github.com/python/cpython/issues/132553."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132176",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b6c552f9e614bab4acf21584baed997f57e74114",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "667579543c6d886ead19710ca5a5d4aed771e785",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6d48194d9f14b7d6a5ee069a7bd269c124c17d59",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

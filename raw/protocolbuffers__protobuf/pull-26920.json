@@ -1,0 +1,37 @@
+{
+ "repo": "protocolbuffers/protobuf",
+ "number": 26920,
+ "type": "pull",
+ "url": "https://github.com/protocolbuffers/protobuf/pull/26920",
+ "title": "Fix RepeatedContainer_pop to raise IndexError for out-of-bounds indices.",
+ "state": "closed",
+ "state_reason": null,
+ "author": "copybara-service[bot]",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-04-16T03:39:17Z",
+ "closed_at": "2026-04-20T18:30:43Z",
+ "body": "Fix RepeatedContainer_pop to raise IndexError for out-of-bounds indices.\n\nThe previous implementation of RepeatedContainer_pop would clamp the index to the last element if it was out of bounds. This change removes the index clamping, ensuring that pop() raises an IndexError when given an index that is out of range, matching the other 2 pyproto implementation as well as standard Python list behavior. Tests are added to confirm this corrected behavior.\n\nThis is the 5th bug listed in https://github.com/protocolbuffers/protobuf/issues/26596\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "78a09ada5c0d2668e1e0aa7cab4ec88d3b33fcd9",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/protocolbuffers/protobuf/pull/27570",
+   "commit": null,
+   "actor": "runzw"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -9,6 +9,9 @@
  "prs": [
   "scipy/scipy#24929"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "C/C++",

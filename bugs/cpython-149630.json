@@ -11,6 +11,9 @@
  "prs": [
   "python/cpython#149631"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "b022ff2d1304a4b2b8d3d8750abd8da5"
  ],

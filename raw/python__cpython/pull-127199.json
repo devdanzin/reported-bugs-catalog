@@ -1,0 +1,80 @@
+{
+ "repo": "python/cpython",
+ "number": 127199,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127199",
+ "title": "gh-127165: Disallow embedded NULL characters in `_interpreters`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2024-11-23T16:11:55Z",
+ "closed_at": "2024-12-01T06:33:23Z",
+ "body": "Currently, null characters in shared namespaces cause truncation of the actual string, because it's eventually passed to `PyUnicode_FromString`, which uses the `strlen` instead of the actual size. Then, things break because the string unexpectedly is not in the namespace dictionary. This fixes that by just raising if we find an embedded NULL character in `_copy_string_obj_raw`.\r\n\r\nWe *could* support embedded NULLs by storing the size alongside the name, but this is much simpler (and in practice, nobody is trying to name variables containing `\\x00`).\n\n<!-- gh-issue-number: gh-127165 -->\n* Issue: gh-127165\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-12-01T06:33:26Z",
+   "body": "Thanks @ZeroIntensity for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-12-01T06:33:57Z",
+   "body": "[GH-127463](https://github.com/python/cpython/pull/127463) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127165",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "46bfd26fb294a8769ef6d0c056ee6c9df022a037",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5718d544537b6c8cef4a8171d143a51cee21907c",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2813a6167560a8d649465249f27ff1c134151387",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7321eff182309b3742e8f30a98838fb97bfc6455",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1aa1f2f6205286102b53dcc342793221d0a80550",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "80a773517acf05502527e2304dac78c9ec14bcea",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

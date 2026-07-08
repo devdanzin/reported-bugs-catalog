@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 146116,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146116",
+ "title": "[3.14] gh-146076: Fix crash when a `ZoneInfo` subclass is missing a `_weak_cache` (GH-146082)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-18T14:57:08Z",
+ "closed_at": "2026-03-18T15:23:46Z",
+ "body": "(cherry picked from commit 3b06d68d8a3cc1f37359af1d7ebb3d09e1222296)\n\nCo-authored-by: Stan Ulbrych <89152624+StanFromIreland@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-146076 -->\n* Issue: gh-146076\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146076",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146082",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6980b94c3a25a69278ef9b348fabec7831651e8e",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

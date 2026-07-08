@@ -1,0 +1,89 @@
+{
+ "repo": "python/cpython",
+ "number": 122126,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/122126",
+ "title": "gh-122071: Fixed traceback leaks global code when file does not exist",
+ "state": "open",
+ "state_reason": null,
+ "author": "lhish",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review",
+  "stale"
+ ],
+ "created_at": "2024-07-22T13:54:17Z",
+ "closed_at": null,
+ "body": "<!-- gh-issue-number: gh-122071 -->\r\n* Issue: gh-122071\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "ghost",
+   "created_at": "2024-07-22T13:54:21Z",
+   "body": "All commit authors signed the Contributor License Agreement. <br/> [![CLA signed](https://cpython-clabot.herokuapp.com/cla-signed.svg)](https://cpython-clabot.herokuapp.com/signed-contributor-license-agreement?version=96a49432-b8b1-11ec-9bf5-bfe9ad6c72c4)"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-07-22T13:54:24Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-22T14:24:16Z",
+   "body": "I got the same test failures without `is_main`, so I added it. But if you can write a test that fails due to checking `is_main`, that'll lead to a better solution."
+  },
+  {
+   "author": "lhish",
+   "created_at": "2024-07-22T17:57:36Z",
+   "body": "> I got the same test failures without `is_main`, so I added it. But if you can write a test that fails due to checking `is_main`, that'll lead to a better solution.\r\n\r\nt.py\r\n```python\r\nimport rely\r\nimport traceback\r\ntry:\r\n    rely.fun()\r\nexcept:\r\n    traceback.print_exc()\r\n```\r\nrely.py\r\n```python\r\ndef fun():\r\n    exec(compile(\"tuple()[1]\",\"s\",\"exec\"))\r\n```\r\n"
+  },
+  {
+   "author": "lhish",
+   "created_at": "2024-07-22T18:00:09Z",
+   "body": "By the way, based on preliminary testing, the `zipimporter` module does not appear to trigger issues related to this bug."
+  },
+  {
+   "author": "lhish",
+   "created_at": "2024-07-22T18:06:09Z",
+   "body": "Regarding the modifications to the testing section: The previous testing method utilized the characteristic that when the target file didn't exist, the current file would be used as the content of the non-existent file for testing purposes. I have now changed this method to directly use the current file for testing."
+  },
+  {
+   "author": "lhish",
+   "created_at": "2024-08-24T17:39:41Z",
+   "body": "After reviewing the discussion in GH-122145, I found it very insightful. The logic presented there is more general and avoids the need for a specific check for zipimporter, as I had implemented. Therefore, I have revised my code accordingly."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-08-25T11:36:31Z",
+   "body": "EDIT: It appears that test failures are important. So maybe the previous logic was fine. By the way, https://github.com/python/cpython/pull/122161#issuecomment-2256901703 suggested returning False instead of True for lazycaching."
+  },
+  {
+   "author": "lhish",
+   "created_at": "2024-08-27T17:01:00Z",
+   "body": "> EDIT: It appears that test failures are important. So maybe the previous logic was fine. By the way, [#122161 (comment)](https://github.com/python/cpython/pull/122161#issuecomment-2256901703) suggested returning False instead of True for lazycaching.\r\n\r\nAfter some investigation, I found that the `get_lines` function seems to be unique to `linecache`, so it shouldn't cause any issues. However, I noticed that if we return `False` directly, using `linecache[\"nonexistent_filename\"]` results in an error, whereas it didn't before the modification. Therefore, I'm uncertain if returning `False` is the correct approach."
+  },
+  {
+   "author": "lhish",
+   "created_at": "2024-08-28T04:39:00Z",
+   "body": "To handle `Fakeloader` and `zipfiles`, I've added additional conditions. However, I don't believe this is the best solution. If anyone has any suggestions or alternative ideas, please help me."
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-18T09:35:38Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-04-17T18:17:37Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122071",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

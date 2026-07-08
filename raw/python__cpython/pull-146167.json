@@ -1,0 +1,63 @@
+{
+ "repo": "python/cpython",
+ "number": 146167,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146167",
+ "title": "gh-146056: Rework ref counting in treebuilder_handle_end()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-19T13:21:02Z",
+ "closed_at": "2026-03-23T11:17:56Z",
+ "body": "Use more regular code to handle reference counting in treebuilder_handle_end().\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146056 -->\n* Issue: gh-146056\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146056",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146062",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "90f9991abb2ef6422ec0ea8330533966a84d8c8f",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3e05fa35e0562de54252dab4d09da002fc358393",
+   "actor": "CuriousLearner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7e159c755bda17727a91b3c581e8a491905911ee",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

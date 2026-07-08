@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 143849,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143849",
+ "title": "[3.14] gh-141805: Fix crash after concurrent addition objects with the same hash to set (GH-143815)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-01-14T21:29:25Z",
+ "closed_at": "2026-01-15T07:31:17Z",
+ "body": "This happens when the set contained several elements with the same hash,\nand then some of them were removed.\n(cherry picked from commit b8e925b4f8f6c5e28fbebc4f3965bf77610698b3)\n\nCo-authored-by: Serhiy Storchaka <storchaka@gmail.com>\n\n<!-- gh-issue-number: gh-141805 -->\n* Issue: gh-141805\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141805",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143815",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "601ccb7f89dc4b6b1da9c5322f0c3abd875fcf2b",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

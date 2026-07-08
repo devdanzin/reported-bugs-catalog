@@ -1,0 +1,97 @@
+{
+ "repo": "aio-libs/multidict",
+ "number": 1317,
+ "type": "pull",
+ "url": "https://github.com/aio-libs/multidict/pull/1317",
+ "title": "Fix use-after-free race condition in C extension for free-threaded CPython (3.13t+)",
+ "state": "open",
+ "state_reason": null,
+ "author": "rodrigobnogueira",
+ "author_association": "MEMBER",
+ "labels": [
+  "bot:chronographer:provided",
+  "free-threading"
+ ],
+ "created_at": "2026-04-12T05:17:20Z",
+ "closed_at": null,
+ "body": "### Description\nThis PR fixes a critical memory-safety race condition (Use-After-Free) that results in a process segmentation fault or abort (stack smashing) when iterating over and modifying a `MultiDict` concurrently in CPython free-threaded mode (3.13t+).\n\n### Context\nWhen running without the GIL, iterating over `md.keys()`/`md.items()` or view objects could safely yield memory pointers pointing to `MultiDictObject->keys`. However, if the dictionary resized concurrently using `_md_resize()`, the keys table was reallocated and immediately `free()`d, leaving concurrent iterators reading stale heap pointers. This explicitly leaked and corrupted process memory resulting in an ASAN/SEGV error on the `READ` inside the iterator buffers.\n\n### Proposed Approach\nTo safely resolve this while adhering to Python 3.13 free-threaded lock mechanisms, we matched CPython's own `dict` concurrent locking pattern. This involves adding `Py_BEGIN_CRITICAL_SECTION(self)` / `Py_END_CRITICAL_SECTION()` at every **public-facing entry point** in the C extension. The `pythoncapi_compat.h` shim already natively skips these macros on pre-3.13 monolithic GIL designs, making this 100% zero-overhead everywhere except 3.13t.\n\n*   Wrapped all major method slots in `_multidict.c` (`__getitem__`, `__setitem__`, `__delitem__`, `add`, `getall`, `pop`, `copy`, etc.),\n*   Wrapped all iterator block functions dynamically unlocking inside `iter.h`,\n*   Fixed finder operations correctly propagating to `cs_done` for safety unloads in `views.h`.\n\n### Verification\n1.  **Concurrency Testing (`test_free_threading.py`):** Added a new threading test module that heavily threads `CIMultiDict` adding and deleting inputs while natively reading iterations concurrently. \n2.  **Safety Assertions:** Validated that upon hash resizing, the active pointers dynamically trip into `finder->version != finder->md->version` successfully, naturally abandoning the iteration and surfacing standard `RuntimeError('MultiDict is changed during iteration')` without throwing a C segmentation fault! This matches native single-threaded Py-behavior correctly.\n3.  **No Native Regressions:** Formatted files by `clang-format` and confirmed 100% test coverage matches the baseline branch over `python3.13t`.\n",
+ "comments": [
+  {
+   "author": "codspeed-hq[bot]",
+   "created_at": "2026-04-12T05:22:11Z",
+   "body": "<!-- __CODSPEED_PERFORMANCE_REPORT_COMMENT__ -->\n## Merging this PR will **not alter performance**\n\n\n\n\n`\u2705 242` untouched benchmarks  \n\n\n\n\n\n---\n\n<sub>Comparing <code>rodrigobnogueira:fix-free-threaded-race-condition</code> (4079a3e) with <code>master</code> (eece5fb)</sub>\n\n<a href=\"https://app.codspeed.io/aio-libs/multidict/branches/rodrigobnogueira%3Afix-free-threaded-race-condition?utm_source=github&utm_medium=comment-v2&utm_content=button\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://codspeed.io/pr-report/open-in-codspeed-dark.svg\">\n    <source media=\"(prefers-color-scheme: light)\" srcset=\"https://codspeed.io/pr-report/open-in-codspeed-light.svg\">\n    <img alt=\"Open in CodSpeed\" src=\"https://codspeed.io/pr-report/open-in-codspeed-light.svg\" width=\"169\" height=\"32\">\n  </picture>\n</a>\n\n"
+  },
+  {
+   "author": "rodrigobnogueira",
+   "created_at": "2026-04-12T16:28:34Z",
+   "body": "Note: This PR temporarily includes the changes from #1316 (Drop Python 3.9 support) so that the CI/cibuildwheel pipeline can pass \u2014 the cp39 wheel build was failing due to setuptools >= 82.0.1 being incompatible with Python 3.9. Once #1316 is merged into master, I will rebase this PR to remove that commit and keep only the free-threaded race condition fix.\r\n\r\nFYI @Dreamsorcerer "
+  },
+  {
+   "author": "codecov[bot]",
+   "created_at": "2026-04-12T16:47:33Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/aio-libs/multidict/pull/1317?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) Report\n:white_check_mark: All modified and coverable lines are covered by tests.\n:white_check_mark: Project coverage is 99.86%. Comparing base ([`eece5fb`](https://app.codecov.io/gh/aio-libs/multidict/commit/eece5fb25f604a96ff85313e8ec8a08b9e4c631a?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs)) to head ([`4079a3e`](https://app.codecov.io/gh/aio-libs/multidict/commit/4079a3ee787295e7690e87e9fd80a42566130de2?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs)).\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@           Coverage Diff           @@\n##           master    #1317   +/-   ##\n=======================================\n  Coverage   99.86%   99.86%           \n=======================================\n  Files          28       29    +1     \n  Lines        3627     3666   +39     \n  Branches      265      271    +6     \n=======================================\n+ Hits         3622     3661   +39     \n  Misses          3        3           \n  Partials        2        2           \n```\n\n| [Flag](https://app.codecov.io/gh/aio-libs/multidict/pull/1317/flags?src=pr&el=flags&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | Coverage \u0394 | |\n|---|---|---|\n| [CI-GHA](https://app.codecov.io/gh/aio-libs/multidict/pull/1317/flags?src=pr&el=flag&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | `99.86% <100.00%> (+<0.01%)` | :arrow_up: |\n| [pytest](https://app.codecov.io/gh/aio-libs/multidict/pull/1317/flags?src=pr&el=flag&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | `99.86% <100.00%> (+<0.01%)` | :arrow_up: |\n\nFlags with carried forward coverage won't be shown. [Click here](https://docs.codecov.io/docs/carryforward-flags?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs#carryforward-flags-in-the-pull-request-comment) to find out more.\n</details>\n\n[:umbrella: View full report in Codecov by Harness](https://app.codecov.io/gh/aio-libs/multidict/pull/1317?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  },
+  {
+   "author": "Vizonex",
+   "created_at": "2026-04-28T20:04:46Z",
+   "body": "@rodrigobnogueira it's been 2 weeks so I'll see if we can get someone else in here to merge since I don't have that authorization to do so yet. for now I recommend staying updated with the main branch."
+  },
+  {
+   "author": "rodrigobnogueira",
+   "created_at": "2026-05-02T03:24:01Z",
+   "body": "While fixing the C extension race condition, our test suite (now running the `any_multidict_class` fixture against both implementations) uncovered a related but separate thread-safety bug in _multidict_py.py on free-threaded CPython (3.13t).\r\n\r\nRoot cause: `__setitem__` temporarily sets `e.hash = -1` as a sentinel marker while traversing entries, relying on `restore_hash()` to clean up afterwards. Under free-threaded CPython, a concurrent thread can enter `_add_with_hash` \u2192 `_resize` \u2192 `build_indices(update=False)` in that window, where it hits:\r\n\r\n```python\r\nassert hash_ != -1  # line 543\r\n```\r\n\r\n...and raises AssertionError because it observed the in-progress -1 sentinel from the other thread.\r\n\r\nThe fix for the C extension in this PR uses Py_BEGIN_CRITICAL_SECTION, but the pure-Python implementation has no equivalent synchronization. Fixing it properly would require adding a threading.Lock to MultiDict.\r\n\r\nI've skipped the test for the pure-Python variant for now to unblock this PR."
+  },
+  {
+   "author": "rodrigobnogueira",
+   "created_at": "2026-05-02T03:24:20Z",
+   "body": "Error showed up in CI (traceback from **Thread B**):\r\n\r\n```\r\n  File \"_multidict_py.py\", line 881, in __setitem__\r\n    self._add_with_hash(_Entry(hash_, identity, key, value))\r\n       \u2193 (usable <= 0, triggers resize)\r\n  File \"_multidict_py.py\", line 1088, in _add_with_hash\r\n    self._resize((self._used * 3 | _HtKeys.MINSIZE - 1).bit_length(), False)\r\n       \u2193\r\n  File \"_multidict_py.py\", line 1083, in _resize\r\n    newkeys.build_indices(update)\r\n       \u2193\r\n  File \"_multidict_py.py\", line 543, in build_indices\r\n    assert hash_ != -1\r\nAssertionError\r\n```\r\n\r\nTwo concurrent `__setitem__` calls race:\r\n- **Thread A** is updating an **existing** key \u2014 it sets `e.hash = -1` (line 874) as a sentinel while iterating, and has not yet called `restore_hash()`.\r\n- **Thread B** is inserting a **new** key \u2014 it enters the `not found` branch (line 880\u2013881), calls `_add_with_hash` \u2192 `_resize` \u2192 `build_indices(update=False)`, which iterates the **same shared entries** and hits Thread A's `-1` sentinel \u2192 `AssertionError`.\r\n"
+  },
+  {
+   "author": "Vizonex",
+   "created_at": "2026-05-02T03:57:47Z",
+   "body": "See #1327 "
+  },
+  {
+   "author": "Dreamsorcerer",
+   "created_at": "2026-05-02T13:40:34Z",
+   "body": "I'm unclear how much we should be concerned with such issues. The entire point of aio-libs is to provide asyncio libraries, so threading issues shouldn't be relevant. I'd rather not start introducing threading locks into our libraries.."
+  },
+  {
+   "author": "Vizonex",
+   "created_at": "2026-05-02T14:59:58Z",
+   "body": "> I'm unclear how much we should be concerned with such issues. The entire point of aio-libs is to provide asyncio libraries, so threading issues shouldn't be relevant. I'd rather not start introducing threading locks into our libraries..\r\n\r\n@Dreamsorcerer You have to remember to that multidict is used in other libraries or projects besides our own. An example that I have is [litestar](https://github.com/litestar-org/litestar/blob/ca374cec33fdb3b7338f3310e1d2aa17c3dae0c4/pyproject.toml#L42) however I'm with you on questioning weather or not thread locks should be considered acceptable or unacceptable however."
+  },
+  {
+   "author": "rodrigobnogueira",
+   "created_at": "2026-05-03T03:16:58Z",
+   "body": "> I'm unclear how much we should be concerned with such issues. The entire point of aio-libs is to provide asyncio libraries, so threading issues shouldn't be relevant. I'd rather not start introducing threading locks into our libraries..\r\n\r\nAdding threading.Lock to the pure-Python fallback would add overhead for all users to solve a problem that is probably an edge case. Would it be acceptable to emit a RuntimeWarning at import time only when both conditions are true: running on free-threaded CPython (GIL disabled) AND the C extension is not available?"
+  },
+  {
+   "author": "Dreamsorcerer",
+   "created_at": "2026-05-03T16:15:18Z",
+   "body": "> Adding threading.Lock to the pure-Python fallback would add overhead for all users to solve a problem that is probably an edge case. Would it be acceptable to emit a RuntimeWarning at import time only when both conditions are true: running on free-threaded CPython (GIL disabled) AND the C extension is not available?\r\n\r\nWe're talking about just iterating and modifying the same multidict, right? Can just mention that this shouldn't be done in a threaded situation. Maybe issue a warning."
+  },
+  {
+   "author": "rodrigobnogueira",
+   "created_at": "2026-05-04T20:37:22Z",
+   "body": "> > Adding threading.Lock to the pure-Python fallback would add overhead for all users to solve a problem that is probably an edge case. Would it be acceptable to emit a RuntimeWarning at import time only when both conditions are true: running on free-threaded CPython (GIL disabled) AND the C extension is not available?\r\n> \r\n> We're talking about just iterating and modifying the same multidict, right? Can just mention that this shouldn't be done in a threaded situation. Maybe issue a warning.\r\n\r\nAdded a RuntimeWarning in __init__.py that fires only when the pure-Python fallback is used on free-threaded CPython (GIL disabled + C extension unavailable). "
+  },
+  {
+   "author": "Vizonex",
+   "created_at": "2026-06-23T03:41:00Z",
+   "body": "Are we still planning to move forward with these free-threaded PRs at all or will these be closed?"
+  },
+  {
+   "author": "rodrigobnogueira",
+   "created_at": "2026-07-05T20:56:13Z",
+   "body": "pre-commit surfaced the new PLC0415 rule, fixed in https://github.com/aio-libs/multidict/commit/4079a3ee787295e7690e87e9fd80a42566130de2."
+  },
+  {
+   "author": "rodrigobnogueira",
+   "created_at": "2026-07-05T21:26:37Z",
+   "body": "> Are we still planning to move forward with these free-threaded PRs at all or will these be closed?\r\n\r\nIMO this solves the issue, and the main cost is how many functions it has to touch: every entry point that reads md->keys needs the critical section, the same way CPython's dict does it. The sections are no-ops on regular builds, so only free-threaded builds pay.\r\n\r\nI think it deserves fixing: this is memory unsafety, not a logical race. A pure-Python user on 3.13t can segfault the process, where CPython's dict raises RuntimeError. The lighter alternative is documenting it as unsupported and keeping only the RuntimeWarning, but that leaves a crash reachable from Python code.\r\n"
+  }
+ ],
+ "timeline_refs": [],
+ "fetch_errors": null
+}

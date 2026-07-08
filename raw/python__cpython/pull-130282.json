@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 130282,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/130282",
+ "title": "gh-130163: Fix usage of borrow references from _PySys_GetAttr",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sergey-miryanov",
+ "author_association": "MEMBER",
+ "labels": [
+  "tests"
+ ],
+ "created_at": "2025-02-18T19:58:24Z",
+ "closed_at": "2025-02-25T17:36:39Z",
+ "body": "WIP\r\n\r\n<!-- gh-issue-number: gh-130163 -->\r\n* Issue: gh-130163\r\n<!-- /gh-issue-number -->\r\n\r\n|                                                        | Repro  | Tests  | Raised exception |\r\n| ------------------------------------------------------ |:------:|:------:| ---------------- |\r\n| `_pickle.c/whichmodule`                                |   No   |   No   | Don't keep       |\r\n| `_threadmodule.c/thread_excepthook`                    |   No   |   No   | Keep             |\r\n| `faulthandler.c/faulthandler_get_fileno`               |  Yes   |  Yes   | Don't keep       |\r\n| `bltinmodule.c/builtin_print_impl`                     |  Yes   |  Yes   | Don't keep       |\r\n| `bltinmodule.c/builtin_input_impl`                     |  Yes   |  Yes   | Don't keep       |\r\n| `errors.c/write_unraisable_exc`                        |   No   |   No   | Keep             |\r\n| `errors.c/format_unraisable_v`                         |  Yes   |  Yes   | Keep             |\r\n| `_warnings.c/show_warning`                             |  Yes   |  Yes   | Don't keep       |\r\n| `intrinsics.c/print_expr`                              |   No   |   No   | Don't keep       |\r\n| `pylifecycle.c/flush_std_files`                        | Yes/No | Yes/No | Don't keep       |\r\n| `pythonrun.c/_PyRun_InteractiveLoopObject`             |   No   |   No   | Don't keep       |\r\n| `pythonrun.c/pyrun_one_parse_ast`                      |   No   |   No   | Don't keep       |\r\n| `pythonrun.c/_Py_HandleSystemExitAndKeyboardInterrupt` |   No   |   No   | Don't keep       |\r\n| `pythonrun.c/_PyErr_PrintEx`                           |  Yes   |  Yes   | Don't keep       |\r\n| `pythonrun.c/PyErr_Display`                            |   No   |   No   | Don't keep       |\r\n| `pythonrun.c/flush_io_stream`                          |   No   |   No   | Don't keep       |\r\n| `sysmodule.c/sys_displayhook`                          |  Maybe |   No   | Don't keep       |\r\n| `sysmodule.c/get_warnoptions`                          |   No   |   No   | Don't keep       |\r\n| `sysmodule.c/PySys_ResetWarnOptions`                   |   No   |   No   | Don't keep       |\r\n| `sysmodule.c/PySys_HasWarnOptions`                     |   No   |   No   | Don't keep       |\r\n| `sysmodule.c/_PySys_AddXOptionWithError`               |   No   |   No   | Don't keep       |\r\n| `sysmodule.c/PySys_SetArgvEx`                          |   No   |   No   | Don't keep       |\r\n| `sysmodule.c/sys_write`                                |   No   |   No   | Don't keep       |\r\n| `sysmodule.c/sys_format`                               |   No   |   No   | Don't keep       |\r\n| `traceback.c/_Py_FindSourceFile`                       |   No   |   No   | Don't keep       |\r\n|                                                        |        |        |                  |\r\n\r\n* I can get a \"segfault\" error when I use `sys_displayhook`, but not where it's used.\r\n* For `sys_write`, `sys_format` - I have checked all the places where they called, and most of the locations are safe. However, a few places use `%s` specifier, in such places it is very tricky to get `segfault`.\r\n* `get_warnoptions`, `PySys_ResetWarnOptions`, `_PySys_AddXOptionWithError` - are deprecated, but it is a very tricky to get `segfault` too.\r\n* `flush_io_stream`, `PyErr_Display`, `pyrun_one_parse_ast`, `print_expr`, `write_unraisable_exc`, `thread_excepthook` - very tight - They use a borrowed reference right after getting. It might be possible to reproduce it under heavy contention, but I wasn't able to do so.\r\n* `_PyRun_InteractiveLoopObject` only checks presence of `ps1` and `ps2`.\r\n* `flush_std_files` used from `_Py_Finalize` and from `fatal_error`. For `_Py_Finalize` I can repro, for `fatal_error` - no.\r\n* `whichmodule`, `_Py_FindSourceFile` iterate borrowed reference, but I wasn't able to reproduce `segfault`.\r\n* Keep or not before raised exception - in the most places `_PySys_GetAttr` called without an exception set.",
+ "comments": [
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-25T17:36:39Z",
+   "body": "Close in favor https://github.com/python/cpython/pull/130503"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130163",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/capi-workgroup/decisions/issues/54",
+   "commit": null,
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sergey-miryanov"
+  }
+ ],
+ "fetch_errors": null
+}

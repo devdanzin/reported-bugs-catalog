@@ -1,0 +1,108 @@
+{
+ "repo": "python/cpython",
+ "number": 151779,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151779",
+ "title": "gh-151763: Fix NULL deref in `os._path_normpath()`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "zainnadeem786",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-06-20T10:11:59Z",
+ "closed_at": "2026-06-24T15:56:10Z",
+ "body": "## Summary\r\n\r\nThis PR addresses **[OOM-0028](https://gist.github.com/devdanzin/774867b89b3de8d36d7e2ac405034577)** from gh-151763.\r\n\r\nIt fixes a NULL dereference in `os__path_normpath_impl()` when memory allocation fails while normalizing a bytes path.\r\n\r\n## Issue\r\n\r\n`os__path_normpath_impl()` builds a Unicode `result` using either `PyUnicode_FromOrdinal()` or `PyUnicode_FromWideChar()`.\r\n\r\nFor bytes input, the function then converts that Unicode result back to bytes using `PyUnicode_EncodeFSDefault()`.\r\n\r\nBefore this change, the result of `PyUnicode_FromWideChar()` was not checked before the bytes-path encoding branch.\r\n\r\nUnder memory pressure, `PyUnicode_FromWideChar()` can return `NULL` with a pending `MemoryError`. The existing code could then pass that `NULL` value into `PyUnicode_EncodeFSDefault()`, causing a crash.\r\n\r\n## Fix\r\n\r\nAdd an explicit NULL check immediately after creating `result` and before the bytes-path encoding branch.\r\n\r\n```c\r\nif (result == NULL) {\r\n    return NULL;\r\n}\r\n```\r\n\r\nThis preserves the pending `MemoryError` and prevents `PyUnicode_EncodeFSDefault()` from receiving a NULL object.\r\n\r\n## Validation\r\n\r\nI validated this using a CPython debug build on Windows:\r\n\r\n```powershell\r\nPCbuild\\build.bat -p x64 -c Debug\r\n```\r\n\r\nThen I used `_testcapi.set_nomemory()` to inject allocation failures while calling:\r\n\r\n```python\r\nos.path.normpath(b\"a\\\\..\\\\b\\\\c\")\r\n```\r\n\r\n### Before the fix\r\n\r\nWith the NULL guard removed, allocation index `2` crashed:\r\n\r\n```text\r\nIDX 2 RC 3221225477\r\n```\r\n\r\n`3221225477` is `0xC0000005`, Windows `STATUS_ACCESS_VIOLATION`.\r\n\r\n### After the fix\r\n\r\nWith the NULL guard restored, the same allocation index returned a clean `MemoryError` instead of crashing:\r\n\r\n```text\r\nIDX 2 RC 10 MEMORYERROR\r\n```\r\n\r\nThis confirms that the failing OOM path now propagates the allocation failure instead of dereferencing NULL.\r\n\r\n## Tests\r\n\r\nFocused `ntpath` tests passed:\r\n\r\n```powershell\r\nPCbuild\\amd64\\python_d.exe -m unittest -v `\r\n  test.test_ntpath.TestNtpath.test_normpath `\r\n  test.test_ntpath.TestNtpath.test_normpath_invalid_paths `\r\n  test.test_ntpath.NtCommonTest.test_normpath_issue5827 `\r\n  test.test_ntpath.NtCommonTest.test_normpath_issue106242\r\n```\r\n\r\nResult:\r\n\r\n```text\r\nRan 4 tests in 0.009s\r\nOK\r\n```\r\n\r\nI also checked the patch with:\r\n\r\n```powershell\r\ngit diff --check -- Modules/posixmodule.c\r\n```\r\n\r\nNo regression test is included in this PR. The OOM reproducer depends on allocation-failure injection and allocation indexes that can be build-sensitive. The fix itself is a minimal local NULL guard.\r\n\r\nAddresses OOM-0028 from gh-151763.\r\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-20T10:12:04Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T14:32:38Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-24T15:56:43Z",
+   "body": "Thanks @zainnadeem786 for the PR, and @StanFromIreland for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 I'm not a witch! I'm not a witch!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-24T15:56:43Z",
+   "body": "Thanks @zainnadeem786 for the PR, and @StanFromIreland for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-24T15:56:44Z",
+   "body": "Thanks @zainnadeem786 for the PR, and @StanFromIreland for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T15:56:58Z",
+   "body": "[GH-152094](https://github.com/python/cpython/pull/152094) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T15:57:03Z",
+   "body": "[GH-152095](https://github.com/python/cpython/pull/152095) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T15:57:09Z",
+   "body": "[GH-152096](https://github.com/python/cpython/pull/152096) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2026-06-24T15:57:25Z",
+   "body": "Merged, thanks."
+  },
+  {
+   "author": "zainnadeem786",
+   "created_at": "2026-06-24T16:10:40Z",
+   "body": "Thanks! @StanFromIreland I really appreciate your review and guidance throughout the process. It was great working with you, and I look forward to contributing more fixes and PRs in the future."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ce8b81fff4094bd0cfb0c57193135bfc904c0ca2",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "58476e8cbbe19fb60b5819d30d0020bd790fad30",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "45de3e041968ffb4aa84a67ccd1502099dad7f2f",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4e7843ea3e7d4c01ead20ded70096a819b9d3da7",
+   "actor": "StanFromIreland"
+  }
+ ],
+ "fetch_errors": null
+}

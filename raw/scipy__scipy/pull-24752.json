@@ -1,0 +1,133 @@
+{
+ "repo": "scipy/scipy",
+ "number": 24752,
+ "type": "pull",
+ "url": "https://github.com/scipy/scipy/pull/24752",
+ "title": "BUG: optimize: improve handling of memory errors in direct()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "jberg5",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "defect",
+  "scipy.optimize",
+  "C/C++"
+ ],
+ "created_at": "2026-03-05T21:05:59Z",
+ "closed_at": "2026-05-09T09:14:38Z",
+ "body": "Some background: in memory constrained production environments, we've noticed occasional segfaults under memory pressure. It's difficult to trace these exactly in Python, ~but some appear to originate from scipy~ (update 2026-03-14, I'm no longer certain that is the case, but I have been able to repro SystemErrors instead of MemoryErrors). I had Claude (Opus 4.6) do a massive audit of scipy to identify and fix memory safety issues. These were tested on a small EC2 by simulating malloc failures using a custom LD_PRELOAD that had malloc return null under certain conditions.\r\n\r\n---\r\n\r\nFix segfaults caused by missing NULL checks after malloc in the DIRECT optimizer and an integer overflow in odepack workspace size calculation.\r\n\r\n`scipy.optimize.direct()` - `direct_wrap.c` sets an error code when `malloc` returns NULL but does not return, falling through to dereference the NULL pointer. `_directmodule.c` has the same pattern. Add early returns with proper Python exceptions.\r\n\r\n`scipy.integrate.odeint()` - `compute_lrw_liw` computes `neq*neq` in `int` arithmetic, which silently overflows for neq > 46340, causing an undersized `calloc` and subsequent heap buffer overflow. Add overflow guards for both dense and banded Jacobian workspace calculations.\r\n\r\n<!-- \r\nThanks for contributing a pull request! Please ensure that\r\nyour PR satisfies the checklist before submitting:\r\nhttps://scipy.github.io/devdocs/dev/contributor/development_workflow.html#checklist-before-submitting-a-pr\r\n\r\nAlso, please name and describe your PR as you would write a\r\ncommit message:\r\nhttps://scipy.github.io/devdocs/dev/contributor/development_workflow.html#writing-the-commit-message.\r\nHowever, please only include an issue number in the description, not the title,\r\nand please ensure that any code names containing underscores are enclosed in backticks.\r\n\r\nDepending on your changes, you can skip CI operations and save time and energy: \r\nhttps://scipy.github.io/devdocs/dev/contributor/continuous_integration.html#skipping\r\n\r\nNote that we are a team of volunteers; we appreciate your\r\npatience during the review process.\r\n\r\nAgain, thanks for contributing!\r\n-->\r\n\r\n#### Reference issue\r\n<!--Example: Closes gh-WXYZ.-->\r\n\r\nHaven't created one; let me know if I should!\r\n\r\n#### What does this implement/fix?\r\n\r\n<!--Please explain your changes.-->\r\n\r\nFixes segfaults under memory pressure, and silent heap truncation on large problem sizes from integer overflow.\r\n\r\n#### Additional information\r\n<!--Any additional information you think is important.-->\r\n\r\n#### AI Generation Disclosure\r\n\r\n<!-- If AI was used in the preparation of this pull request, please disclose\r\nthe tool(s) used, how they were used, and specify what code or text is AI generated.\r\nIf no AI tools were used, please write \"No AI tools used\" in this section. Read our\r\npolicy on AI generated code at\r\nhttps://scipy.github.io/devdocs/dev/conduct/ai_policy.html -->\r\n\r\nAI (Claude with Opus4.6) was used extensively in the creation of this pull request (under heavy supervision!!). It identified the issues, reproduced them, implemented the fixes, and reran the reproduction to prove the fixes were legit.\r\n",
+ "comments": [
+  {
+   "author": "j-bowhay",
+   "created_at": "2026-03-05T21:09:56Z",
+   "body": "Can you provide a reproducer that these change fix please?"
+  },
+  {
+   "author": "ilayn",
+   "created_at": "2026-03-05T21:12:24Z",
+   "body": "Hi @jberg5 we are in this version slowly switching to ILP64 as we did in #24703 but it will require you to use 64bit BLAS/LAPACK. That's why we are not checking the integer limit yet. And if needed we should check those on Python side since we know neq ahead of time. So that fix is not valid for now. \r\n\r\nThe NULL check is always nice. But I'm pretty sure it is not the reason for the segfaults."
+  },
+  {
+   "author": "ev-br",
+   "created_at": "2026-03-05T21:23:46Z",
+   "body": "To add to what Jake and Ilhan said:\r\n\r\n- integer overflow checks indeed need to account for ILP64. In C you need `CBLAS_INT_MAX` from `_build_utils.h`; on the python side (and indeed if you can do a check in python, please do), use the maximum value of  `np.int64 if HAS_ILP64 else np.int32` with `from scipy.linalg.lapack import HAS_ILP64`.\r\n- here's one trick to simulate a constrained memory environment using `psutil` module, under the fold in https://github.com/numpy/numpy/pull/29811 (the trick is not mine)"
+  },
+  {
+   "author": "rgommers",
+   "created_at": "2026-03-12T09:46:26Z",
+   "body": "This kind of testing and fix is quite valuable, so thank you @jberg5. \r\n\r\nThe `direct` fixes look merge-able as is, so let's get those in. That's a different submodule than `integrate` anyway, so it may be easiest to put those in a separate PR - could you please do that @jberg5?\r\n\r\nFor the `integrate` fixes, that needs some changes for ILP64 support indeed. But the general idea is valid I think - it's just very hard to know what the right integer value is to raise an exception on for LP64. But if we trust the derivation of that, we should prefer raising an exception over a hard crash."
+  },
+  {
+   "author": "jberg5",
+   "created_at": "2026-03-14T13:13:29Z",
+   "body": "Thanks everyone for your feedback! I've gone back to the drawing board a little bit because my original repro wasn't super realistic. I used an `LD_PRELOAD` that injected malloc failures at specific intervals, and while this was successful in generating SIGSEGVs, it also effectively skipped earlier handling that would have addressed real memory pressure more gracefully. You guys are right: my production segfaults are probably *not* from the issues I've addressed here.\r\n\r\n@ev-br thanks for sharing that psutil trick, I'm going to add it to my toolkit :)\r\n\r\nBased on that, I started using this repro script (thanks claude for writing it, I've just tweaked a little):\r\n\r\n```python\r\nimport os\r\nimport sys\r\nimport psutil\r\nimport resource\r\nimport faulthandler\r\nfaulthandler.enable()\r\n\r\n# Import scipy before setting memory limit\r\nfrom scipy.optimize import direct\r\n\r\n\r\ndef set_memory_limit(buffer_bytes):\r\n    \"\"\"Limit process virtual memory to current usage + buffer.\"\"\"\r\n    process = psutil.Process(os.getpid())\r\n    used = process.memory_info().vms\r\n    limit = used + buffer_bytes\r\n    resource.setrlimit(resource.RLIMIT_AS, (limit, limit))\r\n\r\n\r\n# Set tight memory limit \u2014 10MB headroom\r\nset_memory_limit(10 * 1024 * 1024)\r\n\r\ndef objective(x):\r\n    return sum(xi**2 for xi in x)\r\n\r\n# Use enough dimensions that malloc(sizeof(double) * dimension * 2)\r\n# in direct_wrap.c will fail under the memory limit.\r\n# 100k dimensions * 8 bytes * 2 = 1.6MB, but DIRECT internally\r\n# allocates much more workspace.\r\nbounds = [(-5.0, 5.0)] * 100_000\r\n\r\ntry:\r\n    result = direct(objective, bounds)\r\n    print(f\"BUG: direct() succeeded unexpectedly: fun={result.fun}\")\r\n    sys.exit(1)\r\nexcept MemoryError:\r\n    # This is the desired behavior after the fix\r\n    print(\"OK: MemoryError raised (graceful failure)\")\r\n    sys.exit(0)\r\nexcept SystemError as e:\r\n    # NULL return without exception manifests as SystemError\r\n    # rather than SIGSEGV. Still a bug \u2014 CPython API violation.\r\n    print(f\"BUG: {e}\")\r\n    print(\"The C code returned NULL without setting a Python exception.\")\r\n    sys.exit(1)\r\n```\r\n\r\nWhat I've seen is that I get `SystemError`s rather than `MemoryError`s, which while not a segfault still isn't ideal. I've tested my changes with this script and have observed on both my macbook and a gcloud c2-standard-4 that now we get a `MemoryError`."
+  },
+  {
+   "author": "jberg5",
+   "created_at": "2026-04-30T13:42:18Z",
+   "body": "Gentle bump :) "
+  },
+  {
+   "author": "jberg5",
+   "created_at": "2026-05-01T13:22:10Z",
+   "body": "Thanks for the review @dschmitz89 ! And good shout about the hack, I'll have a look after this PR."
+  },
+  {
+   "author": "dschmitz89",
+   "created_at": "2026-05-01T18:46:46Z",
+   "body": "Thanks @jberg5 for the quick update. I think I understand the issue with empty bounds better now. Indeed on main we get an interpreter crash in that case. I am wondering though if this should be allowed for the `Bounds` class at all. In my opinion, empty lower and upper limit are useless and should be directly rejected when the object is instantiated. Could you open a separate issue about that topic? Then we can focus this PR on the segmentation fault mitigation/how to process it properly for CPython.\r\n\r\nWhat is the minimal change required so that your MWE raises `MemoryError` instead of `SystemError`? I hope for example that the changes in `cleanup` can be avoided."
+  },
+  {
+   "author": "jberg5",
+   "created_at": "2026-05-02T10:12:52Z",
+   "body": "Thanks again @dschmitz89 - cleaned up the empty bounds stuff, I'll raise an issue to kick off a separate discussion. I've also moved the catch-all out of the `cleanup` path. I think this is now the minimal diff to get my MRE passing."
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-05-02T22:22:02Z",
+   "body": "I should mention the DIRECT crash reproducer from https://github.com/scipy/scipy/issues/24927:\r\n\r\n```\r\nimport gc, os\r\ngc.disable()\r\nimport _testcapi\r\nfrom scipy.optimize import direct\r\n\r\ndef sphere(x):\r\n    return sum(xi**2 for xi in x)\r\n\r\nfor n in range(1, 200):\r\n    _testcapi.set_nomemory(n, 0)\r\n    try:\r\n        direct(sphere, [(-5, 5)] * 2, maxfun=50)\r\n        _testcapi.remove_mem_hooks()\r\n        break\r\n    except MemoryError:\r\n        _testcapi.remove_mem_hooks()\r\n    except:\r\n        _testcapi.remove_mem_hooks()\r\n        break\r\n# Aborted (core dumped) \u2014 assertion failure on debug build\r\n```\r\n\r\nThis also crashes on this branch. Looks like allocation failures at `DIRsubrout.c:1089` here can cause a crash.\r\n\r\n```\r\n\t        PyList_SetItem(x_seq, i, PyFloat_FromDouble(x_i_scaled));\r\n```"
+  },
+  {
+   "author": "dschmitz89",
+   "created_at": "2026-05-03T14:29:44Z",
+   "body": "> I should mention the DIRECT crash reproducer from #24927:\r\n> \r\n> ```\r\n> import gc, os\r\n> gc.disable()\r\n> import _testcapi\r\n> from scipy.optimize import direct\r\n> \r\n> def sphere(x):\r\n>     return sum(xi**2 for xi in x)\r\n> \r\n> for n in range(1, 200):\r\n>     _testcapi.set_nomemory(n, 0)\r\n>     try:\r\n>         direct(sphere, [(-5, 5)] * 2, maxfun=50)\r\n>         _testcapi.remove_mem_hooks()\r\n>         break\r\n>     except MemoryError:\r\n>         _testcapi.remove_mem_hooks()\r\n>     except:\r\n>         _testcapi.remove_mem_hooks()\r\n>         break\r\n> # Aborted (core dumped) \u2014 assertion failure on debug build\r\n> ```\r\n> \r\n> This also crashes on this branch. Looks like allocation failures at `DIRsubrout.c:1089` here can cause a crash.\r\n> \r\n> ```\r\n> \t        PyList_SetItem(x_seq, i, PyFloat_FromDouble(x_i_scaled));\r\n> ```\r\n\r\nOh my, DIRECT truely is an endless source of memory problems. Can we tackle that one also in a separate PR though?\r\n\r\n@jberg5 Could you merge main here to get your updates from https://github.com/scipy/scipy/pull/25088 in? I think this PR should be good then."
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-05-03T20:12:04Z",
+   "body": "> Oh my, DIRECT truely is an endless source of memory problems. Can we tackle that one also in a separate PR though?\r\n\r\nMakes sense to me; don't let the perfect be the enemy of the good."
+  },
+  {
+   "author": "jberg5",
+   "created_at": "2026-05-04T11:17:07Z",
+   "body": "Thanks @dschmitz89 , have done so"
+  },
+  {
+   "author": "dschmitz89",
+   "created_at": "2026-05-08T03:46:38Z",
+   "body": "Are you happy with this PR in its current state @nickodell ?"
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-05-08T04:05:32Z",
+   "body": "> Are you happy with this PR in its current state @nickodell ?\r\n\r\nI have no opinion, positive or negative. I haven't read it or tried to understand the error handling path here. I did try the crash reproducer to see if any interesting new OOM failures popped up. One did, but it's an OOM failure that also exists on main.\r\n\r\nWould you like me to review it? If so, I could do so tomorrow."
+  },
+  {
+   "author": "dschmitz89",
+   "created_at": "2026-05-08T04:23:48Z",
+   "body": "Yes a review would be appreciated as you have a lot more experience than I do in checking for memory safety. Thanks @nickodell ."
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-05-09T08:00:29Z",
+   "body": "Here is my review on whether this change to memory handling is necessary, and whether it is sufficient to solve memory errors in that particular place.\r\n\r\n### Necessity\r\n\r\n#### Change 1\r\n\r\nFirstly, can this malloc fail, and if so, what happens? The attached reproducer didn't quite work for me; I needed to set more aggressive memory limits to get it to crash in the right place.\r\n\r\n<details>\r\n\r\n```python\r\nimport os\r\nimport sys\r\nimport psutil\r\nimport resource\r\nimport faulthandler\r\nfaulthandler.enable()\r\n\r\n# Import scipy before setting memory limit\r\nfrom scipy.optimize import direct, Bounds\r\n\r\n\r\ndef set_memory_limit(buffer_bytes):\r\n    \"\"\"Limit process virtual memory to current usage + buffer.\"\"\"\r\n    process = psutil.Process(os.getpid())\r\n    used = process.memory_info().vms\r\n    limit = used + buffer_bytes\r\n    resource.setrlimit(resource.RLIMIT_AS, (limit, limit))\r\n\r\n\r\n\r\ndef objective(x):\r\n    return sum(xi**2 for xi in x)\r\n\r\n# Use enough dimensions that malloc(sizeof(double) * dimension * 2)\r\n# in direct_wrap.c will fail under the memory limit.\r\n# 100k dimensions * 8 bytes * 2 = 1.6MB, but DIRECT internally\r\n# allocates much more workspace.\r\nN = 100_000\r\n#bounds = [(-5.0, 5.0)] * 100_000\r\nbounds = Bounds([-5.0] * N, [10.0] * N)\r\n# Set tight memory limit \u2014 10MB headroom\r\nset_memory_limit(3 * 1024 * 1024)\r\n\r\ntry:\r\n    result = direct(objective, bounds)\r\n    print(f\"BUG: direct() succeeded unexpectedly: fun={result.fun}\")\r\n    sys.exit(1)\r\n#except MemoryError:\r\n#    # This is the desired behavior after the fix\r\n#    print(\"OK: MemoryError raised (graceful failure)\")\r\n#    sys.exit(0)\r\nexcept SystemError as e:\r\n    # NULL return without exception manifests as SystemError\r\n    # rather than SIGSEGV. Still a bug \u2014 CPython API violation.\r\n    print(f\"BUG: {e}\")\r\n    print(\"The C code returned NULL without setting a Python exception.\")\r\n    sys.exit(1)\r\n```\r\n\r\nRun this like so:\r\n\r\n```\r\nspin run gdb --args python ../foo/bug-24752e.py\r\n```\r\n\r\n</details>\r\n\r\nThe result of this is that `l` is NULL here, and segfaults on line 86.\r\n\r\n```\r\nattempting to alloc l\r\nl: (nil)\r\n\r\nThread 1 \"python\" received signal SIGSEGV, Segmentation fault.\r\ndirect_optimize (f=0x7ffff761a090, x=0x555556d9a270, x_seq=0x7fffb6e81740, args=0x555555b123d0 <_PyRuntime+90640>, dimension=100000, lower_bounds=0x7fffb49fc010, upper_bounds=0x7fffb4938010, minf=0x7fffffffc000, max_feval=100000000, max_iter=1000, magic_eps=0.0001, magic_eps_abs=0, volume_reltol=9.9999999999999998e-17, sigma_reltol=9.9999999999999995e-07, force_stop=0x7fffffffbfc4, fglobal=-inf, fglobal_reltol=0, logfile=0x0, algorithm=DIRECT_GABLONSKY, info=0x7fffffffc0a0, ret_code=0x7fffffffbfd0, callback=0x555555ad1220 <_Py_NoneStruct>) at ../scipy/optimize/_direct/direct_wrap.c:86\r\n86\t      l[i] = lower_bounds[i];\r\n```\r\n\r\nSuppose that `malloc()` fails while attempting to allocate an array for storing lower bound. In that circumstance, is this change necessary? Yes.\r\n\r\nThis is because right after we allocate this, we attempt to write to `l`. Here's the current code on main.\r\n\r\n```\r\n     l = (doublereal *) malloc(sizeof(doublereal) * dimension * 2);\r\n     if (!l) *ret_code = DIRECT_OUT_OF_MEMORY;\r\n     u = l + dimension;\r\n     for (i = 0; i < dimension; ++i) {\r\n      l[i] = lower_bounds[i];\r\n      u[i] = upper_bounds[i];\r\n     }\r\n```\r\n\r\nReading or writing a NULL pointer is UB, so it is necessary to return here before writing to this pointer.\r\n\r\n#### Change 2\r\n\r\nSuppose that direct_direct_ returns NULL, e.g. because this malloc returns NULL, and triggers `goto cleanup`.\r\n\r\n```\r\n98\t    c__ = (doublereal *) malloc(sizeof(doublereal) * (MAXFUNC * (*n)));\r\n```\r\n\r\n(I triggered this by setting the memory limit to `set_memory_limit(4 * 1024 * 1024)`.)\r\n\r\nIn that circumstance, it seems reasonable to raise a MemoryError if ierror indicates a memory error, and give the user a more specific error code instead of SystemError otherwise. If some other error ends up being commonly observed, we can give more specific error messages then.\r\n\r\n### Sufficiency\r\n\r\n#### Change 1\r\n\r\nReturning here does prevent `l` from being used. The caller, `direct`, is prepared to handle `NULL`.\r\n\r\n#### Change 2\r\n\r\nYeah that seems good.\r\n\r\n### Conclusion\r\n\r\nYes, it is.\r\n\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24750",
+   "commit": null,
+   "actor": "ev-br"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/issues/25086",
+   "commit": null,
+   "actor": "jberg5"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "86a2cd82e6fcbd01f5b7e59a90bc5a87ac33a3b5",
+   "actor": "dschmitz89"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dschmitz89"
+  }
+ ],
+ "fetch_errors": null
+}

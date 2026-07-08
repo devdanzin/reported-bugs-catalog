@@ -1,0 +1,76 @@
+{
+ "repo": "python/cpython",
+ "number": 152131,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152131",
+ "title": "gh-151763: Fix crash in `_interpqueues.create` on `MemoryError`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-24T22:01:44Z",
+ "closed_at": "2026-06-25T07:04:03Z",
+ "body": "\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-25T07:04:07Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-25T07:04:21Z",
+   "body": "[GH-152158](https://github.com/python/cpython/pull/152158) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-25T07:04:27Z",
+   "body": "[GH-152159](https://github.com/python/cpython/pull/152159) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-25T07:04:32Z",
+   "body": "[GH-152160](https://github.com/python/cpython/pull/152160) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "a6c2d4ae3bd744610e1a8b70396effdabca1593d",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e09bc5f0be09dab3f602702b155c9b7c98d799fc",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "00b8dabd5fea39a738af5b3a021a96542586d806",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "703c9bf976227f2d5b90e9dfe47564ab345a7383",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

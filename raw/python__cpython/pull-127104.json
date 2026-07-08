@@ -1,0 +1,49 @@
+{
+ "repo": "python/cpython",
+ "number": 127104,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127104",
+ "title": "[3.13] gh-126316: Make grp.getgrall() thread-safe: add a mutex (#127055)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-21T14:50:22Z",
+ "closed_at": "2024-11-26T11:01:51Z",
+ "body": "grpmodule.c is no longer built with the limited C API, since PyMutex is excluded from the limited C API.\r\n\r\n(cherry picked from commit 3c2bd66e21bd8de69a89ebf09ff9d8e78ddfb839)\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-126316 -->\n* Issue: gh-126316\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-25T08:38:21Z",
+   "body": "> Tests / Check if the ABI has changed (pull_request) Failing after 1m \r\n\r\nOh, I suppose that it's the addition of the \"id\" string which is automatically generated from Argument Clinic :-("
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126316",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127055",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9187ac3f2d22a7505da8cc9e159c75068b8b9a50",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

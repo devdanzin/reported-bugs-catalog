@@ -8,18 +8,26 @@
  "issues": [
   "python/cpython#148074"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#148075",
+  "python/cpython#148095"
+ ],
+ "n_prs": 2,
+ "n_backports": 1,
+ "n_fix_prs": 1,
  "gists": [
   "551cace22f112ef0ff4ed3fdbe54d235"
  ],
  "labels": [
   "interpreter-core",
+  "skip news",
   "topic-typing",
   "type-bug"
  ],
  "filed_by": "maintainer",
  "filers": [
-  "Wulian233"
+  "Wulian233",
+  "miss-islington"
  ],
  "status": "closed/fixed",
  "confidence": "medium",
@@ -27,7 +35,9 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-148074.json"
+  "raw/python__cpython/issue-148074.json",
+  "raw/python__cpython/pull-148075.json",
+  "raw/python__cpython/pull-148095.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

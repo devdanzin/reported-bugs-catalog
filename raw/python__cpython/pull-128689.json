@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 128689,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/128689",
+ "title": "[3.13] gh-127196: Fix crash in `_interpreters`, when `shared` had invalid encodings (GH-127220)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-01-09T19:45:47Z",
+ "closed_at": "2025-01-09T20:10:09Z",
+ "body": "(cherry picked from commit 087bb48acac997c06e69dae25bae2dd75194b980)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\n\n<!-- gh-issue-number: gh-127196 -->\n* Issue: gh-127196\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127196",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127220",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "0d2b9abd18ff4fc6d2fbf1b398b411ed3b76266c",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

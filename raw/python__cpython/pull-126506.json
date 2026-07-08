@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 126506,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126506",
+ "title": "gh-126316: Use getgrent_r() in grp.getgrall()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting core review"
+ ],
+ "created_at": "2024-11-06T16:27:07Z",
+ "closed_at": "2024-11-20T10:39:05Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-126316 -->\n* Issue: gh-126316\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-20T10:39:06Z",
+   "body": "getgrent_r() doesn't solve the issue: https://github.com/python/cpython/issues/126316#issuecomment-2460410219"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126316",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

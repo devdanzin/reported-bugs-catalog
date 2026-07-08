@@ -1,0 +1,59 @@
+{
+ "repo": "python/cpython",
+ "number": 128019,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/128019",
+ "title": "gh-127085: Add a test skip if multiprocessing isn't available",
+ "state": "closed",
+ "state_reason": null,
+ "author": "freakboy3742",
+ "author_association": "MEMBER",
+ "labels": [
+  "tests",
+  "skip news",
+  "OS-ios",
+  "OS-android"
+ ],
+ "created_at": "2024-12-17T07:37:05Z",
+ "closed_at": "2024-12-17T08:18:36Z",
+ "body": "#127412 added a test that requires the existence of `multiprocessing`. This test fails on iOS and Android because those platforms *have* threads, but don't have a multiprocessing module (because they don't support *processes*).\r\n\r\nThis PR skips the test on those platforms, so that the buildbots are no longer broken. There may be a better fix that involves re-writing the test to avoid the use of SharedMemoryManager.\r\n\r\n/cc @LindaSummer @kumaraditya303 @ZeroIntensity @mhsmith \r\n\n\n<!-- gh-issue-number: gh-127085 -->\n* Issue: gh-127085\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "freakboy3742",
+   "created_at": "2024-12-17T07:37:27Z",
+   "body": "!buildbot iOS|Android"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2024-12-17T07:37:31Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @freakboy3742 for commit 031e3b31977e4d815c6523e5648c45183f4d9394 :robot:\n\nThe command will test the builders whose names match following regular expression: `iOS|Android`\n\nThe builders matched are:\n- `iOS ARM64 Simulator PR`\n- `aarch64 Android PR`\n- `AMD64 Android PR`\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127085",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b9a492b809d8765ee365a5dd3c6ba4e5130a80af",
+   "actor": "freakboy3742"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "freakboy3742"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b5d061c474d7684abec2d007de5050be26f334f8",
+   "actor": "srinivasreddy"
+  }
+ ],
+ "fetch_errors": null
+}

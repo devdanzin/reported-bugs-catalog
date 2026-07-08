@@ -8,20 +8,28 @@
  "issues": [
   "python/mypy#20585"
  ],
- "prs": [],
+ "prs": [
+  "python/mypy#20586"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "byteforge38"
+ ],
  "status": "open",
  "confidence": "low",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__mypy/issue-20585.json"
+  "raw/python__mypy/issue-20585.json",
+  "raw/python__mypy/pull-20586.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

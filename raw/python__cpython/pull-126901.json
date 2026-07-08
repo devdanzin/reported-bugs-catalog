@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 126901,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126901",
+ "title": "gh-126881: store `debug` flag for event loops as a boolean",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2024-11-16T10:50:33Z",
+ "closed_at": "2024-11-16T11:07:37Z",
+ "body": "I'm opening this one as a possible fix. I'm totally unsure whether this is the way to patch it (see the corresponding issue).\r\n\r\n<!-- gh-issue-number: gh-126881 -->\r\n* Issue: gh-126881\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T11:07:38Z",
+   "body": "Closing in favor of #126904."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126881",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ],
+ "fetch_errors": null
+}

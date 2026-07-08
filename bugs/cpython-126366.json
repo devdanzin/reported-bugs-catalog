@@ -8,24 +8,39 @@
  "issues": [
   "python/cpython#126366"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#126369",
+  "python/cpython#126371",
+  "python/cpython#132693"
+ ],
+ "n_prs": 3,
+ "n_backports": 0,
+ "n_fix_prs": 3,
  "gists": [],
  "labels": [
   "3.13",
   "3.14",
   "interpreter-core",
+  "skip news",
+  "stale",
   "topic-free-threading",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
- "status": "closed/fixed",
+ "filed_by": "self+maintainer",
+ "filers": [
+  "ZeroIntensity",
+  "kumaraditya303"
+ ],
+ "status": "open",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-126366.json"
+  "raw/python__cpython/issue-126366.json",
+  "raw/python__cpython/pull-126369.json",
+  "raw/python__cpython/pull-126371.json",
+  "raw/python__cpython/pull-132693.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

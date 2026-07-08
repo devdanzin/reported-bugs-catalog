@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 132298,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132298",
+ "title": "gh-132296: Use thread-state reference counting to fix `PyEval_SetTraceAllThreads`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2025-04-09T02:17:00Z",
+ "closed_at": "2025-04-26T23:34:20Z",
+ "body": "This extends the `refcount` field to affect `PyThreadState_Delete` and friends, letting us keep a thread state alive for slightly longer. This mechanism is far from being robust, because we're still not preventing the thread state from being cleared or other bad things, but it's a really nice start.\r\n\r\nWe *could* go the route of letting the reference count field prevent any finalization happening to the thread state, but I want to hear opinions on this approach first.\n\n<!-- gh-issue-number: gh-132296 -->\n* Issue: gh-132296\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-09T02:19:46Z",
+   "body": "@colesbury -- As you implemented tstate refcounts, I'd like to hear your opinion on this. Do you think using reference counting before finalization is a good idea?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-26T23:34:21Z",
+   "body": "I realize that this only fixes concurrent deletion, but not concurrent mutation. Silly me."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132296",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

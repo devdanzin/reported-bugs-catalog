@@ -1,0 +1,49 @@
+{
+ "repo": "python/cpython",
+ "number": 143187,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143187",
+ "title": "gh-143183: Rewind stop tracing to previous target",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-12-26T10:56:55Z",
+ "closed_at": "2025-12-28T22:12:31Z",
+ "body": "Fixes #143183\r\n\r\n<!-- gh-issue-number: gh-143183 -->\r\n* Issue: gh-143183\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143183",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "daa9aa4c0a8490f09b01339b6928434d7fe02843",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143268",
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "872f04440ec1fbd25f489a1960a79be14cd62738",
+   "actor": "thunder-coding"
+  }
+ ],
+ "fetch_errors": null
+}

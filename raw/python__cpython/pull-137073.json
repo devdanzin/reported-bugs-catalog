@@ -1,0 +1,75 @@
+{
+ "repo": "python/cpython",
+ "number": 137073,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/137073",
+ "title": "gh-132551: add missing critical sections on BytesIO methods",
+ "state": "closed",
+ "state_reason": null,
+ "author": "kumaraditya303",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news",
+  "topic-free-threading"
+ ],
+ "created_at": "2025-07-24T11:03:32Z",
+ "closed_at": "2025-07-24T11:57:48Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\nFollow up for https://github.com/python/cpython/pull/132616 and adds missing critical sections, this fixes data races on `self->buf` when checking for closed object:\r\n\r\n```console\r\nARNING: ThreadSanitizer: data race (pid=80476)\r\n  Write of size 8 at 0x000118135d60 by thread T26239:\r\n    #0 resize_buffer_lock_held bytesio.c:172 (libpython3.15t.dylib:arm64+0x3d484c)\r\n    #1 write_bytes_lock_held bytesio.c:216 (libpython3.15t.dylib:arm64+0x3d4658)\r\n    #2 _io_BytesIO_write bytesio.c.h:489 (libpython3.15t.dylib:arm64+0x3d1e84)\r\n    #3 _PyEval_EvalFrameDefault generated_cases.c.h:2487 (libpython3.15t.dylib:arm64+0x277ea0)\r\n    #4 _PyEval_Vector ceval.c:1977 (libpython3.15t.dylib:arm64+0x26a148)\r\n    #5 _PyFunction_Vectorcall call.c (libpython3.15t.dylib:arm64+0x7fe5c)\r\n    #6 method_vectorcall classobject.c:73 (libpython3.15t.dylib:arm64+0x8439c)\r\n    #7 context_run context.c:728 (libpython3.15t.dylib:arm64+0x2b4bfc)\r\n    #8 _PyEval_EvalFrameDefault generated_cases.c.h:3766 (libpython3.15t.dylib:arm64+0x27f484)\r\n    #9 _PyEval_Vector ceval.c:1977 (libpython3.15t.dylib:arm64+0x26a148)\r\n    #10 _PyFunction_Vectorcall call.c (libpython3.15t.dylib:arm64+0x7fe5c)\r\n    #11 method_vectorcall classobject.c:73 (libpython3.15t.dylib:arm64+0x8439c)\r\n    #12 _PyObject_Call call.c:348 (libpython3.15t.dylib:arm64+0x7fad4)\r\n    #13 PyObject_Call call.c:373 (libpython3.15t.dylib:arm64+0x7fb48)\r\n    #14 thread_run _threadmodule.c:373 (libpython3.15t.dylib:arm64+0x4174f4)\r\n    #15 pythread_wrapper thread_pthread.h:232 (libpython3.15t.dylib:arm64+0x356b4c)\r\n\r\n  Previous read of size 8 at 0x000118135d60 by thread T26238:\r\n    #0 _io_BytesIO_isatty bytesio.c.h:155 (libpython3.15t.dylib:arm64+0x3d1c10)\r\n    #1 method_vectorcall_NOARGS descrobject.c:448 (libpython3.15t.dylib:arm64+0x96e1c)\r\n    #2 PyObject_VectorcallMethod call.c:859 (libpython3.15t.dylib:arm64+0x81550)\r\n    #3 _io_TextIOWrapper_isatty textio.c.h:1114 (libpython3.15t.dylib:arm64+0x3e7c5c)\r\n    #4 method_vectorcall_NOARGS descrobject.c:448 (libpython3.15t.dylib:arm64+0x96e1c)\r\n    #5 PyObject_Vectorcall call.c:327 (libpython3.15t.dylib:arm64+0x7f824)\r\n    #6 _PyEval_EvalFrameDefault generated_cases.c.h:1620 (libpython3.15t.dylib:arm64+0x276f24)\r\n    #7 _PyEval_Vector ceval.c:1977 (libpython3.15t.dylib:arm64+0x26a148)\r\n    #8 _PyFunction_Vectorcall call.c (libpython3.15t.dylib:arm64+0x7fe5c)\r\n    #9 method_vectorcall classobject.c:73 (libpython3.15t.dylib:arm64+0x8439c)\r\n    #10 context_run context.c:728 (libpython3.15t.dylib:arm64+0x2b4bfc)\r\n    #11 _PyEval_EvalFrameDefault generated_cases.c.h:3766 (libpython3.15t.dylib:arm64+0x27f484)\r\n    #12 _PyEval_Vector ceval.c:1977 (libpython3.15t.dylib:arm64+0x26a148)\r\n    #13 _PyFunction_Vectorcall call.c (libpython3.15t.dylib:arm64+0x7fe5c)\r\n    #14 method_vectorcall classobject.c:73 (libpython3.15t.dylib:arm64+0x8439c)\r\n    #15 _PyObject_Call call.c:348 (libpython3.15t.dylib:arm64+0x7fad4)\r\n    #16 PyObject_Call call.c:373 (libpython3.15t.dylib:arm64+0x7fb48)\r\n    #17 thread_run _threadmodule.c:373 (libpython3.15t.dylib:arm64+0x4174f4)\r\n    #18 pythread_wrapper thread_pthread.h:232 (libpython3.15t.dylib:arm64+0x356b4c)\r\n\r\n```\r\n\r\n<!-- gh-issue-number: gh-132551 -->\r\n* Issue: gh-132551\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-07-24T11:57:51Z",
+   "body": "Thanks @kumaraditya303 for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-07-24T11:57:54Z",
+   "body": "Sorry, @kumaraditya303, I could not cleanly backport this to `3.14` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker d8fa40b08da60a711311751891fa830cb4ae77f3 3.14\n```\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132551",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d8fa40b08da60a711311751891fa830cb4ae77f3",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pycompression/python-isal/pull/233",
+   "commit": null,
+   "actor": "ngoldbaum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d8c887b5c0f034071f072fabebb91b1668fc8c1f",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f54acc9b34963a69767e39f068e161cc5f8184d6",
+   "actor": "Agent-Hellboy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a67559f64885b65e8c95223c0fc6698d24d5930",
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

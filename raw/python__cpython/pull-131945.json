@@ -1,0 +1,73 @@
+{
+ "repo": "python/cpython",
+ "number": 131945,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/131945",
+ "title": "gh-131936: Strengthen check in `_suggestions._generate_suggestions`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-03-31T16:22:57Z",
+ "closed_at": "2025-03-31T17:30:29Z",
+ "body": "This is an alternate option to #131943.\n\n<!-- gh-issue-number: gh-131936 -->\n* Issue: gh-131936\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-03-31T17:31:07Z",
+   "body": "Thanks @ZeroIntensity for the PR, and @vstinner for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-03-31T17:31:15Z",
+   "body": "[GH-131949](https://github.com/python/cpython/pull/131949) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-31T17:32:27Z",
+   "body": "Merged, thank you."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131936",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131943",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "511d3440a0bbb19731f4d96dde65dffbf85cdda5",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e04d2fcde5aa681e32e9d0555813b350e50055fe",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d52371c8cdafeb61df92e9cea6b02e3c4d052765",
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

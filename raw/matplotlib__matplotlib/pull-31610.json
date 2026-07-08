@@ -1,0 +1,21 @@
+{
+ "repo": "matplotlib/matplotlib",
+ "number": 31610,
+ "type": "pull",
+ "url": "https://github.com/matplotlib/matplotlib/pull/31610",
+ "title": "Fix deprecated PyErr_Fetch/PyErr_Restore in close_file_callback",
+ "state": "open",
+ "state_reason": null,
+ "author": "kx7m2qd",
+ "author_association": "NONE",
+ "labels": [
+  "status: needs rebase",
+  "topic: text/fonts"
+ ],
+ "created_at": "2026-05-04T07:58:11Z",
+ "closed_at": null,
+ "body": "Replace deprecated PyErr_Fetch/PyErr_Restore in close_file_callback\r\n\r\n`PyErr_Fetch` and `PyErr_Restore` were deprecated in Python 3.12 in favour of\r\nthe unified `PyErr_GetRaisedException`/`PyErr_SetRaisedException` API.\r\n\r\nThis PR updates `close_file_callback` in `src/ft2font_wrapper.cpp` to use the\r\nnew API on Python 3.12+, while keeping the old API for older versions via a\r\n`#if PY_VERSION_HEX >= 0x030c0000` guard.\r\n\r\nCloses part of #31424\r\n\r\n## PR summary\r\n\r\n`PyErr_Fetch`/`PyErr_Restore` were deprecated in Python 3.12 (see\r\nhttps://docs.python.org/3/whatsnew/3.12.html#deprecated). The replacement is\r\nthe simpler single-object API: `PyErr_GetRaisedException`/`PyErr_SetRaisedException`.\r\n\r\nThe change is in `close_file_callback` in `src/ft2font_wrapper.cpp` (lines ~394\r\nand ~402 as noted in #31424). A version guard ensures backward compatibility\r\nwith Python < 3.12.\r\n\r\nNo behavior change \u2014 this is a pure maintenance fix to silence deprecation\r\nwarnings and future-proof the code for Python 3.13+.\r\n\r\n## AI Disclosure\r\n\r\nUsed Claude (Anthropic) to help identify the correct replacement API and version\r\nguard approach. The fix, testing, and final review were done manually.\r\n\r\n## PR checklist\r\n- [x] \"closes #31424\" is in the body of the PR description\r\n- [x] new and changed code is tested \u2014 67/69 tests pass in `lib/matplotlib/tests/test_ft2font.py`; 2 skips are pre-existing and unrelated to this change\r\n- [N/A] Plotting related features are demonstrated in an example\r\n- [N/A] New Features and API Changes are noted with a directive and release note\r\n- [N/A] Documentation complies with general and docstring guidelines",
+ "comments": [],
+ "timeline_refs": [],
+ "fetch_errors": null
+}

@@ -8,7 +8,14 @@
  "issues": [
   "python/cpython#146080"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146573",
+  "python/cpython#146597",
+  "python/cpython#146598"
+ ],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
  "gists": [
   "50f9880636df43efd3886f6bda2077b3"
  ],
@@ -20,15 +27,20 @@
   "topic-SSL",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "picnixz"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146080.json"
+  "raw/python__cpython/issue-146080.json",
+  "raw/python__cpython/pull-146573.json",
+  "raw/python__cpython/pull-146597.json",
+  "raw/python__cpython/pull-146598.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

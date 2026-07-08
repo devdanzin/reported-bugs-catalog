@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 150383,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/150383",
+ "title": "[3.15] gh-145896: Fix typos and stale docstrings in the traceback module (GH-145897)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-05-25T09:46:25Z",
+ "closed_at": "2026-05-25T10:13:02Z",
+ "body": "(cherry picked from commit 832afeddcea78e40d39c47cd1893f8137e588e72)\n\nCo-authored-by: devdanzin <74280297+devdanzin@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-145896 -->\n* Issue: gh-145896\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145896",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145897",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "28037c2d11be131588efcd22c17c6bafa824cc8d",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -8,25 +8,40 @@
  "issues": [
   "python/cpython#127085"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#127412",
+  "python/cpython#128019"
+ ],
+ "n_prs": 2,
+ "n_backports": 0,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "3.13",
   "3.14",
+  "OS-android",
+  "OS-ios",
   "interpreter-core",
+  "skip news",
+  "tests",
   "topic-free-threading",
   "topic-multiprocessing",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "LindaSummer",
+  "freakboy3742"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-127085.json"
+  "raw/python__cpython/issue-127085.json",
+  "raw/python__cpython/pull-127412.json",
+  "raw/python__cpython/pull-128019.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

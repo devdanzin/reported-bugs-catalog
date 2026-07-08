@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 135425,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/135425",
+ "title": "[3.14] gh-135410: use a critical section around `StringIO.__next__` (GH-135412)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2025-06-12T11:11:43Z",
+ "closed_at": "2025-06-12T11:36:45Z",
+ "body": "(cherry picked from commit e6c3039cb39e68ae9af9ddcaca341c5af8f9cf23)\n\nCo-authored-by: Peter Bierma <zintensitydev@gmail.com>\n\n<!-- gh-issue-number: gh-135410 -->\n* Issue: gh-135410\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135412",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/135410",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "8cb7d9a8102163387907425dc14b5d629b930e76",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

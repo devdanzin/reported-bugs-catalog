@@ -1,0 +1,80 @@
+{
+ "repo": "python/cpython",
+ "number": 141921,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/141921",
+ "title": "GH-141861: Fix invalid memory read in the ENTER_EXECUTOR",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sergey-miryanov",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-11-24T21:27:34Z",
+ "closed_at": "2025-11-24T22:07:46Z",
+ "body": "\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-141861 -->\n* Issue: gh-141861\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-11-24T21:28:16Z",
+   "body": "@Fidget-Spinner Could you please take a look?"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-11-25T09:52:37Z",
+   "body": "Does this really fix the issue?\r\nWithout a proper analysis of the issue, I don't see how we can tell if this is fixed.\r\n\r\nIs this a recent issue? When did it start?\r\n"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-11-25T10:25:05Z",
+   "body": "@markshannon \r\nFix for this PR provided by @Fidget-Spinner \r\n\r\nFailure bisected to a3b78a3adecf794dc576404b14ed3f2c8401fdf1 \r\n\r\n```\r\na3b78a3adecf794dc576404b14ed3f2c8401fdf1 is the first bad commit\r\ncommit a3b78a3adecf794dc576404b14ed3f2c8401fdf1\r\nAuthor: Mikhail Efimov <efimov.mikhail@gmail.com>\r\nDate:   Fri Nov 21 20:00:25 2025 +0300\r\n\r\n    gh-141498: Change backoff counter to use prime numbers instead of powers of 2 (GH-141591)\r\n\r\n Include/internal/pycore_backoff.h                  | 68 +++++++++++++---------\r\n Lib/test/test_opcache.py                           |  2 +-\r\n .../2025-11-15-14-04-35.gh-issue-141589.VfdMDD.rst |  3 +\r\n 3 files changed, 44 insertions(+), 29 deletions(-)\r\n create mode 100644 Misc/NEWS.d/next/Core_and_Builtins/2025-11-15-14-04-35.gh-issue-141589.VfdMDD.rst\r\n\r\n```\r\n\r\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-11-25T10:31:12Z",
+   "body": "What's the root cause?\r\nOn the issue @Fidget-Spinner says \"The problem is that it's possible for oparg to change under our feet\".\r\nWhat is causing the `oparg` to change and when?\r\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-11-25T10:42:52Z",
+   "body": "Since the opcode/oparg pair are written atomically, the fix looks wrong.\r\nIf `ENTER_EXECUTOR` is overwritten (by instrumentation presumably) then the new `this_instr->op.arg` could easily be an invalid index."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-11-25T10:51:25Z",
+   "body": "I noticed that if I disable specialization (`ENABLE_SPECIALIZATION=0`) then failure is gone. However, I'm not sure if this is useful."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141861",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "dc62b622524bf49eb539f444841049fdfbe2681e",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9325c75afb2880d0ccf636740b0847ce46f8b709",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6d24e098c2cef5f3fb922bd6befec2130e12c80a",
+   "actor": "ashm-dev"
+  }
+ ],
+ "fetch_errors": null
+}

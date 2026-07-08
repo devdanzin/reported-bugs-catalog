@@ -1,0 +1,119 @@
+{
+ "repo": "python/cpython",
+ "number": 135724,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/135724",
+ "title": "gh-135698: Fix Cross-interpreter Queue.full() With Negative/Default max_size",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ericsnowcurrently",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-06-19T16:02:37Z",
+ "closed_at": "2025-06-20T20:26:32Z",
+ "body": "We weren't handling non-positive `maxsize` values (including the default) properly in `Queue.full()`.  This change fixes that and adjusts an associated assert.\n\n<!-- gh-issue-number: gh-135698 -->\n* Issue: gh-135698\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-06-20T20:26:35Z",
+   "body": "Thanks @ericsnowcurrently for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-06-20T20:26:44Z",
+   "body": "[GH-135775](https://github.com/python/cpython/pull/135775) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-06-20T20:26:44Z",
+   "body": "Sorry, @ericsnowcurrently, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker c5ea8e8e8fc725f39ed23ff6259b3cc157a0785f 3.13\n```\n"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2025-08-14T18:05:47Z",
+   "body": "Reminder about backporting. @ericsnowcurrently "
+  },
+  {
+   "author": "encukou",
+   "created_at": "2025-08-15T11:02:50Z",
+   "body": "GH-135778 is a backport of this pull request to the 3.13 branch."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/135698",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135703",
+   "commit": null,
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c5ea8e8e8fc725f39ed23ff6259b3cc157a0785f",
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "22ad2f869e6cd83612fd69dc0e8cb7ddaad0da04",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "35b90e8bec9cb93d10a8d08ee8c5af3096da8937",
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "efcecd93aaea089598722c013aa2f0523a7d2583",
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135778",
+   "commit": null,
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "666795ae34ccb912127d47fd091dcf5513dff94c",
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6096098ccb528ee84a2a09fe62a419ea6c4b536f",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "725b6d33a3064982aac3efa50c95a6109aa0cf7a",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7208004cf07d8c8ffc63f2b1f8336bbc6717fe32",
+   "actor": "Agent-Hellboy"
+  }
+ ],
+ "fetch_errors": null
+}

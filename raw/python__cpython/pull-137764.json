@@ -1,0 +1,71 @@
+{
+ "repo": "python/cpython",
+ "number": 137764,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/137764",
+ "title": "gh-137728 gh-137762: Fix bugs in the JIT with many local variables",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-08-14T14:11:50Z",
+ "closed_at": "2025-08-20T14:53:55Z",
+ "body": "It's not really feasible to add a test case for this. As it requires a gigantic frame that just so happens to also pass the frame initialization, but exhaust the symbol arena memory. Furthermore, that test would be tied to the size of the symbol arena, which we will tweak over time anyways, so the test will quickly go out of date.\n\n<!-- gh-issue-number: gh-137728 -->\n* Issue: gh-137728\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-08-20T14:53:58Z",
+   "body": "Thanks @Fidget-Spinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-08-20T14:54:11Z",
+   "body": "[GH-137999](https://github.com/python/cpython/pull/137999) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-08-20T18:21:25Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **ARM Raspbian Linux Asan 3.x** (no tier) has failed when building commit 7fda8b66debb24e0520b94c3769b648c7305f84e.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1811/builds/132) and take a look at the build logs.\n4. Check if the failure is related to this commit (7fda8b66debb24e0520b94c3769b648c7305f84e) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1811/builds/132\n\nFailed tests:\n\n- test_math\n- test_fstring\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nremote: Enumerating objects: 10, done.        \nremote: Counting objects:  14% (1/7)        \nremote: Counting objects:  28% (2/7)        \nremote: Counting objects:  42% (3/7)        \nremote: Counting objects:  57% (4/7)        \nremote: Counting objects:  71% (5/7)        \nremote: Counting objects:  85% (6/7)        \nremote: Counting objects: 100% (7/7)        \nremote: Counting objects: 100% (7/7), done.        \nremote: Compressing objects:  14% (1/7)        \nremote: Compressing objects:  28% (2/7)        \nremote: Compressing objects:  42% (3/7)        \nremote: Compressing objects:  57% (4/7)        \nremote: Compressing objects:  71% (5/7)        \nremote: Compressing objects:  85% (6/7)        \nremote: Compressing objects: 100% (7/7)        \nremote: Compressing objects: 100% (7/7), done.        \nremote: Total 10 (delta 0), reused 0 (delta 0), pack-reused 3 (from 2)        \nFrom https://github.com/python/cpython\n * branch                    main       -> FETCH_HEAD\nNote: switching to '7fda8b66debb24e0520b94c3769b648c7305f84e'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 7fda8b66deb gh-137728 gh-137762: Fix bugs in the JIT with many local variables (GH-137764)\nSwitched to and reset branch 'main'\n\nconfigure: WARNING: no system libmpdec found; falling back to pure-Python version for the decimal module\n\nIn file included from ./Include/internal/pycore_dict.h:11,\n                 from Objects/typeobject.c:7:\nIn function \u2018Py_DECREF_MORTAL\u2019,\n    inlined from \u2018PyStackRef_XCLOSE\u2019 at ./Include/internal/pycore_stackref.h:730:9,\n    inlined from \u2018_PyThreadState_PopCStackRef\u2019 at ./Include/internal/pycore_stackref.h:810:5,\n    inlined from \u2018vectorcall_maybe\u2019 at Objects/typeobject.c:3108:9:\n./Include/internal/pycore_object.h:481:8: warning: array subscript 0 is outside array bounds of \u2018PyObject[0]\u2019 {aka \u2018struct _object[]\u2019} [-Warray-bounds]\n  481 |     if (--op->ob_refcnt == 0) {\n      |        ^\n\nTimeout (0:05:00)!\nThread 0x0000007fa7bff100 [Thread-4] (most recent call first):\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/subprocess.py\", line 2057 in _wait\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/subprocess.py\", line 1277 in wait\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 194 in _run_process\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 299 in run_tmp_files\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 363 in _runtest\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 403 in run\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/threading.py\", line 1074 in _bootstrap_inner\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/threading.py\", line 1036 in _bootstrap\n\nThread 0x0000007fa73ef100 [Thread-3] (most recent call first):\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/subprocess.py\", line 1257 in _remaining_time\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/subprocess.py\", line 2053 in _wait\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/subprocess.py\", line 1277 in wait\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 194 in _run_process\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 299 in run_tmp_files\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 363 in _runtest\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 403 in run\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/threading.py\", line 1074 in _bootstrap_inner\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/threading.py\", line 1036 in _bootstrap\n\nThread 0x0000007fb38f36c0 [python] (most recent call first):\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/utils.py\", line 81 in format_duration\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 464 in get_running\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 551 in _get_result\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/run_workers.py\", line 610 in run\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/main.py\", line 455 in _run_tests_mp\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/main.py\", line 288 in _rerun_failed_tests\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/main.py\", line 309 in rerun_failed_tests\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/main.py\", line 569 in _run_tests\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/main.py\", line 598 in run_tests\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/main.py\", line 767 in main\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/libregrtest/main.py\", line 775 in main\n  File \"/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/Lib/test/__main__.py\", line 2 in <module>\n  File \"<frozen runpy>\", line 88 in _run_code\n  File \"<frozen runpy>\", line 198 in _run_module_as_main\nmake: *** [Makefile:2494: buildbottest] Error 1\n\nCannot open file '/home/buildbot/buildarea/3.x.pablogsal-rasp.asan/build/test-results.xml' for upload\n```\n\n</details>\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/137728",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7fda8b66debb24e0520b94c3769b648c7305f84e",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f55a36ad4d7cc5ab225934d039ec022bae645c4e",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cf5c170c1bec7ab191198770e3ac7623288df9d6",
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3eaa82b15380f10fd25c64d1efd28785f4acade",
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

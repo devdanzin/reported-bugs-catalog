@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 145888,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145888",
+ "title": "gh-145886: Fix e.raw += e.raw typo in UnixConsole.getpending",
+ "state": "closed",
+ "state_reason": null,
+ "author": "wavebyrd",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-03-12T22:02:04Z",
+ "closed_at": "2026-03-15T11:04:24Z",
+ "body": "Fix a copy-paste typo in both variants of `UnixConsole.getpending()` where `e.raw += e.raw` was used instead of `e.raw += e2.raw`.\n\nThe loop dequeues events as `e2` and accumulates their data into a combined event `e`. The `data` field was accumulated correctly (`e.data += e2.data`), but the `raw` field was adding itself to itself rather than accumulating from `e2`. Since `e.raw` starts as `b\"\"`, the result of `b\"\" += b\"\"` was always `b\"\"`, so raw bytes from queued events were silently dropped.\n\nThis fixes the typo in both the `FIONREAD` and fallback code paths, and adds a test that verifies `getpending` correctly accumulates `raw` bytes from multiple queued events.\n\nFixes #145886\n\n<!-- gh-issue-number: gh-145886 -->\n* Issue: gh-145886\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-12T22:02:09Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-15T11:04:43Z",
+   "body": "See https://github.com/python/cpython/issues/145886#issuecomment-4055236815."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145886",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ],
+ "fetch_errors": null
+}

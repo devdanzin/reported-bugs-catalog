@@ -9,6 +9,9 @@
  "prs": [
   "aio-libs/multidict#1328"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "fa00e03ef041c030660f083116a7e1b6"
  ],

@@ -8,11 +8,17 @@
  "issues": [
   "python/cpython#152017"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#152018"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "c0e661ad36a12581333740414e20098e"
  ],
  "labels": [
+  "awaiting review",
   "extension-modules",
   "type-bug"
  ],
@@ -26,7 +32,8 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-152017.json"
+  "raw/python__cpython/issue-152017.json",
+  "raw/python__cpython/pull-152018.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

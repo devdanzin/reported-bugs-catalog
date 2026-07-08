@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 145341,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145341",
+ "title": "gh-145335: validate file descriptor in os.fpathconf and os.pathconf",
+ "state": "closed",
+ "state_reason": null,
+ "author": "gourijain029-del",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-02-28T04:10:59Z",
+ "closed_at": "2026-02-28T08:50:34Z",
+ "body": "Problem\r\nCalling os.fpathconf(-1, name) or os.pathconf(-1, name) on macOS (and other platforms) caused a segmentation fault. The CPython implementation passed the negative file descriptor straight to the underlying \r\n\r\nfpathconf\r\n system call, which is undefined behavior and crashes the interpreter.\r\n\r\nFix\r\n\r\nAdded a guard in \r\n\r\nModules/posixmodule.c\r\n (\r\n\r\nos_fpathconf_impl\r\n) that checks fd < 0.\r\nWhen the descriptor is negative, the function now raises a clear ValueError with the message \u201cfile descriptor cannot be negative\u201d and returns -1 to signal the error.\r\nThe existing error\u2011handling path (errno handling) remains unchanged for valid descriptors.\r\nRegression Test\r\n\r\nIntroduced \r\n\r\nLib/test/test_os_pathconf.py\r\n which verifies that both os.fpathconf(-1, 1) and os.pathconf(-1, 1) raise ValueError with the expected message.\r\nThe test runs as part of the standard CPython test suite, ensuring the fix stays in place.\r\nImpact\r\n\r\nEliminates a hard crash for a common misuse pattern.\r\nProvides a Python\u2011level exception that developers can catch, matching the behaviour of other os.* functions that validate file descriptors.\r\nNo functional changes for valid descriptors; all existing semantics are preserved.\r\nRelated Issue\r\n\r\nFixes issue #145335 (segfault from os.pathconf(-1, 1)).\n\n<!-- gh-issue-number: gh-145335 -->\n* Issue: gh-145335\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-02-28T04:11:04Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2026-02-28T08:47:16Z",
+   "body": "> Added a guard in\r\n\r\nYou've done a whole lot more than that, there are so many changes the diff won't even render. And furthermore, your new test (which should have been added to an existing file) fails."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145335",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "StanFromIreland"
+  }
+ ],
+ "fetch_errors": null
+}

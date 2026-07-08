@@ -8,22 +8,42 @@
  "issues": [
   "python/cpython#130163"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#130282",
+  "python/cpython#130503",
+  "python/cpython#130556",
+  "python/cpython#130568",
+  "python/cpython#130576"
+ ],
+ "n_prs": 5,
+ "n_backports": 3,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "interpreter-core",
+  "skip news",
+  "tests",
   "topic-C-API",
+  "topic-free-threading",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "sergey-miryanov",
+  "serhiy-storchaka"
+ ],
  "status": "closed/fixed",
  "confidence": "low",
  "needs_review": true,
  "review_reason": "cpython-jit-crash(REVIEW)",
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-130163.json"
+  "raw/python__cpython/issue-130163.json",
+  "raw/python__cpython/pull-130282.json",
+  "raw/python__cpython/pull-130503.json",
+  "raw/python__cpython/pull-130556.json",
+  "raw/python__cpython/pull-130568.json",
+  "raw/python__cpython/pull-130576.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 6
 }

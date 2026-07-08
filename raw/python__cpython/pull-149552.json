@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 149552,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/149552",
+ "title": "[3.15] gh-149459: Fix segfault when `_LOAD_SPECIAL` guard deoptimizes (GH-149478)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-05-08T11:20:36Z",
+ "closed_at": "2026-05-08T11:48:05Z",
+ "body": "(cherry picked from commit c341e341b25cec03d28d1b2c368bb871d76ca88b)\n\nCo-authored-by: Hai Zhu <haiizhu@outlook.com>\n\n<!-- gh-issue-number: gh-149459 -->\n* Issue: gh-149459\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/149459",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/149478",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "f9e5975deb6b01c434eadff66f28bd53e0ca4c55",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

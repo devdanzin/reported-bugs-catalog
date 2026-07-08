@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 152155,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152155",
+ "title": "gh-151763: Fix OOM cleanup of initial thread state",
+ "state": "closed",
+ "state_reason": null,
+ "author": "zainnadeem786",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-25T06:44:58Z",
+ "closed_at": "2026-06-25T07:20:15Z",
+ "body": "## Summary\r\n\r\nThis PR addresses **OOM-0020** from gh-151763.\r\n\r\nIt fixes a free-threaded crash during interpreter creation when memory allocation fails after the preallocated initial thread state has been selected but before `init_threadstate()` initializes its interpreter back-pointer.\r\n\r\n## Issue\r\n\r\nIn the free-threaded build, `_interpreters.create(reqrefs=True)` can fail during early thread-state allocation setup.\r\n\r\nThe affected path is:\r\n\r\n```text\r\n_interpreters.create(reqrefs=True)\r\n-> _interpreters_create_impl()\r\n-> _PyXI_NewInterpreter()\r\n-> Py_NewInterpreterFromConfig()\r\n-> new_interpreter()\r\n-> _PyThreadState_New()\r\n-> new_threadstate()\r\n-> alloc_threadstate()\r\n-> _Py_qsbr_reserve() / _Py_ReserveTLBCIndex()\r\n-> free_threadstate()\r\n```\r\n\r\nFor the initial thread state, `alloc_threadstate()` obtains memory embedded in `PyInterpreterState` rather than heap-allocated memory.\r\n\r\nHowever, if a later free-threaded allocation fails before `init_threadstate()` runs, cleanup reaches `free_threadstate()` while `tstate->base.interp` is still unset.\r\n\r\nAs a result, `free_threadstate()` fails to recognize the preallocated initial thread state and may incorrectly call `PyMem_RawFree()` on embedded memory.\r\n\r\nThis can result in:\r\n\r\n* `_PyMem_DebugRawFree: bad ID` in debug builds\r\n* access violation in release builds\r\n\r\n## Fix\r\n\r\nInitialize the interpreter back-pointer earlier in `alloc_threadstate()`:\r\n\r\n```c\r\ntstate->base.interp = interp;\r\n```\r\n\r\nThis ensures that cleanup paths can correctly identify the preallocated initial thread state even if a later allocation fails before `init_threadstate()` is reached.\r\n\r\nThe successful path remains unchanged because `init_threadstate()` already sets the same value later.\r\n\r\n## Validation\r\n\r\nValidated locally on Windows.\r\n\r\nBuilds completed successfully:\r\n\r\n```text\r\nPCbuild\\build.bat -p x64 -c Debug --disable-gil\r\nPCbuild\\build.bat -p x64 -c Release --disable-gil\r\nPCbuild\\build.bat -p x64 -c Debug\r\n```\r\n\r\nBefore the fix, the OOM-0020 reproducer crashed in the free-threaded build with:\r\n\r\n```text\r\n_PyMem_DebugRawFree: bad ID\r\n```\r\n\r\nAfter the fix, the same allocation-failure path reaches `MemoryError` instead of crashing.\r\n\r\nFocused tests passed:\r\n\r\n```text\r\nPCbuild/amd64t/python_d.exe -m test test__interpreters\r\nPCbuild/amd64/python_d.exe -m test test__interpreters\r\n```\r\n\r\n`git diff --check` also passes.\r\n\r\n## Regression Test\r\n\r\nNo regression test is included.\r\n\r\nThe reproducer depends on `_testcapi.set_nomemory()` in a free-threaded build, and the exact allocation index is build-sensitive. This follows the recent maintainer direction for these OOM-path fixes, where a focused code fix is preferable to fragile allocation-index regression tests.\r\n\r\n## Compatibility\r\n\r\nThis is a localized initialization-order fix for an OOM cleanup path.\r\n\r\nNormal successful interpreter creation keeps the same final state, because `init_threadstate()` already assigns the same interpreter pointer later.\r\n\r\nAddresses OOM-0020 from gh-151763.\r\n",
+ "comments": [
+  {
+   "author": "zainnadeem786",
+   "created_at": "2026-06-25T07:20:15Z",
+   "body": "Closing this PR because I accidentally opened it from a branch that also contained unrelated OOM-0030 changes. I\u2019ll reopen it from a clean branch with only the OOM-0020 fix."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "zainnadeem786"
+  }
+ ],
+ "fetch_errors": null
+}

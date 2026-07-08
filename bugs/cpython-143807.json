@@ -8,22 +8,36 @@
  "issues": [
   "python/cpython#143807"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#143812",
+  "python/cpython#143814"
+ ],
+ "n_prs": 2,
+ "n_backports": 0,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
+  "awaiting core review",
+  "awaiting review",
   "interpreter-core",
+  "stale",
   "topic-JIT",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "Fidget-Spinner",
+  "VanshAgarwal24036"
+ ],
  "status": "open",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-143807.json"
+  "raw/python__cpython/issue-143807.json",
+  "raw/python__cpython/pull-143812.json",
+  "raw/python__cpython/pull-143814.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

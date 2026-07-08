@@ -1,0 +1,34 @@
+{
+ "repo": "numpy/numpy",
+ "number": 30076,
+ "type": "pull",
+ "url": "https://github.com/numpy/numpy/pull/30076",
+ "title": "BUG: avoid negating INT_MIN in PyArray_Round implementation (#30071)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "charris",
+ "author_association": "MEMBER",
+ "labels": [
+  "00 - Bug",
+  "08 - Backport"
+ ],
+ "created_at": "2025-10-25T16:37:39Z",
+ "closed_at": "2025-10-25T17:37:22Z",
+ "body": "Backport of #30071.\r\n\r\nc.f. https://huntr.com/bounties/49928a2c-c6bb-4c1c-80ec-5d7bf708bf28 where this almost led to a CVE getting reported against NumPy.\r\n\r\nAddresses one of the issues reported in https://github.com/numpy/numpy/issues/28829.\r\n\r\nFor those who are unaware: the value of `INT_MIN` is `-INT_MAX - 1` (negating using two's complement arithmetic), so that means that if C used two's complement `-INT_MIN == INT_MIN`. For that reason, `-INT_MIN` is UB according to the C standard. You are always supposed to do a check like this when negating a signed integer, but it is often skipped.\r\n\r\nI learned while working on this that passing `round` a negative `ndigits` is supported. Round with `ndigits!=0` is the same as round with `ndigits==0`, but transformed in the following way: `round(x * 10**ndigits, 0) / 10**ndigits`. The same formula holds for positive and negative ndigits. \r\n\r\nNo tests because it's annoying to write a test for this case (see https://github.com/python/cpython/issues/132474 -- it turns out `round(2**31, -2**31)` will hang CPython...).\r\n\r\nOpen to suggestions if people want to do a more thorough job of this but at least this prevents the segfault.\r\n\r\nPing @devdanzin, this seems relevant to your interests.\r\n\r\n<!--         ----------------------------------------------------------------\r\n                MAKE SURE YOUR PR GETS THE ATTENTION IT DESERVES!\r\n                ----------------------------------------------------------------\r\n\r\n*  FORMAT IT RIGHT:\r\n      https://www.numpy.org/devdocs/dev/development_workflow.html#writing-the-commit-message\r\n\r\n*  IF IT'S A NEW FEATURE OR API CHANGE, TEST THE WATERS:\r\n      https://www.numpy.org/devdocs/dev/development_workflow.html#get-the-mailing-list-s-opinion\r\n\r\n*  HIT ALL THE GUIDELINES:\r\n      https://numpy.org/devdocs/dev/index.html#guidelines\r\n\r\n*  WHAT TO DO IF WE HAVEN'T GOTTEN BACK TO YOU:\r\n      https://www.numpy.org/devdocs/dev/development_workflow.html#getting-your-pr-reviewed\r\n-->\r\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d01c23d5289aac0d45aeeb2c8c7d745bc1a42357",
+   "actor": "charris"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "charris"
+  }
+ ],
+ "fetch_errors": null
+}

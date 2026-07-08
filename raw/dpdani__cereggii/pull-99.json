@@ -1,0 +1,35 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 99,
+ "type": "pull",
+ "url": "https://github.com/dpdani/cereggii/pull/99",
+ "title": "`AtomicDict.fast_iter` now raises `ConcurrentUsageDetected` when it detects concurrent mutations, instead of raising a segmentation fault",
+ "state": "closed",
+ "state_reason": null,
+ "author": "dpdani",
+ "author_association": "OWNER",
+ "labels": [
+  "bug",
+  "AtomicDict",
+  "fusil-fuzzer"
+ ],
+ "created_at": "2025-11-19T20:02:49Z",
+ "closed_at": "2025-12-29T15:07:59Z",
+ "body": "Fixes #88",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e9e459638023764f3bd8cc9e0a5f919b1df372f3",
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ],
+ "fetch_errors": null
+}

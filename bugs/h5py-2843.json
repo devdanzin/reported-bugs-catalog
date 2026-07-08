@@ -1,0 +1,32 @@
+{
+ "bug_id": "h5py-2843",
+ "title": "BUG: add missing nullptr checks following malloc calls",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "h5py/h5py",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "h5py/h5py#2843"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
+ "gists": [],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "neutrinoceros"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/h5py__h5py/pull-2843.json"
+ ],
+ "n_artifacts": 1
+}

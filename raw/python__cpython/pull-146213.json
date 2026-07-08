@@ -1,0 +1,57 @@
+{
+ "repo": "python/cpython",
+ "number": 146213,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146213",
+ "title": "Update docs for gh-146056",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [
+  "docs"
+ ],
+ "created_at": "2026-03-20T14:38:51Z",
+ "closed_at": "2026-03-22T07:29:05Z",
+ "body": "\n\n<!-- gh-issue-number: gh-146056 -->\n* Issue: gh-146056\n<!-- /gh-issue-number -->\n\r\n\r\n<!-- readthedocs-preview cpython-previews start -->\r\n----\n\ud83d\udcda Documentation preview \ud83d\udcda: https://cpython-previews--146213.org.readthedocs.build/\n\r\n<!-- readthedocs-preview cpython-previews end -->",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146056",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3776aba20482a24096e8760e8a32d13b95d51492",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3e05fa35e0562de54252dab4d09da002fc358393",
+   "actor": "CuriousLearner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fcfe3f1169e0e3310f656e926144bac304bf3765",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

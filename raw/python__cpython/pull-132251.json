@@ -1,0 +1,65 @@
+{
+ "repo": "python/cpython",
+ "number": 132251,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132251",
+ "title": "gh-132250: Clear error in lsprof callback when method descriptor raises an excep\u2026",
+ "state": "closed",
+ "state_reason": null,
+ "author": "gaogaotiantian",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-04-08T01:52:56Z",
+ "closed_at": "2025-04-08T17:36:47Z",
+ "body": "\u2026tion\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-132250 -->\n* Issue: gh-132250\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2025-04-08T02:02:22Z",
+   "body": "Hi @sobolevn , I think we've been working on `_lsprof` a few times so maybe you could take a look at this fix?"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-08T17:36:51Z",
+   "body": "Thanks @gaogaotiantian for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-08T17:37:09Z",
+   "body": "[GH-132281](https://github.com/python/cpython/pull/132281) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132250",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ab64130b572424695bf072f7608a536997dce14f",
+   "actor": "gaogaotiantian"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "gaogaotiantian"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "aaa08caca953bdc18d08e8a004596dedd720ca90",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "10fe658f34a7b4d1bd07882fe5f76204d69977e9",
+   "actor": "gaogaotiantian"
+  }
+ ],
+ "fetch_errors": null
+}

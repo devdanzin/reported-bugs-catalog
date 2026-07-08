@@ -8,24 +8,39 @@
  "issues": [
   "python/cpython#126881"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#126901",
+  "python/cpython#126904",
+  "python/cpython#127395"
+ ],
+ "n_prs": 3,
+ "n_backports": 1,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "3.12",
   "3.13",
   "3.14",
+  "awaiting review",
   "interpreter-core",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "kumaraditya303",
+  "miss-islington",
+  "picnixz"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-126881.json"
+  "raw/python__cpython/issue-126881.json",
+  "raw/python__cpython/pull-126901.json",
+  "raw/python__cpython/pull-126904.json",
+  "raw/python__cpython/pull-127395.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

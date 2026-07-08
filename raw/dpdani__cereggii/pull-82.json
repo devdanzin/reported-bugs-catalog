@@ -1,0 +1,35 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 82,
+ "type": "pull",
+ "url": "https://github.com/dpdani/cereggii/pull/82",
+ "title": "Handle errors in internal calls to `reduce_flush()`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "dpdani",
+ "author_association": "OWNER",
+ "labels": [
+  "bug",
+  "AtomicDict",
+  "fusil-fuzzer"
+ ],
+ "created_at": "2025-10-19T13:29:33Z",
+ "closed_at": "2025-10-19T13:49:51Z",
+ "body": "Fixes #71",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "339c475a74ba980cef0be13290c4244ca91f49ce",
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ],
+ "fetch_errors": null
+}

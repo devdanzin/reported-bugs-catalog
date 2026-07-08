@@ -8,7 +8,13 @@
  "issues": [
   "python/cpython#134119"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#134120",
+  "python/cpython#134153"
+ ],
+ "n_prs": 2,
+ "n_backports": 1,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.14",
@@ -16,15 +22,20 @@
   "interpreter-core",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "JelleZijlstra",
+  "miss-islington"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-134119.json"
+  "raw/python__cpython/issue-134119.json",
+  "raw/python__cpython/pull-134120.json",
+  "raw/python__cpython/pull-134153.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

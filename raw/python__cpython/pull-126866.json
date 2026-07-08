@@ -1,0 +1,51 @@
+{
+ "repo": "python/cpython",
+ "number": 126866,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126866",
+ "title": "[3.13] gh-126312: Don't traverse frozen objects on the free-threaded build (GH-126338)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2024-11-15T12:19:39Z",
+ "closed_at": "2024-11-15T13:46:01Z",
+ "body": "Also, _PyGC_Freeze() no longer freezes unreachable objects.\r\n\r\n(cherry picked from commit d4c72fed8cba8e15ab7bb6c30a92bc9f2c8f0a2c)\r\n\r\nCo-authored-by: Sergey B Kirpichev <skirpichev@gmail.com>\n\n<!-- gh-issue-number: gh-126312 -->\n* Issue: gh-126312\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-15T13:46:08Z",
+   "body": "Merged, thanks."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126338",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126312",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ecda3ae2a51cdec65996005690391172bc25ca4b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

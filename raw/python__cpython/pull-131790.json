@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 131790,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/131790",
+ "title": "[3.13] gh-131712: Build _suggestions extension on Windows (GH-131759)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-03-27T08:55:02Z",
+ "closed_at": "2025-03-27T09:19:48Z",
+ "body": "Add a test checking that the '_suggestions' extension is available.\n(cherry picked from commit 9ef9d687ff7cfc4bbf422ba61db04207b7f343d2)\n\nCo-authored-by: Victor Stinner <vstinner@python.org>\n\n<!-- gh-issue-number: gh-131712 -->\n* Issue: gh-131712\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131759",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131712",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5c0be8ced6fcdb4372eb946ce816c4f689f2917b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,58 @@
+{
+ "repo": "python/cpython",
+ "number": 129953,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/129953",
+ "title": "GH-128682: Account for escapes in `DECREF_INPUTS`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "markshannon",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-02-10T11:24:06Z",
+ "closed_at": "2025-02-12T17:45:00Z",
+ "body": "This is the final PR (apart from potential bug fixes) for https://github.com/python/cpython/issues/128682.\r\nIt:\r\n* Handles `DECREF_INPUTS` by either:\r\n  * setting the on-stack references to `NULL` before closing them, or\r\n  * where more efficient, setting the stack pointer before each reference is closed\r\n* Changes many uses of `DECREF_INPUTS` to `PyStackRef_CLOSE` where there was only one input.\r\n* Adds asserts that the stack pointer is spilled at key points outside of the interpreter.\r\n\n\n<!-- gh-issue-number: gh-128682 -->\n* Issue: gh-128682\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "iritkatriel",
+   "created_at": "2025-02-10T14:02:41Z",
+   "body": "Some tests are failing."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-02-12T13:44:27Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @markshannon for commit 76001f7fdb6fab904dde5c1e3fc388562edd40b7 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F30617%2Fmerge\n\nIf you want to schedule another build, you need to add the <kbd>:hammer: test-with-refleak-buildbots</kbd> label again.\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-02-12T13:49:25Z",
+   "body": "Latest [benchmarking results](https://github.com/faster-cpython/benchmarking-public/tree/main/results/bm-20250210-3.14.0a4+-534b694) show a 0.2% slowdown "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-24T18:38:55Z",
+   "body": "This change introduced a regression on opcodes using `PyStackRef_AsPyObjectSteal()` like `CALL_LIST_APPEND`: see issue gh-151818."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/128682",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "72f56654d06a6d23c91e892c05f9e4d70009315b",
+   "actor": "markshannon"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "markshannon"
+  }
+ ],
+ "fetch_errors": null
+}

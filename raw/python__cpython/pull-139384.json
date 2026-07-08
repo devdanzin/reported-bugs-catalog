@@ -1,0 +1,119 @@
+{
+ "repo": "python/cpython",
+ "number": 139384,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/139384",
+ "title": "GH-139193: Fix dump_stack when PYTHON_LLTRACE=4",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sergey-miryanov",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-09-27T20:08:53Z",
+ "closed_at": "2025-10-22T13:14:25Z",
+ "body": "There are two problems:\r\n1. `dump_stack`/`dump_item` should ignore items that pushed on the stack with `PyStackRef_Wrap`\r\n2. `PyStackRef_IsError` should test only `Py_TAG_BITS` of `.bits` not whole `.bits` value\r\n\r\nAlso, PyStackRef_IsValid should be fixed accordingly.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n<!-- gh-issue-number: gh-139193 -->\r\n* Issue: gh-139193\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-09-27T20:10:06Z",
+   "body": "PR ready to review, please take a look."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-09-28T07:26:26Z",
+   "body": "@Fidget-Spinner Thanks for review! I tried to fix `PyStackRef_IsValid` accordingly, because I oversight it yesterday."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-09-28T07:33:47Z",
+   "body": "I revert it because it was not right."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-09-30T13:45:02Z",
+   "body": "`PyStackRef_IsError` should return `true` only for `PyStackRef_ERROR`\r\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-09-30T13:46:12Z",
+   "body": "Any suggestions for a better name are welcome, as it is obviously not clear."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-10-01T19:18:07Z",
+   "body": "@markshannon What do you think about adding new function `PyStackRef_IsInvalid` to check is INVALID bit is set or no? And fix `PyStackRef_IsError` to check as you said above?"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-10-03T07:58:55Z",
+   "body": "> @markshannon What do you think about adding new function `PyStackRef_IsInvalid` to check is INVALID bit is set or no? And fix `PyStackRef_IsError` to check as you said above?\r\n\r\nThat sounds good. Leave `PyStackRef_IsError` untouched and add `PyStackRef_IsMalformed`.\r\nIt is tricky choosing a name that indicates that the stackef is broken, not that the ref is correct but thing it refers to is broken.\r\nI think \"malformed\" conveys that a bit better than \"invalid\", but feel free to pick the name you think is clearest."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-10-07T20:03:34Z",
+   "body": "@markshannon Please take a look. I have added `PyStackRef_IsMalformed` for default and no-gil builds. For `Py_STACKREF_DEBUG` we can add it after gh-139475 merged."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-10-22T13:14:10Z",
+   "body": "Thanks for doing this"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-10-22T13:21:35Z",
+   "body": "Thanks everyone for reviews!"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-10-22T13:30:32Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **x86 Debian Non-Debug with X 3.x** (no tier) has failed when building commit a4709e525f5bc3a1719b33f52377cccb2af70278.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1245/builds/6677) and take a look at the build logs.\n4. Check if the failure is related to this commit (a4709e525f5bc3a1719b33f52377cccb2af70278) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1245/builds/6677\n\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/contextlib.py\"^[[0m, line ^[[35m85^[[0m, in ^[[35minner^[[0m\n    return func(*args, **kwds)\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/test/_test_multiprocessing.py\"^[[0m, line ^[[35m596^[[0m, in ^[[35mtest_interrupt^[[0m\n    exitcode = self._kill_process(multiprocessing.Process.interrupt)\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/contextlib.py\"^[[0m, line ^[[35m85^[[0m, in ^[[35minner^[[0m\n    return func(*args, **kwds)\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/test/_test_multiprocessing.py\"^[[0m, line ^[[35m577^[[0m, in ^[[35m_kill_process^[[0m\n    self.assertEqual(^[[31mjoin^[[0m^[[1;31m()^[[0m, None)\n                     ^[[31m~~~~^[[0m^[[1;31m^^^[[0m\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/test/_test_multiprocessing.py\"^[[0m, line ^[[35m250^[[0m, in ^[[35m__call__^[[0m\n    return ^[[31mself.func^[[0m^[[1;31m(*args, **kwds)^[[0m\n           ^[[31m~~~~~~~~~^[[0m^[[1;31m^^^^^^^^^^^^^^^^[[0m\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/multiprocessing/process.py\"^[[0m, line ^[[35m156^[[0m, in ^[[35mjoin^[[0m\n    res = self._popen.wait(timeout)\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/multiprocessing/popen_fork.py\"^[[0m, line ^[[35m44^[[0m, in ^[[35mwait^[[0m\n    return ^[[31mself.poll^[[0m^[[1;31m(os.WNOHANG if timeout == 0.0 else 0)^[[0m\n           ^[[31m~~~~~~~~~^[[0m^[[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[[0m\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/multiprocessing/popen_fork.py\"^[[0m, line ^[[35m28^[[0m, in ^[[35mpoll^[[0m\n    pid, sts = ^[[31mos.waitpid^[[0m^[[1;31m(self.pid, flag)^[[0m\n               ^[[31m~~~~~~~~~~^[[0m^[[1;31m^^^^^^^^^^^^^^^^^[[0m\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/test/_test_multiprocessing.py\"^[[0m, line ^[[35m573^[[0m, in ^[[35mhandler^[[0m\n    raise RuntimeError('join took too long: %s' % p)\n^[[1;35mRuntimeError^[[0m: ^[[35mjoin took too long: <Process name='Process-1' pid=2952 parent=2950 started daemon>^[[0m\n\n\nTraceback (most recent call last):\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/contextlib.py\"^[[0m, line ^[[35m85^[[0m, in ^[[35minner^[[0m\n    return func(*args, **kwds)\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/test/_test_multiprocessing.py\"^[[0m, line ^[[35m596^[[0m, in ^[[35mtest_interrupt^[[0m\n    exitcode = self._kill_process(multiprocessing.Process.interrupt)\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/contextlib.py\"^[[0m, line ^[[35m85^[[0m, in ^[[35minner^[[0m\n    return func(*args, **kwds)\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/test/_test_multiprocessing.py\"^[[0m, line ^[[35m577^[[0m, in ^[[35m_kill_process^[[0m\n    self.assertEqual(^[[31mjoin^[[0m^[[1;31m()^[[0m, None)\n                     ^[[31m~~~~^[[0m^[[1;31m^^^[[0m\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/test/_test_multiprocessing.py\"^[[0m, line ^[[35m250^[[0m, in ^[[35m__call__^[[0m\n    return ^[[31mself.func^[[0m^[[1;31m(*args, **kwds)^[[0m\n           ^[[31m~~~~~~~~~^[[0m^[[1;31m^^^^^^^^^^^^^^^^[[0m\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/multiprocessing/process.py\"^[[0m, line ^[[35m156^[[0m, in ^[[35mjoin^[[0m\n    res = self._popen.wait(timeout)\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/multiprocessing/popen_fork.py\"^[[0m, line ^[[35m44^[[0m, in ^[[35mwait^[[0m\n    return ^[[31mself.poll^[[0m^[[1;31m(os.WNOHANG if timeout == 0.0 else 0)^[[0m\n           ^[[31m~~~~~~~~~^[[0m^[[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[[0m\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/multiprocessing/popen_fork.py\"^[[0m, line ^[[35m28^[[0m, in ^[[35mpoll^[[0m\n    pid, sts = ^[[31mos.waitpid^[[0m^[[1;31m(self.pid, flag)^[[0m\n               ^[[31m~~~~~~~~~~^[[0m^[[1;31m^^^^^^^^^^^^^^^^^[[0m\n  File ^[[35m\"/buildbot/buildarea/3.x.ware-debian-x86.nondebug/build/Lib/test/_test_multiprocessing.py\"^[[0m, line ^[[35m573^[[0m, in ^[[35mhandler^[[0m\n    raise RuntimeError('join took too long: %s' % p)\n^[[1;35mRuntimeError^[[0m: ^[[35mjoin took too long: <Process name='Process-159' pid=23294 parent=22521 started daemon>^[[0m\n\n```\n\n</details>\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/139193",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/139728",
+   "commit": null,
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/140310",
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "a4709e525f5bc3a1719b33f52377cccb2af70278",
+   "actor": "markshannon"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/139475",
+   "commit": null,
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5a5687427a4bb2335d77ffad3dd82e2ad2a5a62",
+   "actor": "StanFromIreland"
+  }
+ ],
+ "fetch_errors": null
+}

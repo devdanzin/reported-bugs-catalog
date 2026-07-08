@@ -1,0 +1,82 @@
+{
+ "repo": "python/cpython",
+ "number": 151836,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151836",
+ "title": "gh-151773: NULL-check token_new() in PyContextVar_Set",
+ "state": "closed",
+ "state_reason": null,
+ "author": "bhuvi27",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-06-21T10:46:45Z",
+ "closed_at": "2026-06-23T14:15:15Z",
+ "body": "Fixes #151773.\n\n`token_new()` can return NULL on OOM, but `PyContextVar_Set` went straight into `contextvar_set()` and then `Py_DECREF(tok)` on the error path. Added an early return when `tok` is NULL.\n\n\n<!-- gh-issue-number: gh-151773 -->\n* Issue: gh-151773\n<!-- /gh-issue-number -->",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-23T14:15:20Z",
+   "body": "Thanks @bhuvi27 for the PR, and @sobolevn for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-23T14:15:36Z",
+   "body": "[GH-152009](https://github.com/python/cpython/pull/152009) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-23T14:15:48Z",
+   "body": "[GH-152010](https://github.com/python/cpython/pull/152010) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-23T14:15:56Z",
+   "body": "[GH-152011](https://github.com/python/cpython/pull/152011) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151773",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d35b1719a58c8682a22ef698e070e97661af8d14",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a1f31af280a5c56c9eb85e2de5251c3c1b0e8bd3",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b471b4a6bad62f0b237aa4cb86bf8f20481c129c",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7b765a47b83d9f5155c8fc7a6e54ab86e5e61600",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "38f0c51c8337bcd2b4738070b6e8a9a73b01d624",
+   "actor": "pyctrl"
+  }
+ ],
+ "fetch_errors": null
+}

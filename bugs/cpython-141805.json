@@ -8,24 +8,44 @@
  "issues": [
   "python/cpython#141805"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#142007",
+  "python/cpython#143815",
+  "python/cpython#143849",
+  "python/cpython#143853"
+ ],
+ "n_prs": 4,
+ "n_backports": 2,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "3.13",
   "3.14",
   "3.15",
+  "DO-NOT-MERGE",
+  "awaiting core review",
   "interpreter-core",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "kemingy",
+  "miss-islington",
+  "serhiy-storchaka"
+ ],
  "status": "closed/fixed",
  "confidence": "low",
  "needs_review": true,
  "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-141805.json"
+  "raw/python__cpython/issue-141805.json",
+  "raw/python__cpython/pull-142007.json",
+  "raw/python__cpython/pull-143815.json",
+  "raw/python__cpython/pull-143849.json",
+  "raw/python__cpython/pull-143853.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 5
 }

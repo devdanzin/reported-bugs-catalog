@@ -1,0 +1,112 @@
+{
+ "repo": "python/cpython",
+ "number": 139170,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/139170",
+ "title": "GH-137218: Fix Makefile to handle FreeBSD (fix for JIT stencil changes)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "savannahostrowski",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news",
+  "topic-JIT"
+ ],
+ "created_at": "2025-09-19T15:18:44Z",
+ "closed_at": "2025-09-22T12:21:57Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\nThis is a follow up from #137265 to fix FreeBSD builds.\n\n<!-- gh-issue-number: gh-137218 -->\n* Issue: gh-137218\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-19T15:19:41Z",
+   "body": "!buildbot FreeBSD"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-19T15:19:45Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @savannahostrowski for commit 64ba8f3491a1d619ddb051107fed4461743e2d41 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F139170%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `FreeBSD`\n\nThe builders matched are:\n- `AMD64 FreeBSD Refleaks PR`\n- `AMD64 FreeBSD15 PR`\n- `AMD64 FreeBSD PR`\n- `AMD64 FreeBSD14 PR`\n"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-19T15:31:03Z",
+   "body": "!buildbot FreeBSD"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-19T15:31:07Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @savannahostrowski for commit b2b95d1db29e8f1f08861bdb2a33f694df808bf1 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F139170%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `FreeBSD`\n\nThe builders matched are:\n- `AMD64 FreeBSD Refleaks PR`\n- `AMD64 FreeBSD15 PR`\n- `AMD64 FreeBSD PR`\n- `AMD64 FreeBSD14 PR`\n"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-19T20:56:24Z",
+   "body": "!buildbot FreeBSD"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-19T20:56:27Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @savannahostrowski for commit 69f9202a073053bbb16206a1e08f0bf1c3d4b274 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F139170%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `FreeBSD`\n\nThe builders matched are:\n- `AMD64 FreeBSD Refleaks PR`\n- `AMD64 FreeBSD15 PR`\n- `AMD64 FreeBSD PR`\n- `AMD64 FreeBSD14 PR`\n"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-19T21:26:36Z",
+   "body": "!buildbot FreeBSD"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-19T21:26:39Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @savannahostrowski for commit 9f51d6b3053428a940c683b6acef2205c65ae026 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F139170%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `FreeBSD`\n\nThe builders matched are:\n- `AMD64 FreeBSD Refleaks PR`\n- `AMD64 FreeBSD15 PR`\n- `AMD64 FreeBSD PR`\n- `AMD64 FreeBSD14 PR`\n"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-19T21:37:26Z",
+   "body": "!buildbot FreeBSD"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-19T21:37:30Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @savannahostrowski for commit b51c85dd0cda332af9d20325573dcf317c56069a :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F139170%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `FreeBSD`\n\nThe builders matched are:\n- `AMD64 FreeBSD Refleaks PR`\n- `AMD64 FreeBSD15 PR`\n- `AMD64 FreeBSD PR`\n- `AMD64 FreeBSD14 PR`\n"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-19T21:51:40Z",
+   "body": "!buildbot FreeBSD"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-19T21:51:43Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @savannahostrowski for commit 656a0a2255d2792be57783d3ba016358f56ce601 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F139170%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `FreeBSD`\n\nThe builders matched are:\n- `AMD64 FreeBSD Refleaks PR`\n- `AMD64 FreeBSD15 PR`\n- `AMD64 FreeBSD PR`\n- `AMD64 FreeBSD14 PR`\n"
+  },
+  {
+   "author": "encukou",
+   "created_at": "2025-09-22T12:18:51Z",
+   "body": "The refleaks failure is unrelated, and should be fixed in https://github.com/python/cpython/pull/139225"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/137218",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "72d5ee051145c5aaf3cc6b8e807a3a2b8930ae63",
+   "actor": "encukou"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "encukou"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/139241",
+   "commit": null,
+   "actor": "savannahostrowski"
+  }
+ ],
+ "fetch_errors": null
+}

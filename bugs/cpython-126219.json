@@ -8,7 +8,15 @@
  "issues": [
   "python/cpython#126219"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#151980",
+  "python/cpython#152045",
+  "python/cpython#152046",
+  "python/cpython#152047"
+ ],
+ "n_prs": 4,
+ "n_backports": 3,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.12",
@@ -18,15 +26,22 @@
   "topic-tkinter",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "miss-islington",
+  "serhiy-storchaka"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-126219.json"
+  "raw/python__cpython/issue-126219.json",
+  "raw/python__cpython/pull-151980.json",
+  "raw/python__cpython/pull-152045.json",
+  "raw/python__cpython/pull-152046.json",
+  "raw/python__cpython/pull-152047.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 5
 }

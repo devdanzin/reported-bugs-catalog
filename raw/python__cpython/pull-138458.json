@@ -1,0 +1,64 @@
+{
+ "repo": "python/cpython",
+ "number": 138458,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/138458",
+ "title": "gh-138431: JIT Optimizer --- Fix round-tripping references for str and tuple",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-09-03T15:34:40Z",
+ "closed_at": "2025-09-03T18:05:06Z",
+ "body": "The problem is that when something round-trips through `str` or `tuple`, it isn't guaranteed to maintain the same reference information.\r\n\r\nThe test script deals \\with some quirks of immortalization/interning in CPython. \r\n\r\n<!-- gh-issue-number: gh-138431 -->\r\n* Issue: gh-138431\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "markshannon",
+   "created_at": "2025-09-03T16:55:27Z",
+   "body": "I don't think this has anything to do with string interning, but that `tuple(t)` and `str(s)` return a new reference to the object.\r\nWhat was a deferred reference becomes non-deferred when returned from a call.\r\n\r\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-03T17:07:47Z",
+   "body": "> I don't think this has anything to do with string interning, but that `tuple(t)` and `str(s)` return a new reference to the object. What was a deferred reference becomes non-deferred when returned from a call.\r\n\r\nYes I'm aware. Sorry that I didn't put it in the first sentence. What I was talking about (interning/immortalization) is a quirk of why the test script is written that way. For some reason if it's in a separate script, it stays non-immortal but interned, but if it's in the same test file, it stays immortal and interned, causing some weird behavior."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-09-03T18:05:10Z",
+   "body": "Thanks @Fidget-Spinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-09-03T18:05:13Z",
+   "body": "Sorry, @Fidget-Spinner, I could not cleanly backport this to `3.14` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 2402f84665df41732c94db2ccd6f90dd13479fa8 3.14\n```\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/138431",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "2402f84665df41732c94db2ccd6f90dd13479fa8",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b244a0930c4fc3e3da02724596d0f8571c62d815",
+   "actor": "lkollar"
+  }
+ ],
+ "fetch_errors": null
+}

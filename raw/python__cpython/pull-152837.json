@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 152837,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152837",
+ "title": "[3.14] gh-151763: Fix OOM-0013 crash when the parser or compiler fails to allocate (GH-151968)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-07-02T00:34:32Z",
+ "closed_at": "2026-07-02T08:23:07Z",
+ "body": "(cherry picked from commit 669299b62f6c2176d4bedcf550fb9baaabd6a9d6)\n\nCo-authored-by: tonghuaroot (\u7ae5\u8bdd) <tonghuaroot@gmail.com>\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151968",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "74c8d5ce0f7ba5eb0f9d299f30ac7c6468a59ef5",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  }
+ ],
+ "fetch_errors": null
+}

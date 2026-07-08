@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 124214,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/124214",
+ "title": "[3.13] gh-122145: Handle an empty AST body when reporting tracebacks (GH-122161)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-09-18T16:42:42Z",
+ "closed_at": "2024-09-30T01:13:37Z",
+ "body": "(cherry picked from commit 5cd50cb6eb28e525f0c838e049e900ea982a5a23)\n\nCo-authored-by: B\u00e9n\u00e9dikt Tran <10796600+picnixz@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-122145 -->\n* Issue: gh-122145\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122161",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122145",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "99dc0893c7e680a3d6b7c2a917a569681b95b8de",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Yhg1s"
+  }
+ ],
+ "fetch_errors": null
+}

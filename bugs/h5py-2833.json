@@ -1,0 +1,28 @@
+{
+ "bug_id": "h5py-2833",
+ "title": "`h5r.get_name` has unchecked malloc",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "h5py/h5py",
+ "is_umbrella": false,
+ "issues": [
+  "h5py/h5py#2833"
+ ],
+ "prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/h5py__h5py/issue-2833.json"
+ ],
+ "n_artifacts": 1
+}

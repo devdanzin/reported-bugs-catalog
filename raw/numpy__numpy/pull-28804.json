@@ -1,0 +1,45 @@
+{
+ "repo": "numpy/numpy",
+ "number": 28804,
+ "type": "pull",
+ "url": "https://github.com/numpy/numpy/pull/28804",
+ "title": "BUG: fix heap buffer overflow in np.strings.find",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ngoldbaum",
+ "author_association": "MEMBER",
+ "labels": [
+  "00 - Bug"
+ ],
+ "created_at": "2025-04-23T17:52:49Z",
+ "closed_at": "2025-04-24T01:13:45Z",
+ "body": "Fixes #28791 \r\n\r\nMultiplying by `sizeof(npy_ucs4)` here is nonsense. I'm the one who added this if statement originally. No idea what I was thinking.",
+ "comments": [
+  {
+   "author": "charris",
+   "created_at": "2025-04-24T01:13:55Z",
+   "body": "Thanks Nathan."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "441e280a8c74ae7c9dae07833baaa40e8c8366d4",
+   "actor": "charris"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "charris"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/28852",
+   "commit": null,
+   "actor": "charris"
+  }
+ ],
+ "fetch_errors": null
+}

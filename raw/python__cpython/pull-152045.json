@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 152045,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152045",
+ "title": "[3.15] gh-126219: Fix crash in tkinter.Tk with non-BMP className on Tcl/Tk 8.x (GH-151980)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-24T05:59:51Z",
+ "closed_at": "2026-06-24T06:32:06Z",
+ "body": "Tcl 8.x crashes when title-casing a non-BMP character during Tk\ninitialization, so such a className is now rejected with a ValueError.\n(cherry picked from commit 124c7cd91be8cff76d1eec0adef65991c23c4419)\n\nCo-authored-by: Serhiy Storchaka <storchaka@gmail.com>\nCo-authored-by: Claude Opus 4.8 <noreply@anthropic.com>\n\n<!-- gh-issue-number: gh-126219 -->\n* Issue: gh-126219\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126219",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151980",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "dbc9b686e02abb9af57f16184666ba9a344f8004",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

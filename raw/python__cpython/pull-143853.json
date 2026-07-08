@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 143853,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143853",
+ "title": "[3.13] gh-141805: Fix crash after concurrent addition objects with the same hash to set (GH-143815)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-01-15T07:30:17Z",
+ "closed_at": "2026-01-15T07:59:16Z",
+ "body": "This happens when the set contained several elements with the same hash, and then some of them were removed.\r\n(cherry picked from commit b8e925b4f8f6c5e28fbebc4f3965bf77610698b3)\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-141805 -->\n* Issue: gh-141805\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141805",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143815",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5c028df404b0d8453a4ecb8b938122f3d3c62a30",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

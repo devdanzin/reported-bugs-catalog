@@ -1,0 +1,55 @@
+{
+ "repo": "python/cpython",
+ "number": 127605,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127605",
+ "title": "[3.12] GH-117195: Avoid assertion error in `object.__sizeof__` (GH-117220)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-12-04T14:54:21Z",
+ "closed_at": "2024-12-11T11:21:07Z",
+ "body": "(cherry picked from commit 406ffb5293a8c9ca315bf63de1ee36a9b33f9aaf)\n\nCo-authored-by: Mark Shannon <mark@hotpy.org>\n\n<!-- gh-issue-number: gh-117195 -->\n* Issue: gh-117195\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-04T16:20:43Z",
+   "body": "cc @markshannon @iritkatriel @JelleZijlstra "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/117195",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/117220",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127603",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "0964f9f1847bcbe90345eeafd65813d06db4ba3b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

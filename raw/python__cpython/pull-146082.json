@@ -1,0 +1,93 @@
+{
+ "repo": "python/cpython",
+ "number": 146082,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146082",
+ "title": "gh-146076: Fix crash when a `ZoneInfo` subclass is missing a `_weak_cache`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "StanFromIreland",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-17T20:46:45Z",
+ "closed_at": "2026-03-18T12:58:09Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146076 -->\n* Issue: gh-146076\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-18T14:56:58Z",
+   "body": "Thanks @StanFromIreland for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-18T14:56:59Z",
+   "body": "Thanks @StanFromIreland for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-18T14:57:14Z",
+   "body": "[GH-146115](https://github.com/python/cpython/pull/146115) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-18T14:57:20Z",
+   "body": "[GH-146116](https://github.com/python/cpython/pull/146116) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2026-03-18T16:09:05Z",
+   "body": "Thanks for the reviews and backports!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146076",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3b06d68d8a3cc1f37359af1d7ebb3d09e1222296",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "31b2e5065e0ec4397087c7499af8ccaf45985b80",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c9ac70fc456f5a8b7e8d217c27f3f6f6f782c967",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "450e9eaf735dc40faf536b337e6c784e2f9050e3",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6980b94c3a25a69278ef9b348fabec7831651e8e",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a597827085b6131c2984dfac4060c70e5b37ff22",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

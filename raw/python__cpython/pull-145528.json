@@ -1,0 +1,57 @@
+{
+ "repo": "python/cpython",
+ "number": 145528,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145528",
+ "title": "gh-145335: Skip Emscripten for os.execve test",
+ "state": "closed",
+ "state_reason": null,
+ "author": "hoodmane",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-05T10:10:45Z",
+ "closed_at": "2026-03-05T11:29:35Z",
+ "body": "Emscripten's os.execve always fails with ENOEXEC. As an alternative, we could add\r\nENOEXEC to the list of allowed return codes.\r\n\r\n\r\n<!-- gh-issue-number: gh-145335 -->\r\n* Issue: gh-145335\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-05T11:29:43Z",
+   "body": "Merged, thanks for the fix."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145335",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145439",
+   "commit": null,
+   "actor": "hoodmane"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "23a4e3ba3c44b423eff635672c56d614f5ea3899",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9d93f19d6b4e0271e30a699f3349cfe7a682b123",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

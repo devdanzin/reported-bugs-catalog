@@ -1,0 +1,48 @@
+{
+ "repo": "python/cpython",
+ "number": 142007,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/142007",
+ "title": "gh-141805: avoid increase the set->used twice when the __eq__ trigger another add",
+ "state": "closed",
+ "state_reason": null,
+ "author": "kemingy",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting core review",
+  "DO-NOT-MERGE",
+  "needs backport to 3.13",
+  "needs backport to 3.14"
+ ],
+ "created_at": "2025-11-27T09:51:59Z",
+ "closed_at": "2026-01-15T01:37:40Z",
+ "body": "gh-141805: goes directly to the `found_unused_or_dummy` when finding a dummy slot in set.add\r\n\r\nThis avoids triggering the `__eq__` in the next iteration by the `PyObject_RichCompareBool`, which might introduce another `set.add` in the user code. Like:\r\n\r\n```py\r\ntasks = set()\r\n\r\nclass Corrupt:\r\n    def __eq__(self, value):\r\n        tasks.add(self)\r\n        return False\r\n```\r\n\r\nAs described in https://github.com/python/cpython/issues/141805#issuecomment-3584997981\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n",
+ "comments": [
+  {
+   "author": "kemingy",
+   "created_at": "2026-01-08T03:20:06Z",
+   "body": "Kindly ping @rhettinger, please take a look when you are free. Thanks!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141805",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143781",
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kemingy"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -8,21 +8,36 @@
  "issues": [
   "python/cpython#131936"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#131943",
+  "python/cpython#131945",
+  "python/cpython#131949"
+ ],
+ "n_prs": 3,
+ "n_backports": 1,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
+  "awaiting review",
   "interpreter-core",
+  "skip news",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "ZeroIntensity",
+  "miss-islington"
+ ],
  "status": "closed/fixed",
  "confidence": "low",
  "needs_review": true,
  "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-131936.json"
+  "raw/python__cpython/issue-131936.json",
+  "raw/python__cpython/pull-131943.json",
+  "raw/python__cpython/pull-131945.json",
+  "raw/python__cpython/pull-131949.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

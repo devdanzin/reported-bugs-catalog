@@ -8,22 +8,31 @@
  "issues": [
   "python/cpython#132474"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#132579"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
+  "awaiting review",
   "interpreter-core",
   "performance",
   "type-feature"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "skirpichev"
+ ],
  "status": "closed/fixed",
  "confidence": "medium",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-132474.json"
+  "raw/python__cpython/issue-132474.json",
+  "raw/python__cpython/pull-132579.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

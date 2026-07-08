@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 143175,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143175",
+ "title": "[3.14] gh-142975: During GC, mark frozen objects with a merged zero refcount for destruction (GH-143156)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2025-12-25T16:31:54Z",
+ "closed_at": "2025-12-25T17:00:42Z",
+ "body": "(cherry picked from commit 8611f74e089d9ac9de84dd42be9d251db27889aa)\n\nCo-authored-by: Peter Bierma <zintensitydev@gmail.com>\n\n<!-- gh-issue-number: gh-142975 -->\n* Issue: gh-142975\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/142975",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143156",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "8a61b71eeef01b6024dccf6705cdfaa4c6c2edaf",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

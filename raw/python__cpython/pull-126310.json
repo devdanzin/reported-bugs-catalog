@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 126310,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126310",
+ "title": "[3.13] gh-126220: Fix crash on calls to `_lsprof.Profiler` methods with 0 args (backportable) (GH-126271)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-01T21:53:37Z",
+ "closed_at": "2024-11-01T22:24:06Z",
+ "body": "(cherry picked from commit 28b148fb32e4548b461137d18d1ab6d366395d36)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\nCo-authored-by: Erlend E. Aasland <erlend.aasland@protonmail.com>\n\n<!-- gh-issue-number: gh-126220 -->\n* Issue: gh-126220\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126220",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126271",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "1b9710c57188bad9152c0973d7c1ea766ae03247",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,93 @@
+{
+ "repo": "python/cpython",
+ "number": 146356,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146356",
+ "title": "gh-146355: Fix `main_module` ref leak in `_PyRun_SimpleStringFlagsWithName`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "A0su",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-24T03:03:19Z",
+ "closed_at": "2026-03-25T06:37:00Z",
+ "body": "# gh-146355: Fix `main_module` ref leak in `_PyRun_SimpleStringFlagsWithName`\r\n\r\nThis is a sub-issue for #146102 and original gist details can be found [here](https://gist.github.com/devdanzin/86eda5ca53243ef667773991312c2e74)\r\n\r\nWhen `the_name` is NULL we'll fail to call `Py_DECREF` on `main_module`. I used the same goto pattern as `_PyRun_SimpleFileObject` to fix this.\r\n\r\nI omitted a new test entry as we have indirect coverage of functionality in `test_embed.py`. Not sure if it makes sense for the scope of fixing the ref leak to include the additional code for a test in test_run.py (which has a TODO for this function). ",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-24T03:03:22Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2026-03-24T03:03:23Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-24T13:12:02Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\n\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-24T15:33:49Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "A0su",
+   "created_at": "2026-03-24T15:42:39Z",
+   "body": "I have made the requested changes; please review again."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-24T15:42:44Z",
+   "body": "Thanks for making the requested changes!\n\n@vstinner: please review the changes made to this pull request.\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-25T06:37:14Z",
+   "body": "Merged, thanks for the fix."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146355",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "08f6b33bf32bdfc30eeda5966707849c459da7c2",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "166013971bfbaaffca2cba8c7ac12dc479c876a8",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5f193281e7b07d0022ca6a50f71f8405e3ef4bbb",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,69 @@
+{
+ "repo": "python/cpython",
+ "number": 134795,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/134795",
+ "title": "[3.14] gh-134744: Fix fcntl error handling (#134748)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "tests",
+  "skip news"
+ ],
+ "created_at": "2025-05-27T15:42:49Z",
+ "closed_at": "2025-05-27T16:13:20Z",
+ "body": "Fix also reference leak on buffer overflow.\r\n\r\n(cherry picked from commit 9300a596d37d058e6e58d00a2ad70617c863a3de)\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-134744 -->\n* Issue: gh-134744\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-05-27T16:13:23Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-05-27T16:13:33Z",
+   "body": "[GH-134798](https://github.com/python/cpython/pull/134798) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/134744",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134748",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "8a6a6f39c869a6601babc31592e156ce22478a47",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "968d688f995ecfb25c727f84df522a5adce582e8",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "741040236e05a3789e5d9756530b5ff92e0bc52d",
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

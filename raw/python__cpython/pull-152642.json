@@ -1,0 +1,112 @@
+{
+ "repo": "python/cpython",
+ "number": 152642,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152642",
+ "title": "gh-152635: Raise MemoryError rather than fail assert() when the lock allocation fails in _interpchannels.create()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "stestagg",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-06-29T23:43:33Z",
+ "closed_at": "2026-06-30T10:57:29Z",
+ "body": "Previously, an allocation failure when creating the lock for a channel in `_interpchannels` would trigger an assert. Caused by `handle_channel_error` being passed an error code of -1 which is only allowed if an exception has been set. (in this case, no exception was set)\r\n\r\n`channelsmod_create` now forwards the error code from `channel_create` which `handle_channel_error` already handled.\r\n\r\nBecause the only way to get a -7 error code (was `ERR_CHANNEL_MUTEX_INIT`) is via an allocation failure in `PyThread_allocate_lock`, I made `handle_channel_error` raise a `MemoryError` for this case rather than a `ChannelError` which seems more consistent with general practice.\r\n\r\nI also renamed the constant from `ERR_CHANNEL_MUTEX_INIT` to `ERR_CHANNEL_ALLOC_LOCK` to make this clearer for future changes.\r\n\r\nThere's a test to cover this, which does rely on `_interpchannels.create` code paths not changing too wildly (first allocation has to be the lock), but even if that changes, the test isn't invalid.\r\n\r\nFull test suite passes, except `test_struct` which is known in gh-142414 on MacOS and Windows\r\n\r\n<details>\r\n<summary>Test summary</summary>\r\n\r\n```\r\n== Tests result: FAILURE ==\r\n\r\n32 tests skipped:\r\n    test.test_asyncio.test_windows_events\r\n    test.test_asyncio.test_windows_utils test.test_gdb.test_backtrace\r\n    test.test_gdb.test_cfunction test.test_gdb.test_cfunction_full\r\n    test.test_gdb.test_jit test.test_gdb.test_misc\r\n    test.test_gdb.test_pretty_print\r\n    test.test_multiprocessing_fork.test_manager\r\n    test.test_multiprocessing_fork.test_misc\r\n    test.test_multiprocessing_fork.test_processes\r\n    test.test_multiprocessing_fork.test_threads\r\n    test.test_os.test_windows test_android test_dbm_gnu test_devpoll\r\n    test_dtrace test_epoll test_free_threading test_idle test_launcher\r\n    test_msvcrt test_startfile test_tcl test_tkinter test_ttk\r\n    test_ttk_textonly test_turtle test_winapi test_winconsoleio\r\n    test_winreg test_wmi\r\n\r\n9 tests skipped (resource denied):\r\n    test_curses test_peg_generator test_smtpnet test_socketserver\r\n    test_urllib2net test_urllibnet test_winsound test_xpickle\r\n    test_zipfile64\r\n\r\n1 test altered the execution environment (env changed):\r\n    test_httpservers\r\n\r\n1 test failed:\r\n    test_struct\r\n\r\n462 tests OK.\r\n```\r\n\r\n</details>\n\n<!-- gh-issue-number: gh-152635 -->\n* Issue: gh-152635\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2026-06-29T23:43:38Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "stestagg",
+   "created_at": "2026-06-30T00:15:46Z",
+   "body": "Sorry for the force push, I didn't realise that github would do that with no warning on a simple rebase!"
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2026-06-30T08:20:30Z",
+   "body": "Something went wrong when merging, but we're only bothering Terry (who can unsubscribe in the sidebar ;-) so I don't think we need to recreate."
+  },
+  {
+   "author": "stestagg",
+   "created_at": "2026-06-30T08:22:37Z",
+   "body": "> Something went wrong when merging, but we're only bothering Terry (who can unsubscribe in the sidebar ;-) so I don't think we need to recreate.\r\n\r\nYeah, sorry, I'm working on it, I'm not used to this exact workflow "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-30T10:57:32Z",
+   "body": "Thanks @stestagg for the PR, and @sobolevn for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-30T10:57:45Z",
+   "body": "[GH-152671](https://github.com/python/cpython/pull/152671) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-30T10:57:51Z",
+   "body": "[GH-152672](https://github.com/python/cpython/pull/152672) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-30T10:57:58Z",
+   "body": "[GH-152673](https://github.com/python/cpython/pull/152673) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "stestagg",
+   "created_at": "2026-06-30T10:58:19Z",
+   "body": "@sobolevn - Thanks for your help guiding me! "
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2026-06-30T10:58:46Z",
+   "body": "Happy to help! Thanks for finding this bug :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152635",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b383aa6e1a8ea53fdeed88c71fbc34d8b2d1fde9",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2c9972c697d149390bdf9d54563212a427c5477b",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0d76fdb0647dbcb11ef6129289eec4ba9784c5d0",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "589833e0a4fae6b476107f5fb345d8058ce2712a",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "da7d768a6158938f38be1a7dd734adba8ff33b51",
+   "actor": "maurycy"
+  }
+ ],
+ "fetch_errors": null
+}

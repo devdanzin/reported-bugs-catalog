@@ -1,0 +1,69 @@
+{
+ "repo": "python/cpython",
+ "number": 141495,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/141495",
+ "title": "[3.14] gh-140104: Set next_instr properly in the JIT during exceptions (GH-140233)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "efimov-mikhail",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-11-13T09:53:59Z",
+ "closed_at": "2025-11-13T18:47:25Z",
+ "body": "It's an another attempt to backport GH-140233.\r\nThe first one was buggy and we reverted it.\r\n\r\nCC @Fidget-Spinner.\r\n\r\nI'm not sure that this fix is fully correct.\r\nBut it passes all the tests on my machine (Debian 12, x86_64) in both build configurations:\r\n\r\n```\r\n./configure --enable-experimental-jit=yes --with-pydebug\r\n./configure --enable-experimental-jit=interpreter --with-pydebug\r\n```\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n<!-- gh-issue-number: gh-140104 -->\r\n* Issue: gh-140104\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-13T14:42:16Z",
+   "body": "Could you pleas trigger the JIT CI by pushing whitespace to a jit file? We can revert that after I see it's green."
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-13T15:39:43Z",
+   "body": "> Could you pleas trigger the JIT CI by pushing whitespace to a jit file? We can revert that after I see it's green.\r\n\r\nSure! I hope that I understand correctly what file do you mean (`Tools/jit/template.c`)."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-13T16:11:22Z",
+   "body": "Very cool. It's green! Ok, please revert the jit file change and I'll merge it."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-13T18:47:15Z",
+   "body": "Thanks again."
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-13T18:53:04Z",
+   "body": "Thank you for review and merge!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/140233",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/140104",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "af20b880fc14c5a397f2f160877b94cb3d69f45c",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

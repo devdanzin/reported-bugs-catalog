@@ -1,0 +1,63 @@
+{
+ "repo": "python/cpython",
+ "number": 149076,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/149076",
+ "title": "gh-149049: Fix jit binary op stack underflow",
+ "state": "closed",
+ "state_reason": null,
+ "author": "eendebakpt",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-04-27T20:45:04Z",
+ "closed_at": "2026-04-30T09:36:04Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-149049 -->\n* Issue: gh-149049\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-28T11:03:22Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\n\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-04-28T14:49:32Z",
+   "body": "Since this is fixing a reported bug, it will need a news entry."
+  },
+  {
+   "author": "read-the-docs-community[bot]",
+   "created_at": "2026-04-28T21:36:15Z",
+   "body": "<!-- readthedocs-883176 -->\n\n### Documentation build overview\n\n> \ud83d\udcda [cpython-previews](https://app.readthedocs.org/projects/cpython-previews/) | \ud83d\udee0\ufe0f Build [#32458600](https://app.readthedocs.org/projects/cpython-previews/builds/32458600/) | \ud83d\udcc1 Comparing 901ad116e3d4faf142ca01f41d0dae074ce945b8 against [main](https://cpython-previews.readthedocs.io/en/main/) (40dc61a0e0672810c3934da8cc2eda68027c24ce)\n\n[<kbd> &nbsp; \ud83d\udd0d Preview build &nbsp; </kbd>](https://cpython-previews--149076.org.readthedocs.build/en/149076/)\n\n\n<details>\n<summary>5 files changed \u00b7 <code>\u00b1</code> 5 modified</summary>\n<br>\n\n`\u00b1` **Modified**\n- [`contents.html`](https://cpython-previews--149076.org.readthedocs.build/en/149076/contents.html)\n- [`download.html`](https://cpython-previews--149076.org.readthedocs.build/en/149076/download.html)\n- [`library/asyncio-task.html`](https://cpython-previews--149076.org.readthedocs.build/en/149076/library/asyncio-task.html)\n- [`whatsnew/3.15.html`](https://cpython-previews--149076.org.readthedocs.build/en/149076/whatsnew/3.15.html)\n- [`whatsnew/changelog.html`](https://cpython-previews--149076.org.readthedocs.build/en/149076/whatsnew/changelog.html)\n\n</details>\n\n"
+  },
+  {
+   "author": "eendebakpt",
+   "created_at": "2026-04-29T22:24:43Z",
+   "body": "I have made the requested changes; please review again\r\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-29T22:24:47Z",
+   "body": "Thanks for making the requested changes!\n\n@markshannon: please review the changes made to this pull request.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/149049",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7fe51ceae8513e40452829d7d3ae6ff2a2576a0b",
+   "actor": "markshannon"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "markshannon"
+  }
+ ],
+ "fetch_errors": null
+}

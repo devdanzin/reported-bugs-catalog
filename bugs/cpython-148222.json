@@ -9,8 +9,14 @@
   "python/cpython#148222"
  ],
  "prs": [
-  "python/cpython#148226"
+  "python/cpython#148226",
+  "python/cpython#148705",
+  "python/cpython#148712",
+  "python/cpython#148717"
  ],
+ "n_prs": 4,
+ "n_backports": 3,
+ "n_fix_prs": 1,
  "gists": [
   "266ca45099796a2373866a07447d5ebf"
  ],
@@ -20,16 +26,20 @@
  ],
  "filed_by": "maintainer",
  "filers": [
+  "miss-islington",
   "prakashsellathurai"
  ],
  "status": "closed/fixed",
- "confidence": "medium",
+ "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-148222.json",
-  "raw/python__cpython/pull-148226.json"
+  "raw/python__cpython/pull-148226.json",
+  "raw/python__cpython/pull-148705.json",
+  "raw/python__cpython/pull-148712.json",
+  "raw/python__cpython/pull-148717.json"
  ],
- "n_artifacts": 2
+ "n_artifacts": 5
 }

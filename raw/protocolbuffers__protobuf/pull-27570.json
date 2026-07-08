@@ -1,0 +1,36 @@
+{
+ "repo": "protocolbuffers/protobuf",
+ "number": 27570,
+ "type": "pull",
+ "url": "https://github.com/protocolbuffers/protobuf/pull/27570",
+ "title": "fix(python): raise IndexError in repeated field pop() for out-of-range index",
+ "state": "closed",
+ "state_reason": null,
+ "author": "jlaportebot",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-05-25T00:35:20Z",
+ "closed_at": "2026-05-29T23:08:25Z",
+ "body": "## Summary\n\nFixes item 5 from #26596 \u2014 the upb C extension `RepeatedContainer_Pop()` was clamping out-of-range indices instead of raising `IndexError`, which is inconsistent with Python's built-in `list.pop()`.\n\n## Bug Description\n\nWhen calling `.pop()` with an out-of-range index on a protobuf repeated field using the upb (C) backend, the index was silently clamped to the last valid index instead of raising `IndexError`:\n\n```python\nmsg.repeated_int32.extend(range(5))\nmsg.repeated_int32.pop(999999)  # Returns 4 instead of raising IndexError!\nmsg.repeated_int32.pop(-5)      # Also clamped instead of raising IndexError\n```\n\nPython's `list.pop()` raises `IndexError` in both cases. The pure Python fallback implementation already behaves correctly since `self._values[key]` on a list raises `IndexError` naturally.\n\n## Changes\n\n### `python/repeated.c`\n- Removed the `#if UPB_FUTURE_REMOVE_POP_CLAMP` conditional clamping code\n- Added proper bounds checking: raises `IndexError` with message `\"pop index (%zd) out of range\"` when index is out of range after negative-index normalization\n- Matches `PyUpb_RepeatedContainer_Item()` which already raises `IndexError` for out-of-range access\n\n### `python/google/protobuf/internal/message_test.py`\n- Removed `@unittest.skipIf(api_implementation.Type() == 'upb', ...)` decorator from `testRepeatedPopOutOfBounds` since the upb implementation now correctly raises `IndexError`\n\n## Test Plan\n\nThe existing `testRepeatedPopOutOfBounds` test (previously skipped for upb) now passes with this fix:\n- `pop(-5)` on a 3-element list \u2192 `IndexError` \u2713\n- `pop(999999)` \u2192 `IndexError` \u2713\n- Normal `pop()`, `pop(0)`, `pop(1)`, `pop(-1)` still work correctly \u2713",
+ "comments": [
+  {
+   "author": "runzw",
+   "created_at": "2026-05-27T21:51:49Z",
+   "body": "The issue was already fixed by a future breaking [change](https://github.com/protocolbuffers/protobuf/pull/26920) which will not be released until 27Q1 (notice that it's guarded by the breaking change flag). "
+  },
+  {
+   "author": "jlaportebot",
+   "created_at": "2026-05-29T23:08:24Z",
+   "body": "Thanks @runzw for the context. Since this is already fixed by #26920 (guarded by the breaking change flag, targeting 27Q1), I'll close this PR to avoid duplication. Appreciate the review!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "jlaportebot"
+  }
+ ],
+ "fetch_errors": null
+}

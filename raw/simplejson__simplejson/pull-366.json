@@ -1,0 +1,25 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 366,
+ "type": "pull",
+ "url": "https://github.com/simplejson/simplejson/pull/366",
+ "title": "Enable free threading post-#362",
+ "state": "closed",
+ "state_reason": null,
+ "author": "etrepum",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-04-08T19:14:54Z",
+ "closed_at": "2026-04-09T05:52:15Z",
+ "body": "Since #362 should have solved the issues with free threading we can remove the is_gil_enabled code",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,79 @@
+{
+ "repo": "python/cpython",
+ "number": 144742,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/144742",
+ "title": "gh-144681: Fix JIT trace builder assertion failure when conditional branch jump target coincides with fallthrough target",
+ "state": "closed",
+ "state_reason": null,
+ "author": "cocolato",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-02-12T12:35:56Z",
+ "closed_at": "2026-03-10T04:12:49Z",
+ "body": "When the JIT trace builder translates `POP_JUMP_IF_TRUE` instructions, it determines the branch direction by comparing `next_instr` (where execution actually went) against `computed_jump_instr` (the jump target address). However, when oparg equals 1 and the instruction is followed by NOT_TAKEN, the computed jump target and the computed fallthrough target are the same address:\r\n\r\n```\r\ncomputed_next_instr = target + 2 + 1 (skip NOT_TAKEN) = target + 3\r\ncomputed_jump_instr = target + 2 + 1 (oparg)\r\n```\r\n\r\nIn this minimal reproduction case:\r\n\r\n```python\r\ndef trigger():\r\n    _ = [x for x in range(200) if [].append(x) or True]\r\n\r\nfor i in range(300):\r\n    trigger()\r\n\r\nprint(\"we finished\")\r\n```\r\n\r\nwhich produces:\r\n```\r\n...\r\n        POP_JUMP_IF_TRUE         1 (to L4)\r\nL3:     NOT_TAKEN\r\nL4:     LOAD_FAST_BORROW         0 (x)\r\n        LIST_APPEND              3\r\n        JUMP_BACKWARD           30 (to L2)\r\n...\r\n```\r\n\r\nthe address comparison `computed_jump_instr == next_instr` is always true regardless of which branch was actually taken, causing the assertion `jump_happened == (target_instr[1].cache & 1)` failed when the branch was not taken.\r\n\r\nSo we should fall back to the `RECORD_BRANCH_TAKEN` cache bit (`target_instr[1].cache & 1`) to determine the branch direction, since address comparison is ambiguous. \r\n\n\n<!-- gh-issue-number: gh-144681 -->\n* Issue: gh-144681\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-03T15:11:44Z",
+   "body": "Related: https://github.com/python/cpython/issues/141797"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-09T09:10:22Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\nAnd if you don't make the requested changes, you will be poked with soft cushions!\n\n"
+  },
+  {
+   "author": "cocolato",
+   "created_at": "2026-03-09T14:44:31Z",
+   "body": "Thanks for review! I have made the requested changes; please review again."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-09T14:44:39Z",
+   "body": "Thanks for making the requested changes!\n\n@markshannon, @Fidget-Spinner: please review the changes made to this pull request.\n"
+  },
+  {
+   "author": "cocolato",
+   "created_at": "2026-03-09T15:43:15Z",
+   "body": "The failed test appears unrelated to the current PR. It seems to have been introduced here: https://github.com/python/cpython/pull/145279"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-03-09T18:01:55Z",
+   "body": "Let's see if updating the branch fixes it"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2026-03-10T07:15:01Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 Fedora Stable Refleaks 3.x** (tier-1) has failed when building commit 66eafc9ea74e5233f2c46b424729d6dadfbb3111.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/320/builds/3803) and take a look at the build logs.\n4. Check if the failure is related to this commit (66eafc9ea74e5233f2c46b424729d6dadfbb3111) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/320/builds/3803\n\nFailed tests:\n\n- test.test_multiprocessing_fork.test_processes\n\nFailed subtests:\n\n- test_interrupt - test.test_multiprocessing_fork.test_processes.WithProcessesTestProcess.test_interrupt\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/multiprocessing/process.py\", line 320, in _bootstrap\n    self.run()\n    ~~~~~~~~^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/multiprocessing/process.py\", line 108, in run\n    self._target(*self._args, **self._kwargs)\n    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 525, in _sleep_some_event\n    time.sleep(100)\n    ~~~~~~~~~~^^^^^\nKeyboardInterrupt\nk\n\n\nTraceback (most recent call last):\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/contextlib.py\", line 85, in inner\n    return func(*args, **kwds)\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 597, in test_interrupt\n    exitcode = self._kill_process(multiprocessing.Process.interrupt)\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/contextlib.py\", line 85, in inner\n    return func(*args, **kwds)\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 578, in _kill_process\n    self.assertEqual(join(), None)\n                     ~~~~^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 251, in __call__\n    return self.func(*args, **kwds)\n           ~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/multiprocessing/process.py\", line 156, in join\n    res = self._popen.wait(timeout)\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/multiprocessing/popen_fork.py\", line 44, in wait\n    return self.poll(os.WNOHANG if timeout == 0.0 else 0)\n           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/multiprocessing/popen_fork.py\", line 28, in poll\n    pid, sts = os.waitpid(self.pid, flag)\n               ~~~~~~~~~~^^^^^^^^^^^^^^^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 574, in handler\n    raise RuntimeError('join took too long: %s' % p)\nRuntimeError: join took too long: <Process name='Process-1' pid=3582947 parent=3582945 started daemon>\n\n\nTraceback (most recent call last):\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/contextlib.py\", line 85, in inner\n    return func(*args, **kwds)\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 597, in test_interrupt\n    exitcode = self._kill_process(multiprocessing.Process.interrupt)\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/contextlib.py\", line 85, in inner\n    return func(*args, **kwds)\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 578, in _kill_process\n    self.assertEqual(join(), None)\n                     ~~~~^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 251, in __call__\n    return self.func(*args, **kwds)\n           ~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/multiprocessing/process.py\", line 156, in join\n    res = self._popen.wait(timeout)\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/multiprocessing/popen_fork.py\", line 44, in wait\n    return self.poll(os.WNOHANG if timeout == 0.0 else 0)\n           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/multiprocessing/popen_fork.py\", line 28, in poll\n    pid, sts = os.waitpid(self.pid, flag)\n               ~~~~~~~~~~^^^^^^^^^^^^^^^^\n  File \"/home/buildbot-worker/cstratak-fedora-stable-x86_64/3.x.cstratak-fedora-stable-x86_64.refleak/build/Lib/test/_test_multiprocessing.py\", line 574, in handler\n    raise RuntimeError('join took too long: %s' % p)\nRuntimeError: join took too long: <Process name='Process-929' pid=3539619 parent=3533096 started daemon>\n\n```\n\n</details>\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/144681",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "66eafc9ea74e5233f2c46b424729d6dadfbb3111",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "896c961fa5a9e534f6ba97abf9a481f207a1a556",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

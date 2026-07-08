@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 135020,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/135020",
+ "title": "[3.13] gh-130999: Avoid exiting the new REPL when there are non-string candidates for suggestions (gh-131001)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-repl"
+ ],
+ "created_at": "2025-06-02T11:05:12Z",
+ "closed_at": "2025-06-02T14:58:29Z",
+ "body": "(cherry picked from commit baccfdb3d4d004cfb5308674e5e6ea6e598abcd7)\n\nCo-authored-by: devdanzin <74280297+devdanzin@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-130999 -->\n* Issue: gh-130999\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131001",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130999",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7ca17edd13c77a38d1a7b7f3c0becff63f7e2506",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  }
+ ],
+ "fetch_errors": null
+}

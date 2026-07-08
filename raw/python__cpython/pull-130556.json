@@ -1,0 +1,89 @@
+{
+ "repo": "python/cpython",
+ "number": 130556,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/130556",
+ "title": "[3.13] gh-130163: Fix crashes related to PySys_GetObject() (GH-130503)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2025-02-25T22:02:05Z",
+ "closed_at": "2025-02-25T22:50:27Z",
+ "body": "The use of PySys_GetObject() and _PySys_GetAttr(), which return a borrowed reference, has been replaced by using one of the following functions, which return a strong reference and distinguish a missing attribute from an error: _PySys_GetOptionalAttr(), _PySys_GetOptionalAttrString(), _PySys_GetRequiredAttr(), and _PySys_GetRequiredAttrString(). (cherry picked from commit 0ef4ffeefd1737c18dc9326133c7894d58108c2e)\r\n\n\n<!-- gh-issue-number: gh-130163 -->\n* Issue: gh-130163\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-02-25T22:50:30Z",
+   "body": "Thanks @serhiy-storchaka for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-02-25T22:50:33Z",
+   "body": "Sorry, @serhiy-storchaka, I could not cleanly backport this to `3.12` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 7c1b76fce8c8df00da38830f72dbdde6881a33be 3.12\n```\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-02-26T07:28:18Z",
+   "body": "This change introduced reference leaks in the 3.13 branch. Example:\r\n\r\n```\r\n$ ./python -m test test_genericalias -R 3:3\r\n(...)\r\ntest_genericalias leaked [108, 108, 108] references, sum=324\r\n(...)\r\n```\r\n\r\ncc @encukou "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-02-26T07:33:22Z",
+   "body": "Example of buildbot failure, Fedora Stable (x86): https://buildbot.python.org/#/builders/1471/builds/551\r\n\r\nFailed tests:\r\n\r\n- test_genericalias\r\n- test_ast\r\n- test_pickletools\r\n- test_typing\r\n"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2025-02-26T10:11:25Z",
+   "body": "Indeed, there is a leak in `_pickle.c` caused by mistake in backporting. Should be fixed by #130568. Thank you @vstinner for noticing."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-02-26T11:58:07Z",
+   "body": "[GH-130576](https://github.com/python/cpython/pull/130576) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130503",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130163",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7c1b76fce8c8df00da38830f72dbdde6881a33be",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4cf5fc4968786597542a3dd8b922c72276af0c5a",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "89a79fc919419bfe817da13bc2a4437908d7fc07",
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

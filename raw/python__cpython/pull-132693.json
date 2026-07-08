@@ -1,0 +1,40 @@
+{
+ "repo": "python/cpython",
+ "number": 132693,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132693",
+ "title": "gh-126366: fix thread safety of dict key iterator",
+ "state": "closed",
+ "state_reason": null,
+ "author": "kumaraditya303",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news",
+  "topic-free-threading"
+ ],
+ "created_at": "2025-04-18T15:42:58Z",
+ "closed_at": "2025-04-18T16:13:49Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-126366 -->\n* Issue: gh-126366\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126366",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "4c3d187d9f143eee930a88a38b90f4842911b8be",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

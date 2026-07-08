@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 146596,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146596",
+ "title": "[3.13] gh-146090: fix memory management of internal `sqlite3` callback contexts (GH-146569)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-29T12:21:49Z",
+ "closed_at": "2026-03-29T13:14:58Z",
+ "body": "(cherry picked from commit aa6680775d6d9ca571a675c3b2d655f4ade78c0c)\n\nCo-authored-by: B\u00e9n\u00e9dikt Tran <10796600+picnixz@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-146090 -->\n* Issue: gh-146090\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146090",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146569",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6fdf0846449064c2f5bec18296163e19ee09121e",
+   "actor": "picnixz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,65 @@
+{
+ "repo": "python/cpython",
+ "number": 127220,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127220",
+ "title": "gh-127196: Fix crash in `_interpreters`, when `shared` had invalid encodings",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-24T11:55:10Z",
+ "closed_at": "2025-01-09T19:45:35Z",
+ "body": "\n\n<!-- gh-issue-number: gh-127196 -->\n* Issue: gh-127196\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-26T10:41:01Z",
+   "body": "Thank you! I will wait for @ericsnowcurrently's review, because this is an important part of the project."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-01-09T19:45:39Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-01-09T19:46:02Z",
+   "body": "[GH-128689](https://github.com/python/cpython/pull/128689) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127196",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "087bb48acac997c06e69dae25bae2dd75194b980",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "da3aba9498c6c000c50f72605670c25c524c9c08",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0d2b9abd18ff4fc6d2fbf1b398b411ed3b76266c",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

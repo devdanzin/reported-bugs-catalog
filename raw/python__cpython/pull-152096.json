@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 152096,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152096",
+ "title": "[3.15] gh-151763: Fix NULL dereference in `os._path_normpath()` under OOM (GH-151779)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-06-24T15:57:00Z",
+ "closed_at": "2026-06-24T16:25:28Z",
+ "body": "(cherry picked from commit ce8b81fff4094bd0cfb0c57193135bfc904c0ca2)\n\nCo-authored-by: Zain Nadeem <zainnadeemzainnadeem80@gmail.com>\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151779",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "4e7843ea3e7d4c01ead20ded70096a819b9d3da7",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "StanFromIreland"
+  }
+ ],
+ "fetch_errors": null
+}

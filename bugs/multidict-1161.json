@@ -8,18 +8,28 @@
  "issues": [
   "aio-libs/multidict#1161"
  ],
- "prs": [],
+ "prs": [
+  "aio-libs/multidict#1163"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
- "labels": [],
- "filed_by": "self",
- "filers": [],
+ "labels": [
+  "bot:chronographer:provided"
+ ],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "bdraco"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/aio-libs__multidict/issue-1161.json"
+  "raw/aio-libs__multidict/issue-1161.json",
+  "raw/aio-libs__multidict/pull-1163.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

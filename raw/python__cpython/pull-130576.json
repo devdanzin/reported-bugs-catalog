@@ -1,0 +1,46 @@
+{
+ "repo": "python/cpython",
+ "number": 130576,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/130576",
+ "title": "[3.12] gh-130163: Fix crashes related to PySys_GetObject() (GH-130503) (GH-130556)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2025-02-26T11:58:04Z",
+ "closed_at": "2025-02-26T15:20:48Z",
+ "body": "The use of PySys_GetObject() and _PySys_GetAttr(), which return a borrowed reference, has been replaced by using one of the following functions, which return a strong reference and distinguish a missing attribute from an error: _PySys_GetOptionalAttr(), _PySys_GetOptionalAttrString(), _PySys_GetRequiredAttr(), and _PySys_GetRequiredAttrString(). (cherry picked from commit 0ef4ffeefd1737c18dc9326133c7894d58108c2e) (cherry picked from commit 7c1b76fce8c8df00da38830f72dbdde6881a33be)\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-130163 -->\n* Issue: gh-130163\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130556",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130163",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "89a79fc919419bfe817da13bc2a4437908d7fc07",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -11,6 +11,9 @@
  "prs": [
   "zopefoundation/zope.interface#365"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "5afbad864934b165a2cc080f110aa720"
  ],

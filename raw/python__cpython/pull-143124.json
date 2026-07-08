@@ -1,0 +1,63 @@
+{
+ "repo": "python/cpython",
+ "number": 143124,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143124",
+ "title": "gh-143092: Make CALL_LIST_APPEND and BINARY_OP_INPLACE_ADD_UNICODE normal instructions",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-12-23T23:05:17Z",
+ "closed_at": "2025-12-24T22:03:00Z",
+ "body": "Fixes https://github.com/python/cpython/issues/143092\r\n\r\nThese super instructions need many special cases in the interpreter and JIT. It's best we convert them to normal instructions.\r\n\r\n<!-- gh-issue-number: gh-143092 -->\r\n* Issue: gh-143092\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-24T09:40:50Z",
+   "body": "The changes to `_CALL_LIST_APPEND` look good, but I have concerns about the handling of `_BINARY_OP_ADD_UNICODE`\r\n\r\n* Because the current threshold for the JIT is quite high, the quadratic time for adding strings could still be observable in the interpreter. \r\n* The optimizer code is quite coupled to the front-end. The optimizer code should be quite narrow in scope so that it can handle changes in other parts of the JIT.\r\n\r\nWe can make `BINARY_OP_INPLACE_ADD_UNICODE` a normal instruction, without much change:\r\nInstead of writing the result string to the local and skipping the following `STORE_FAST`, we could write `NULL` to the local and leave the result string on the stack for the `STORE_FAST` to store. It is a bit less efficient as we need to do some extra work, but it does the two things we need: gets rid of the superinstruction and avoids quadratic behavior.\r\n\r\n\r\nNote: Adding the extra `_POP_TOP` isn't that cheap, as requires an extra push, pop, decref and instruction dispatch in the interpreter.  It is really cheap in the JIT though as it is effectively free. It is absolutely worth it for the simplification and improved robustness, but there is some cost.\r\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-24T11:07:29Z",
+   "body": "> We can make `BINARY_OP_INPLACE_ADD_UNICODE` a normal instruction, without much change: Instead of writing the result string to the local and skipping the following `STORE_FAST`, we could write `NULL` to the local and leave the result string on the stack for the `STORE_FAST` to store. It is a bit less efficient as we need to do some extra work, but it does the two things we need: gets rid of the superinstruction and avoids quadratic behavior.\r\n\r\nThis requires an `oparg` for both BINARY_OP (original) and `STORE_FAST`. How do you do this? Unless you want to pack bits into the oparg, which I'm not in favour of as we need more code to get it atomic on FT."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-24T11:09:20Z",
+   "body": "Wait I think I misunderstood you, let me implement this."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-24T12:53:56Z",
+   "body": "@markshannon I converted both of them to normal instructions. Again, I highly doubt any of them will show up on benchmarks considering how few super instructions we have, and also IIRC the original superinstructions PR only added at most 1% speedup, and that contained LOAD_FAST_LOAD_FAST and friends as well."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-12-24T18:21:27Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @Fidget-Spinner for commit 880b48d720a0c3eca5b9c4f51a694cd927fec0af :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F143124%2Fmerge\n\nIf you want to schedule another build, you need to add the <kbd>:hammer: test-with-refleak-buildbots</kbd> label again.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143092",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "cf6758ff9ebd6df8ac2a87755cdbad674c49c9cb",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

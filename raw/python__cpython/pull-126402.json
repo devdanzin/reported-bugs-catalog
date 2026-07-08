@@ -1,0 +1,40 @@
+{
+ "repo": "python/cpython",
+ "number": 126402,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126402",
+ "title": "[3.13] gh-126220: Adapt `_lsprof` to Argument Clinic (GH-126233)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting review",
+  "skip news"
+ ],
+ "created_at": "2024-11-04T16:18:34Z",
+ "closed_at": "2024-11-04T16:18:55Z",
+ "body": "(cherry picked from commit c806cd5af677c385470001efc68da38a32919196)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\nCo-authored-by: Erlend E. Aasland <erlend.aasland@protonmail.com>\n\n<!-- gh-issue-number: gh-126220 -->\n* Issue: gh-126220\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126233",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126220",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

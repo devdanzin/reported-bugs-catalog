@@ -1,0 +1,184 @@
+{
+ "repo": "python/cpython",
+ "number": 127412,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127412",
+ "title": "gh-127085: Fix `memoryview->exports` race condition.",
+ "state": "closed",
+ "state_reason": null,
+ "author": "LindaSummer",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2024-11-29T13:40:29Z",
+ "closed_at": "2024-12-16T19:12:19Z",
+ "body": "# Issue\r\n\r\nClose #127085 .\r\n\r\n# Proposed Changes\r\n\r\n- Make `memoryview->exports` protected by critical section.\r\n- Add unit test from the issue.\r\n\r\n# Cause of the problem\r\n\r\nWith TSAN, I find that the root cause should be racing between `memory_getbuf` and `memory_releasebuf`.\r\n\r\nAfter adding the critical section, this racing has been fixed.\r\n\r\nHere are the TSAN outputs.\r\n\r\n```\r\nPython 3.14.0a2+ experimental free-threading build (heads/main:db5c5763f3, Nov 28 2024, 21:41:41) [GCC 11.4.1 20231218 (Red Hat 11.4.1-3)] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\nwarning: can't use pyrepl: No module named 'msvcrt'\r\n>>> import multiprocessing.shared_memory\r\nfrom threading import Thread\r\n\r\nobj = multiprocessing.shared_memory.ShareableList(\"Uq..SeDAmB+EBrkLl.SG.Z+Z.ZdsV..wT+zLxKwdN\\b\")\r\n\r\nfor x in range(10):\r\n    Thread(target=obj.count, args=(1,)).start()\r\n\r\ndel obj\r\n\r\n>>> >>> >>> >>> >>> ... ... ==================\r\nWARNING: ThreadSanitizer: data race (pid=3465000)\r\n  Read of size 8 at 0x7f056b7e1010 by thread T2:\r\n    #0 memory_getbuf Objects/memoryobject.c:1592 (python+0x5c0b9c)\r\n    #1 PyObject_GetBuffer Objects/abstract.c:442 (python+0x4d8844)\r\n    #2 unpack_from Modules/clinic/_struct.c.h:370 (_struct.cpython-314td-x86_64-linux-gnu.so+0xc66a)\r\n    #3 cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:452 (python+0x5c9ec7)\r\n    #4 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x510279)\r\n    #5 PyObject_Vectorcall Objects/call.c:327 (python+0x5103b4)\r\n    #6 _PyEval_EvalFrameDefault Python/generated_cases.c.h:953 (python+0x77d0fa)\r\n    #7 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb5f9)\r\n    #8 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb5f9)\r\n    #9 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #10 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x649082)\r\n    #11 vectorcall_unbound Objects/typeobject.c:2776 (python+0x649082)\r\n    #12 vectorcall_method Objects/typeobject.c:2807 (python+0x649082)\r\n    #13 slot_sq_item Objects/typeobject.c:9617 (python+0x649446)\r\n    #14 PySequence_GetItem Objects/abstract.c:1847 (python+0x4dd14f)\r\n    #15 iter_iternext Objects/iterobject.c:66 (python+0x572a7d)\r\n    #16 _PyEval_EvalFrameDefault Python/generated_cases.c.h:3927 (python+0x794437)\r\n    #17 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x550b43)\r\n    #18 gen_send_ex2 Objects/genobject.c:245 (python+0x550b43)\r\n    #19 gen_iternext Objects/genobject.c:618 (python+0x5514e3)\r\n    #20 iternext Objects/abstract.c:2874 (python+0x4d60e7)\r\n    #21 PyIter_Next Objects/abstract.c:2924 (python+0x4dffb4)\r\n    #22 builtin_sum_impl Python/bltinmodule.c:2716 (python+0x764943)\r\n    #23 builtin_sum Python/clinic/bltinmodule.c.h:1167 (python+0x766254)\r\n    #24 cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:452 (python+0x5c9ec7)\r\n    #25 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x510279)\r\n    #26 PyObject_Vectorcall Objects/call.c:327 (python+0x5103b4)\r\n    #27 _PyEval_EvalFrameDefault Python/generated_cases.c.h:953 (python+0x77d0fa)\r\n    #28 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb5f9)\r\n    #29 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb5f9)\r\n    #30 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #31 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x515230)\r\n    #32 method_vectorcall Objects/classobject.c:93 (python+0x51603f)\r\n    #33 _PyVectorcall_Call Objects/call.c:273 (python+0x51303f)\r\n    #34 _PyObject_Call Objects/call.c:348 (python+0x5134f9)\r\n    #35 PyObject_Call Objects/call.c:373 (python+0x513578)\r\n    #36 _PyEval_EvalFrameDefault Python/generated_cases.c.h:1745 (python+0x782ad6)\r\n    #37 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb5f9)\r\n    #38 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb5f9)\r\n    #39 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #40 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x51623d)\r\n    #41 method_vectorcall Objects/classobject.c:71 (python+0x51623d)\r\n    #42 _PyVectorcall_Call Objects/call.c:273 (python+0x51303f)\r\n    #43 _PyObject_Call Objects/call.c:348 (python+0x5134f9)\r\n    #44 PyObject_Call Objects/call.c:373 (python+0x513578)\r\n    #45 thread_run Modules/_threadmodule.c:337 (python+0x985d20)\r\n    #46 pythread_wrapper Python/thread_pthread.h:242 (python+0x8aaff3)\r\n\r\n  Previous write of size 8 at 0x7f056b7e1010 by thread T1:\r\n    #0 memory_getbuf Objects/memoryobject.c:1592 (python+0x5c0ba8)\r\n    #1 PyObject_GetBuffer Objects/abstract.c:442 (python+0x4d8844)\r\n    #2 unpack_from Modules/clinic/_struct.c.h:370 (_struct.cpython-314td-x86_64-linux-gnu.so+0xc66a)\r\n    #3 cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:452 (python+0x5c9ec7)\r\n    #4 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x510279)\r\n    #5 PyObject_Vectorcall Objects/call.c:327 (python+0x5103b4)\r\n    #6 _PyEval_EvalFrameDefault Python/generated_cases.c.h:953 (python+0x77d0fa)\r\n    #7 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb5f9)\r\n    #8 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb5f9)\r\n    #9 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #10 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x649082)\r\n    #11 vectorcall_unbound Objects/typeobject.c:2776 (python+0x649082)\r\n    #12 vectorcall_method Objects/typeobject.c:2807 (python+0x649082)\r\n    #13 slot_sq_item Objects/typeobject.c:9617 (python+0x649446)\r\n    #14 PySequence_GetItem Objects/abstract.c:1847 (python+0x4dd14f)\r\n    #15 iter_iternext Objects/iterobject.c:66 (python+0x572a7d)\r\n    #16 _PyEval_EvalFrameDefault Python/generated_cases.c.h:3927 (python+0x794437)\r\n    #17 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x550b43)\r\n    #18 gen_send_ex2 Objects/genobject.c:245 (python+0x550b43)\r\n    #19 gen_iternext Objects/genobject.c:618 (python+0x5514e3)\r\n    #20 iternext Objects/abstract.c:2874 (python+0x4d60e7)\r\n    #21 PyIter_Next Objects/abstract.c:2924 (python+0x4dffb4)\r\n    #22 builtin_sum_impl Python/bltinmodule.c:2716 (python+0x764943)\r\n    #23 builtin_sum Python/clinic/bltinmodule.c.h:1167 (python+0x766254)\r\n    #24 cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:452 (python+0x5c9ec7)\r\n    #25 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x510279)\r\n    #26 PyObject_Vectorcall Objects/call.c:327 (python+0x5103b4)\r\n    #27 _PyEval_EvalFrameDefault Python/generated_cases.c.h:953 (python+0x77d0fa)\r\n    #28 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb5f9)\r\n    #29 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb5f9)\r\n    #30 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #31 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x515230)\r\n    #32 method_vectorcall Objects/classobject.c:93 (python+0x51603f)\r\n    #33 _PyVectorcall_Call Objects/call.c:273 (python+0x51303f)\r\n    #34 _PyObject_Call Objects/call.c:348 (python+0x5134f9)\r\n    #35 PyObject_Call Objects/call.c:373 (python+0x513578)\r\n    #36 _PyEval_EvalFrameDefault Python/generated_cases.c.h:1745 (python+0x782ad6)\r\n    #37 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb5f9)\r\n    #38 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb5f9)\r\n    #39 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #40 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x51623d)\r\n    #41 method_vectorcall Objects/classobject.c:71 (python+0x51623d)\r\n    #42 _PyVectorcall_Call Objects/call.c:273 (python+0x51303f)\r\n    #43 _PyObject_Call Objects/call.c:348 (python+0x5134f9)\r\n    #44 PyObject_Call Objects/call.c:373 (python+0x513578)\r\n    #45 thread_run Modules/_threadmodule.c:337 (python+0x985d20)\r\n    #46 pythread_wrapper Python/thread_pthread.h:242 (python+0x8aaff3)\r\n\r\nSUMMARY: ThreadSanitizer: data race Objects/memoryobject.c:1592 in memory_getbuf\r\n==================\r\n>>> >>> >>> \r\nException ignored in: <function SharedMemory.__del__ at 0x7f056b26f350>\r\nTraceback (most recent call last):\r\n  File \"/home/mizuki/project/cpython/Lib/multiprocessing/shared_memory.py\", line 189, in __del__\r\n    self.close()\r\n  File \"/home/mizuki/project/cpython/Lib/multiprocessing/shared_memory.py\", line 229, in close\r\n    self._buf.release()\r\nBufferError: memoryview has 2 exported buffers\r\npython: Objects/memoryobject.c:1143: memory_dealloc: Assertion `self->exports == 0' failed.\r\n/home/mizuki/project/cpython/Lib/multiprocessing/resource_tracker.py:276: UserWarning: resource_tracker: There appear to be 1 leaked shared_memory objects to clean up at shutdown: {'/psm_3a39690b'}\r\n  warnings.warn(\r\n```\r\n\r\n```\r\nPython 3.14.0a2+ experimental free-threading build (heads/main-dirty:db5c5763f3, Nov 28 2024, 21:44:57) [GCC 11.4.1 20231218 (Red Hat 11.4.1-3)] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\nwarning: can't use pyrepl: No module named 'msvcrt'\r\n>>> import multiprocessing.shared_memory\r\nfrom threading import Thread\r\n\r\nobj = multiprocessing.shared_memory.ShareableList(\"Uq..SeDAmB+EBrkLl.SG.Z+Z.ZdsV..wT+zLxKwdN\\b\")\r\n\r\nfor x in range(10):\r\n    Thread(target=obj.count, args=(1,)).start()\r\n\r\ndel obj\r\n>>> >>> >>> >>> >>> ... ... ==================\r\nWARNING: ThreadSanitizer: data race (pid=3470244)\r\n  Read of size 8 at 0x7f221cf8fb70 by thread T1:\r\n    #0 memory_getbuf Objects/memoryobject.c:1593 (python+0x5c0ba8)\r\n    #1 PyObject_GetBuffer Objects/abstract.c:442 (python+0x4d8844)\r\n    #2 unpack_from Modules/clinic/_struct.c.h:370 (_struct.cpython-314td-x86_64-linux-gnu.so+0xc66a)\r\n    #3 cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:452 (python+0x5c9edc)\r\n    #4 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x510279)\r\n    #5 PyObject_Vectorcall Objects/call.c:327 (python+0x5103b4)\r\n    #6 _PyEval_EvalFrameDefault Python/generated_cases.c.h:953 (python+0x77d10f)\r\n    #7 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb60e)\r\n    #8 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb60e)\r\n    #9 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #10 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x649097)\r\n    #11 vectorcall_unbound Objects/typeobject.c:2776 (python+0x649097)\r\n    #12 vectorcall_method Objects/typeobject.c:2807 (python+0x649097)\r\n    #13 slot_sq_item Objects/typeobject.c:9617 (python+0x64945b)\r\n    #14 PySequence_GetItem Objects/abstract.c:1847 (python+0x4dd14f)\r\n    #15 iter_iternext Objects/iterobject.c:66 (python+0x572a7d)\r\n    #16 _PyEval_EvalFrameDefault Python/generated_cases.c.h:3927 (python+0x79444c)\r\n    #17 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x550b43)\r\n    #18 gen_send_ex2 Objects/genobject.c:245 (python+0x550b43)\r\n    #19 gen_iternext Objects/genobject.c:618 (python+0x5514e3)\r\n    #20 iternext Objects/abstract.c:2874 (python+0x4d60e7)\r\n    #21 PyIter_Next Objects/abstract.c:2924 (python+0x4dffb4)\r\n    #22 builtin_sum_impl Python/bltinmodule.c:2716 (python+0x764958)\r\n    #23 builtin_sum Python/clinic/bltinmodule.c.h:1167 (python+0x766269)\r\n    #24 cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:452 (python+0x5c9edc)\r\n    #25 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x510279)\r\n    #26 PyObject_Vectorcall Objects/call.c:327 (python+0x5103b4)\r\n    #27 _PyEval_EvalFrameDefault Python/generated_cases.c.h:953 (python+0x77d10f)\r\n    #28 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb60e)\r\n    #29 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb60e)\r\n    #30 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #31 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x515230)\r\n    #32 method_vectorcall Objects/classobject.c:93 (python+0x51603f)\r\n    #33 _PyVectorcall_Call Objects/call.c:273 (python+0x51303f)\r\n    #34 _PyObject_Call Objects/call.c:348 (python+0x5134f9)\r\n    #35 PyObject_Call Objects/call.c:373 (python+0x513578)\r\n    #36 _PyEval_EvalFrameDefault Python/generated_cases.c.h:1745 (python+0x782aeb)\r\n    #37 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb60e)\r\n    #38 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb60e)\r\n    #39 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #40 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x51623d)\r\n    #41 method_vectorcall Objects/classobject.c:71 (python+0x51623d)\r\n    #42 _PyVectorcall_Call Objects/call.c:273 (python+0x51303f)\r\n    #43 _PyObject_Call Objects/call.c:348 (python+0x5134f9)\r\n    #44 PyObject_Call Objects/call.c:373 (python+0x513578)\r\n    #45 thread_run Modules/_threadmodule.c:337 (python+0x985d35)\r\n    #46 pythread_wrapper Python/thread_pthread.h:242 (python+0x8ab008)\r\n\r\n  Previous write of size 8 at 0x7f221cf8fb70 by thread T2:\r\n    #0 memory_releasebuf Objects/memoryobject.c:1603 (python+0x5bd1d3)\r\n    #1 PyBuffer_Release Objects/abstract.c:812 (python+0x4d91bd)\r\n    #2 unpack_from Modules/clinic/_struct.c.h:396 (_struct.cpython-314td-x86_64-linux-gnu.so+0xc8d4)\r\n    #3 cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:452 (python+0x5c9edc)\r\n    #4 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x510279)\r\n    #5 PyObject_Vectorcall Objects/call.c:327 (python+0x5103b4)\r\n    #6 _PyEval_EvalFrameDefault Python/generated_cases.c.h:953 (python+0x77d10f)\r\n    #7 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb60e)\r\n    #8 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb60e)\r\n    #9 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #10 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x649097)\r\n    #11 vectorcall_unbound Objects/typeobject.c:2776 (python+0x649097)\r\n    #12 vectorcall_method Objects/typeobject.c:2807 (python+0x649097)\r\n    #13 slot_sq_item Objects/typeobject.c:9617 (python+0x64945b)\r\n    #14 PySequence_GetItem Objects/abstract.c:1847 (python+0x4dd14f)\r\n    #15 iter_iternext Objects/iterobject.c:66 (python+0x572a7d)\r\n    #16 _PyEval_EvalFrameDefault Python/generated_cases.c.h:3927 (python+0x79444c)\r\n    #17 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x550b43)\r\n    #18 gen_send_ex2 Objects/genobject.c:245 (python+0x550b43)\r\n    #19 gen_iternext Objects/genobject.c:618 (python+0x5514e3)\r\n    #20 iternext Objects/abstract.c:2874 (python+0x4d60e7)\r\n    #21 PyIter_Next Objects/abstract.c:2924 (python+0x4dffb4)\r\n    #22 builtin_sum_impl Python/bltinmodule.c:2716 (python+0x764958)\r\n    #23 builtin_sum Python/clinic/bltinmodule.c.h:1167 (python+0x766269)\r\n    #24 cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:452 (python+0x5c9edc)\r\n    #25 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x510279)\r\n    #26 PyObject_Vectorcall Objects/call.c:327 (python+0x5103b4)\r\n    #27 _PyEval_EvalFrameDefault Python/generated_cases.c.h:953 (python+0x77d10f)\r\n    #28 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb60e)\r\n    #29 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb60e)\r\n    #30 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #31 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x515230)\r\n    #32 method_vectorcall Objects/classobject.c:93 (python+0x51603f)\r\n    #33 _PyVectorcall_Call Objects/call.c:273 (python+0x51303f)\r\n    #34 _PyObject_Call Objects/call.c:348 (python+0x5134f9)\r\n    #35 PyObject_Call Objects/call.c:373 (python+0x513578)\r\n    #36 _PyEval_EvalFrameDefault Python/generated_cases.c.h:1745 (python+0x782aeb)\r\n    #37 _PyEval_EvalFrame Include/internal/pycore_ceval.h:116 (python+0x7bb60e)\r\n    #38 _PyEval_Vector Python/ceval.c:1871 (python+0x7bb60e)\r\n    #39 _PyFunction_Vectorcall Objects/call.c:413 (python+0x50fa9b)\r\n    #40 _PyObject_VectorcallTstate Include/internal/pycore_call.h:167 (python+0x51623d)\r\n    #41 method_vectorcall Objects/classobject.c:71 (python+0x51623d)\r\n    #42 _PyVectorcall_Call Objects/call.c:273 (python+0x51303f)\r\n    #43 _PyObject_Call Objects/call.c:348 (python+0x5134f9)\r\n    #44 PyObject_Call Objects/call.c:373 (python+0x513578)\r\n    #45 thread_run Modules/_threadmodule.c:337 (python+0x985d35)\r\n    #46 pythread_wrapper Python/thread_pthread.h:242 (python+0x8ab008)\r\n\r\nSUMMARY: ThreadSanitizer: data race Objects/memoryobject.c:1593 in memory_getbuf\r\n==================\r\n>>> >>> \r\nException ignored in: <function SharedMemory.__del__ at 0x7f221cf81eb0>\r\nTraceback (most recent call last):\r\n  File \"/home/mizuki/project/cpython/Lib/multiprocessing/shared_memory.py\", line 189, in __del__\r\n    self.close()\r\n  File \"/home/mizuki/project/cpython/Lib/multiprocessing/shared_memory.py\", line 229, in close\r\n    self._buf.release()\r\nBufferError: memoryview has 7 exported buffers\r\npython: Objects/memoryobject.c:1143: memory_dealloc: Assertion `self->exports == 0' failed.\r\n/home/mizuki/project/cpython/Lib/multiprocessing/resource_tracker.py:276: UserWarning: resource_tracker: There appear to be 1 leaked shared_memory objects to clean up at shutdown: {'/psm_616253a2'}\r\n  warnings.warn(\r\n```\r\n\n\n<!-- gh-issue-number: gh-127085 -->\n* Issue: gh-127085\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ghost",
+   "created_at": "2024-11-29T13:40:32Z",
+   "body": "All commit authors signed the Contributor License Agreement. <br/> [![CLA signed](https://cpython-clabot.herokuapp.com/cla-signed.svg)](https://cpython-clabot.herokuapp.com/signed-contributor-license-agreement?version=96a49432-b8b1-11ec-9bf5-bfe9ad6c72c4)"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-29T13:40:36Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-29T22:01:25Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-30T00:41:02Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-30T15:01:22Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-30T15:01:34Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-30T15:02:40Z",
+   "body": "Please add a news entry so the bot stops spamming."
+  },
+  {
+   "author": "LindaSummer",
+   "created_at": "2024-12-01T14:34:54Z",
+   "body": "> Just some formatting nitpicks. I'll do a more thorough audit of the thread safety later today.\r\n\r\nHi @ZeroIntensity ,\r\n\r\nThanks very much for your patience and warm help! \ud83d\ude0a\r\n\r\nWish a nice day!\r\n\r\nBest Regards,\r\nEdward"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-12-02T13:06:55Z",
+   "body": "@LindaSummer Please do not update the branch with the latest main unless you have conflicts to resolve. This wastes resources and notifies everyone subscribed to the PR."
+  },
+  {
+   "author": "LindaSummer",
+   "created_at": "2024-12-02T13:11:51Z",
+   "body": "> @LindaSummer Please do not update the branch with the latest main unless you have conflicts to resolve. This wastes resources and notifies everyone subscribed to the PR.\r\n\r\nHi @picnixz ,\r\n\r\nSorry for updating branch so frequently. \r\n\r\nI will only update for conflict resolving. \ud83d\ude0a\r\n\r\nThanks again for your warm reminder!\r\n\r\nBest Regards,\r\nEdward"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-12-02T13:48:57Z",
+   "body": "I think we can leave it to another PR and issue where we focus on making `memoryview` free-threaded-safe instead. (I really think we should have a different issue)"
+  },
+  {
+   "author": "LindaSummer",
+   "created_at": "2024-12-02T15:00:52Z",
+   "body": "> OK, on the basis that there will be a follow-up PR, this LGTM. Thanks, @LindaSummer!\r\n\r\nHi @ZeroIntensity , @picnixz ,\r\n\r\nThanks again for your guidance and patience! \u2764\r\n\r\nBest Regards,\r\nEdward"
+  },
+  {
+   "author": "LindaSummer",
+   "created_at": "2024-12-05T05:32:17Z",
+   "body": "Hi @ZeroIntensity ,\n\nSorry to bother you again. \ud83d\ude0a\n\nThis PR has been pending for three days in awaiting core review.\n\nShould I mention someone in this thread for next steps? \ud83d\ude0a\n\nBest Regards,\nEdward"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-12-05T12:58:30Z",
+   "body": "No worries. Typically the `topic-free-threading` label is enough to get one of the free threading experts to look at it, but not always. Tag me next week if nobody has taken a look."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-12-09T14:09:54Z",
+   "body": "I'll be reviewing this by next week"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-12-16T19:12:25Z",
+   "body": "Thanks @LindaSummer for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-12-16T19:12:38Z",
+   "body": "Sorry, @LindaSummer and @kumaraditya303, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 4937ba54c0ff7cc4a83d7345d398b804365af2d6 3.13\n```\n"
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-12-16T19:14:06Z",
+   "body": "I'll take of backporting this if needed as part of https://github.com/python/cpython/issues/127716"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2024-12-16T19:29:04Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **aarch64 Android 3.x** has failed when building commit 4937ba54c0ff7cc4a83d7345d398b804365af2d6.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1594/builds/825) and take a look at the build logs.\n4. Check if the failure is related to this commit (4937ba54c0ff7cc4a83d7345d398b804365af2d6) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1594/builds/825\n\nFailed tests:\n\n- test_memoryview\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/data/user/0/org.python.testbed/files/python/lib/python3.14/test/test_memoryview.py\", line 742, in test_racing_getbuf_and_releasebuf\n    from multiprocessing.managers import SharedMemoryManager\nImportError: cannot import name 'SharedMemoryManager' from 'multiprocessing.managers' (/data/user/0/org.python.testbed/files/python/lib/python3.14/multiprocessing/managers.py)\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2024-12-16T19:33:01Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **iOS ARM64 Simulator 3.x** has failed when building commit 4937ba54c0ff7cc4a83d7345d398b804365af2d6.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1380/builds/2128) and take a look at the build logs.\n4. Check if the failure is related to this commit (4937ba54c0ff7cc4a83d7345d398b804365af2d6) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1380/builds/2128\n\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2024-12-16T19:44:22Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 Android 3.x** has failed when building commit 4937ba54c0ff7cc4a83d7345d398b804365af2d6.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1591/builds/728) and take a look at the build logs.\n4. Check if the failure is related to this commit (4937ba54c0ff7cc4a83d7345d398b804365af2d6) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1591/builds/728\n\nFailed tests:\n\n- test_memoryview\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/data/user/0/org.python.testbed/files/python/lib/python3.14/test/test_memoryview.py\", line 742, in test_racing_getbuf_and_releasebuf\n    from multiprocessing.managers import SharedMemoryManager\nImportError: cannot import name 'SharedMemoryManager' from 'multiprocessing.managers' (/data/user/0/org.python.testbed/files/python/lib/python3.14/multiprocessing/managers.py)\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "mhsmith",
+   "created_at": "2024-12-16T21:08:10Z",
+   "body": "iOS and Android don't support subprocesses, and therefore don't support the `multiprocessing`. It looks like this test doesn't actually use multiple processes, so maybe it can be fixed to avoid the use of `multiprocessing`. Otherwise, it'll have to be given a decorator to skip it when `multiprocessing` is unavailable."
+  },
+  {
+   "author": "LindaSummer",
+   "created_at": "2024-12-17T00:38:03Z",
+   "body": "> iOS and Android don't support subprocesses, and therefore don't support the `multiprocessing`. It looks like this test doesn't actually use multiple processes, so maybe it can be fixed to avoid the use of `multiprocessing`. Otherwise, it'll have to be given a decorator to skip it when `multiprocessing` is unavailable.\r\n\r\nHi @mhsmith ,\r\n\r\nThanks for your suggestion! \ud83d\ude0a\r\n\r\nI will try to fix the test case issue.\r\n\r\nBest Regards,\r\nEdward"
+  },
+  {
+   "author": "hugovk",
+   "created_at": "2025-02-26T13:38:02Z",
+   "body": "> I'll take of backporting this if needed as part of #127716\r\n\r\n@kumaraditya303 Triage: Please could you make the backport if needed? Otherwise let's remove the label. Thanks!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127085",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127716",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "4937ba54c0ff7cc4a83d7345d398b804365af2d6",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/128019",
+   "commit": null,
+   "actor": "freakboy3742"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0be115deac8b855c8d1a6c940ae438bd30db2d15",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/129248",
+   "commit": null,
+   "actor": "mhsmith"
+  }
+ ],
+ "fetch_errors": null
+}

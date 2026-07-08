@@ -1,0 +1,118 @@
+{
+ "repo": "python/cpython",
+ "number": 146173,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146173",
+ "title": "gh-146059: Call fast_save_leave() in pickle save_frozenset()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-19T15:17:04Z",
+ "closed_at": "2026-03-26T16:35:28Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146059 -->\n* Issue: gh-146059\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-20T11:44:28Z",
+   "body": "@serhiy-storchaka: Please review the updated PR. Is it what you expected?\r\n\r\n> Also, this mechanism is used to guard against deeply nested structures, so it would be worth to test deeply nested structures.\r\n\r\nI added deep_nested_struct() tests for the 6 types.\r\n\r\n> More Pythonic way would be to make tested_type and data parameters and call the function with different arguments.\r\n\r\nGood idea, I rewrote tests like that."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-24T11:14:21Z",
+   "body": "Ping @serhiy-storchaka."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-26T16:35:35Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 I'm not a witch! I'm not a witch!"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-26T16:35:50Z",
+   "body": "[GH-146473](https://github.com/python/cpython/pull/146473) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-26T16:35:55Z",
+   "body": "[GH-146474](https://github.com/python/cpython/pull/146474) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-26T18:30:43Z",
+   "body": "> LGTM. \ud83d\udc4d I only have some minor questions.\r\n\r\nThanks for your review. I created https://github.com/python/cpython/pull/146481 to address your review.\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146059",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5c0dcb3e0d817bd8c28e8efcdb97103cd9210989",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3ba60463d438e5980a628e3df8355981314f00c1",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "16abed639868ac87cf67eed8375d1d6ff8c72e4f",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e8c3d31b2c3fd630859f453566c19cf6baa25501",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146480",
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "de1644cd40be90201f0300ddaef5f4e6e58720a8",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a03671c8af24ddb6c70026891a02d4eba91c61b7",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "42b743e3219168751031f2ba32ab1f013a171b5e",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

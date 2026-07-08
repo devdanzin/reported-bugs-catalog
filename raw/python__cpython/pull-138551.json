@@ -1,0 +1,51 @@
+{
+ "repo": "python/cpython",
+ "number": 138551,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/138551",
+ "title": "[3.14] gh-132551: make `io.BytesIO` thread safe (GH-132616)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "kumaraditya303",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2025-09-05T16:59:20Z",
+ "closed_at": "2025-10-07T18:18:28Z",
+ "body": "(cherry picked from commits 5dd3a3a58cca4798ebfc2edd673211067453e81e, 7c92497e5c6d3d6c36721f554d09efffbe4bbc23 and d8fa40b08da60a711311751891fa830cb4ae77f3)\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n<!-- gh-issue-number: gh-132551 -->\r\n* Issue: gh-132551\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-05T17:16:41Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @kumaraditya303 for commit 5b8cff99c74fbc094b93e1a1e81cb8aa0805f7cc :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F138551%2Fmerge\n\nIf you want to schedule another build, you need to add the <kbd>:hammer: test-with-buildbots</kbd> label again.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132551",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132616",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "23cc8f789d8366573cf12c4495b5a4c9afa64005",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

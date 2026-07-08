@@ -8,21 +8,32 @@
  "issues": [
   "python/cpython#143191"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#143601",
+  "python/cpython#143611"
+ ],
+ "n_prs": 2,
+ "n_backports": 1,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "extension-modules",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "miss-islington",
+  "vstinner"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-143191.json"
+  "raw/python__cpython/issue-143191.json",
+  "raw/python__cpython/pull-143601.json",
+  "raw/python__cpython/pull-143611.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

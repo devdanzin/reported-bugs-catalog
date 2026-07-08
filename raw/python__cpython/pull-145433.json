@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 145433,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145433",
+ "title": "[3.14] gh-145335: Fix crash when passing -1 as fd in os.pathconf (GH-145390)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-02T18:08:21Z",
+ "closed_at": "2026-03-02T18:33:47Z",
+ "body": "(cherry picked from commit 5c3a47b94a39f87c36b1f36704d80775802ad034)\n\nCo-authored-by: AN Long <aisk@users.noreply.github.com>\nCo-authored-by: blurb-it[bot] <43283697+blurb-it[bot]@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-145335 -->\n* Issue: gh-145335\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145335",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145390",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "504436870b7dacc18a4f88a4beaf0ee80163e4b4",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

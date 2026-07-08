@@ -8,17 +8,27 @@
  "issues": [
   "python/cpython#153068"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#153070",
+  "python/cpython#153240",
+  "python/cpython#153241",
+  "python/cpython#153242"
+ ],
+ "n_prs": 4,
+ "n_backports": 3,
+ "n_fix_prs": 1,
  "gists": [
   "ed7691a99c26ede561a549ab1dba00b2"
  ],
  "labels": [
+  "awaiting merge",
   "extension-modules",
   "type-bug"
  ],
  "filed_by": "maintainer",
  "filers": [
-  "aisk"
+  "aisk",
+  "miss-islington"
  ],
  "status": "closed/fixed",
  "confidence": "high",
@@ -26,7 +36,11 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-153068.json"
+  "raw/python__cpython/issue-153068.json",
+  "raw/python__cpython/pull-153070.json",
+  "raw/python__cpython/pull-153240.json",
+  "raw/python__cpython/pull-153241.json",
+  "raw/python__cpython/pull-153242.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 5
 }

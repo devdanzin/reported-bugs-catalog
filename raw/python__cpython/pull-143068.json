@@ -1,0 +1,94 @@
+{
+ "repo": "python/cpython",
+ "number": 143068,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143068",
+ "title": "GH-139922: Tail calling for MSVC (VS 2026)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "chris-eibl",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-12-22T13:38:57Z",
+ "closed_at": "2025-12-22T23:01:34Z",
+ "body": "So much has happened on main that I started fresh over and sqash merged the needed things from https://github.com/python/cpython/pull/139962 onto latest main (mostly because I wanted to use it for my own experiments on main again).\r\n\r\nBased on @markshannon's work in https://github.com/python/cpython/pull/142228 I've factored out `_Py_VectorCallInstrumentation_StackRefSteal`, because then @Fidget-Spinner's  https://github.com/python/cpython/issues/138115 is not needed in this PR and can be done in a follow-up. An alternative would be to keep it and pass `tstate` into the `Py_*_StackRefSteal` functions.\n\n<!-- gh-issue-number: gh-139922 -->\n* Issue: gh-139922\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-22T14:41:32Z",
+   "body": "In the future, please communicate if you want to supercede a PR for other contributors. It's often considered not good etiquette to take over another person's PR unless they explicitly allow it. However, I'm more than happy to let you take over the PR in this case."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-12-22T14:48:46Z",
+   "body": "> In the future, please communicate if you want to supercede a PR for other contributors. It's often considered not good etiquette to take over another person's PR unless they explicitly allow it. However, I'm more than happy to let you take over the PR in this case.\r\n\r\nSorry, wasn't ment as superseding, more as a follow up and maybe just a draft for new discussions. Thought about you're gonna take whatever deems appropriate back into your original PR ...\r\n\r\nIf this here is going to fly, I'd like to include you and Brandt as authors for the commits, but don't know how atm ..."
+  },
+  {
+   "author": "hugovk",
+   "created_at": "2025-12-22T14:49:42Z",
+   "body": "> If this here is going to fly, I'd like to include you and Brandt as authors for the commits, but don't know how atm ...\r\n\r\n`Co-authored-by` is the way:\r\n\r\nhttps://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-22T14:55:47Z",
+   "body": "> If this here is going to fly, I'd like to include you and Brandt as authors for the commits, but don't know how atm ...\r\n\r\nOh I'm happy to be superseded. If you'd like to attribute commit history though, you can just push a trivial commit with the co-author info like Hugo pointed out, and when I squash and merge I'll use that."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-22T16:03:26Z",
+   "body": "Try pulling `main` in, I fixed a JIT bug there that should turn the JIT CI green again."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-12-22T16:25:31Z",
+   "body": "> `Co-authored-by` is the way:\r\n\r\nDone"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-12-22T16:48:27Z",
+   "body": "https://github.com/python/cpython/actions/runs/20437258430/job/58722460806 failed inbetween \r\ntest_extractall_none_gid (test.test_tarfile.NoneInfoExtractTests_Tar.test_extractall_none_gid) ... Windows fatal exception: access violation\r\n(but got green when rerunning the failed test) even though pulling in main.\r\n\r\nI've found this: https://github.com/python/cpython/pull/143073\r\n\r\nHopefully, this will fix it ...\r\n\r\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-22T17:19:16Z",
+   "body": "Just ignore the JIT problems for now. The new JIT executor management has a known bug https://github.com/python/cpython/issues/143026"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-12-22T19:07:49Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @Fidget-Spinner for commit da1adaf41e08d367cf6e45e181ebbfd4a065f11c :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F143068%2Fmerge\n\nIf you want to schedule another build, you need to add the <kbd>:hammer: test-with-refleak-buildbots</kbd> label again.\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-22T22:46:12Z",
+   "body": "Benchmark results are within noise for the default interpreter https://github.com/facebookexperimental/free-threading-benchmarking/blob/main/results/bm-20251222-3.15.0a3%2B-da1adaf/bm-20251222-vultr-x86_64-chris%252deibl-msvc_tail_call_new-3.15.0a3%2B-da1adaf-vs-base.md\r\n\r\nRefleak bots are green."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/139922",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "be3c1316406b2d00c7a1d41311be4e40ee30c81c",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143095",
+   "commit": null,
+   "actor": "hugovk"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,66 @@
+{
+ "repo": "python/cpython",
+ "number": 126696,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126696",
+ "title": "gh-126644: Fix various thread safety issues in `_interpreters`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-subinterpreters",
+  "topic-free-threading"
+ ],
+ "created_at": "2024-11-11T18:24:24Z",
+ "closed_at": "2024-11-14T21:19:43Z",
+ "body": "This PR fixes a few things:\r\n\r\n- Setting an error with `_PyXI_ERR_ALREADY_RUNNING` currently relies on the interpreter state *after* the thread state has already been detached, so it's possible, at least on the free-threaded build, that another thread stops the interpreter and breaks the `FailIfRunningMain` check. This fixes that by just raising the exception manually.\r\n- `_interpreters.destroy` doesn't expect another thread to start the interpreter after its initial check, so this adds a flag on the interpreter state that prevents future threads from starting after destruction has started.\r\n- As it turns out, creating a thread state has some thread safety issues as of gh-123926, so this just slaps an ugly `HEAD_LOCK` on it for now.\r\n- Re-enables subinterpreter tests for free-threaded builds, because they should be thread-safe now.\r\n\r\nIt would be nice if we didn't have to throw an exception for everything and instead just make it thread-safe, but that would be too big of a PR to backport to 3.13.\n\n<!-- gh-issue-number: gh-126644 -->\n* Issue: gh-126644\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-11T19:46:18Z",
+   "body": "> More generally, I'm not convinced it's worth the risk to backport non-trivial fixes to issues that solely come up when using the combination of free-threading + subinterpreters.\r\n\r\nHmm, why? This will hurt PEP 734, because Eric's [PyPI package](https://pypi.org/project/interpreters-pep-734/) for backporting features is targeted towards 3.13+, not 3.14+. I'm not sure how many people are using 3.13t as their working copy, but I would assume that the people who are using it are also the people who would like to use subinterpreters to get around the GIL as well."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-11T19:58:37Z",
+   "body": "* Both free threading and `_interpreters` are experimental; the combination is especially so.\r\n* I think the scope of getting the two to work robustly together is large; more like a \"feature\" than a \"bug fix\"\r\n* Some of these changes are risky; we may introduce regressions to fix something that is not a regression.\r\n* I do not fully understand the thread-safety implications here. From the PR description, I'm not sure you fully understand them either. If you do, then the thread-safety requirements should be more clearly explained in the PR."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-11T20:12:16Z",
+   "body": "> * Some of these changes are risky; we may introduce regressions to fix something that is not a regression.\r\n\r\nJudging by the failing tests, I see your point :)\r\n\r\nWhat do you suggest we do for 3.13? Slap a big `Py_MOD_GIL_USED` on `_interpreters`?\r\n\r\n> * I do not fully understand the thread-safety implications here. From the PR description, I'm not sure you fully understand them either. If you do, then the thread-safety requirements should be more clearly explained in the PR.\r\n\r\nYeah, I'm pretty sure that the cases I've fixed in this PR are truly fixed, but the test case isn't extensive at all. I'm doing my best to try and cover the bases that aren't thread-safe here, but as far as I can tell, interpreter switching without waiting on the GIL is a gray area. There are things that work right now that shouldn't, and I'm not totally sure why. (I'm not even addressing the C API here, that's probably still a mess--this change is assuming that subinterpreters created by `_interpreters` are *only* used by `_interpreters`.)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-12T14:53:24Z",
+   "body": "@colesbury FWIW, I was being dumb. The exception problem is almost certainly present on the default builds (I said that in the original issue, but not in the description for whatever reason). I'm assuming the same goes for the `destroy` issue, but I haven't been able to reproduce it yet.\r\n\r\nApparently, there's some sort of race on both builds when creating thread states that's been screwing up my reproducers (I get hit with a `thread state already initialized` fatal error on both GIL and no-GIL):\r\n\r\n```py\r\nfrom threading import Thread\r\nimport _interpreters\r\n\r\ninterp = _interpreters.create()\r\n\r\ndef run():\r\n    this_interp = _interpreters.create()\r\n    _interpreters.run_string(this_interp, f\"import _interpreters; _interpreters.run_string({interp}, '1')\")\r\n\r\nthreads = [Thread(target=run) for _ in range(1000)]\r\nfor thread in threads:\r\n    thread.start()\r\n\r\nfor thread in threads:\r\n    thread.join()\r\n```\r\n\r\nAs far as I can tell, moving `HEAD_LOCK` here was an incidental fix for that. I'll investigate this further later today."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-14T21:19:43Z",
+   "body": "I'm going to split this into smaller PRs so we can address reviews and backporting on a case-by-case basis."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126644",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127041",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

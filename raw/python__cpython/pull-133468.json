@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 133468,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/133468",
+ "title": "[3.13] gh-131878: Fix input of unicode characters with two or more code points in new pyrepl on Windows (gh-131901)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ambv",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-05-05T19:49:42Z",
+ "closed_at": "2025-05-05T21:08:09Z",
+ "body": "(cherry picked from commit 0c5151bc81ec8e8588bef4389df12a9ab50e9fa0)\r\n\n\n<!-- gh-issue-number: gh-131878 -->\n* Issue: gh-131878\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131878",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131901",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "891232f3386dd8b20a216a473954c1b01cede7ec",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  }
+ ],
+ "fetch_errors": null
+}

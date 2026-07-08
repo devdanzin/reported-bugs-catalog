@@ -1,0 +1,100 @@
+{
+ "repo": "python/cpython",
+ "number": 132475,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132475",
+ "title": "gh-132470: Prevent crash in ctypes.CField when `byte_size` is incorrect",
+ "state": "closed",
+ "state_reason": null,
+ "author": "dura0ok",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "topic-ctypes"
+ ],
+ "created_at": "2025-04-13T11:37:25Z",
+ "closed_at": "2025-04-22T13:13:00Z",
+ "body": "\r\nWhen creating a ctypes.CField with an incorrect byte_size (e.g., using byte_size=2 for ctypes.c_byte), the code would previously abort due to the failed assertion byte_size == info->size.\r\n\r\nThis commit replaces the assertion with a proper error handling mechanism that raises a ValueError when byte_size does not match the expected type size. This prevents the crash and provides a more informative error message to the us\r\n\r\n\r\n\n\n<!-- gh-issue-number: gh-132470 -->\n* Issue: gh-132470\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-13T11:37:30Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-04-13T11:40:59Z",
+   "body": "I not found place where to write regression test for it."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-13T13:17:53Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-04-13T13:25:10Z",
+   "body": "@sobolevn @ZeroIntensity \r\nnews and test added "
+  },
+  {
+   "author": "brianschubert",
+   "created_at": "2025-04-13T13:53:20Z",
+   "body": "@dura0ok it's best to avoid force pushing once you've received feedback, since that makes it harder for reviewers to see what changed. All commits are squashed on merge anyway"
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-04-16T10:09:17Z",
+   "body": "@ZeroIntensity  problem with space fixed."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-22T13:13:04Z",
+   "body": "Thanks @dura0ok for the PR, and @sobolevn for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-22T13:13:20Z",
+   "body": "Sorry, @dura0ok and @sobolevn, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 3b4b56f46dbfc0c336a1f70704f127593ec1f4ce 3.13\n```\n"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-22T13:14:22Z",
+   "body": "@dura0ok can you please work on a manual backport?"
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-04-22T13:17:56Z",
+   "body": "@sobolevn yes, sure. In which pr?"
+  },
+  {
+   "author": "encukou",
+   "created_at": "2025-04-28T15:09:42Z",
+   "body": "Thanks for getting this in everyone!\r\n\r\n\r\nPython 3.13 does not allow creating `CField` from Python at all, and doesn't have a `byte_size` argument, so this shouldn't be backported.\r\n\r\n@ZeroIntensity: A friendly bicker, just so you know my opinion: This should not have a NEWS entry, since the CField constructor is not public. If you call it (with `_internal_use=True`), you are using fragile undocumented internal API.\r\nBut, now that the entry it's there I don't think it's worth it to remove it.\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-28T15:18:50Z",
+   "body": "FWIW, I do sometimes see changelog entries for changes to the private API if people were relying on it. I don't know if that applied here."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132470",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3b4b56f46dbfc0c336a1f70704f127593ec1f4ce",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

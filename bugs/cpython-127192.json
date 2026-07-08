@@ -9,6 +9,9 @@
   "python/cpython#127192"
  ],
  "prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
  "gists": [],
  "labels": [
   "3.13",

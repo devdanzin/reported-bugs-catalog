@@ -8,22 +8,47 @@
  "issues": [
   "python/cpython#146056"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146062",
+  "python/cpython#146129",
+  "python/cpython#146155",
+  "python/cpython#146167",
+  "python/cpython#146204",
+  "python/cpython#146213",
+  "python/cpython#146271"
+ ],
+ "n_prs": 7,
+ "n_backports": 3,
+ "n_fix_prs": 4,
  "gists": [],
  "labels": [
+  "awaiting core review",
+  "docs",
   "extension-modules",
+  "needs backport to 3.13",
+  "skip news",
   "topic-XML",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "serhiy-storchaka",
+  "vstinner"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146056.json"
+  "raw/python__cpython/issue-146056.json",
+  "raw/python__cpython/pull-146062.json",
+  "raw/python__cpython/pull-146129.json",
+  "raw/python__cpython/pull-146155.json",
+  "raw/python__cpython/pull-146167.json",
+  "raw/python__cpython/pull-146204.json",
+  "raw/python__cpython/pull-146213.json",
+  "raw/python__cpython/pull-146271.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 8
 }

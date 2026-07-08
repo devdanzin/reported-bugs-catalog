@@ -1,0 +1,60 @@
+{
+ "repo": "python/cpython",
+ "number": 146147,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146147",
+ "title": "gh-146091: Fix NULL check in termios.tcsetwinsize",
+ "state": "closed",
+ "state_reason": null,
+ "author": "okiemute04",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-03-18T23:41:45Z",
+ "closed_at": "2026-03-19T10:50:18Z",
+ "body": "Fixes #146091\r\n\r\nAdd proper NULL checks for PySequence_GetItem results before passing\r\nto PyLong_AsLong, this prevents SystemError when a BadSequence raises\r\nTypeError in __getitem__, the issue was that PySequence_GetItem can return NULL, which when passed to PyLong_AsLong would cause an internal error instead of propagating\r\nthe original exception.\r\n\n\n<!-- gh-issue-number: gh-146091 -->\n* Issue: gh-146091\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-18T23:41:49Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2026-03-18T23:41:50Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146091",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "89a154a0c0f6b8844e1fe7fd761f75ead13608bd",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2f8f8bc128ede3ee0c2b88117474543ef1b33a41",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

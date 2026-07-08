@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 146517,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146517",
+ "title": "[3.14] gh-146250: Fix memory leak in re-initialization of `SyntaxError` (GH-146251)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-27T13:59:29Z",
+ "closed_at": "2026-03-30T16:14:58Z",
+ "body": "(cherry picked from commit 0de4e08a5990e4692feb1b1ea01c303e468a2894)\n\nCo-authored-by: Brij Kapadia <97006829+bkap123@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-146250 -->\n* Issue: gh-146250\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146250",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146251",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3c434f7f0f956a11616ec745cff4bb1e4e37a55a",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  }
+ ],
+ "fetch_errors": null
+}

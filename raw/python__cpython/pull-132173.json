@@ -1,0 +1,68 @@
+{
+ "repo": "python/cpython",
+ "number": 132173,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132173",
+ "title": "gh-132171: Fix `_interpreters.run_string` crash on string subclass",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-subinterpreters"
+ ],
+ "created_at": "2025-04-06T20:10:35Z",
+ "closed_at": "2025-04-07T11:59:45Z",
+ "body": "\n\n<!-- gh-issue-number: gh-132171 -->\n* Issue: gh-132171\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-07T11:59:48Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-07T12:00:00Z",
+   "body": "[GH-132219](https://github.com/python/cpython/pull/132219) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132171",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132174",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "398071871066548954f4c51e8250d13b7c9659e0",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b8fafb2ea3bfcb89013ba316d861e6d28630ab67",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6afab81f72cae75baee877271a7a75c4ad187f84",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

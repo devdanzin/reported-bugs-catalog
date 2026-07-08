@@ -8,21 +8,45 @@
  "issues": [
   "python/cpython#145335"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#145341",
+  "python/cpython#145390",
+  "python/cpython#145432",
+  "python/cpython#145433",
+  "python/cpython#145439",
+  "python/cpython#145528"
+ ],
+ "n_prs": 6,
+ "n_backports": 2,
+ "n_fix_prs": 4,
  "gists": [],
  "labels": [
+  "awaiting review",
   "extension-modules",
+  "skip news",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "aisk",
+  "gourijain029-del",
+  "hoodmane",
+  "miss-islington",
+  "vstinner"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-145335.json"
+  "raw/python__cpython/issue-145335.json",
+  "raw/python__cpython/pull-145341.json",
+  "raw/python__cpython/pull-145390.json",
+  "raw/python__cpython/pull-145432.json",
+  "raw/python__cpython/pull-145433.json",
+  "raw/python__cpython/pull-145439.json",
+  "raw/python__cpython/pull-145528.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 7
 }

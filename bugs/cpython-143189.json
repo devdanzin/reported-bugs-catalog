@@ -8,21 +8,33 @@
  "issues": [
   "python/cpython#143189"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#143285",
+  "python/cpython#143771",
+  "python/cpython#143772"
+ ],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "interpreter-core",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "methane"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-143189.json"
+  "raw/python__cpython/issue-143189.json",
+  "raw/python__cpython/pull-143285.json",
+  "raw/python__cpython/pull-143771.json",
+  "raw/python__cpython/pull-143772.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

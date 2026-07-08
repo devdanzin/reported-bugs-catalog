@@ -1,0 +1,27 @@
+{
+ "repo": "python/cpython",
+ "number": 152981,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152981",
+ "title": "gh-152083: Fix crash clearing a managed dict under low memory",
+ "state": "open",
+ "state_reason": null,
+ "author": "deadlovelll",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-07-03T20:25:41Z",
+ "closed_at": null,
+ "body": "Fix crash clearing a managed dict under low memory\r\n\r\nFor more details see gh-152083",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152083",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

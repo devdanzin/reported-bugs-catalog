@@ -1,0 +1,34 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2887,
+ "type": "pull",
+ "url": "https://github.com/h5py/h5py/pull/2887",
+ "title": "fix: reject short fileobj reads",
+ "state": "open",
+ "state_reason": null,
+ "author": "dfgvaetyj3456356-hash",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-06-04T02:56:01Z",
+ "closed_at": null,
+ "body": "## Summary\n\nFixes #2835.\n\nThe `fileobj` VFD read callback now treats short reads as failures for both file-like read paths:\n\n- checks the byte count returned by `readinto()` before returning success\n- returns `-1` for short `read()` results, matching `herr_t` failure conventions\n\nPreviously, `readinto()` results were ignored, so a file-like object that returned fewer bytes than requested could leave part of the destination buffer untouched while the callback still returned success. The fallback `read()` path also returned `1` for a short read, which is non-negative and therefore not a conventional `herr_t` failure.\n\n## Tests\n\nAdded `TestFileObj.test_short_readinto`, which builds a valid in-memory HDF5 file and then serves it through a file-like object whose `readinto()` intentionally returns one byte short.\n\nLocal checks run:\n\n- `python -m py_compile h5py\\tests\\test_file2.py`\n- `git diff --check`\n\nI could not run the new runtime test locally in this checkout because Cython is not installed here, and this change touches a Cython template that needs the normal h5py extension build.\r\n",
+ "comments": [
+  {
+   "author": "tacaswell",
+   "created_at": "2026-06-04T03:01:03Z",
+   "body": "@dfgvaetyj3456356-hash Please test this locally."
+  },
+  {
+   "author": "codecov[bot]",
+   "created_at": "2026-06-04T03:07:28Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/h5py/h5py/pull/2887?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py) Report\n:white_check_mark: All modified and coverable lines are covered by tests.\n:white_check_mark: Project coverage is 90.39%. Comparing base ([`88ff342`](https://app.codecov.io/gh/h5py/h5py/commit/88ff342474416db07119fd768cd537c8f3b9535b?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)) to head ([`066e577`](https://app.codecov.io/gh/h5py/h5py/commit/066e577cf50cbbb19ef8c4938d9999169c2ac771?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)).\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@           Coverage Diff           @@\n##           master    #2887   +/-   ##\n=======================================\n  Coverage   90.39%   90.39%           \n=======================================\n  Files          16       16           \n  Lines        2509     2509           \n=======================================\n  Hits         2268     2268           \n  Misses        241      241           \n```\n</details>\n\n[:umbrella: View full report in Codecov by Harness](https://app.codecov.io/gh/h5py/h5py/pull/2887?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  },
+  {
+   "author": "dfgvaetyj3456356-hash",
+   "created_at": "2026-06-04T03:23:58Z",
+   "body": "Tested locally on Windows with an editable build of this branch against HDF5 1.12.2.\\n\\nEnvironment:\\n- Python 3.11.9\\n- h5py 3.16.0 from this checkout\\n- HDF5 1.12.2 built locally with Visual Studio 2022 Build Tools\\n- NumPy 2.4.6\\n- Cython 3.2.5\\n\\nCommands/results:\\n- \\\\pytest h5py/tests/test_file2.py::TestFileObj::test_short_readinto -q\\\\ -> \\\\1 passed\\\\\\n- \\\\pytest h5py/tests/test_file2.py::TestFileObj -q\\\\ -> \\\\9 passed, 1 skipped\\\\\\n\\nAlso confirmed the PR CI/Codecov are green from the GitHub checks."
+  }
+ ],
+ "timeline_refs": [],
+ "fetch_errors": null
+}

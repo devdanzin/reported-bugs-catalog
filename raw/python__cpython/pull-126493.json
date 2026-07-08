@@ -1,0 +1,49 @@
+{
+ "repo": "python/cpython",
+ "number": 126493,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126493",
+ "title": "[3.13] gh-126313: Fix a crash in curses.napms() due to incorrect error handling (GH-126351)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-06T12:50:17Z",
+ "closed_at": "2024-11-06T13:33:24Z",
+ "body": "(cherry picked from commit 19d935843727fff93b2c0e09a63fd32c0d97098d)\n\n<!-- gh-issue-number: gh-126313 -->\n* Issue: gh-126313\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T13:33:30Z",
+   "body": "Merged, thanks."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126351",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126313",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6e9da38866e3990df440da63bbec39a90487e261",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

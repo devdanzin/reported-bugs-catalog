@@ -1,0 +1,105 @@
+{
+ "repo": "python/cpython",
+ "number": 143815,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143815",
+ "title": "gh-141805: Fix crash after concurrent addition objects with the same hash to set",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-01-13T20:33:52Z",
+ "closed_at": "2026-01-14T21:29:17Z",
+ "body": "This happens when the set contained several elements with the same hash, and then some of them were removed.\r\n\r\n\r\n<!-- gh-issue-number: gh-139071 -->\r\n* Issue: gh-139071\r\n<!-- /gh-issue-number -->\r\n<!-- gh-issue-number: gh-141805 -->\r\n* Issue: gh-141805\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "skirpichev",
+   "created_at": "2026-01-13T23:26:26Z",
+   "body": "I think this also fixes #143546.  (N.B.: on my system I can't trigger a crash with ``left &= right`` from issue, but ``left |= right`` - \"works\" for me.)\r\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-01-14T21:29:21Z",
+   "body": "Thanks @serhiy-storchaka for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-01-14T21:29:30Z",
+   "body": "Sorry, @serhiy-storchaka, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker b8e925b4f8f6c5e28fbebc4f3965bf77610698b3 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-01-14T21:29:34Z",
+   "body": "[GH-143849](https://github.com/python/cpython/pull/143849) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-01-15T07:30:28Z",
+   "body": "[GH-143853](https://github.com/python/cpython/pull/143853) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141805",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/139071",
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143546",
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b8e925b4f8f6c5e28fbebc4f3965bf77610698b3",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "72851c432495483ec91d1962c72694d015f23c8e",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fd4b336b9fd9b0c2f1cb0016a3d0c8611312232d",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "601ccb7f89dc4b6b1da9c5322f0c3abd875fcf2b",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5c028df404b0d8453a4ecb8b938122f3d3c62a30",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "21f25a9f791fe6c96d561ed69475398f8a43708a",
+   "actor": "thunder-coding"
+  }
+ ],
+ "fetch_errors": null
+}

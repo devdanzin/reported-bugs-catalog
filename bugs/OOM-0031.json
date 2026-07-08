@@ -8,7 +8,14 @@
  "issues": [
   "python/cpython#151842"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#151843",
+  "python/cpython#152031",
+  "python/cpython#152032"
+ ],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "interpreter-core",
@@ -17,7 +24,8 @@
  ],
  "filed_by": "maintainer",
  "filers": [
-  "amruthamodela06"
+  "amruthamodela06",
+  "miss-islington"
  ],
  "status": "closed/fixed",
  "confidence": "high",
@@ -25,7 +33,10 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-151842.json"
+  "raw/python__cpython/issue-151842.json",
+  "raw/python__cpython/pull-151843.json",
+  "raw/python__cpython/pull-152031.json",
+  "raw/python__cpython/pull-152032.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

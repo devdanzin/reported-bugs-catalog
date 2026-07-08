@@ -1,0 +1,159 @@
+{
+ "repo": "python/cpython",
+ "number": 131901,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/131901",
+ "title": "gh-131878: Fix input of unicode characters with two or more code points in new pyrepl on Windows",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sergey-miryanov",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-03-30T12:01:49Z",
+ "closed_at": "2025-05-05T16:25:01Z",
+ "body": "If unicode characters with two or more codepoints (\u00f1 or \u00e9) typed or pasted, then it should be converted to bytes before passing to `eventqueue.push`.\r\n\r\nAlso fixed handling of exceptions while decoding buffer. If exception occurred then buffer should be flushed to prevent mixing it with following control commands (for example \"\\x1b[201\").\r\n\r\n<!-- gh-issue-number: gh-131878 -->\r\n* Issue: gh-131878\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-06T13:56:24Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-14T16:19:37Z",
+   "body": "LGTM. I cannot do a thorough review, but at least confirm, that with this PR I can enter `\u00e4\u00c4\u00f6\u00d6\u00fc\u00dc`, etc, again \ud83d\ude80 \r\n"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-26T22:42:40Z",
+   "body": "> LGTM. I cannot do a thorough review, but at least confirm, that with this PR I can enter `\u00e4\u00c4\u00f6\u00d6\u00fc\u00dc`, etc, again \ud83d\ude80\r\n\r\nHad some time now: this needs fixes for Linux. Otherwise looks good, thanks @sergey-miryanov!"
+  },
+  {
+   "author": "tomasr8",
+   "created_at": "2025-04-27T14:26:30Z",
+   "body": " >This breaks Linux, because only one char is inserted in UnixConsole.get_event() [...]\r\n\r\nSince this wasn't caught by the tests, we should also probably add a test for that."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-27T14:28:08Z",
+   "body": "I have suggested the `def test_push_unicode_character_two_bytes(self):` which tests exactly that.\r\n"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-04-27T17:29:49Z",
+   "body": "@chris-eibl Please take a look! I would like to keep tests for paste mode to be sure that escape sequences not mixed with input if error occurred. But I'm OK to remove them if you think it is not necessary."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-28T07:10:17Z",
+   "body": "LGTM. Sure, more tests are always better. Though, AFAIU, there is nothing special about paste mode here:\r\n- `test_push_unicode_character_two_bytes_in_paste_mode` just asserts that a valid \"two byte char\" within a sequence of \"one byte chars\" is working as expected.\r\n- likewise, `test_push_unicode_character_as_str_in_paste_mode` asserts that when an exception during a sequence of feeding bytes via `push` is caught, we can continue pushing afterwards.\r\n\r\nIMHO, both are reasonable, but \"paste mode\" makes them look too special about pasting?\r\n\r\nSo I'd rename them and use arbitrary \"one byte chars\" in there."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-04-28T07:29:40Z",
+   "body": "Sequence of \"one byte chars\" is a control command to enable \"paste mode\". Originally in gh-131878 problem aroise from case where the wrongly passed unicode string puts to the buffer and mixed with following control command that disables paste mode and asserted in those code path. So, I want to check that we don't \"corrupt\" chars buffer."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-28T07:44:49Z",
+   "body": "Yupp, I know. But as said, there is nothing special about bracketed pasting here. From the perspective of the eventqueue test, these are just arbitrary bytes. Whether bracketed pasting is working correctly, is tested in\r\nhttps://github.com/python/cpython/blob/1b7470f8cbff4bb9e58edd940a997a3647e285e4/Lib/test/test_pyrepl/test_pyrepl.py#L1201\r\n\r\nIf you'd like to showcase that sequences of \"one byte chars\" interleaved with \"multi byte chars\" work correctly via \"paste mode\", then maybe just add a comment?\r\n\r\nAnd small nit: `~` is missing in the escape sequences, see\r\nhttps://github.com/python/cpython/blob/1b7470f8cbff4bb9e58edd940a997a3647e285e4/Lib/test/test_pyrepl/test_pyrepl.py#L1227-L1228\r\n\r\nTo me, those two tests have merit, but are too special about \"paste mode\"."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-04-28T18:09:44Z",
+   "body": "@chris-eibl It seems that I did not correctly assume how paste-mode works (shame on me!). I removed one test because the same code path is covered by `test_push_unicode_character_two_bytes`. And renamed and simplified a bit `test_push_single_chars_and_unicode_character_as_str` (not sure the name is ok though)."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-28T19:51:41Z",
+   "body": "I don't have a better name - the comment in there clarifies what we intend to test (not much tbh).\r\nJust a small nit on the comment.\r\n\r\nOtherwise LGTM. Thanks for bearing with me!"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-04-29T05:20:07Z",
+   "body": "@chris-eibl Thanks for the review and patience!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-05-05T16:45:07Z",
+   "body": "Thanks @sergey-miryanov for the PR, and @ambv for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-05-05T16:45:22Z",
+   "body": "Sorry, @sergey-miryanov and @ambv, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 0c5151bc81ec8e8588bef4389df12a9ab50e9fa0 3.13\n```\n"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-05-05T17:10:03Z",
+   "body": "@ambv Please take a look - this is the same problem with backport as in earlier PR - https://github.com/python/cpython/pull/130805#issuecomment-2712877535"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-05-05T19:49:49Z",
+   "body": "[GH-133468](https://github.com/python/cpython/pull/133468) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-05-05T21:30:47Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 Debian root 3.13** (tier-1) has failed when building commit 891232f3386dd8b20a216a473954c1b01cede7ec.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1441/builds/1169) and take a look at the build logs.\n4. Check if the failure is related to this commit (891232f3386dd8b20a216a473954c1b01cede7ec) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1441/builds/1169\n\n\n\nSummary of the results of the build (if available):\n\n\n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nremote: Enumerating objects: 26, done.        \nremote: Counting objects:   3% (1/26)        \nremote: Counting objects:   7% (2/26)        \nremote: Counting objects:  11% (3/26)        \nremote: Counting objects:  15% (4/26)        \nremote: Counting objects:  19% (5/26)        \nremote: Counting objects:  23% (6/26)        \nremote: Counting objects:  26% (7/26)        \nremote: Counting objects:  30% (8/26)        \nremote: Counting objects:  34% (9/26)        \nremote: Counting objects:  38% (10/26)        \nremote: Counting objects:  42% (11/26)        \nremote: Counting objects:  46% (12/26)        \nremote: Counting objects:  50% (13/26)        \nremote: Counting objects:  53% (14/26)        \nremote: Counting objects:  57% (15/26)        \nremote: Counting objects:  61% (16/26)        \nremote: Counting objects:  65% (17/26)        \nremote: Counting objects:  69% (18/26)        \nremote: Counting objects:  73% (19/26)        \nremote: Counting objects:  76% (20/26)        \nremote: Counting objects:  80% (21/26)        \nremote: Counting objects:  84% (22/26)        \nremote: Counting objects:  88% (23/26)        \nremote: Counting objects:  92% (24/26)        \nremote: Counting objects:  96% (25/26)        \nremote: Counting objects: 100% (26/26)        \nremote: Counting objects: 100% (26/26), done.        \nremote: Compressing objects:  33% (1/3)        \nremote: Compressing objects:  66% (2/3)        \nremote: Compressing objects: 100% (3/3)        \nremote: Compressing objects: 100% (3/3), done.        \nremote: Total 14 (delta 12), reused 12 (delta 11), pack-reused 0 (from 0)        \nFrom https://github.com/python/cpython\n * branch                    3.13       -> FETCH_HEAD\nNote: switching to '891232f3386dd8b20a216a473954c1b01cede7ec'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 891232f3386 [3.13] gh-131878: Fix input of unicode characters with two or more code points in new pyrepl on Windows (gh-131901) (gh-133468)\nSwitched to and reset branch '3.13'\n\nconfigure: WARNING: no system libmpdecimal found; falling back to bundled libmpdecimal (deprecated and scheduled for removal in Python 3.15)\nconfigure: WARNING: pkg-config is missing. Some dependencies may not be detected correctly.\n\nfind: \u2018build\u2019: No such file or directory\nfind: \u2018build\u2019: No such file or directory\nfind: \u2018build\u2019: No such file or directory\nfind: \u2018build\u2019: No such file or directory\nmake: [Makefile:3116: clean-retain-profile] Error 1 (ignored)\n```\n\n</details>\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131878",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131910",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132440",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "0c5151bc81ec8e8588bef4389df12a9ab50e9fa0",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1fcec66d59a262591e169f4cc9aa8c32b456dd78",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "891232f3386dd8b20a216a473954c1b01cede7ec",
+   "actor": "ambv"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/133030",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ac6b1518f1454ffc7de0b6381ac29a665137cd13",
+   "actor": "Pranjal095"
+  }
+ ],
+ "fetch_errors": null
+}

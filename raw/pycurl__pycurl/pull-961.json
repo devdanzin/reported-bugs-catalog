@@ -1,0 +1,31 @@
+{
+ "repo": "pycurl/pycurl",
+ "number": 961,
+ "type": "pull",
+ "url": "https://github.com/pycurl/pycurl/pull/961",
+ "title": "Fix bugs noted by C Extension Review Toolkit",
+ "state": "closed",
+ "state_reason": null,
+ "author": "swt2c",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-03-27T20:56:05Z",
+ "closed_at": "2026-03-27T22:01:56Z",
+ "body": "See #960 ",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "41f86157f94ca01b14dbe157ea23e127894cf515",
+   "actor": "swt2c"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "swt2c"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,31 @@
+{
+ "repo": "pypy/pypy",
+ "number": 4960,
+ "type": "pull",
+ "url": "https://github.com/pypy/pypy/pull/4960",
+ "title": "py3 __import__ fast path",
+ "state": "closed",
+ "state_reason": null,
+ "author": "cfbolz",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-05-21T14:57:28Z",
+ "closed_at": "2024-05-21T15:47:17Z",
+ "body": "try to fix #4951 by porting the `import`-Statement fast path to be in `__import__` (which nicely also makes it simpler).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9064d3c9091ea1cc50fb49fbfffe53985232e2a4",
+   "actor": "cfbolz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "cfbolz"
+  }
+ ],
+ "fetch_errors": null
+}

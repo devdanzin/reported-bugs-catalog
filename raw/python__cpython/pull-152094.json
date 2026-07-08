@@ -1,0 +1,51 @@
+{
+ "repo": "python/cpython",
+ "number": 152094,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152094",
+ "title": "[3.13] gh-151763: Fix NULL dereference in `os._path_normpath()` under OOM (GH-151779)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-06-24T15:56:49Z",
+ "closed_at": "2026-06-24T16:22:24Z",
+ "body": "(cherry picked from commit ce8b81fff4094bd0cfb0c57193135bfc904c0ca2)\n\nCo-authored-by: Zain Nadeem <zainnadeemzainnadeem80@gmail.com>\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "read-the-docs-community[bot]",
+   "created_at": "2026-06-24T16:00:23Z",
+   "body": "<!-- readthedocs-883176 -->\n\n### Documentation build overview\n\n> \ud83d\udcda [cpython-previews](https://app.readthedocs.org/projects/cpython-previews/) | \ud83d\udee0\ufe0f Build [#33293002](https://app.readthedocs.org/projects/cpython-previews/builds/33293002/) | \ud83d\udcc1 Comparing 62a346a6d51c8615d9c314cb09266758d90c49fe against [main](https://cpython-previews.readthedocs.io/en/main/) (ce8b81fff4094bd0cfb0c57193135bfc904c0ca2)\n\n[<kbd> &nbsp; \ud83d\udd0d Preview build &nbsp; </kbd>](https://cpython-previews--152094.org.readthedocs.build/en/152094/)\n\n\n<details>\n<summary>465 files changed \u00b7 <code>\u00b1</code> 425 modified \u00b7 <code>-</code> 40 deleted</summary>\n<br>\n\n`\u00b1` **Modified**\n- [`about.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/about.html)\n- [`bugs.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/bugs.html)\n- [`copyright.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/copyright.html)\n- [`glossary.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/glossary.html)\n- [`index.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/index.html)\n- [`license.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/license.html)\n- [`py-modindex.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/py-modindex.html)\n- [`c-api/allocation.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/allocation.html)\n- [`c-api/apiabiversion.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/apiabiversion.html)\n- [`c-api/arg.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/arg.html)\n- *and 415 more...*\n\n`-` **Deleted**\n- [`improve-page-nojs.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/improve-page-nojs.html)\n- [`improve-page.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/improve-page.html)\n- [`_static/tachyon-example-flamegraph.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/_static/tachyon-example-flamegraph.html)\n- [`_static/tachyon-example-heatmap.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/_static/tachyon-example-heatmap.html)\n- [`c-api/extension-modules.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/extension-modules.html)\n- [`c-api/interp-lifecycle.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/interp-lifecycle.html)\n- [`c-api/lifecycle.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/lifecycle.html)\n- [`c-api/profiling.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/profiling.html)\n- [`c-api/sentinel.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/sentinel.html)\n- [`c-api/slots.html`](https://cpython-previews--152094.org.readthedocs.build/en/152094/c-api/slots.html)\n- *and 30 more...*\n\n</details>\n\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151779",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "58476e8cbbe19fb60b5819d30d0020bd790fad30",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "StanFromIreland"
+  }
+ ],
+ "fetch_errors": null
+}

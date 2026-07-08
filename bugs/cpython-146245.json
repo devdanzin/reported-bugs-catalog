@@ -8,15 +8,26 @@
  "issues": [
   "python/cpython#146245"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146247",
+  "python/cpython#146248",
+  "python/cpython#146274",
+  "python/cpython#146275"
+ ],
+ "n_prs": 4,
+ "n_backports": 2,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
+  "awaiting review",
   "extension-modules",
   "type-bug"
  ],
  "filed_by": "maintainer",
  "filers": [
-  "aisk"
+  "aisk",
+  "kimimgo",
+  "miss-islington"
  ],
  "status": "closed/fixed",
  "confidence": "high",
@@ -24,7 +35,11 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146245.json"
+  "raw/python__cpython/issue-146245.json",
+  "raw/python__cpython/pull-146247.json",
+  "raw/python__cpython/pull-146248.json",
+  "raw/python__cpython/pull-146274.json",
+  "raw/python__cpython/pull-146275.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 5
 }

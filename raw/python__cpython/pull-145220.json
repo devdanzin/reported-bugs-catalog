@@ -1,0 +1,49 @@
+{
+ "repo": "python/cpython",
+ "number": 145220,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145220",
+ "title": "gh-145197: Fix JIT trace crash when recording function from cleared generator frame",
+ "state": "closed",
+ "state_reason": null,
+ "author": "cocolato",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-02-25T15:00:05Z",
+ "closed_at": "2026-02-25T16:52:53Z",
+ "body": "\r\nIn the JIT trace record path, `_RECORD_NOS_GEN_FUNC` originally reads the generator function object via `_PyFrame_GetFunction()`; when the generator `frame` has been cleared, this path may trigger a crash.\n\n<!-- gh-issue-number: gh-145197 -->\n* Issue: gh-145197\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145197",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "277a03711b1d712c1a4881f07705498c07ebf957",
+   "actor": "markshannon"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d129eae7ee8befb374eda63e271d25427c94dff1",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7ff115b7f1ab8d57a7b55a46f766a06caac89ea7",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,200 @@
+{
+ "repo": "python/cpython",
+ "number": 135412,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/135412",
+ "title": "gh-135410: Use a critical section around `StringIO.__next__`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2025-06-11T23:19:21Z",
+ "closed_at": "2025-06-12T11:11:05Z",
+ "body": "I'm generally not a fan of adding locks around `__next__`, because concurrent iteration isn't generally a real use case, but `readlines` calls into `__next__`. \n\n<!-- gh-issue-number: gh-135410 -->\n* Issue: gh-135410\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "corona10",
+   "created_at": "2025-06-11T23:29:00Z",
+   "body": "Let's consider the following options.\r\n1. Prevent segfault only.\r\n2. Guarantee thread safety also. But IIRC, we do not guarantee all stdlib iterations.\r\n\r\n\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-11T23:34:24Z",
+   "body": "Yeah, I totally agree on that. There was an [issue](https://github.com/python/cpython/issues/134908) similar to this a few weeks ago, where a `TextIOWrapper.__next__` didn't have a critical section on it, which ended up causing crashes. I originally rejected it, but I was eventually convinced that it is worth doing for IO objects."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-06-12T02:22:51Z",
+   "body": "I am fine with if this change will not regress overall performance. But if the object is shared by multiple threads user should care about the correctness if the object itself does not gurentee it.\r\ncc @colesbury "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-06-12T10:25:37Z",
+   "body": "> But if the object is shared by multiple threads user should care about the correctness if the object itself does not gurentee it.\r\n\r\nCurrently, the doc says nothing about io.StringIO: https://docs.python.org/dev/library/io.html#multi-threading"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-06-12T11:11:40Z",
+   "body": "Thanks @ZeroIntensity for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-06-12T11:11:40Z",
+   "body": "Thanks @ZeroIntensity for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-06-12T11:11:46Z",
+   "body": "Sorry, @ZeroIntensity and @kumaraditya303, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker e6c3039cb39e68ae9af9ddcaca341c5af8f9cf23 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-06-12T11:11:49Z",
+   "body": "[GH-135425](https://github.com/python/cpython/pull/135425) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-06-12T11:42:37Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 CentOS9 NoGIL 3.14** (tier-1) has failed when building commit 8cb7d9a8102163387907425dc14b5d629b930e76.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1733/builds/261) and take a look at the build logs.\n4. Check if the failure is related to this commit (8cb7d9a8102163387907425dc14b5d629b930e76) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1733/builds/261\n\nFailed tests:\n\n- test_memoryio\n\nFailed subtests:\n\n- test_concurrent_use - test.test_memoryio.PyStringIOPickleTest.test_concurrent_use\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/home/buildbot/buildarea/3.14.itamaro-centos-aws.nogil/build/Lib/test/test_memoryio.py\", line 742, in test_concurrent_use\n    self.assertIsNone(cm.exc_value)\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: UnboundLocalError(\"cannot access local variable 'dec_flags' where it is not associated with a value\") is not None\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-06-12T12:28:13Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 CentOS9 NoGIL Refleaks 3.x** (tier-1) has failed when building commit e6c3039cb39e68ae9af9ddcaca341c5af8f9cf23.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1610/builds/1566) and take a look at the build logs.\n4. Check if the failure is related to this commit (e6c3039cb39e68ae9af9ddcaca341c5af8f9cf23) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1610/builds/1566\n\nFailed tests:\n\n- test_memoryio\n\nFailed subtests:\n\n- test_concurrent_use - test.test_memoryio.PyStringIOPickleTest.test_concurrent_use\n- test_concurrent_use - test.test_memoryio.PyStringIOTest.test_concurrent_use\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/home/buildbot/buildarea/3.x.itamaro-centos-aws.refleak.nogil/build/Lib/test/test_memoryio.py\", line 742, in test_concurrent_use\n    self.assertIsNone(cm.exc_value)\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: UnboundLocalError(\"cannot access local variable 'dec_flags' where it is not associated with a value\") is not None\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-06-12T12:54:18Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 CentOS9 NoGIL Refleaks 3.14** (tier-1) has failed when building commit 8cb7d9a8102163387907425dc14b5d629b930e76.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1774/builds/185) and take a look at the build logs.\n4. Check if the failure is related to this commit (8cb7d9a8102163387907425dc14b5d629b930e76) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1774/builds/185\n\nFailed tests:\n\n- test_memoryio\n\nFailed subtests:\n\n- test_concurrent_use - test.test_memoryio.PyStringIOPickleTest.test_concurrent_use\n- test_concurrent_use - test.test_memoryio.PyStringIOTest.test_concurrent_use\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/home/buildbot/buildarea/3.14.itamaro-centos-aws.refleak.nogil/build/Lib/test/test_memoryio.py\", line 742, in test_concurrent_use\n    self.assertIsNone(cm.exc_value)\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: UnboundLocalError(\"cannot access local variable 'dec_flags' where it is not associated with a value\") is not None\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-12T13:30:00Z",
+   "body": "Those buildbot failures look related. I'll quickly investigate and if I can't figure it out in the next half an hour or so, I'll put up a revert."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-06-12T15:42:01Z",
+   "body": "IMO this change was merged too quickly and I suggest to revert it.\r\n\r\n* I was awaiting for @colesbury to review the change.\r\n* @corona10 asked for benchmarks, this request was ignored.\r\n* I pointed out that the documentation says nothing about io.StringIO thread safety. I would prefer to address this point at the same time.\r\n* And now, Refleak buildbots are failing. It seems like the Python implementation (_pyio) behaves differently than the C implementation (io).\r\n\r\nI suggest to revert the two changes (main and 3.14 branches) and spend more time to design this fix. I don't think that there is any urgency to fix this issue."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-12T17:27:05Z",
+   "body": "Sorry for the hassle everyone! I didn't get a chance to reply to any comments before it was merged. I'll put up a revert while we discuss this."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/135410",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e6c3039cb39e68ae9af9ddcaca341c5af8f9cf23",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ead9fb0a532fe0dac36d81d7ae608997fb582234",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8cb7d9a8102163387907425dc14b5d629b930e76",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135430",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4ab61b3eed103089a2c4185e6cee453d5dbbc611",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "73431356d324842cac0d545018c3ad21c85bc883",
+   "actor": "corona10"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fcc34936b80db697d88842aab0703a08ba6b92ef",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3efd3d7d3b052a8b3a1d2afa2c8001b3bac26d5",
+   "actor": "corona10"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c4d421c5a5ff4f18237c360481ab5c0535cb5c76",
+   "actor": "lkollar"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dd95024aea40c4f30a766000754af1bdb01cc84d",
+   "actor": "lkollar"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f58e3d9c52efdfd760496222748cf7003fac4908",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8ce3f1a6878f812e069394dc9f049d9125dae0cc",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "02a55c461f3e19924a325ee6a14bf044aa75e6a9",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "902e279df3f52d33812c5e153bf63377075c37f8",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9b3cc437add17312de2c5668bab3141643ae4652",
+   "actor": "Agent-Hellboy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "031304784fa1b09707dd479674ecf8bc01e830f0",
+   "actor": "Agent-Hellboy"
+  }
+ ],
+ "fetch_errors": null
+}

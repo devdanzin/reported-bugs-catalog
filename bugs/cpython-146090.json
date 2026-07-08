@@ -8,7 +8,14 @@
  "issues": [
   "python/cpython#146090"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146569",
+  "python/cpython#146595",
+  "python/cpython#146596"
+ ],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
  "gists": [
   "69aff7ff2d64ce8c7c21622f7f36e84c"
  ],
@@ -20,15 +27,21 @@
   "topic-sqlite3",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "miss-islington",
+  "picnixz"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146090.json"
+  "raw/python__cpython/issue-146090.json",
+  "raw/python__cpython/pull-146569.json",
+  "raw/python__cpython/pull-146595.json",
+  "raw/python__cpython/pull-146596.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

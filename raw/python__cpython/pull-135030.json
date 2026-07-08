@@ -1,0 +1,74 @@
+{
+ "repo": "python/cpython",
+ "number": 135030,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/135030",
+ "title": "gh-130999: Fix globals() poisoning in test_traceback",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ambv",
+ "author_association": "MEMBER",
+ "labels": [
+  "tests",
+  "skip news"
+ ],
+ "created_at": "2025-06-02T14:09:03Z",
+ "closed_at": "2025-06-02T14:57:08Z",
+ "body": "\n\n<!-- gh-issue-number: gh-130999 -->\n* Issue: gh-130999\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ambv",
+   "created_at": "2025-06-02T14:09:50Z",
+   "body": "!buildbot M1 Refleaks"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-06-02T14:09:54Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @ambv for commit 944169fae59a47b006f3fc087f7cc1c1aee3c509 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F135030%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `M1 Refleaks`\n\nThe builders matched are:\n- `ARM64 MacOS M1 Refleaks NoGIL PR`\n"
+  },
+  {
+   "author": "ambv",
+   "created_at": "2025-06-02T14:11:08Z",
+   "body": "I'll backport it directly to the still open backport PRs of #131001."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130999",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "055827528fa50c9a7707792f5fe264c4e20c07e9",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3e18a3c08736f96f35c4abe6539d4850be66c88b",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "31f0d6e454e959b09e68cc4400a6e9399fb1bf88",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3fa92652f8af90dd788a5a6100fffe8b41f6b665",
+   "actor": "Agent-Hellboy"
+  }
+ ],
+ "fetch_errors": null
+}

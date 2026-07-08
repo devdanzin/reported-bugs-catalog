@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 148413,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148413",
+ "title": "[3.13] gh-148208: Fix recursion depth leak in `PyObject_Print` (GH-148209)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-04-12T00:26:28Z",
+ "closed_at": "2026-04-12T00:28:12Z",
+ "body": "(cherry picked from commit e2fa10e04d3fed4c248881d69411fc208d05ad6b)\n\nCo-authored-by: Wulian233 <1055917385@qq.com>\n\n<!-- gh-issue-number: gh-148208 -->\n* Issue: gh-148208\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "gpshead",
+   "created_at": "2026-04-12T00:28:12Z",
+   "body": "this doesn't apply to 3.13.  new internal API pattern."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148209",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148208",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "gpshead"
+  }
+ ],
+ "fetch_errors": null
+}

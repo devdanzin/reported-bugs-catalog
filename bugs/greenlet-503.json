@@ -8,12 +8,18 @@
  "issues": [
   "python-greenlet/greenlet#503"
  ],
- "prs": [],
+ "prs": [
+  "python-greenlet/greenlet#504"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [],
  "filed_by": "maintainer",
  "filers": [
-  "NitayDariel"
+  "NitayDariel",
+  "jamadden"
  ],
  "status": "closed/fixed",
  "confidence": "high",
@@ -21,7 +27,8 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python-greenlet__greenlet/issue-503.json"
+  "raw/python-greenlet__greenlet/issue-503.json",
+  "raw/python-greenlet__greenlet/pull-504.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

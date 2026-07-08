@@ -1,0 +1,52 @@
+{
+ "repo": "python/cpython",
+ "number": 142286,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/142286",
+ "title": "gh-141786: Fix missing parent executor during JIT of trace",
+ "state": "closed",
+ "state_reason": null,
+ "author": "caje731",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2025-12-05T09:33:01Z",
+ "closed_at": "2025-12-05T10:47:09Z",
+ "body": "\n\n<!-- gh-issue-number: gh-141786 -->\n* Issue: gh-141786\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-12-05T09:33:06Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-12-05T10:47:09Z",
+   "body": "It is customary to ask on the issue if one can create a PR for the patch before doing it, especially if someone is already assigned to the issue. If the assignee has already started working on it, it should be done so to avoid synchronization issues. Sorry, but I will close the PR for now (in addition, tests seem to be broken by this change) (you can still work on it on your fork but we try to avoid open PRs sitting there).\r\n\r\nIf the assignee wants to delegate the work, I'll re-open the PR (but the tests need to pass, and regression tests must be added as well)"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-05T12:19:14Z",
+   "body": "The check in crval.c is wrong.\n\nYou need to move the following checks into this line. So it should be a nested if."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-05T14:10:01Z",
+   "body": "@picnixz I'm helping the OP with creating a PR for this. So I let them take the issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141786",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ],
+ "fetch_errors": null
+}

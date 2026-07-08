@@ -1,0 +1,75 @@
+{
+ "repo": "python/cpython",
+ "number": 126472,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126472",
+ "title": "gh-126456: Fix _pyrepl curses tigetstr()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news",
+  "topic-repl"
+ ],
+ "created_at": "2024-11-06T07:06:37Z",
+ "closed_at": "2024-11-13T16:46:11Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-126456 -->\n* Issue: gh-126456\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-13T16:46:14Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-13T16:46:29Z",
+   "body": "[GH-126790](https://github.com/python/cpython/pull/126790) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126456",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b2bbdc56e3276f3b37ea5cf5f73f49c4cce6d9f6",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "737866ca855613c0a721cb6ebfc9e311782a8c3b",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9162340e0627d0cb0bc8e8c72f1aa53f5556897b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "19eee7bde9d96947bd95c5b3677c7ca3d064d8ce",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7cf1b745e1bb00b5ba5879946114a38b0066ebbc",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

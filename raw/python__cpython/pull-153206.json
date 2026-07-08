@@ -1,0 +1,81 @@
+{
+ "repo": "python/cpython",
+ "number": 153206,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/153206",
+ "title": "gh-153205: Set MemoryError in stackref array conversion",
+ "state": "closed",
+ "state_reason": null,
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-07-06T14:50:22Z",
+ "closed_at": "2026-07-07T16:03:35Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-153205 -->\n* Issue: gh-153205\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "aisk",
+   "created_at": "2026-07-06T14:54:44Z",
+   "body": "This change is in `_PyObjectArray_FromStackRefArray`, which is added in 3.14, so we only need to backport it to 3.14 / 3.15."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-07-06T23:42:53Z",
+   "body": "Fix looks right. However, I think this needs a news entry as it's fixing a user-visible bug for low memory situations?"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-07-07T16:03:39Z",
+   "body": "Thanks @aisk for the PR, and @sobolevn for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 I'm not a witch! I'm not a witch!"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-07T16:03:53Z",
+   "body": "[GH-153272](https://github.com/python/cpython/pull/153272) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-07T16:04:02Z",
+   "body": "[GH-153273](https://github.com/python/cpython/pull/153273) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153205",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153215",
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "08759ff1015552d58c1f6ffa13ea08b0ae32e6c0",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "97a45b0d000ec9e13291bf70dd59c3b8d68fde80",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7342e012531d46e4508f50887a66d58972f35da2",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

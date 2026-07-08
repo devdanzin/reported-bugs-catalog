@@ -1,0 +1,130 @@
+{
+ "repo": "python/cpython",
+ "number": 147962,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/147962",
+ "title": "gh-146613: Fix re-entrant use-after-free in itertools._grouper",
+ "state": "closed",
+ "state_reason": null,
+ "author": "TheSkyC",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-01T11:03:21Z",
+ "closed_at": "2026-04-02T13:34:58Z",
+ "body": "Closes gh-146613\r\n\r\nThe same pattern was fixed in `groupby.__next__` (gh-143543 / a91b5c3), but `_grouper_next` (the inner group iterator returned by `groupby`) was missed.\r\n\r\nA user-defined `__eq__` can re-enter the grouper during `PyObject_RichCompareBool`, causing `Py_XSETREF` to free `currkey` while it is still being used.\r\n\r\nFixed by taking strong references (`Py_INCREF` / `Py_DECREF`) to `tgtkey` and `currkey` before the comparison, exactly as done in `groupby_next`.\r\n\r\nAdded regression test `test_grouper_reentrant_eq_does_not_crash`.",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-01T11:03:25Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2026-04-01T11:03:25Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "TheSkyC",
+   "created_at": "2026-04-01T12:18:47Z",
+   "body": "Hi @vstinner,\r\nI've addressed your review comments in the latest commit\r\nThanks for your guidance!"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-04-01T13:24:53Z",
+   "body": "Lint CI job failed with:\r\n\r\n```\r\n  error[: unpinned action reference\r\n    --> .github/workflows/reusable-check-html-ids.yml:19:15\r\n     |\r\n  19 |         uses: actions/checkout@v6\r\n     |               ^^^^^^^^^^^^^^^^^^^ action is not pinned to a hash (required by blanket policy)\r\n```\r\n\r\nIt's unrelated to this change. I reported the issue to: https://github.com/python/cpython/pull/145632#issuecomment-4170068801."
+  },
+  {
+   "author": "TheSkyC",
+   "created_at": "2026-04-01T13:42:12Z",
+   "body": "Thanks for reporting the issue, @vstinner! Should I update the branch from main to fix it?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-04-01T13:43:16Z",
+   "body": "> Thanks for reporting the issue, @vstinner! Should I update the branch from main to fix it?\r\n\r\nThe issue is not fixed yet, so there is no need to update your branch."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-04-01T14:00:57Z",
+   "body": "https://github.com/python/cpython/pull/147968 will fix the Lint CI."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-04-02T13:35:02Z",
+   "body": "Thanks @TheSkyC for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-02T13:35:12Z",
+   "body": "[GH-148010](https://github.com/python/cpython/pull/148010) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-02T13:35:16Z",
+   "body": "[GH-148011](https://github.com/python/cpython/pull/148011) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146613",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145632",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "fc7a188fe70a7b98696b4fcee8db9eb8398aeb7b",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e6d83253eaf5b73df7afc58c4a82920f41cc1652",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "afa86501ee907e0dfc5c8e49de452dd4300faa4c",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "07158b605d638c3e79709939ceb114de4658b3d9",
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7fc8507f3d5251b8a5dc84049b261d69ca02f996",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7c4fe17c8efb025f50c16774a1d5018a78be09b2",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

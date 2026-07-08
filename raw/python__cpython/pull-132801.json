@@ -1,0 +1,65 @@
+{
+ "repo": "python/cpython",
+ "number": 132801,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132801",
+ "title": "gh-132713: Fix repr(list) race condition",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-04-22T14:39:00Z",
+ "closed_at": "2025-04-22T20:09:35Z",
+ "body": "Hold a strong reference to the item while calling repr(item).\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-132713 -->\n* Issue: gh-132713\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-22T15:09:58Z",
+   "body": "> Nit: I would use same comment style as for the rest of function.\r\n\r\nI don't think that `listobject.c` has a single coding style for comments, there are already many comments using the `// comment` syntax."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-22T20:11:50Z",
+   "body": "Merged, thanks for reviews."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-22T20:21:08Z",
+   "body": "[GH-132809](https://github.com/python/cpython/pull/132809) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132713",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "a4ea80d52394bafffb2257abbe815c7ffdb003a3",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2edc8652fefd20cc038fb0204a85fe5e60a6fd4a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3de0f55f3410ae835923d10ae098558900a9a121",
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

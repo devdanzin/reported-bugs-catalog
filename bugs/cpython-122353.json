@@ -8,24 +8,33 @@
  "issues": [
   "python/cpython#122353"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#122389"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.12",
   "3.13",
   "3.14",
   "OS-windows",
+  "awaiting merge",
   "type-bug"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "picnixz"
+ ],
  "status": "open",
  "confidence": "low",
  "needs_review": true,
  "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-122353.json"
+  "raw/python__cpython/issue-122353.json",
+  "raw/python__cpython/pull-122389.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

@@ -1,0 +1,64 @@
+{
+ "repo": "python/cpython",
+ "number": 142344,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/142344",
+ "title": "gh-141786: Fix missing parent executor during JIT trace",
+ "state": "closed",
+ "state_reason": null,
+ "author": "caje731",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2025-12-06T13:37:51Z",
+ "closed_at": "2026-03-23T22:18:23Z",
+ "body": "An executor's trace can point to another executor, forming a graph of traces / executors. Sometimes it is possible while recording a trace that the parent executor is freed / invalidated halfway. This leads to the bug described in the issue gh-141786, which if left unfixed could cause a memory leak.\r\n\r\nThis patch checks for the validity of the parent executor as well as allowing JIT from the cold executor. While the cold executor is not linked, it is the executor responsible for creating side traces and we still want to JIT from it.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n",
+ "comments": [
+  {
+   "author": "caje731",
+   "created_at": "2025-12-06T13:38:54Z",
+   "body": "@Fidget-Spinner who the issue is currently assigned to has helped me with this PR."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-06T14:20:28Z",
+   "body": "@devdanzin can we use your repro as a test case please?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-12-06T20:19:49Z",
+   "body": "Sure, in this case and any others, whenever you want."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-06T20:22:02Z",
+   "body": "@caje731 please add a test case to `Lib/test/test_capi/test_opt.py` by copying the script from here https://github.com/python/cpython/issues/141786#issuecomment-3572014739. You can take a look at `test_interpreter_finalization_with_generator_alive` to see how to run a test in a subprocess easily."
+  },
+  {
+   "author": "caje731",
+   "created_at": "2025-12-08T15:26:29Z",
+   "body": "I should note that the following simple diff in the test:\r\n ```\r\n diff --git a/Lib/test/test_capi/test_opt.py b/Lib/test/test_capi/test_opt.py\r\nindex 0f67f19a115..9027be79254 100644\r\n--- a/Lib/test/test_capi/test_opt.py\r\n+++ b/Lib/test/test_capi/test_opt.py\r\n@@ -2772,7 +2772,7 @@ def B(B):\r\n                 if rand.random() < 0.1:\r\n                     C(B)\r\n \r\n-            for D in range(200):\r\n+            for D in range(350):\r\n                 try:\r\n                     B(D)\r\n                 except:\r\n```\r\n\r\nproduces a breakage in the test:\r\n```\r\n...\r\nstderr:\r\n---\r\nTraceback (most recent call last):\r\n  File \"<string>\", line 136, in <module>\r\n    b()\r\n    ~^^\r\n  File \"<string>\", line 101, in b\r\n    del B\r\n        ^\r\nUnboundLocalError: cannot access local variable 'B' where it is not associated with a value\r\n---\r\n```\r\n\r\nAt this point I'm unsure if this is related to JIT optimizations, but superficially seems to be just a side-effect of the symbol-conflicts (ab)used in the test."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-11T11:10:48Z",
+   "body": "@markshannon i would like to merge this still. Even with your proposed fix it's possible to invalidate an executor while tracing. This is a separate issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141786",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 142541,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/142541",
+ "title": "[3.14] gh-137007: Track executor before any possible deallocations (GH-137016)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-12-10T21:22:49Z",
+ "closed_at": "2025-12-10T22:54:28Z",
+ "body": "(cherry picked from commit 97e19014ddc652beae58e7eceb591f5d65a875e6)\n\nCo-authored-by: Ken Jin <kenjin@python.org>\n\n<!-- gh-issue-number: gh-137007 -->\n* Issue: gh-137007\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/137007",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/137016",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "acd5b9708222e768fe0d0e1fb6071c6602acb63f",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

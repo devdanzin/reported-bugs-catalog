@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 119682,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/119682",
+ "title": "[3.13] gh-119118: Fix performance regression in tokenize module (GH-119615)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-05-28T19:17:58Z",
+ "closed_at": "2024-05-28T20:47:46Z",
+ "body": "* gh-119118: Fix performance regression in tokenize module\r\n\r\n- Cache line object to avoid creating a Unicode object\r\n  for all of the tokens in the same line.\r\n- Speed up byte offset to column offset conversion by using the\r\n  smallest buffer possible to measure the difference.\r\n\r\n(cherry picked from commit d87b0151062e36e67f9e42e1595fba5bf23a485c)\n\nCo-authored-by: Lysandros Nikolaou <lisandrosnik@gmail.com>\nCo-authored-by: Pablo Galindo <pablogsal@gmail.com>",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/119118",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/119615",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "0d0be6b3efeace4743329f81c08f9720cc221207",
+   "actor": "lysnikolaou"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "lysnikolaou"
+  }
+ ],
+ "fetch_errors": null
+}

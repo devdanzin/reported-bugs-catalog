@@ -1,0 +1,35 @@
+{
+ "bug_id": "bottleneck-528",
+ "title": "PyArray_Ravel unchecked in iterators.h init_iter_all \u2014 NULL dereference and ref leak",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pydata/bottleneck",
+ "is_umbrella": false,
+ "issues": [
+  "pydata/bottleneck#528"
+ ],
+ "prs": [
+  "pydata/bottleneck#545"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
+ "gists": [],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "neutrinoceros"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pydata__bottleneck/issue-528.json",
+  "raw/pydata__bottleneck/pull-545.json"
+ ],
+ "n_artifacts": 2
+}

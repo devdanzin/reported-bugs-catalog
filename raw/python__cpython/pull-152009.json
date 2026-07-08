@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 152009,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152009",
+ "title": "[3.15] gh-151773: Fix NULL dereference in `PyContextVar_Set` (GH-151836)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-23T14:15:26Z",
+ "closed_at": "2026-06-23T14:46:06Z",
+ "body": "(cherry picked from commit d35b1719a58c8682a22ef698e070e97661af8d14)\n\nCo-authored-by: dev <b.chouksey27@gmail.com>\n\n<!-- gh-issue-number: gh-151773 -->\n* Issue: gh-151773\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151773",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151836",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7b765a47b83d9f5155c8fc7a6e54ab86e5e61600",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

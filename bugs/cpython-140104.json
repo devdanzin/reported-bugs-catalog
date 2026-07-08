@@ -8,7 +8,15 @@
  "issues": [
   "python/cpython#140104"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#140233",
+  "python/cpython#140687",
+  "python/cpython#140890",
+  "python/cpython#141495"
+ ],
+ "n_prs": 4,
+ "n_backports": 3,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.14",
@@ -16,15 +24,22 @@
   "topic-JIT",
   "type-bug"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "Fidget-Spinner",
+  "efimov-mikhail"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-140104.json"
+  "raw/python__cpython/issue-140104.json",
+  "raw/python__cpython/pull-140233.json",
+  "raw/python__cpython/pull-140687.json",
+  "raw/python__cpython/pull-140890.json",
+  "raw/python__cpython/pull-141495.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 5
 }

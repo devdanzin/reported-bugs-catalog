@@ -8,11 +8,10 @@
  "issues": [
   "simplejson/simplejson#362"
  ],
- "prs": [
-  "simplejson/simplejson#363",
-  "simplejson/simplejson#364",
-  "simplejson/simplejson#365"
- ],
+ "prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
  "gists": [
   "be2bea00e879ed44e273eec1a0715f00"
  ],
@@ -25,10 +24,7 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/simplejson__simplejson/issue-362.json",
-  "raw/simplejson__simplejson/pull-363.json",
-  "raw/simplejson__simplejson/pull-364.json",
-  "raw/simplejson__simplejson/pull-365.json"
+  "raw/simplejson__simplejson/issue-362.json"
  ],
- "n_artifacts": 4
+ "n_artifacts": 1
 }

@@ -9,8 +9,13 @@
   "python/cpython#122273"
  ],
  "prs": [
-  "python/cpython#122274"
+  "python/cpython#122274",
+  "python/cpython#127141",
+  "python/cpython#127289"
  ],
+ "n_prs": 3,
+ "n_backports": 1,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "OS-windows",
@@ -18,8 +23,10 @@
   "topic-repl",
   "type-feature"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "vstinner"
+ ],
  "status": "closed/fixed",
  "confidence": "medium",
  "needs_review": false,
@@ -27,7 +34,9 @@
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-122273.json",
-  "raw/python__cpython/pull-122274.json"
+  "raw/python__cpython/pull-122274.json",
+  "raw/python__cpython/pull-127141.json",
+  "raw/python__cpython/pull-127289.json"
  ],
- "n_artifacts": 2
+ "n_artifacts": 4
 }

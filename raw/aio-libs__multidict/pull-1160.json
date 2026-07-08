@@ -1,0 +1,44 @@
+{
+ "repo": "aio-libs/multidict",
+ "number": 1160,
+ "type": "pull",
+ "url": "https://github.com/aio-libs/multidict/pull/1160",
+ "title": "Fix segfault when a single arg is passed to setdefault",
+ "state": "closed",
+ "state_reason": null,
+ "author": "bdraco",
+ "author_association": "MEMBER",
+ "labels": [
+  "bot:chronographer:provided"
+ ],
+ "created_at": "2025-05-04T16:54:42Z",
+ "closed_at": "2025-05-16T20:09:22Z",
+ "body": "fixes #1159\r\n",
+ "comments": [
+  {
+   "author": "codspeed-hq[bot]",
+   "created_at": "2025-05-04T17:04:04Z",
+   "body": "<!-- __CODSPEED_PERFORMANCE_REPORT_COMMENT__ -->\n<!-- __CODSPEED_INSTRUMENTATION_PERFORMANCE_REPORT_COMMENT__ -->\n\n## [CodSpeed Performance Report](https://codspeed.io/aio-libs/multidict/branches/single_arg_setdefault)\n\n### Merging #1160 will **degrade performances by 27.51%**\n\n<sub>Comparing <code>single_arg_setdefault</code> (ecd772f) with <code>master</code> (7770ff2)</sub>\n\n\n\n### Summary\n\n`\u274c 12` regressions  \n`\u2705 232` untouched benchmarks  \n\n\n> :warning: _Please fix the performance issues or [acknowledge them on CodSpeed](https://codspeed.io/aio-libs/multidict/branches/single_arg_setdefault)._\n\n### Benchmarks breakdown\n\n|     | Benchmark | `BASE` | `HEAD` | Change |\n| --- | --------- | ----------------------- | ------------------- | ------ |\n| \u274c | `` test_iterate_multidict_items[case-insensitive-pure-python-module] `` | 254.9 \u00b5s | 329.8 \u00b5s | -22.71% |\n| \u274c | `` test_iterate_multidict_items[case-sensitive-pure-python-module] `` | 180.2 \u00b5s | 248.6 \u00b5s | -27.51% |\n| \u274c | `` test_multidict_extend_str[case-sensitive-pure-python-module] `` | 55.1 ms | 62 ms | -11% |\n| \u274c | `` test_multidict_popitem_str[case-insensitive-pure-python-module] `` | 740.5 \u00b5s | 813.7 \u00b5s | -9% |\n| \u274c | `` test_multidict_popitem_str[case-sensitive-pure-python-module] `` | 518.8 \u00b5s | 588.4 \u00b5s | -11.82% |\n| \u274c | `` test_items_view_less[case-insensitive-pure-python-module] `` | 307.5 \u00b5s | 383.3 \u00b5s | -19.78% |\n| \u274c | `` test_items_view_less[case-sensitive-pure-python-module] `` | 233.2 \u00b5s | 303.2 \u00b5s | -23.08% |\n| \u274c | `` test_items_view_less_or_equal[case-insensitive-pure-python-module] `` | 304.7 \u00b5s | 381.5 \u00b5s | -20.13% |\n| \u274c | `` test_items_view_less_or_equal[case-sensitive-pure-python-module] `` | 230.9 \u00b5s | 299.3 \u00b5s | -22.86% |\n| \u274c | `` test_items_view_or[case-sensitive-pure-python-module] `` | 1.6 ms | 1.7 ms | -9.3% |\n| \u274c | `` test_items_view_sub[case-insensitive-pure-python-module] `` | 643.6 \u00b5s | 731.5 \u00b5s | -12% |\n| \u274c | `` test_items_view_sub[case-sensitive-pure-python-module] `` | 440.4 \u00b5s | 514.4 \u00b5s | -14.37% |\n"
+  },
+  {
+   "author": "codecov[bot]",
+   "created_at": "2025-05-04T17:05:15Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/aio-libs/multidict/pull/1160?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) Report\n:white_check_mark: All modified and coverable lines are covered by tests.\n:white_check_mark: Project coverage is 98.62%. Comparing base ([`7770ff2`](https://app.codecov.io/gh/aio-libs/multidict/commit/7770ff2779022edfb0f3f2dd23ca5497a34a7b07?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs)) to head ([`ba8c950`](https://app.codecov.io/gh/aio-libs/multidict/commit/ba8c9500da9f9a25b9d6c2c59315c8c1e2b99eec?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs)).\n:warning: Report is 73 commits behind head on master.\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@           Coverage Diff           @@\n##           master    #1160   +/-   ##\n=======================================\n  Coverage   98.62%   98.62%           \n=======================================\n  Files          27       27           \n  Lines        3553     3558    +5     \n  Branches      561      561           \n=======================================\n+ Hits         3504     3509    +5     \n  Misses         17       17           \n  Partials       32       32           \n```\n\n| [Flag](https://app.codecov.io/gh/aio-libs/multidict/pull/1160/flags?src=pr&el=flags&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | Coverage \u0394 | |\n|---|---|---|\n| [CI-GHA](https://app.codecov.io/gh/aio-libs/multidict/pull/1160/flags?src=pr&el=flag&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | `98.62% <100.00%> (+<0.01%)` | :arrow_up: |\n| [MyPy](https://app.codecov.io/gh/aio-libs/multidict/pull/1160/flags?src=pr&el=flag&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | `83.23% <100.00%> (+0.02%)` | :arrow_up: |\n| [pytest](https://app.codecov.io/gh/aio-libs/multidict/pull/1160/flags?src=pr&el=flag&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | `100.00% <100.00%> (\u00f8)` | |\n\nFlags with carried forward coverage won't be shown. [Click here](https://docs.codecov.io/docs/carryforward-flags?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs#carryforward-flags-in-the-pull-request-comment) to find out more.\n</details>\n\n[:umbrella: View full report in Codecov by Sentry](https://app.codecov.io/gh/aio-libs/multidict/pull/1160?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "fea968f9475bc5b1fb0603a838104baf992cf1d9",
+   "actor": "bdraco"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "bdraco"
+  }
+ ],
+ "fetch_errors": null
+}

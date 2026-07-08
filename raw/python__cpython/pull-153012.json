@@ -1,0 +1,64 @@
+{
+ "repo": "python/cpython",
+ "number": 153012,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/153012",
+ "title": "[3.14] gh-152851: fix a crash when copying a BLAKE-2s/2b object (GH-153008)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-07-04T10:11:28Z",
+ "closed_at": "2026-07-04T10:46:47Z",
+ "body": "(cherry picked from commit 5a400ceafbbd4456ac65fbdbcf5d62ce9e8e4f9f)\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-152851 -->\n* Issue: gh-152851\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-07-04T10:46:51Z",
+   "body": "Thanks @picnixz for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-07-04T10:46:55Z",
+   "body": "Sorry, @picnixz, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker d786fbdfcc9d63e0f92df60f464c46ac6b4ce292 3.13\n```\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-07-04T10:52:59Z",
+   "body": ":sob: "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-07-04T10:55:46Z",
+   "body": "Oh no need for backports actually! 3.13 is using old impl."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152851",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153008",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d786fbdfcc9d63e0f92df60f464c46ac6b4ce292",
+   "actor": "picnixz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ],
+ "fetch_errors": null
+}

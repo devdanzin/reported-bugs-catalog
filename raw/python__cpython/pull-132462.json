@@ -1,0 +1,104 @@
+{
+ "repo": "python/cpython",
+ "number": 132462,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132462",
+ "title": "gh-132461: Fix crash in OrderedDict.setdefault when key has unstable hash",
+ "state": "open",
+ "state_reason": null,
+ "author": "dura0ok",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review",
+  "stale"
+ ],
+ "created_at": "2025-04-13T04:44:29Z",
+ "closed_at": null,
+ "body": "Replaced assertion with a runtime check in OrderedDict_setdefault_impl to gracefully handle keys with changing hash values. If such a key is detected, a TypeError is raised instead of aborting the interpreter.\r\n\n\n<!-- gh-issue-number: gh-132461 -->\n* Issue: gh-132461\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-13T04:44:34Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-13T07:22:45Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-13T07:25:33Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-13T08:19:13Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-04-13T08:19:25Z",
+   "body": "> Please add a regression test and a NEWS entry as well.\r\n\r\nAdded."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-04-13T08:38:26Z",
+   "body": "Please, add the NEWS entry mentioning the bugfix."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-04-13T08:40:45Z",
+   "body": "Note that the Python implementation would not crash so the test should be only meant for the C implementation."
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-04-13T10:08:25Z",
+   "body": "> Note that the Python implementation would not crash so the test should be only meant for the C implementation.\r\n\r\nI believe that the behavior should be the same. Why only for the C interface?"
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-04-13T10:08:46Z",
+   "body": "> Please, add the NEWS entry mentioning the bugfix.\r\n\r\nHow i can do it? Please, help."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-04-13T10:11:15Z",
+   "body": "> I believe that the behavior should be the same. Why only for the C interface?\r\n\r\nThe behavior is not the same. The pure python implementation does not use the same implementation and does not have the same construction (but the functionalities are identical; it's just that some bugs will only appear in the C version)\r\n\r\n> How i can do it? Please, help.\r\n\r\nUsing https://pypi.org/project/blurb/. See https://github.com/python/cpython/pull/132462#issuecomment-2799839160 for instance."
+  },
+  {
+   "author": "emmatyping",
+   "created_at": "2025-05-26T16:01:45Z",
+   "body": "@dura0ok would you like to continue this PR?"
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-05-26T17:05:40Z",
+   "body": "@emmatyping yes."
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-06-02T15:42:56Z",
+   "body": "Hi! While the added assertion and error check prevent crashes when keys have unstable hash values, the current solution still leaves us in a difficult position.\r\n\r\nTo correctly and reliably detect that a key with the same equality (__eq__) but a different hash (__hash__) has already been inserted, we would need to store the original hash for each key in the dict. This introduces overhead \u2014 both in terms of memory and performance \u2014 just to protect against a relatively rare \"misbehavior\" (i.e., keys with unstable hashes).\r\n\r\nIt feels like this adds non-trivial cost to all users just to catch a developer error. Is there a better trade-off here? Maybe this should just remain undefined behavior, or at most be a debug-only check?\r\n\r\nI\u2019m unsure how to proceed \u2014 any suggestions would be appreciated."
+  },
+  {
+   "author": "dura0ok",
+   "created_at": "2025-06-10T21:08:05Z",
+   "body": "I think we should close this issue with reason \"Wont do\"."
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-04-23T06:37:57Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132461",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

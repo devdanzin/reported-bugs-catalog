@@ -12,6 +12,9 @@
   "python/cpython#121017",
   "python/cpython#121064"
  ],
+ "n_prs": 2,
+ "n_backports": 1,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "skip news",
@@ -22,9 +25,9 @@
  "filed_by": "self",
  "filers": [],
  "status": "closed/fixed",
- "confidence": "low",
- "needs_review": true,
- "review_reason": "cpython-untagged(REVIEW)",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-121016.json",

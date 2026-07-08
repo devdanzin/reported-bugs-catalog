@@ -1,0 +1,111 @@
+{
+ "repo": "python/cpython",
+ "number": 127400,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127400",
+ "title": "gh-127208: Reject null character in _imp.create_dynamic()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2024-11-29T10:35:34Z",
+ "closed_at": "2024-11-29T15:20:39Z",
+ "body": "_imp.create_dynamic() now rejects embedded null characters in the path and in the module name.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-127208 -->\n* Issue: gh-127208\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-29T10:36:00Z",
+   "body": "cc @ZeroIntensity @sobolevn "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-29T11:04:42Z",
+   "body": "According to the issue, it fails on 3.12 so does it require a 3.12 bp as well? (I don't have the code in front of me)"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-29T15:20:15Z",
+   "body": "> According to the issue, it fails on 3.12 so does it require a 3.12 bp as well? (I don't have the code in front of me)\r\n\r\n`_PyUnicode_AsUTF8NoNUL()` was added to Python 3.13. Since the bug report comes from a fuzzing tool, I don't think that it's worth it to backport the fix up to Python 3.12. The bug is old and nobody complained before."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-29T15:20:42Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-29T15:20:54Z",
+   "body": "[GH-127418](https://github.com/python/cpython/pull/127418) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-29T15:25:54Z",
+   "body": "[GH-127419](https://github.com/python/cpython/pull/127419) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-29T15:26:21Z",
+   "body": "Hum, I changed my mind and backported the _PyUnicode_AsUTF8NoNUL() function instead :-) I created https://github.com/python/cpython/pull/127419 backport for 3.12."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127208",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b14fdadc6c620875a20b7ccc3c9b069e85d8557a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "89b4ccea17ce152017faeaf10a16468c68befdc6",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c4a359dc426bcb1a5f16ef25b0e3110bb463bdad",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e7ab97862deb8ad69caccbc5c6e1f7b4e670afbd",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2979fa177b1daf26136d3c11029a91bb72672818",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1908728e164434e5318f70115122bcb92c1a83fd",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9db2d4ee3445bc6f07726136c064a4f49b49aac3",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

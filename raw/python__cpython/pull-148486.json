@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 148486,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148486",
+ "title": "gh-148263: Fix refcount leak in weakref proxy operations",
+ "state": "closed",
+ "state_reason": null,
+ "author": "prakashsellathurai",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-04-13T06:34:07Z",
+ "closed_at": "2026-07-04T09:35:16Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n\r\n<!-- gh-issue-number: gh-148263 -->\r\n* Issue: gh-148263\r\n<!-- /gh-issue-number -->\r\n### Issue\r\n\r\nWhen a weakref proxy was used in binary, ternary, or rich comparison operations and one of the operands turned out to be a dead proxy, the reference count of any already-unwrapped arguments was incremented by the `UNWRAP` macro but never released causing a memory leak of ~1 ref per call.\r\n\r\nThis affected ~20 binary operators (`+`, `-`, `*`, `/`, `|`, `&`, `^`, etc.), ternary `pow()`, and rich comparisons.\r\n\r\nReproducer showing ~1 leaked ref per call on the main branch: \r\n\r\n\r\n### Fix\r\n\r\n- Replaced the `UNWRAP` macro with a proper inline function `_proxy_unwrap()` that tracks whether each argument was successfully incref'd via a `did_incref` flag.\r\n- Introduced `goto clean_up` error paths in `WRAP_BINARY`, `WRAP_TERNARY`, and `proxy_richcompare` that correctly `Py_DECREF` any already-acquired references before returning `NULL`.\r\n- Also migrated `WRAP_UNARY` and `WRAP_METHOD` to use `_proxy_unwrap()` for consistency. No ref leak is observed in those paths today, but dependent changes in the mainline would [fail](https://github.com/python/cpython/pull/148308#issuecomment-4234498561) without this migration since they rely on the new unwrap function  rather than the old macro.\r\n\r\n## Validation:\r\n\r\nReproducer script ->  https://gist.github.com/prakashsellathurai/ea7ba0ec8a5cf049881464d34de31411\r\n\r\n#### before (mainline )\r\n```\r\n(venv) PS C:\\Users\\Prakash\\Documents\\work\\projects\\mainline> .\\python.bat ..\\cpython\\tmp\\final-test.py\r\nRunning Debug|x64 interpreter...\r\nbinary +: leaked 10003 refs (~1/call)\r\nternary pow: leaked 10003 refs (~1/call)\r\ncompare ==: leaked 10003 refs (~1/call)\r\n```\r\n\r\n#### After this change\r\n```\r\n(venv) PS C:\\Users\\Prakash\\Documents\\work\\projects\\cpython> .\\python.bat  .\\tmp\\final-test.py\r\nRunning Debug|x64 interpreter...\r\nbinary +: leaked 3 refs (~0/call)\r\nternary pow: leaked 3 refs (~0/call)\r\ncompare ==: leaked 3 refs (~0/call)\r\n```\r\n\r\n\r\n\r\n",
+ "comments": [
+  {
+   "author": "prakashsellathurai",
+   "created_at": "2026-04-18T16:52:23Z",
+   "body": "@Wulian233 I have addressed the comments and all checks are passing,\r\n\r\n could you please  take a look this when you get a chance? Thank you!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148263",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148308",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "prakashsellathurai"
+  }
+ ],
+ "fetch_errors": null
+}

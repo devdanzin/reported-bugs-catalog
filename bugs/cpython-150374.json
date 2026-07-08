@@ -8,7 +8,13 @@
  "issues": [
   "python/cpython#150374"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#150376",
+  "python/cpython#150378"
+ ],
+ "n_prs": 2,
+ "n_backports": 1,
+ "n_fix_prs": 1,
  "gists": [
   "432d9af1a8833bef53bc9ae342310622"
  ],
@@ -17,7 +23,8 @@
  ],
  "filed_by": "maintainer",
  "filers": [
-  "lpyu001"
+  "lpyu001",
+  "miss-islington"
  ],
  "status": "closed/fixed",
  "confidence": "high",
@@ -25,7 +32,9 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-150374.json"
+  "raw/python__cpython/issue-150374.json",
+  "raw/python__cpython/pull-150376.json",
+  "raw/python__cpython/pull-150378.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

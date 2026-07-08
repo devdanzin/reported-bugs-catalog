@@ -8,21 +8,30 @@
  "issues": [
   "python/cpython#151673"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#151767"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
+  "awaiting review",
   "extension-modules",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "Ijtihed"
+ ],
  "status": "open",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-151673.json"
+  "raw/python__cpython/issue-151673.json",
+  "raw/python__cpython/pull-151767.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

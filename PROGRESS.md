@@ -75,13 +75,24 @@ OOM-catalog overrides) → `sources/classification.json`; `tools/group.py`
 (union-find on issue↔PR links, umbrella-protected, tool propagation) →
 **`bugs/<id>.json` (410 bug clusters)** from 461 artifacts (51 PRs merged).
 
-Pipeline: **classify.py → group.py → enrich.py** (enrich adds synthetic records
-for catalog bugs with no GitHub artifact). Re-run all three after any edit.
+Pipeline: **harvest.py → harvest_fixprs.py → classify.py → group.py → enrich.py**
+(fixprs backfills fix/backport PRs; enrich adds synthetic records for catalog bugs
+with no GitHub artifact). Re-run classify→group→enrich after any edit.
 
-**Bug counts (excl. 20 umbrella containers) = 442 total:** **fusil 152** · cext-review
-135 · **cpython-review 55** · lafleur 34 · ft-review 26 · manual 26 · cereggii 14.
-(fusil 131 artifact + 22 OOM synthetic; crtk 44 artifact + 13 synthetic.)
-filed_by: self 297 · other 114 · self+maintainer 16.
+**FIX-PR BACKFILL (user-flagged gap):** the PRs that closed our issues were
+authored by the fixer (not devdanzin) + cite no gist, so they weren't harvested.
+Backfilled **425 fix/backport PRs** (raw 479→904) from issue-timeline cross-refs.
+Merging rewritten to use precise **fix_links** (PR title `gh-<issue>` + body
+`fixes #N`), NOT bare `#N` mentions — this fixed bad merges (PR #142529, cited by
+16 sibling issues, had chain-merged them; #137728/#137762 lafleur wrongly merged).
+**0 multi-issue non-umbrella clusters now.** All 32 #146102 sub-issues have their
+fix-PRs. **491 PRs in clusters = 334 distinct fixes + 157 backports** (backports =
+same bug, flagged `n_backports`).
+
+**Bug counts (filed-artifact + synthetic):** **fusil 153** (131+22 OOM) · cext-review
+150 · **cpython-review 57** (44+13) · lafleur 34 · ft-review 34 · manual 33 · cereggii 15.
+filed_by (clusters): **self 180 · self+maintainer 146 · maintainer 115** (self+maintainer
+= you filed the issue, a maintainer authored the fix — 146 such collaborations).
 
 **#146102 clump captured (user-flagged):** the cpython-review umbrella lists **47
 select bugs**; harvested its 18 missing sub-issues/PRs (again mostly

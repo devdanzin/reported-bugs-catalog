@@ -8,17 +8,26 @@
  "issues": [
   "python/cpython#127953"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#128350",
+  "python/cpython#129127",
+  "python/cpython#132268"
+ ],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.12",
   "3.13",
   "3.14",
+  "awaiting core review",
   "interpreter-core",
   "type-bug"
  ],
  "filed_by": "maintainer",
  "filers": [
+  "markshannon",
   "nedbat"
  ],
  "status": "open",
@@ -27,7 +36,10 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-127953.json"
+  "raw/python__cpython/issue-127953.json",
+  "raw/python__cpython/pull-128350.json",
+  "raw/python__cpython/pull-129127.json",
+  "raw/python__cpython/pull-132268.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

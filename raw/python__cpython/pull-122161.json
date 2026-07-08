@@ -1,0 +1,230 @@
+{
+ "repo": "python/cpython",
+ "number": 122161,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/122161",
+ "title": "gh-122145: Handle an empty AST body when reporting tracebacks.",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-07-23T10:39:01Z",
+ "closed_at": "2024-09-18T16:42:34Z",
+ "body": "Credits to @sobolevn.\r\n\r\nShould I rather try to fix the two issues simultaneously or should I just fix this one here?\n\n<!-- gh-issue-number: gh-122145 -->\n* Issue: gh-122145\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-23T12:15:56Z",
+   "body": "I don't know what to really put in the NEWS entry :cry: I'm not sure that the only way to get an AST body that is empty is only by having comments inside (and without causing a SyntaxError/Import Error) =/ (I also forgot to add credits to you Nikita)."
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T09:18:20Z",
+   "body": "CC @pablogsal "
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T09:19:34Z",
+   "body": "I don't think it's possible for an AST to have a node with empty body, there seems to be something else going on here. "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-29T09:23:03Z",
+   "body": "> I don't think it's possible for an AST to have a node with empty body,\r\n\r\nActually it is if you only have comments:\r\n\r\n```py\r\n>>> ast.parse('#').body\r\n[]\r\n```\r\n"
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T10:00:08Z",
+   "body": "Could you rewrite the test to use this ast rather than construct the intermediate structure?"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-29T10:02:19Z",
+   "body": "> Could you rewrite the test to use this ast rather than construct the intermediate structure?\r\n\r\nI can do it but I need to check that I'm able to hit the `ast.parse()` call. I don't know how I can call `format_frame_summary` without the intermediate FrameSummary (I can however change my '#1234567890' into '#' if this is what you wanted and can directly call `_should_show_carets`)"
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T14:04:55Z",
+   "body": "> > Could you rewrite the test to use this ast rather than construct the intermediate structure?\r\n> \r\n> I can do it but I need to check that I'm able to hit the `ast.parse()` call. I don't know how I can call `format_frame_summary` without the intermediate FrameSummary (I can however change my '#1234567890' into '#' if this is what you wanted and can directly call `_should_show_carets`)\r\n\r\nCan you create the frame summary from the python code snippet, rather than hard code it?\r\nThis would make the test look like it's testing something real."
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T14:41:12Z",
+   "body": ">  (I can however change my '#1234567890' into '#' if this is what you wanted and can directly call `_should_show_carets`)\r\n\r\nIdeally no, we don't write unit tests for internal functions. "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-29T14:50:44Z",
+   "body": "Ok, I'll try to see how I can write my test without this (I was fixing some stuff in the meantime)"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-29T15:43:06Z",
+   "body": "@iritkatriel I tried to use as much public API I could but it's actually extremely difficult to trigger the bug without an explicit construction of a FrameSummary. The reason is that the column offsets are only set when invoking `traceback.TracebackException.from_exception(exc).stack`, otherwise they are set to `None` and the AST is never parsed.\r\n\r\n(Also, I don't think I can write everything in the file since otherwise the AST won't be empty...)"
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T15:58:11Z",
+   "body": "> @iritkatriel I tried to use as much public API I could but it's actually extremely difficult to trigger the bug without an explicit construction of a FrameSummary. The reason is that the column offsets are only set when invoking `traceback.TracebackException.from_exception(exc).stack`, otherwise they are set to `None` and the AST is never parsed.\r\n> \r\n> (Also, I don't think I can write everything in the file since otherwise the AST won't be empty...)\r\n\r\nSo this makes me wonder - ok, it's possible to have an empty body on an AST node, but how is it possible for that to appear on the traceback of an exception? It would be compiled into something like \"RESUME\" followed by \"RETURN_CONST None\". So maybe if there is a KeyboardInterrupt while the RETURN_CONST is executing?\r\n\r\nHow did an empty body end up being accessed from ``traceback``in the case that was reported in this issue?"
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T16:05:10Z",
+   "body": "Sorry, RETURN_CONST will only be added to a function node body. For a module not even that.\r\n\r\nBut the question remains - how does executing an empty module raise an exception?"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-29T16:17:31Z",
+   "body": "> But the question remains - how does executing an empty module raise an exception?\r\n\r\nActually, I think it's because of `linecache` (but I'm not sure). In my test, I need to fake the real source of the file so that the line to render (and to actually parase) would give an empty AST body.\r\n\r\nFor the issue, I think the source is incorrectly deduced or one of the frame is actually used in the traceback itself. Except for a live reproducer with the REPL or with a linecache hack, I don't know how to do reproduce the bug. I agree that we should not have an empty AST because that would mean the file is empty or only consists of comments. Empty lines are already handled but somewhat comments only no.\r\n\r\nIn the meantime, we could perhaps have this hotfix and then try to investigate more in details (or we can just take our time, though it could be annoying that your REPL crashes without you being able to do anything...). The culprit AST is in `_pyrepl/__main__.py` (it seems that the traceback is assuming that the file it should take the line from is this one):\r\n\r\n```py\r\n# Important: don't add things to this module, as they will end up in the REPL's\r\n# default globals.  Use _pyrepl.main instead.\r\n\r\nif __name__ == \"__main__\":\r\n    from .main import interactive_console as __pyrepl_interactive_console\r\n    __pyrepl_interactive_console()\r\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-29T16:19:07Z",
+   "body": "So, there are two possibilities I can think of:\r\n\r\n- Use the small fix on the AST. Shouldn't happen in general since you cannot have an exception unless you mess up with `linecache`.\r\n- Try to fix the REPL (but I have no idea how to...)"
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T16:26:45Z",
+   "body": "But ``_pyrepl/__main__.py`` is not empty. Is linecache returning the wrong file? \r\n\r\nIndeed, this seems to happen only on the repl, ``exec(compile(\"tuple()[0]\", \"s\", \"exec\"))`` in a unit test doesn't fail. \r\n\r\n@ambv , @pablogsal   do you want to investigate this further or just commit this fix?"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-29T16:29:01Z",
+   "body": "> But `_pyrepl/__main__.py` is not empty. Is linecache returning the wrong file?\r\n\r\nIt's not empty but the first line is a comment. If you add `print(all_lines)` just after `ast.parse()` in `traceback.py`, you'll see:\r\n\r\n```py\r\n>>> exec(compile(\"1/0\", \"?\", \"exec\"))\r\n[\"# Important: don't add things to this module, as they will end up in the REPL's\"]\r\nTraceback (most recent call last):\r\n[\"# Important: don't add things to this module, as they will end up in the REPL's\"]\r\nTraceback (most recent call last):\r\n  File \"/lib/python/cpython/Lib/code.py\", line 91, in runcode\r\n    exec(code, self.locals)\r\n  File \"<python-input-0>\", line 1, in <module>\r\n  File \"?\", line 1, in <module>\r\nZeroDivisionError: division by zero\r\n```\r\n\r\n(That's how I knew which file was the culprit...)\r\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-29T16:33:52Z",
+   "body": "Actually, the files being queried by linecache are:\r\n\r\n```\r\n>>> exec(compile(\"1/0\", \"?\", \"exec\"))\r\nfilename= <python-input-0>\r\nfilename= ?\r\n[\"# Important: don't add things to this module, as they will end up in the REPL's\"]\r\nfilename= <frozen runpy>\r\nfilename= <frozen runpy>\r\nfilename= /lib/python/cpython/Lib/_pyrepl/__main__.py\r\nfilename= /lib/python/cpython/Lib/_pyrepl/main.py\r\nfilename= /lib/python/cpython/Lib/_pyrepl/simple_interact.py\r\nfilename= /lib/python/cpython/Lib/code.py\r\nfilename= /lib/python/cpython/Lib/_pyrepl/console.py\r\nfilename= /lib/python/cpython/Lib/code.py\r\nfilename= /lib/python/cpython/Lib/_pyrepl/console.py\r\nfilename= /lib/python/cpython/Lib/code.py\r\nfilename= /lib/python/cpython/Lib/traceback.py\r\nfilename= /lib/python/cpython/Lib/traceback.py\r\nfilename= /lib/python/cpython/Lib/traceback.py\r\nfilename= /lib/python/cpython/Lib/traceback.py\r\nfilename= /lib/python/cpython/Lib/traceback.py\r\nfilename= /lib/python/cpython/Lib/code.py\r\nfilename= <python-input-0>\r\nfilename= ?\r\nTraceback (most recent call last):\r\n[\"# Important: don't add things to this module, as they will end up in the REPL's\"]\r\nTraceback (most recent call last):\r\n  File \"/lib/python/cpython/Lib/code.py\", line 91, in runcode\r\n    exec(code, self.locals)\r\n  File \"<python-input-0>\", line 1, in <module>\r\n  File \"?\", line 1, in <module>\r\nZeroDivisionError: division by zero\r\n```\r\n\r\nI've added a `print(\"filename=\", self.filename)` inside the `FrameSummary._set_lines()` to check when the lines are being queried."
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T17:34:40Z",
+   "body": "I put a breakpoint just before the call to ``StackSummary._extract_from_extended_frame_gen``, and the exception's traceback has two entries:\r\n\r\n```\r\n(Pdb) p exc_traceback.tb_frame.f_code\r\n<code object <module> at 0x10dee5470, file \"<python-input-0>\", line 1>\r\n(Pdb) p exc_traceback.tb_next.tb_frame.f_code\r\n<code object <module> at 0x10db16340, file \"s\", line 1>\r\n```\r\n\r\nneither of these is in ``_pyrepl/__main__.py``. So there is some bug that makes code from ``_pyrepl/__main__.py`` to be looked up.\r\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-29T18:18:16Z",
+   "body": "It's linecache using a loader that has the wrong filename. I'll post the relevant code once I'm on my computer. "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-29T18:36:14Z",
+   "body": "See https://github.com/python/cpython/issues/122071#issuecomment-2242410571 and surrounding context for an explanation, a possible fix and a PR targeting this."
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T20:44:39Z",
+   "body": "> It's linecache using a loader that has the wrong filename. I'll post the relevant code once I'm on my computer.\r\n\r\nRight. I just landed on this possible solution before I saw your comment (not sure this is 100% correct, there's stuff here I'm not very familiar with):\r\n\r\n```\r\ndiff --git a/Lib/linecache.py b/Lib/linecache.py\r\nindex 3462f1c451b..2b98488adf3 100644\r\n--- a/Lib/linecache.py\r\n+++ b/Lib/linecache.py\r\n@@ -175,6 +175,8 @@ def lazycache(filename, module_globals):\r\n         return False\r\n     # Try for a __loader__, if available\r\n     if module_globals and '__name__' in module_globals:\r\n+        if not ((mod_file := module_globals.get('__file__', None)) and mod_file.endswith(filename)):\r\n+            return False\r\n         spec = module_globals.get('__spec__')\r\n         name = getattr(spec, 'name', None) or module_globals['__name__']\r\n         loader = getattr(spec, 'loader', None)\r\n\r\n```"
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2024-07-29T20:48:58Z",
+   "body": "It would be nice to have compile() feed linecache with the line it's compiling. Then we would have that in the traceback as well (not just the exec call). compile is written in C though, so it's not clear how simple this is.  "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-30T07:47:38Z",
+   "body": "I'll add a DO-NOT-MERGE label here because we might possibly want to fix linecache instead of using this simple fix. If we fix linecache, I think we should instead have an `assert` out there just in case (unless I'm mistaken, we seem to agree that you cannot raise an exception with an empty AST body)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-17T11:48:57Z",
+   "body": "@picnixz: Your PR has the DO-NOT-MERGE label. Is the PR ready for review? It already got multiple reviews :-)"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-17T11:49:39Z",
+   "body": "> I'll add a DO-NOT-MERGE label here because we might possibly want to fix linecache instead of using this simple fix.\r\n\r\nIMO this fix is needed. Fixing linecache is something different which deserves its own PR."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-18T12:43:03Z",
+   "body": "This bug can occur if the Python source code is modified after a program started, which is likely while developing. So again, IMO it's worth it to fix this bug.\r\n\r\nFixing the other bug about getting the right line in linecache is also worth it but has a lower priority. I marked this bug as a blocker issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-18T12:44:18Z",
+   "body": "@iritkatriel @sobolevn: I removed the DO-NOT-MERGE label. Are you still ok to merge this change?"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-09-18T16:42:37Z",
+   "body": "Thanks @picnixz for the PR, and @vstinner for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-09-18T16:42:47Z",
+   "body": "[GH-124214](https://github.com/python/cpython/pull/124214) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-18T16:53:56Z",
+   "body": "Merged. Thanks @picnixz for your fix and the test."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122145",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122170",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122126",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/124060",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5cd50cb6eb28e525f0c838e049e900ea982a5a23",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d474ae35a3db3f77c8721b0c00a06dd2d13d4769",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/124219",
+   "commit": null,
+   "actor": "zware"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "96c03b366d4f2430d5662271ee4c7c4928469cf9",
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "99dc0893c7e680a3d6b7c2a917a569681b95b8de",
+   "actor": "Yhg1s"
+  }
+ ],
+ "fetch_errors": null
+}

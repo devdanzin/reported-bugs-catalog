@@ -1,0 +1,148 @@
+{
+ "repo": "python/cpython",
+ "number": 134748,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/134748",
+ "title": "gh-134744: Fix fcntl error handling",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-05-26T19:29:44Z",
+ "closed_at": "2025-05-27T13:09:47Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-134744 -->\n* Issue: gh-134744\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-26T19:31:12Z",
+   "body": "@serhiy-storchaka: It seems like only the main branch is affected.\r\n\r\nI wrote a patch adding tests but it doesn't check modified error paths:\r\n\r\n```py\r\ndiff --git a/Lib/test/test_fcntl.py b/Lib/test/test_fcntl.py\r\nindex e0e6782258f..e1c72c6ab7e 100644\r\n--- a/Lib/test/test_fcntl.py\r\n+++ b/Lib/test/test_fcntl.py\r\n@@ -11,7 +11,7 @@\r\n     cpython_only, get_pagesize, is_apple, requires_subprocess, verbose\r\n )\r\n from test.support.import_helper import import_module\r\n-from test.support.os_helper import TESTFN, unlink\r\n+from test.support.os_helper import TESTFN, unlink, make_bad_fd\r\n\r\n\r\n # Skip test if no fcntl module.\r\n@@ -274,6 +274,13 @@ def test_fcntl_small_buffer(self):\r\n     def test_fcntl_large_buffer(self):\r\n         self._check_fcntl_not_mutate_len(2024)\r\n\r\n+    @unittest.skipUnless(hasattr(fcntl, 'FICLONE'), 'need fcntl.FICLONE')\r\n+    def test_bad_fd(self):\r\n+        # gh-134744: Test error handling\r\n+        fd = make_bad_fd()\r\n+        with self.assertRaises(OSError):\r\n+            fcntl.ioctl(fd, fcntl.F_DUPFD, 0)\r\n+\r\n\r\n if __name__ == '__main__':\r\n     unittest.main()\r\ndiff --git a/Lib/test/test_ioctl.py b/Lib/test/test_ioctl.py\r\nindex 3c7a58aa2bc..e2f94dbf5dd 100644\r\n--- a/Lib/test/test_ioctl.py\r\n+++ b/Lib/test/test_ioctl.py\r\n@@ -5,7 +5,7 @@\r\n import threading\r\n import unittest\r\n from test import support\r\n-from test.support import threading_helper\r\n+from test.support import os_helper, threading_helper\r\n from test.support.import_helper import import_module\r\n fcntl = import_module('fcntl')\r\n termios = import_module('termios')\r\n@@ -201,6 +201,15 @@ def test_ioctl_set_window_size(self):\r\n         new_winsz = struct.unpack(\"HHHH\", result)\r\n         self.assertEqual(new_winsz[:2], (20, 40))\r\n\r\n+    @unittest.skipUnless(hasattr(fcntl, 'FICLONE'), 'need fcntl.FICLONE')\r\n+    def test_bad_fd(self):\r\n+        # gh-134744: Test error handling\r\n+        with open(__file__) as fp:\r\n+            fd1 = fp.fileno()\r\n+            fd2 = os_helper.make_bad_fd()\r\n+            with self.assertRaises(OSError):\r\n+                fcntl.ioctl(fd1, fcntl.FICLONE, fd2)\r\n+\r\n\r\n if __name__ == \"__main__\":\r\n     unittest.main()\r\n```"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-05-26T19:36:43Z",
+   "body": "@vstinner It seems that on 139 and 321 lines it may leak."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-26T19:39:54Z",
+   "body": "> @vstinner It seems that on 139 and 321 lines it may leak.\r\n\r\nWould you mind to elaborate? What leak? In which file?"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-05-26T19:44:47Z",
+   "body": "Sorry, I was not clear.\r\n\r\nIn `fcntlmodule.c`\r\n\r\nhttps://github.com/python/cpython/blob/3c0525126ef95efe2f578e93db09f3282e3ca08f/Modules/fcntlmodule.c#L130-L141\r\nAs you can see `result` decrefed on 134, but not on 139 lines.\r\n\r\nhttps://github.com/python/cpython/blob/3c0525126ef95efe2f578e93db09f3282e3ca08f/Modules/fcntlmodule.c#L312-L323\r\nSame here - it decrefed on 316, but not on 321."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2025-05-26T20:13:15Z",
+   "body": "Thank you @vstinner. The code is the same in 3.14 and main, but 3.13 is not affected. It is my fail.\r\n\r\nFor testing you need to pass a large bytes object (more than 1024 bytes). Simply pass `b'\\0' * 2048`, it should fail with bad file descriptor.\r\n\r\nThank you @sergey-miryanov for noticing a leak."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-27T10:06:55Z",
+   "body": "Ok, I added tests and I fixed the reference leak spotted by @sergey-miryanov."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-27T10:07:49Z",
+   "body": "@serhiy-storchaka: Would you mind to review my fix?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-27T10:09:34Z",
+   "body": "> Thank you @vstinner. The code is the same in 3.14 and main, but 3.13 is not affected. It is my fail.\r\n\r\n3.14 doesn't seem to be affected, the code is different.\r\n\r\n```c\r\n        if (ret < 0) {\r\n            return !async_err ? PyErr_SetFromErrno(PyExc_OSError) : NULL;\r\n        }\r\n```"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2025-05-27T12:56:02Z",
+   "body": "Ah, so both bugs was introduced while adding a buffer overflow check."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2025-05-27T13:15:56Z",
+   "body": "It would be nice to backport the tests."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-05-27T15:42:55Z",
+   "body": "[GH-134795](https://github.com/python/cpython/pull/134795) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-27T15:43:36Z",
+   "body": "> It would be nice to backport the tests.\r\n\r\nI wrote https://github.com/python/cpython/pull/134795 to backport tests. I had to modify tests since Python 3.14 only supports buffer up to 1024 bytes."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/134744",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9300a596d37d058e6e58d00a2ad70617c863a3de",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "34ac00c9f0c51b414a9b4f872c14a93a132d1d08",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8a6a6f39c869a6601babc31592e156ce22478a47",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "968d688f995ecfb25c727f84df522a5adce582e8",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134798",
+   "commit": null,
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "741040236e05a3789e5d9756530b5ff92e0bc52d",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e22646743e6bb999614ee70c1c585bf34b46d456",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "315e6aa03d4a33da784a92473867efc93c7e2699",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b9d427e5d5348c1bff236f9cca225ec576d94541",
+   "actor": "gostak-dd"
+  }
+ ],
+ "fetch_errors": null
+}

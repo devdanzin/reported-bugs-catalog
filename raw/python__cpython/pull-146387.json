@@ -1,0 +1,63 @@
+{
+ "repo": "python/cpython",
+ "number": 146387,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146387",
+ "title": "gh-146386:`modsupport.c` Missing `va_end` in `_abiinfo_raise`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "A0su",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-24T18:11:39Z",
+ "closed_at": "2026-03-25T12:54:09Z",
+ "body": "### modsupport.c: Missing va_end in _abiinfo_raise\r\n\r\n`va_start(vargs, format)` at line 689 but `va_end(vargs)` never called on any path. UB per C99 7.15.1.\r\n\r\nThis is a sub-issue of https://github.com/python/cpython/issues/146102 with original [gist details](https://gist.github.com/devdanzin/d1a6ab9f62970be0cae139366ce3c482)\r\n\r\n`va_end` was added at the two exit points.\n\n<!-- gh-issue-number: gh-146386 -->\n* Issue: gh-146386\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-24T18:11:45Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146386",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "04bd54305a548f817e1a4dba0dc20aab350ee6fc",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3dcffa3160951e6bbd3b6ea1ffa9ef1cd6927ebf",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "800514c27caae9afc185e7e2de4bc2c57e4ce80b",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

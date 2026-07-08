@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 132281,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132281",
+ "title": "[3.13] gh-132250: Clear error in lsprof callback when method descriptor raises an excep\u2026 (GH-132251)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-04-08T17:36:57Z",
+ "closed_at": "2025-04-08T21:19:41Z",
+ "body": "(cherry picked from commit ab64130b572424695bf072f7608a536997dce14f)\n\nCo-authored-by: Tian Gao <gaogaotiantian@hotmail.com>\n\n<!-- gh-issue-number: gh-132250 -->\n* Issue: gh-132250\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132250",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132251",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "10fe658f34a7b4d1bd07882fe5f76204d69977e9",
+   "actor": "gaogaotiantian"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "gaogaotiantian"
+  }
+ ],
+ "fetch_errors": null
+}

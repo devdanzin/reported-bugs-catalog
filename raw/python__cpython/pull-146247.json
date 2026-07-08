@@ -1,0 +1,33 @@
+{
+ "repo": "python/cpython",
+ "number": 146247,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146247",
+ "title": "gh-146245: Fix ref/buffer leaks in socketmodule.c on audit hook failure",
+ "state": "closed",
+ "state_reason": null,
+ "author": "kimimgo",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-03-21T08:40:20Z",
+ "closed_at": "2026-03-21T09:55:07Z",
+ "body": "Fixes #146245\n\n## Summary\n\nTwo leak bugs in `socketmodule.c` when `PySys_Audit` raises:\n\n### 1. `getaddrinfo` (line 6985)\n\n`return NULL` skipped cleanup of `idna` and `pstr` refs. Changed to\n`goto err` which properly calls `Py_XDECREF` on both.\n\n### 2. `sock_sendto` (line 4811)\n\n`return NULL` skipped `PyBuffer_Release(&pbuf)`. Added the release\nbefore the return, matching the pattern used in adjacent error paths.\n\n<!-- gh-issue-number: gh-146245 -->\n* Issue: gh-146245\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146245",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kimimgo"
+  }
+ ],
+ "fetch_errors": null
+}

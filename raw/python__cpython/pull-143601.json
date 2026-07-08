@@ -1,0 +1,77 @@
+{
+ "repo": "python/cpython",
+ "number": 143601,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143601",
+ "title": "gh-143191: Use _PyOS_MIN_STACK_SIZE in _thread.stack_size()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-01-09T12:08:30Z",
+ "closed_at": "2026-01-09T15:08:41Z",
+ "body": "The stack size must be at least _PyOS_MIN_STACK_SIZE+SYSTEM_PAGE_SIZE bytes.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-143191 -->\n* Issue: gh-143191\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-01-09T15:08:45Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-01-09T15:08:58Z",
+   "body": "[GH-143611](https://github.com/python/cpython/pull/143611) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-01-09T15:09:29Z",
+   "body": "Merged, thanks for the review @kumaraditya303."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143191",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ba10100c3931b18812b82d7124e2238f01927910",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "302922365982e01bede2ba1b58e5567362537963",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0e2ed4b0e1ae36bd7dbbcb210f686deffc10f14e",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "39e26078e4b7a4b7198891da25916a3d0dcd33af",
+   "actor": "reidenong"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d20787230ad3485885a2c56864705473ca40f4bf",
+   "actor": "thunder-coding"
+  }
+ ],
+ "fetch_errors": null
+}

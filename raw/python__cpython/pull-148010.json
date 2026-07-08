@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 148010,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148010",
+ "title": "[3.14] gh-146613: Fix re-entrant use-after-free in `itertools._grouper` (GH-147962)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-04-02T13:35:06Z",
+ "closed_at": "2026-04-06T15:23:09Z",
+ "body": "(cherry picked from commit fc7a188fe70a7b98696b4fcee8db9eb8398aeb7b)\n\nCo-authored-by: Ma Yukun <68433685+TheSkyC@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-146613 -->\n* Issue: gh-146613\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/147962",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146613",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "07158b605d638c3e79709939ceb114de4658b3d9",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  }
+ ],
+ "fetch_errors": null
+}

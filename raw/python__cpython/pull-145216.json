@@ -1,0 +1,63 @@
+{
+ "repo": "python/cpython",
+ "number": 145216,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145216",
+ "title": "gh-145202: Fix crash in unicodedata's GraphemeBreakIterator and Segment",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-02-25T14:05:28Z",
+ "closed_at": "2026-02-26T09:30:08Z",
+ "body": "Remove the tp_clear slots and make Segment members read-only.\r\n\n\n<!-- gh-issue-number: gh-145202 -->\n* Issue: gh-145202\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-02-25T15:09:50Z",
+   "body": "It is difficult to implement the absence of something. There are other GC classes that do not implement tp_clear. They will also crash if we add tp_clear without updating tp_dealloc.\r\n\r\nI added tests to ensure that these classes work with the garbage collector."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145202",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145203",
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "812ef66759f9fe27d68283d8e67d6cd3eb512be2",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3032154b86a8d5a5fd41659bc4fe1b5550b4efad",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5179bd7986679711cf23345f3dd3ee784c9c3ce2",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

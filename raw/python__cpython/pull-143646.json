@@ -1,0 +1,70 @@
+{
+ "repo": "python/cpython",
+ "number": 143646,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143646",
+ "title": "gh-143604: Hold strong reference to executor during JIT tracing",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Zheaoli",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-01-10T09:14:42Z",
+ "closed_at": "2026-01-10T11:15:48Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-143604 -->\n* Issue: gh-143604\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-10T09:34:04Z",
+   "body": "Full disclaimer: I wrote the test here and verified it crashes on ASAN on main branch."
+  },
+  {
+   "author": "Zheaoli",
+   "created_at": "2026-01-10T09:43:54Z",
+   "body": "BTW, for the record, when I run `./python -m unittest -v test.test_capi.test_opt.TestExecutorInvalidation.test_prev_executor_freed_while_tracing`. A new ASAN error has been raised \r\n\r\n```text\r\n==3795402==ERROR: LeakSanitizer: detected memory leaks\r\n\r\nDirect leak of 2040 byte(s) in 1 object(s) allocated from:\r\n    #0 0x7fe57ad20cb5 in malloc /usr/src/debug/gcc/gcc/libsanitizer/asan/asan_malloc_linux.cpp:67\r\n    #1 0x5647b297e7c9 in _PyMem_RawMalloc Objects/obmalloc.c:64\r\n    #2 0x5647b297db5f in _PyMem_DebugRawAlloc Objects/obmalloc.c:2926\r\n    #3 0x5647b297dbc8 in _PyMem_DebugRawMalloc Objects/obmalloc.c:2959\r\n    #4 0x5647b297f4a6 in _PyMem_DebugMalloc Objects/obmalloc.c:3124\r\n    #5 0x5647b29a84bf in PyObject_Malloc Objects/obmalloc.c:1532\r\n    #6 0x5647b2c7ece2 in _PyObject_MallocWithType Include/internal/pycore_object_alloc.h:46\r\n    #7 0x5647b2c7ece2 in gc_alloc Python/gc.c:2352\r\n    #8 0x5647b2c7ef4b in _PyObject_GC_NewVar Python/gc.c:2394\r\n    #9 0x5647b2ce92b2 in allocate_executor Python/optimizer.c:1261\r\n    #10 0x5647b2cf07ad in make_executor_from_uops Python/optimizer.c:1348\r\n    #11 0x5647b2cf143d in uop_optimize Python/optimizer.c:1528\r\n    #12 0x5647b2cf266c in _PyOptimizer_Optimize Python/optimizer.c:164\r\n    #13 0x5647b2b34772 in stop_tracing_and_jit Python/ceval.c:1461\r\n    #14 0x5647b2b7d2aa in _PyEval_EvalFrameDefault Python/generated_cases.c.h:11823\r\n    #15 0x5647b2b80d59 in _PyEval_EvalFrame Include/internal/pycore_ceval.h:118\r\n    #16 0x5647b2b810c2 in _PyEval_Vector Python/ceval.c:2541\r\n    #17 0x5647b28b0877 in _PyFunction_Vectorcall Objects/call.c:413\r\n    #18 0x5647b28b6cbf in _PyObject_VectorcallTstate Include/internal/pycore_call.h:136\r\n    #19 0x5647b28b6fb1 in method_vectorcall Objects/classobject.c:95\r\n    #20 0x5647b28b3f42 in _PyVectorcall_Call Objects/call.c:273\r\n    #21 0x5647b28b441e in _PyObject_Call Objects/call.c:348\r\n    #22 0x5647b28b4465 in PyObject_Call Objects/call.c:373\r\n    #23 0x5647b2b4db07 in _PyEval_EvalFrameDefault Python/generated_cases.c.h:2876\r\n    #24 0x5647b2b80d59 in _PyEval_EvalFrame Include/internal/pycore_ceval.h:118\r\n    #25 0x5647b2b810c2 in _PyEval_Vector Python/ceval.c:2541\r\n    #26 0x5647b28b0877 in _PyFunction_Vectorcall Objects/call.c:413\r\n    #27 0x5647b28b37a4 in _PyObject_VectorcallDictTstate Objects/call.c:135\r\n    #28 0x5647b28b3bb1 in _PyObject_Call_Prepend Objects/call.c:504\r\n    #29 0x5647b29f04b2 in call_method Objects/typeobject.c:3088\r\n    #30 0x5647b29f0684 in slot_tp_call Objects/typeobject.c:10681\r\n```\r\n\r\nI'm trying to figure it out why"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-10T10:05:18Z",
+   "body": "> I'm trying to figure it out why\r\n\r\nOops, I was testing this locally and also saw the ASAN leak so I fixed it. There's no more leak now."
+  },
+  {
+   "author": "Zheaoli",
+   "created_at": "2026-01-10T10:29:01Z",
+   "body": "> Oops, I was testing this locally and also saw the ASAN leak so I fixed it. There's no more leak now.\n\nLOL, Thanks for the new commit. Actually I have never think about this part yet. Thanks for the leason #TIL\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143604",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e2f0160026db71d23137f84bf3f5c43f983f978d",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b27d2a37e80d698beaa06c143f32a4e50379f4bc",
+   "actor": "reidenong"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3b0030c63660eddf27335312c239fe5158ac1b6",
+   "actor": "thunder-coding"
+  }
+ ],
+ "fetch_errors": null
+}

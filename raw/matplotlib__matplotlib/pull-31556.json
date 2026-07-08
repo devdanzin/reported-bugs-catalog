@@ -1,0 +1,55 @@
+{
+ "repo": "matplotlib/matplotlib",
+ "number": 31556,
+ "type": "pull",
+ "url": "https://github.com/matplotlib/matplotlib/pull/31556",
+ "title": "FIX: Inverted PyErr_Occurred check in enum type caster (_enums.h)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "beelauuu",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-23T18:33:24Z",
+ "closed_at": "2026-04-23T20:39:56Z",
+ "body": "## PR summary\r\nFix an inverted error-check in the pybind11 enum type caster in src/_enums.h. `PyLong_AsLong` signals failure by returning -1 and setting a Python exception.  The correct way to check for failure should be: `return !(ival == -1 && PyErr_Occurred());`\r\n\r\nPart of #31424 \r\n\r\n_this is my first PR here; I just wanted to get the flow down of contributing here before making any larger changes :)_\r\n\r\n## AI Disclosure\r\nI used Claude Code to help understand the codebase. The fix itself is a one-character change I applied.\r\n\r\n## PR checklist\r\n<!-- Please mark any checkboxes that do not apply to this PR as [N/A].-->\r\n\r\n- [N/A] \"closes #0000\" is in the body of the PR description to [link the related issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)\r\n- [x] new and changed code is [tested](https://matplotlib.org/devdocs/devel/testing.html)\r\n- [N/A] *Plotting related* features are demonstrated in an [example](https://matplotlib.org/devdocs/devel/document.html#write-examples-and-tutorials)\r\n- [N/A ] *New Features* and *API Changes* are noted with a [directive and release note](https://matplotlib.org/devdocs/devel/api_changes.html#announce-changes-deprecations-and-new-features)\r\n- [N/A ] Documentation complies with [general](https://matplotlib.org/devdocs/devel/document.html#write-rest-pages) and [docstring](https://matplotlib.org/devdocs/devel/document.html#write-docstrings) guidelines",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b39d9927a7872d40fcb2f311b0e184462c01f863",
+   "actor": "ksunden"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ksunden"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/matplotlib/matplotlib/pull/31558",
+   "commit": null,
+   "actor": "meeseeksmachine"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a83faacb0dbe7edd1bae38e1e715b77b6aaebb84",
+   "actor": "ksunden"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "163793248a5fc9f23a560e45551c44351a8bd716",
+   "actor": "ksunden"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/matplotlib/matplotlib/pull/31560",
+   "commit": null,
+   "actor": "ksunden"
+  }
+ ],
+ "fetch_errors": null
+}

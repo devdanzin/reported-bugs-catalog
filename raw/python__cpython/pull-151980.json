@@ -1,0 +1,76 @@
+{
+ "repo": "python/cpython",
+ "number": 151980,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151980",
+ "title": "gh-126219: Fix crash in tkinter.Tk with non-BMP className on Tcl/Tk 8.x",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-23T10:42:27Z",
+ "closed_at": "2026-06-24T05:59:42Z",
+ "body": "`tkinter.Tk(className='\\U0010FFFF')` (and the underlying `_tkinter.create()`) crashes with a segfault when tkinter is built against Tcl/Tk 8.x.\n\nThe class name is title-cased during Tk initialization, and Tcl 8.x crashes in `Tcl_UtfToTitle()` on non-BMP characters (encoded as 4-byte UTF-8 sequences). Such a className is now rejected with a `ValueError` before Tk is initialized.\n\nTcl 9 supports non-BMP characters and is not affected; the check is compiled out there.\n\nAmong the other string arguments of `_tkinter.create()`, only `className` is affected \u2014 `screenName`, `baseName` and `use` fail gracefully.\n\n(The same Tcl 8.x bug also affects `Tcl_UtfToUpper()`/`Tcl_UtfToLower()`, reachable via e.g. `tk.call('string', 'toupper', ...)`, but that is a general Tcl issue that cannot be guarded on the CPython side.)\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n\n\n<!-- gh-issue-number: gh-126219 -->\n* Issue: gh-126219\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-24T05:59:46Z",
+   "body": "Thanks @serhiy-storchaka for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T05:59:58Z",
+   "body": "[GH-152045](https://github.com/python/cpython/pull/152045) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T06:00:04Z",
+   "body": "[GH-152046](https://github.com/python/cpython/pull/152046) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T06:00:12Z",
+   "body": "[GH-152047](https://github.com/python/cpython/pull/152047) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126219",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "124c7cd91be8cff76d1eec0adef65991c23c4419",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ba13d34fb8f730f8f087f3756a4a7adfe3f04eb",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "32546b728eea7c2757210ee89bb43d360a29a5fa",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dbc9b686e02abb9af57f16184666ba9a344f8004",
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

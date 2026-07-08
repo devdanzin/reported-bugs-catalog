@@ -8,7 +8,13 @@
  "issues": [
   "python/cpython#137007"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#137016",
+  "python/cpython#142541"
+ ],
+ "n_prs": 2,
+ "n_backports": 1,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.14",
@@ -16,15 +22,20 @@
   "topic-JIT",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "Fidget-Spinner",
+  "miss-islington"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-137007.json"
+  "raw/python__cpython/issue-137007.json",
+  "raw/python__cpython/pull-137016.json",
+  "raw/python__cpython/pull-142541.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

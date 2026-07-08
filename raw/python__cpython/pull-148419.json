@@ -1,0 +1,70 @@
+{
+ "repo": "python/cpython",
+ "number": 148419,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148419",
+ "title": "gh-148418: Fix a possible reference leak in a corrupted `TYPE_CODE` marshal stream",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Wulian233",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-12T02:42:55Z",
+ "closed_at": "2026-05-04T13:42:03Z",
+ "body": "\n\n<!-- gh-issue-number: gh-148418 -->\n* Issue: gh-148418\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-04T13:42:28Z",
+   "body": "Thanks @Wulian233 for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-04T13:42:28Z",
+   "body": "Thanks @Wulian233 for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-05-04T13:42:42Z",
+   "body": "[GH-149363](https://github.com/python/cpython/pull/149363) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-05-04T13:42:48Z",
+   "body": "[GH-149364](https://github.com/python/cpython/pull/149364) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148418",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c3972f2795bf9270008d09dc6919b9735e20c606",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6d6471b7eb099fefc243b2fba3825979fad7cf6f",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "95979d18138a2afe2e9dd9917bf59148116be394",
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

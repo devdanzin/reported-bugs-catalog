@@ -4,7 +4,7 @@ Best-guess tool assigned by heuristic; **please confirm or correct**.
 These are devdanzin-authored CPython artifacts that name no tool — a mix
 of manual contributions, fusil crashes, and JIT (lafleur) crashes.
 
-**27 bugs to review.**
+**25 bugs to review.**
 
 ## best-guess: fusil  (12)
 | artifact | title | reason |
@@ -32,16 +32,14 @@ of manual contributions, fusil crashes, and JIT (lafleur) crashes.
 | python/cpython#143751 | JIT: Segfault from setting `UOP_MAX_TRACE_LENGTH` to a large value | cpython-jit-crash(REVIEW) |
 | python/cpython#145064 | JIT: `co != NULL` assertion failure in `*_Py_uop_frame_new` | cpython-jit-crash(REVIEW) |
 
-## best-guess: manual  (9)
+## best-guess: manual  (7)
 | artifact | title | reason |
 |---|---|---|
-| python/cpython#121016 | `PYTHON_BASIC_REPL` is not currently tested | cpython-untagged(REVIEW) |
 | python/cpython#122145 | Exception raised in traceback.StackSummary._should_show_carets exits i | cpython-untagged(REVIEW) |
 | python/cpython#122170 | Interpreter exits on Windows due to ValueError raised in linecache.py | cpython-untagged(REVIEW) |
 | python/cpython#122533 | New REPL will exit the interpreter due to errors from substituting bui | cpython-untagged(REVIEW) |
 | python/cpython#122692 | gh-123572: Fix key codes in VK_MAP in windows_console.py | cpython-untagged(REVIEW) |
 | python/cpython#125852 | `sys.addaudithook(None)` breaks the REPL | cpython-untagged(REVIEW) |
 | python/cpython#126032 | gh-126019 Fix inspect.getsource for classes created in PyREPL | cpython-untagged(REVIEW) |
-| python/cpython#145887 | Use `write` instead of `stream.write` in `PrettyPrinter._pprint_frozen | cpython-untagged(REVIEW) |
 | python/cpython#30135 | gh-90117: handle dict and mapping views in pprint | cpython-untagged(REVIEW) |
 

@@ -1,0 +1,135 @@
+{
+ "repo": "python/cpython",
+ "number": 142054,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/142054",
+ "title": "gh-142029: Raise `ModuleNotFoundError` instead of crashing on nonexsistent module name given to `create_builtin()`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "dr-carlos",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2025-11-28T22:31:01Z",
+ "closed_at": "2025-12-15T12:20:20Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n- Prior to https://github.com/python/cpython/commit/1e4e59bb3714ba7c6b6297f1a74e231b056f004c, `Py_NewRef(Py_None)` was returned in this case; so, theoretically, this should be re-introducing behaviour that was previously broken by that commit.\r\n\r\n<!-- gh-issue-number: gh-142029 -->\r\n* Issue: gh-142029\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-11-28T23:33:51Z",
+   "body": "On further inspection, `is_core_module()` is only defined under an `#ifndef NDEBUG` statement (since it was only used in `assert()` calls), so it's not valid to use in non-debug builds. Would it be acceptable to move this out of the `#if`?"
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-01T01:28:54Z",
+   "body": "> On further inspection, `is_core_module()` is only defined under an `#ifndef NDEBUG` statement (since it was only used in `assert()` calls), so it's not valid to use in non-debug builds. Would it be acceptable to move this out of the `#if`?\r\n\r\nNo longer relevant for the improved implementation. Thanks to @itamaro."
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-01T22:36:12Z",
+   "body": "Tests seem to be failing on Android/iOS because pickled `__loader__` is not `builtins.__loader__`. This is probably because `__loader__.create_module` calls `_imp.create_builtin()`, which was modified in this PR.\r\n\r\nUnfortunately it's not reproducible on my Linux computer (hence the Linux tests passing fine). Not sure if it's trying to compare the new `__loader__` with the old `__loader__` from a previous Python version?"
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-02T22:31:21Z",
+   "body": "> I prefer raising an exception as done in #142033 instead of returning None.\r\n\r\nSounds good. Would a `ModuleNotFoundError` be most appropriate here?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-12-10T12:29:47Z",
+   "body": "https://github.com/python/cpython/pull/142033 has been merged instead."
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-11T02:25:11Z",
+   "body": "@vstinner #142033 only fixes one of the two issues included in #142029.\r\n\r\nThe first issue mentioned in that bug report is still unfixed, i.e. the following will crash on `main`:\r\n```python\r\n>>> import _imp\r\n>>> class A: pass\r\n... \r\n>>> a = A()\r\n>>> a.name = \"123\"\r\n>>> _imp.create_builtin(a)\r\n```\r\n\r\nBut this would raise a `ModuleNotFoundError` were this PR merged."
+  },
+  {
+   "author": "itamaro",
+   "created_at": "2025-12-11T05:58:48Z",
+   "body": "@vstinner I think this PR is still needed, regardless of gh-142033.\r\nit's fixing a real bug I introduced in gh-139196"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-12-11T11:41:51Z",
+   "body": "Oh sorry, I didn't see that the issue had two sub-issues."
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-11T22:08:01Z",
+   "body": "> LGTM. But there are now conflicts in Lib/test/test_import/**init**.py: can you try to solve them? (`git merge main`)\r\n\r\nYep, just done so."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-12-12T23:11:47Z",
+   "body": "Strange, pickle tests failed on iOS and Android:\r\n\r\n```\r\n   2 re-run tests:\r\n       test_pickle test_pickletools\r\n```\r\n\r\nExample of failure:\r\n\r\n```\r\n  ERROR: test_builtin_types (test.test_pickletools.OptimizedPickleTests.test_builtin_types)\r\n  ----------------------------------------------------------------------\r\n  Traceback (most recent call last):\r\n    File \"/data/user/0/org.python.testbed/files/python/lib/python3.15/test/pickletester.py\", line 3217, in test_builtin_types\r\n      s = self.dumps(t, proto)\r\n    File \"/data/user/0/org.python.testbed/files/python/lib/python3.15/test/test_pickletools.py\", line 16, in dumps\r\n      return pickletools.optimize(pickle.dumps(arg, proto, **kwargs))\r\n                                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^\r\n  _pickle.PicklingError: Can't pickle <class 'importlib._bootstrap.BuiltinImporter'>: it's not the same object as importlib._bootstrap.BuiltinImporter\r\n \r\n```"
+  },
+  {
+   "author": "mhsmith",
+   "created_at": "2025-12-13T00:51:35Z",
+   "body": "This error came up in #103247, and I think @freakboy3742 dealt with a more recent instance, but I can't find it now."
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-13T01:08:06Z",
+   "body": "> This error came up in #103247, and I think @freakboy3742 dealt with a more recent instance, but I can't find it now.\r\n\r\nThanks!\r\nI had a look at the initial fix, which was just an uncache - but we can't uncache sys or builtins, which are the only modules imported here. I've tried just removing the sys/builtin test liens for now to see what CI thinks and if that doesn't work, I'll have a more detailed look later."
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-14T23:14:27Z",
+   "body": "Okay, manged to reproduce the error on Linux with `./python -m test test_import test_importlib test_pickletools`. Turns out that you can uncache the `builtins` module, but then other tests in importlib break. I couldn't find a proper fix, so for now, I've re-added the test with `sys`, leaving the `builtins` one out."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-12-15T12:20:34Z",
+   "body": "Merged, thanks for the fix."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-12-15T12:40:59Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **ARM Raspbian 3.x** (tier-3) has failed when building commit cd2ca74c53d3cb502db40e3f52911d4429797daf.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/424/builds/12349) and take a look at the build logs.\n4. Check if the failure is related to this commit (cd2ca74c53d3cb502db40e3f52911d4429797daf) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/424/builds/12349\n\nFailed tests:\n\n- test_annotationlib\n\nFailed subtests:\n\n- test_nonexistent_attribute - test.test_annotationlib.TestForwardRefFormat.test_nonexistent_attribute\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/var/lib/buildbot/workers/3.x.gps-raspbian.nondebug/build/Lib/test/test_annotationlib.py\", line 160, in test_nonexistent_attribute\n    self.assertEqual(epsilon_anno, support.EqualToForwardRef(\"some | {obj, module}\", owner=f))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ForwardRef('some | {module, obj}', owner=[79 chars]3f0>) != EqualToForwardRef('some | {obj, module}',[86 chars]3f0>)\n\n\nTraceback (most recent call last):\n  File \"/var/lib/buildbot/workers/3.x.gps-raspbian.nondebug/build/Lib/test/test_annotationlib.py\", line 160, in test_nonexistent_attribute\n    self.assertEqual(epsilon_anno, support.EqualToForwardRef(\"some | {obj, module}\", owner=f))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ForwardRef('some | {module, obj}', owner=[79 chars]760>) != EqualToForwardRef('some | {obj, module}',[86 chars]760>)\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-15T22:16:39Z",
+   "body": "Unfortunately I'm unsure why this buildbot is failing - it's only happening on ARM Raspbian. It's not having issues importing anything (which is what this PR changes). Plus, the failure is only on this one specific test which seems totally unrelated.\r\n\r\nHowever, the test only seems to be failing after this commit, and it's happening now on other commits (27a2e49d1849751008ea5807558129e11d35fb7a)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-12-16T10:45:15Z",
+   "body": "> Unfortunately I'm unsure why this buildbot is failing\r\n\r\nThe failure seems to be unrelated."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/142029",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "cd2ca74c53d3cb502db40e3f52911d4429797daf",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7dfa26cef099474460f1b223726e0566c46f82b5",
+   "actor": "fatelei"
+  }
+ ],
+ "fetch_errors": null
+}

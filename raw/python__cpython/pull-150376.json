@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 150376,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/150376",
+ "title": "gh-150374:Fix double release of import lock in lazy import reification",
+ "state": "closed",
+ "state_reason": null,
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-05-25T07:34:14Z",
+ "closed_at": "2026-05-25T09:09:39Z",
+ "body": "\n\n<!-- gh-issue-number: gh-150374 -->\n* Issue: gh-150374\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-25T09:09:43Z",
+   "body": "Thanks @lpyu001 for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-05-25T09:10:05Z",
+   "body": "[GH-150378](https://github.com/python/cpython/pull/150378) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150374",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5498eba545e950c7550c924f2e458c740a689c69",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "acd402ecdb7d04d8730d2d10352fa22823b0bd1c",
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

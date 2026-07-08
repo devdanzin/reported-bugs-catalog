@@ -1,0 +1,69 @@
+{
+ "repo": "python/cpython",
+ "number": 143894,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143894",
+ "title": "gh-143820: ENTER_EXECUTOR can be inserted after BINARY_OP_INPLACE_ADD_UNICODE",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting changes"
+ ],
+ "created_at": "2026-01-15T22:17:12Z",
+ "closed_at": "2026-03-17T09:20:39Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-143820 -->\n* Issue: gh-143820\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-01-16T10:30:06Z",
+   "body": "<!-- changes-requested -->\nWhen you're done making the requested changes, leave the comment: `I have made the requested changes; please review again`.\n<!-- /changes-requested -->\n\n\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-16T21:43:34Z",
+   "body": "> It is the assert that needs changing. You'll need to use `_Py_GetBaseCodeUnit`\r\n\r\nIt matters because we get the next instruction's oparg and check it `next_oparg = next_instr->op.arg;`. ENTER_EXECUTOR overrides the oparg. If we use `_Py_GetBaseCodeUnit`, it will significantly slow down the current code, so I choose to deopt instead.\r\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-01-20T10:22:22Z",
+   "body": "We need to check for `ENTER_EXECUTOR` either way, so we might as well handle that case without deopting and losing the big-O improvement.\r\n```\r\nnext_oparg = next_instr->op.arg;\r\nif (next_instr->op.code == ENTER_EXECUTOR) {\r\n    _PyExecutorObject *exec = _PyFrame_GetCode(frame)->co_executors->executors[next_oparg];\r\n    next_oparg = exec->vm_data.oparg;\r\n}\r\n// Updated assert goes here\r\n```"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-02-03T14:02:31Z",
+   "body": "We could avoid accessing the following instruction's `oparg` by storing the local variable's index in the inline cache.\r\nIt would also then be able to handle:\r\n```\r\nBINARY_OP # To be specialized\r\nEXTENDED_ARG # 1 to 3 of these\r\nSTORE_FAST\r\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-03-16T15:14:53Z",
+   "body": "Not sure I have time to fix this up for merge. @cocolato really sorry but can I let you take over this fix?"
+  },
+  {
+   "author": "cocolato",
+   "created_at": "2026-03-17T02:33:44Z",
+   "body": "> Not sure I have time to fix this up for merge. @cocolato really sorry but can I let you take over this fix?\r\n\r\nNo worries at all! I can take it over from here. Thanks for getting it started."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-03-17T09:20:39Z",
+   "body": "Thanks Hai Zhu, I will close this PR then."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143820",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

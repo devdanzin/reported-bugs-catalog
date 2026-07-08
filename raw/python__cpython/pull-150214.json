@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 150214,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/150214",
+ "title": "gh-150213: Fix OOM error handling in _interpchannels",
+ "state": "closed",
+ "state_reason": null,
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-05-22T02:24:53Z",
+ "closed_at": "2026-06-12T06:35:13Z",
+ "body": "\n\n<!-- gh-issue-number: gh-150213 -->\n* Issue: gh-150213\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "lpyu001",
+   "created_at": "2026-05-23T03:55:36Z",
+   "body": "The runner was terminated during task execution. Could you please retrigger the failed job? Thank you. @aisk "
+  },
+  {
+   "author": "lpyu001",
+   "created_at": "2026-06-12T06:35:06Z",
+   "body": "fix in https://github.com/python/cpython/pull/151239"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150213",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "lpyu001"
+  }
+ ],
+ "fetch_errors": null
+}

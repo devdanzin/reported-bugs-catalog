@@ -1,0 +1,149 @@
+{
+ "repo": "python/cpython",
+ "number": 126759,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126759",
+ "title": "gh-126341: added release check to iteration method of memoryview object",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ritvikpasham",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-12T19:17:55Z",
+ "closed_at": "2024-11-13T11:51:01Z",
+ "body": "\n\n<!-- gh-issue-number: gh-126341 -->\n* Issue: gh-126341\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ghost",
+   "created_at": "2024-11-12T19:17:59Z",
+   "body": "All commit authors signed the Contributor License Agreement. <br/> [![CLA signed](https://cpython-clabot.herokuapp.com/cla-signed.svg)](https://cpython-clabot.herokuapp.com/signed-contributor-license-agreement?version=96a49432-b8b1-11ec-9bf5-bfe9ad6c72c4)"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-12T19:18:00Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-12T19:39:21Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\nAnd if you don't make the requested changes, you will be put in the comfy chair!\n\n"
+  },
+  {
+   "author": "ritvikpasham",
+   "created_at": "2024-11-12T20:18:49Z",
+   "body": "I have made the requested changes; please review again."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-12T20:18:54Z",
+   "body": "Thanks for making the requested changes!\n\n@sobolevn: please review the changes made to this pull request.\n"
+  },
+  {
+   "author": "ritvikpasham",
+   "created_at": "2024-11-12T20:32:36Z",
+   "body": "> I don't think we need a whole new file for the test, as it's only a 3 line reproducer. You could just add it alongside the existing tests for memoryview iteration.\r\n\r\nYeah, that makes sense! Would you happen to know where the memoryview iteration tests are?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-12T20:36:51Z",
+   "body": "I don't, but you can just CTRL+F `iter` in the memoryview tests and you'll probably find it :)"
+  },
+  {
+   "author": "ritvikpasham",
+   "created_at": "2024-11-12T21:13:10Z",
+   "body": "It look like there was a previous test case that tests CHECK_RELEASED, so I just added a check to the iter method there."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-13T11:20:39Z",
+   "body": "@sobolevn: I let you review the updated PR. You can merge it if it looks good to you."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-13T11:43:37Z",
+   "body": "Should we backport this change?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-13T11:44:34Z",
+   "body": "I think so, it's a bugfix."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-13T11:51:05Z",
+   "body": "Thanks @ritvikpasham for the PR, and @sobolevn for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-13T11:51:18Z",
+   "body": "[GH-126778](https://github.com/python/cpython/pull/126778) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-13T11:51:24Z",
+   "body": "[GH-126779](https://github.com/python/cpython/pull/126779) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-13T11:52:05Z",
+   "body": "Congrats on your first contribution @ritvikpasham :tada:"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126341",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "a12690ef49e8fc8a3af4c5f1757eb3caffb35e03",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a7414313c59e404995e0e33e7a8e85e753000956",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1af10dec6ea991725c506fe39e5baf39c996ade5",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0bdcc84ae99ff695b10b2f13c5a00497ce0840e5",
+   "actor": "Eclips4"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3fe062c98d5b25766740effa866bbf9e38c0a585",
+   "actor": "Eclips4"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0c6ec4ac6bdf79545d243588d90e97088112b5ce",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6adefa16e3e5eff3735d2903832f0bef18ee7247",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 150378,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/150378",
+ "title": "[3.15] gh-150374: Fix double release of import lock in lazy import reification (GH-150376)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-05-25T09:09:55Z",
+ "closed_at": "2026-05-25T09:36:22Z",
+ "body": "(cherry picked from commit 5498eba545e950c7550c924f2e458c740a689c69)\n\nCo-authored-by: pengyu lee <lipengyu@kylinos.cn>\n\n<!-- gh-issue-number: gh-150374 -->\n* Issue: gh-150374\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150374",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150376",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "acd402ecdb7d04d8730d2d10352fa22823b0bd1c",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

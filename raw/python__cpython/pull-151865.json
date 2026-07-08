@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 151865,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151865",
+ "title": "[3.15] gh-151845: Fix formatfloat() return-value contract in unicode_format.c (GH-151846)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-06-21T17:16:41Z",
+ "closed_at": "2026-06-21T17:43:01Z",
+ "body": "Fix formatfloat() return-value contract in unicode_format.c\n(cherry picked from commit c2661e6189ab2833bf32fa723cc427e64c026839)\n\nCo-authored-by: AN Long <aisk@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-151845 -->\n* Issue: gh-151845\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151845",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151846",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "f5119a536a6ca97f282fb0e8d3f700369f907bb6",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

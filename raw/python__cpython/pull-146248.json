@@ -1,0 +1,100 @@
+{
+ "repo": "python/cpython",
+ "number": 146248,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146248",
+ "title": "gh-146245: Fix reference and buffer leaks via audit hook in socket module",
+ "state": "closed",
+ "state_reason": null,
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-21T08:44:29Z",
+ "closed_at": "2026-03-22T11:29:34Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146245 -->\n* Issue: gh-146245\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "aisk",
+   "created_at": "2026-03-21T13:37:29Z",
+   "body": "> The fix LGTM. I am not sure that it is worth to add such complicated and costly test. There is no precedence.\r\n\r\nThe tests are reverted."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-22T11:29:39Z",
+   "body": "Thanks @aisk for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-22T11:29:50Z",
+   "body": "[GH-146274](https://github.com/python/cpython/pull/146274) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-22T11:29:55Z",
+   "body": "[GH-146275](https://github.com/python/cpython/pull/146275) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146245",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c30fae4bea9f9ba07833e97eb542754c26610765",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6bfcd897582e3f6d12348d053fbf71d5c2639b8b",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c64d830b28bae55ba607f381c036f70e8455759c",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2f1e341b2898fd5bb9c8800ccf6646dbe214f519",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "69a37be21c56d26aa616e64069bfe45c63ebb04e",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3e05fa35e0562de54252dab4d09da002fc358393",
+   "actor": "CuriousLearner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fec6f9186409d2d8c2eda75a78eba975eb223b83",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

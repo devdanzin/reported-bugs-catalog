@@ -1,0 +1,104 @@
+{
+ "repo": "python/cpython",
+ "number": 127055,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127055",
+ "title": "gh-126316: Make grp.getgrall() thread-safe: add a mutex",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-20T10:40:40Z",
+ "closed_at": "2024-11-21T14:47:25Z",
+ "body": "grpmodule.c is no longer built with the limited C API, since PyMutex is excluded from the limited C API.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-126316 -->\n* Issue: gh-126316\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-20T10:41:08Z",
+   "body": "@ZeroIntensity @colesbury: Would you mind to review my change?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-20T18:42:43Z",
+   "body": "Thanks for the insight, Sam. How scalable is this approach (as in, will we have a static `PyMutex` everywhere)?"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-20T20:21:36Z",
+   "body": "I don't think we'll have `static PyMutex` everywhere, but this is a good pattern for certain libc functions that are not thread-safe and do not have thread-safe alternatives."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-21T09:48:02Z",
+   "body": "> I think the pycore_lock.h include in pycore_modsupport.h can be removed now.\r\n\r\nCorrect: I wrote https://github.com/python/cpython/pull/127093 to remove it."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-21T14:47:49Z",
+   "body": "Merged, thanks for reviews @colesbury and @ZeroIntensity."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-21T14:50:30Z",
+   "body": "[GH-127104](https://github.com/python/cpython/pull/127104) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126316",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127102",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3c2bd66e21bd8de69a89ebf09ff9d8e78ddfb839",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126504",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c36d77dab36ee0f291e5117ae7ef26ac98782f2a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9187ac3f2d22a7505da8cc9e159c75068b8b9a50",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2629000b254e6bed249e51902c96e3c5df9b71d6",
+   "actor": "ebonnal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/136695",
+   "commit": null,
+   "actor": "yoney"
+  }
+ ],
+ "fetch_errors": null
+}

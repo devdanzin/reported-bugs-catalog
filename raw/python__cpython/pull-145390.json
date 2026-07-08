@@ -1,0 +1,103 @@
+{
+ "repo": "python/cpython",
+ "number": 145390,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145390",
+ "title": "gh-145335: Fix crash when passing -1 as fd in os.pathconf",
+ "state": "closed",
+ "state_reason": null,
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-01T13:34:02Z",
+ "closed_at": "2026-03-02T18:07:49Z",
+ "body": "We currently test whether `path_t.fd` is -1 to decide if the argument should be treated as an fd or as a path, and then call `fpathconf()` or `pathconf()` according to it.\r\n\r\nIn the original issue, we passing -1 caused the code incorrectly treats the argument as a real path. But, `path->narrow` is NULL, so calling `pathconf()` on it will crash the interpreter.\r\n\r\nThis change adds a helper that checks whether the original argument is index-like to determine if it's an fd, so we can correctly the behavior and avoid the crash.\r\n\r\nThere are other `os` functions that accept `path_t` and may have the same issue. Since that is outside the scope of the original issue, I think we should fix those in a separate PR.\r\n\r\n<!-- gh-issue-number: gh-145335 -->\r\n* Issue: gh-145335\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-02T14:45:34Z",
+   "body": "Other functions have the same issues, even if they don't crash:\r\n\r\n* `os.stat(-1)`\r\n* `os.statx(-1, mask=0)`\r\n* `os.chdir(-1)`\r\n* `os.chmod(-1, 0)`\r\n* `os.chown(-1, 0, 0)`\r\n* `os.listdir(-1)`: current it behaves as `os.listdir(os.path.curdir)`\r\n* `os._path_exists(-1)` (Windows only)\r\n* `os._path_lexists(-1)` (Windows only)\r\n* `os._path_isdir(-1)` (Windows only)\r\n* `os._path_isfile(-1)` (Windows only)\r\n* `os._path_islink(-1)` (Windows only)\r\n* `os._path_isjunction(-1)` (Windows only)\r\n* `os.utime(-1, (0, 0))`\r\n* `os.execve(-1, ['/bin/true'], os.environ)`\r\n* `os.truncate(-1, 0)`\r\n* `os.statvfs(-1)`\r\n* `os.pathconf(-1, \"PC_NAME_MAX\")` crash (issue https://github.com/python/cpython/issues/145335)\r\n* `os.getxattr(-1, \"user\")`\r\n* `os.setxattr(-1, \"user\", b\"1\")`\r\n* `os.removexattr(-1, \"user\")`\r\n* `os.listxattr(-1)`: current it behaves as `os.listxattr(os.path.curdir)`\r\n* `os.scandir(-1)`: current it behaves as `os.scandir(os.path.curdir)`\r\n\r\nOn Linux (with the glibc), most functions fail with `OSError: [Errno 14] Bad address: -1`.\r\n\r\nThis list are functions using `path_t(allow_fd=True)` type in Argument Clinic, or variants such as `path_t(allow_fd='PATH_HAVE_FCHDIR')` type."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-02T18:08:12Z",
+   "body": "Thanks @aisk for the PR, and @vstinner for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-02T18:08:13Z",
+   "body": "Thanks @aisk for the PR, and @vstinner for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-02T18:08:25Z",
+   "body": "[GH-145432](https://github.com/python/cpython/pull/145432) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-02T18:08:29Z",
+   "body": "[GH-145433](https://github.com/python/cpython/pull/145433) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-02T18:12:19Z",
+   "body": "Merged, thanks for your contribution @aisk.\r\n\r\nI'm working on a fix for the other affected functions."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-02T19:39:50Z",
+   "body": "I wrote https://github.com/python/cpython/pull/145439 to fix other os functions."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145335",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5c3a47b94a39f87c36b1f36704d80775802ad034",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e5a8b0548f14669f5cae7011ef5cd7c6eae10c33",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3a159dffe693520a3ac15fb2c153913f55cade81",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d305326458a3d78409bc7721ce4245a5bfbc0a6c",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "504436870b7dacc18a4f88a4beaf0ee80163e4b4",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7e5a8afd72664dff279961ce691c56a9d182d6e9",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

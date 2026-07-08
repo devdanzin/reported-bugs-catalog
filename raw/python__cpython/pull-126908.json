@@ -1,0 +1,84 @@
+{
+ "repo": "python/cpython",
+ "number": 126908,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126908",
+ "title": "gh-126907: Lock the `atexit` state on the free-threaded build",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting merge",
+  "DO-NOT-MERGE",
+  "topic-free-threading",
+  "needs backport to 3.13"
+ ],
+ "created_at": "2024-11-16T15:40:56Z",
+ "closed_at": "2024-12-16T19:32:21Z",
+ "body": "\n\n<!-- gh-issue-number: gh-126907 -->\n* Issue: gh-126907\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-12-10T21:45:59Z",
+   "body": "Ok, I'll switch this over to critical sections. For now, I'd rather just ignore `ll_callbacks` until I fix `PyUnstable_AtExit` (gh-127793).\r\n\r\n> I suspect a lot of the code would be simplified if state->callbacks were a Python list object\r\n\r\nIt could, but it also might be a PITA because we'd need to introduce capsules into the mix. I'll play around with it and see how it looks. "
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-12-10T22:01:17Z",
+   "body": "> It could, but it also might be a PITA because we'd need to introduce capsules into the mix. I'll play around with it and see how it looks.\r\n\r\nI don't think you need capsules, which I agree would be a pain. I think you can use a tuple of three items instead of `atexit_py_callback` and replace `atexit_py_callback **callbacks` with a list of those tuples.\r\n\r\nMost of what `atexit` does with the *Python* callbacks is essentially list manipulation and we already have thread-safe implementations for PyListObject. You might need to expose `list_remove` as an internal-only function though.\r\n\r\nThe Python callbacks are executed while other threads are still running (and can possibly modify the callbacks). Using a PyListObject makes it easier to make a local copy of the callbacks before iterating over them, which avoids some re-entrancy and thread-safety issues in `atexit_callfuncs` that aren't limited to the free threading build."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-12-10T22:03:52Z",
+   "body": "To be clear, I am only suggesting a PyListObject instead of `atexit_py_callback **callbacks` (the high-level Python callbacks) and not instead of `atexit_callback *ll_callbacks` (the low-level C callbacks)."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-12-10T22:07:36Z",
+   "body": "I was just thinking about using a list because it has a nicer interface, not for thread safety. \r\n\r\n> The Python callbacks are executed while other threads are still running (and can possibly modify the callbacks).\r\n\r\nThey are? That's not good. The two places that execute atexit callbacks (apart from manually doing it) are https://github.com/python/cpython/blob/51216857ca8283f5b41c8cf9874238da56da4968/Python/pylifecycle.c#L2040 and https://github.com/python/cpython/blob/51216857ca8283f5b41c8cf9874238da56da4968/Python/pylifecycle.c#L2440\r\n\r\nBoth of which are *supposed* to happen when no threads are left. I guess daemon and C threads could screw things up, but I'm willing to write that off as a \"play stupid games, win stupid prizes.\""
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-12-12T14:13:23Z",
+   "body": "Marking as `DO-NOT-MERGE` while I refactor this. I'll (hopefully) have this ready by the end of the week."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-12T14:42:35Z",
+   "body": "You might create a new PR if you switch to critical sections, so we can compare the two approaches, and the PR history is easier to follow."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-12-16T19:32:21Z",
+   "body": "Closing now that #127935 got merged. Thanks to everyone that reviewed!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126907",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127791",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127935",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

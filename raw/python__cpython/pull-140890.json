@@ -1,0 +1,59 @@
+{
+ "repo": "python/cpython",
+ "number": 140890,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/140890",
+ "title": "[3.14] gh-140104: Revert \"Set next_instr properly in the JIT during exceptions (GH-140233) (GH-140687)\"",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-11-01T16:54:35Z",
+ "closed_at": "2025-11-01T18:41:01Z",
+ "body": "This makes CI green again for JIT on 3.14\n\n<!-- gh-issue-number: gh-140104 -->\n* Issue: gh-140104\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-01T17:09:04Z",
+   "body": "Sorry, I don't fully understand, which CI was red?\r\n\r\nFor me on 3.14 all work as expected.\r\nBut, of course, I can miss something due to very little experience with JIT."
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-01T17:27:06Z",
+   "body": "Oh, I've found some bad run:\r\nhttps://github.com/python/cpython/actions/runs/18999446540/job/54264041076"
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-01T17:48:42Z",
+   "body": "Yes, there's a problem with one JIT test on current 3.14 branch, `test.test_capi.test_opt.TestUopsOptimization.test_next_ instr_for_exception_handler_set`.\r\n\r\nAnd there's no such problem on main.\r\n\r\niOS problem is unrelated.\r\nWe can merge this and further investigate what should be done for 3.14 (if we want to, since JIT is experimental for now)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/140104",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/140687",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "4d68b758fa0a18c949d7d2f22dde091c8d7a3ba7",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

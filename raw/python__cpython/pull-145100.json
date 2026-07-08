@@ -1,0 +1,61 @@
+{
+ "repo": "python/cpython",
+ "number": 145100,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145100",
+ "title": "gh-145064:  Fix JIT assertion failure during CALL_ALLOC_AND_ENTER_INIT side exit",
+ "state": "closed",
+ "state_reason": null,
+ "author": "cocolato",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-02-22T07:43:31Z",
+ "closed_at": "2026-02-22T18:46:04Z",
+ "body": "When `CALL_ALLOC_AND_ENTER_INIT` creates an instance of a heap type (with `__slots__` and `tp_new == object.__new__`), it pushes a shim frame via `_PyFrame_PushTrampolineUnchecked`. This shim frame has `f_funcobj = Py_None`:\r\nhttps://github.com/python/cpython/blob/2be2dd5fc219a5c252d72f351c85db14314bfca5/Include/internal/pycore_interpframe.h#L368\r\n\r\nIf a JIT trace runs out of buffer space exactly at this shim frame's `EXIT_INIT_CHECK` instruction, the `_EXIT_TRACE` terminator hands off to a `_COLD_EXIT` executor, which calls `_PyJit_TryInitializeTracing()` with the shim frame. The existing guard only checked `func == NULL`, but `Py_None` is not NULL, so control falls through  which casue assertion crash.\n\n<!-- gh-issue-number: gh-145064 -->\n* Issue: gh-145064\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "cocolato",
+   "created_at": "2026-02-22T07:51:28Z",
+   "body": "cc @Fidget-Spinner "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145064",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "fd01372d4e509b2cbec708adcf7cdf6f7c1c1298",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c06cdc28f755436db2244089a5cd38cfe76016e1",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3d04ec0c5f55eba460e3de428151b23e4fb95bbc",
+   "actor": "KowalskiThomas"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7631d20afa9206c513f90574ddf2dd25f9c0350a",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

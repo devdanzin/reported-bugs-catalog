@@ -1,0 +1,94 @@
+{
+ "repo": "python/cpython",
+ "number": 150179,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/150179",
+ "title": "gh-150178: Fix refcount leaks in hamt allocation failure paths",
+ "state": "closed",
+ "state_reason": null,
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-05-21T08:04:56Z",
+ "closed_at": "2026-05-23T08:33:40Z",
+ "body": "fix:https://github.com/python/cpython/issues/150178\n\n<!-- gh-issue-number: gh-150178 -->\n* Issue: gh-150178\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "aisk",
+   "created_at": "2026-05-21T09:44:09Z",
+   "body": "The fix looks good to me. However, I think the NEWS entry is too internal-facing, and it's a rare-case fix, so I don't think we need a NEWS entry for it."
+  },
+  {
+   "author": "lpyu001",
+   "created_at": "2026-05-21T09:51:50Z",
+   "body": "> The fix looks good to me. However, I think the NEWS entry is too internal-facing, and it's a rare-case fix, so I don't think we need a NEWS entry for it.\r\n\r\nthanks for your comments, I've delete NEWS"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-23T08:41:00Z",
+   "body": "Thanks @lpyu001 for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-23T08:41:00Z",
+   "body": "Thanks @lpyu001 for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-23T08:41:01Z",
+   "body": "Thanks @lpyu001 for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-05-23T08:41:13Z",
+   "body": "[GH-150301](https://github.com/python/cpython/pull/150301) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150178",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "32823af153b76b7042fbce28ea8a6e0c3c4f1ca8",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "95c93239be9d6e7f047ab3fba41b6bff3e9aca0c",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6b17d1a783d3c0a9c8a35a94e24a2987807728ef",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5676bfcf859529b9ddd9a74b3199f2d932992458",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/dashboard/issues/23",
+   "commit": null,
+   "actor": "StanFromIreland"
+  }
+ ],
+ "fetch_errors": null
+}

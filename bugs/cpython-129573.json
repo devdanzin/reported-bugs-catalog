@@ -12,6 +12,9 @@
   "python/cpython#129574",
   "python/cpython#130997"
  ],
+ "n_prs": 2,
+ "n_backports": 1,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.13",

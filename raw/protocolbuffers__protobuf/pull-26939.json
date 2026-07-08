@@ -1,0 +1,31 @@
+{
+ "repo": "protocolbuffers/protobuf",
+ "number": 26939,
+ "type": "pull",
+ "url": "https://github.com/protocolbuffers/protobuf/pull/26939",
+ "title": "Refactor container comparison function in py/C++ and py/upb to return enum instead of integer.",
+ "state": "closed",
+ "state_reason": null,
+ "author": "copybara-service[bot]",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-04-16T17:52:55Z",
+ "closed_at": "2026-04-22T00:21:28Z",
+ "body": "Refactor container comparison function in py/C++ and py/upb to return enum instead of integer.\n\nThe new enum is:\n```py\ntypedef enum {\n  kPyUpb_CompareEqual, # formerly return value 1\n  kPyUpb_CompareNotEqual, # formerly return value 0\n  kPyUpb_CompareError, # formerly return value -1\n} PyUpb_CompareResult;\n```\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c857f492242f889b2a5551b50e309d927cb77b57",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "copybara-service[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

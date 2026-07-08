@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 152159,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152159",
+ "title": "[3.14] gh-151763: Fix crash in `_interpqueues.create` on `MemoryError` (GH-152131)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-25T07:04:19Z",
+ "closed_at": "2026-06-25T07:31:27Z",
+ "body": "(cherry picked from commit a6c2d4ae3bd744610e1a8b70396effdabca1593d)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152131",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "00b8dabd5fea39a738af5b3a021a96542586d806",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

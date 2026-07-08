@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 146510,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146510",
+ "title": "[3.13] gh-146059: Cleanup pickle fast_save_enter() test (GH-146481)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-27T10:26:37Z",
+ "closed_at": "2026-03-27T10:49:58Z",
+ "body": "Remove {\"key\": data}, it's not required to reproduce the bug.\nSimplify also deep_nested_struct(): remove the seed parameter.\nFix a typo in a comment.\n(cherry picked from commit 0c7a75aeef4dae87f02536ed4c42a57c13ef20e2)\n\nCo-authored-by: Victor Stinner <vstinner@python.org>\n\n<!-- gh-issue-number: gh-146059 -->\n* Issue: gh-146059\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146059",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146481",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9ee6b67ee9839dd46fc7c27aab24deae403b1bbc",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

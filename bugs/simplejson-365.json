@@ -1,0 +1,28 @@
+{
+ "bug_id": "simplejson-365",
+ "title": "Add per-object critical sections to scanner and encoder (free-threading safety)",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "simplejson/simplejson",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "simplejson/simplejson#365"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/simplejson__simplejson/pull-365.json"
+ ],
+ "n_artifacts": 1
+}

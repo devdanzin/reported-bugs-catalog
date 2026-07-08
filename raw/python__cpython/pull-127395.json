@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 127395,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127395",
+ "title": "[3.13] gh-126881: fix finalization of dtoa state (GH-126904)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-29T09:47:31Z",
+ "closed_at": "2024-11-29T10:52:22Z",
+ "body": "(cherry picked from commit 762c603a866146afc7db2591fb49605e0858e9b1)\n\nCo-authored-by: Kumar Aditya <kumaraditya@python.org>\n\n<!-- gh-issue-number: gh-126881 -->\n* Issue: gh-126881\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-29T09:56:02Z",
+   "body": ">  kumaraditya303 approved these changes Nov 29, 2024 \r\n\r\nYou should click on [Enable auto-merge (squash)] to merge the PR once the CI tests pass. I clicked on the button :-)"
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-29T10:02:43Z",
+   "body": "> You should click on [Enable auto-merge (squash)] to merge the PR once the CI tests pass. I clicked on the button :-)\r\n\r\nOh, forgot that, thanks @vstinner "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126881",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126904",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "47b0f8f2972facc29ec33f1f0b353784ff94b709",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

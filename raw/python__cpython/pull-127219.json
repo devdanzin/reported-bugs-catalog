@@ -1,0 +1,83 @@
+{
+ "repo": "python/cpython",
+ "number": 127219,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127219",
+ "title": "gh-127182: Fix `io.StringIO.__setstate__` crash when `None` is the first value",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-24T11:25:36Z",
+ "closed_at": "2024-11-25T17:32:02Z",
+ "body": "Change:\r\n- We now check for explicit `None` value in `__setstate__`, it cannot be recieved normally, because `__getstate__` never returns `None`, but we should not let a simple direct call to crash, when the fix is rather simple\r\n- Why does it happen in the first place? Because we do the input validation with `__init__` method: https://github.com/python/cpython/blob/f7bb658124aba74be4c13f498bf46cfded710ef9/Modules/_io/stringio.c#L898\r\n- But, `None` is an allowed input value, see https://github.com/python/cpython/blob/f7bb658124aba74be4c13f498bf46cfded710ef9/Modules/_io/stringio.c#L693\r\n- We did not check for `None` in `__setstate__`\r\n- `NULL` cannot be passed to `__setstate__`, because it requires a `tuple` input\n\n<!-- gh-issue-number: gh-127182 -->\n* Issue: gh-127182\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-25T17:32:07Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-25T17:32:21Z",
+   "body": "[GH-127262](https://github.com/python/cpython/pull/127262) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-25T17:32:28Z",
+   "body": "[GH-127263](https://github.com/python/cpython/pull/127263) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127182",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "a2ee89968299fc4f0da4b5a4165025b941213ba5",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5694d249eb9838a3767e3bc6ff346902026c5f90",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b4c48aa70833311a764431473e1242c8931723f8",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a4d6b905dd46eedaa118b95d1ed052a7171cd608",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a1b9663c417ec4f2c53cf59b4f6e2c765e48f829",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "49a5468ad692cb096b8bd68aa28687d8ee524fb0",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

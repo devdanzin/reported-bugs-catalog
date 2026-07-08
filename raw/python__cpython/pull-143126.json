@@ -1,0 +1,136 @@
+{
+ "repo": "python/cpython",
+ "number": 143126,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143126",
+ "title": "gh-143123: Protect against recursive tracer calls/finalization",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-12-23T23:35:34Z",
+ "closed_at": "2026-01-14T12:23:14Z",
+ "body": "Fixes https://github.com/python/cpython/issues/143358\r\nFixes https://github.com/python/cpython/issues/143123\r\n\r\n\r\n<!-- gh-issue-number: gh-143123 -->\r\n* Issue: gh-143123\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-24T10:09:30Z",
+   "body": "Can we have a test for this?"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-24T10:16:24Z",
+   "body": "> Can we have a test for this?\r\n\r\nThe reproducer provided by the OP requires installation of a package to crash. I don't think we can unit test this if that's the case."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-24T10:19:05Z",
+   "body": "> Is the problem that we are unable to distinguish between tracing happening in an invocation of _PyEval_EvalFrameDefault higher up the call stack and tracing happening in this invocation of _PyEval_EvalFrameDefault?\r\n\r\nYes I suspect that's the case."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-24T11:27:10Z",
+   "body": "@Fidget-Spinner \r\nWe could add a \"jit_depth\" field to the thread state, initialized to 0.\r\n\r\n* On entering `_PyEval_EvalFrameDefault`: if jit_depth is non-zero, increase it by one.\r\n* On leaving: if jit_depth is non-zero, decrease it by one\r\n* Don't start tracing if jit_depth is non-zero. \r\n* When starting tracing, set it to 1.\r\n* Tracing is active if `jit _depth == 1`\r\n* Assert that it is 1 anywhere we call the optimizer, start or stop tracing, etc."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-25T00:31:04Z",
+   "body": "I realised we can just do the check in `_PyJit_InitializeTracing`, and leave the invariants to the rest of the optimizer."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-29T02:43:22Z",
+   "body": "So I spent 30 minutes trying to create a simple reproducer to no avail. The following needs to happen:\r\n\r\n1. Outer Python -> C -> Inner Python calls.\r\n2. That just so happen to **all** be tracing at the same time.\r\n3. Outer traces, inner traces. Inner trace stomp on outer.\r\n\r\nThis is really hard to create a reproducer for as I'm not sure how to finangle the counters to be just right."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-01-05T12:18:26Z",
+   "body": "Let's not worry about a reproducer, but ensure that tracing is active only once in any thread.\r\nThen we don't need to worry about \"inner\" or \"outer\" traces, as there will only be (at most) one trace."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-05T13:30:44Z",
+   "body": "> Let's not worry about a reproducer, but ensure that tracing is active only once in any thread. Then we don't need to worry about \"inner\" or \"outer\" traces, as there will only be (at most) one trace.\r\n\r\nThis has nothing to do with threads. It's recursive traces."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-01-05T16:58:32Z",
+   "body": "Not once across all threads. Once *per* thread."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-07T11:05:26Z",
+   "body": "Well, this PR does that. It fails if it detects another trace occuring during trace initialization."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-01-08T12:48:42Z",
+   "body": "How do you detect when to stop tracing? If an exception is raised and tracing is active, but higher up the stack, how do you know *not* to stop tracing?"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-08T13:10:17Z",
+   "body": "> How do you detect when to stop tracing? If an exception is raised and tracing is active, but higher up the stack, how do you know _not_ to stop tracing?\r\n\r\nIt's protected by this https://github.com/python/cpython/blob/main/Python/optimizer.c#L720"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-01-09T10:14:42Z",
+   "body": "Maybe, but the current approach seems hard to follow and fragile.\r\nI'm fairly sure we don't always stop tracing cleanly when exceptions are raised. \r\n\r\nI think we need a clear way to express the two queries:\r\n1. \"is tracing happening in *this* invocation of PyEval_EvalFrame?\", and\r\n2. \"is tracing happening in this thread?\"\r\n\r\nAnd add some asserts that (1) always implies (2).\r\n\r\nWe should only start tracing if (2) is false, and only stop tracing if (1) is true.\r\n\r\nI think we already have these two queries:\r\n1. IS_JIT_TRACING()\r\n2. tstate->jit_tracer_state.initial_state.code != NULL\r\n\r\nWe should probably add a `is_tracing` field to the thread state for clarity instead of the very unclear `tstate->jit_tracer_state.initial_state.code != NULL`\r\n\r\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-09T16:32:08Z",
+   "body": "@markshannon I updated to use a dedicated field to indicate tracing"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-12T00:16:26Z",
+   "body": "@markshannon I found a repro where not stopping early during exceptions actually cause issues https://github.com/python/cpython/issues/143358.\r\n\r\nAdded code to stop early when an exception is raised."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-01-13T10:44:45Z",
+   "body": "<!-- changes-requested -->\nWhen you're done making the requested changes, leave the comment: `I have made the requested changes; please review again`.\n<!-- /changes-requested -->\n\n\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143123",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143644",
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143820",
+   "commit": null,
+   "actor": "cocolato"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e370c8db52d8b0983158ba6261ab227d8158b8b4",
+   "actor": "markshannon"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1bc8e9688da98fd7aa25c94c31bbd34a40fe5de8",
+   "actor": "thunder-coding"
+  }
+ ],
+ "fetch_errors": null
+}

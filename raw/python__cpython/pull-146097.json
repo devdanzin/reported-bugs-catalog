@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 146097,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146097",
+ "title": "gh-145886: remove unused Event.raw field from _pyrepl",
+ "state": "closed",
+ "state_reason": null,
+ "author": "HCYT",
+ "author_association": "NONE",
+ "labels": [
+  "awaiting core review"
+ ],
+ "created_at": "2026-03-18T04:15:22Z",
+ "closed_at": "2026-03-18T08:53:52Z",
+ "body": "While looking at the `getpending()` bug (`e.raw += e.raw` instead of `e2.raw`), I noticed `Event.raw` is never actually read anywhere -- only written to. So instead of just fixing the typo, this removes the dead field entirely.\n\nRemoved `raw: bytes = b\"\"` from the `Event` dataclass along with all related assignments in `unix_console.py`, `windows_console.py`, and `base_eventqueue.py`. The `flush_buf()` calls are kept since they still need to clear the internal buffer, just no longer pass the result to `Event`.\n\nTests updated to match.\n\n<!-- gh-issue-number: gh-145886 -->\n* Issue: gh-145886\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2026-03-18T04:15:26Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-18T04:15:26Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T08:54:14Z",
+   "body": "There is no consensus on the issue. Do not open PRs in those cases please."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T08:55:17Z",
+   "body": "Can we first discuss this on the issue before we open PRs in the future? "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145886",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -8,22 +8,31 @@
  "issues": [
   "python/cpython#146065"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146304"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
+  "awaiting merge",
   "extension-modules",
   "topic-asyncio",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "VanshAgarwal24036"
+ ],
  "status": "open",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146065.json"
+  "raw/python__cpython/issue-146065.json",
+  "raw/python__cpython/pull-146304.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

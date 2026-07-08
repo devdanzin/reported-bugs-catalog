@@ -1,0 +1,27 @@
+{
+ "repo": "python/cpython",
+ "number": 152164,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152164",
+ "title": "gh-151763: Fix debug assertion in unicode subtype cleanup under OOM",
+ "state": "open",
+ "state_reason": null,
+ "author": "zainnadeem786",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-25T07:33:12Z",
+ "closed_at": null,
+ "body": "## Summary\r\n\r\nThis PR addresses **OOM-0030** from gh-151763.\r\n\r\nIt fixes a debug-build assertion that can occur while cleaning up a partially constructed Unicode subtype after an allocation failure.\r\n\r\n## Issue\r\n\r\n`unicode_subtype_new()` allocates a non-compact Unicode subtype object and initializes its internal state before allocating the backing character buffer.\r\n\r\nIf allocating that buffer fails, the constructor cleans up using:\r\n\r\n```c\r\nPy_DECREF(self);\r\n```\r\n\r\nAt that point the object is valid enough to own a reference, but its internal data pointer is still `NULL`.\r\n\r\nDuring debug builds, deallocation calls `unicode_is_singleton()`. For length-1 strings that helper reads the first character using:\r\n\r\n```c\r\nPyUnicode_READ_CHAR(unicode, 0);\r\n```\r\n\r\nFor a partially initialized non-compact Unicode object this reaches the internal assertion:\r\n\r\n```\r\ndata != NULL\r\n```\r\n\r\ncausing the interpreter to abort instead of propagating the pending `MemoryError`.\r\n\r\n## Fix\r\n\r\nBefore reading the first character, `unicode_is_singleton()` now detects the temporary construction state:\r\n\r\n```c\r\nif (!PyUnicode_IS_COMPACT(unicode) &&\r\n    _PyUnicode_DATA_ANY(unicode) == NULL) {\r\n    return 0;\r\n}\r\n```\r\n\r\nA non-compact Unicode object with a `NULL` data pointer cannot represent a singleton, so returning `0` is correct while avoiding the invalid debug-only access.\r\n\r\nThe constructor, ownership model, and cleanup logic remain unchanged.\r\n\r\n## Validation\r\n\r\nBuilt locally:\r\n\r\n```text\r\nPCbuild\\build.bat -p x64 -c Debug\r\n```\r\n\r\nReproduced the original OOM path using `_testcapi.set_nomemory()`.\r\n\r\n### Before\r\n\r\nThe reproducer aborted with:\r\n\r\n```\r\nAssertion failed: data != NULL\r\nInclude/cpython/unicodeobject.h\r\n```\r\n\r\n### After\r\n\r\nThe same allocation-failure sweep completes without triggering the assertion and correctly propagates `MemoryError`.\r\n\r\n## Tests\r\n\r\nExecuted focused Unicode test suites:\r\n\r\n```text\r\nPCbuild\\amd64\\python_d.exe -m test test_str test_capi.test_unicode\r\nPCbuild\\amd64\\python_d.exe -m test test_codecs\r\n```\r\n\r\nAll passed.\r\n\r\nI also verified:\r\n\r\n```text\r\ngit diff --check\r\n```\r\n\r\nNo whitespace issues were reported.\r\n\r\n## Notes\r\n\r\nNo regression test is included.\r\n\r\nThe reproducer relies on `_testcapi.set_nomemory()` and allocation-failure indices that are build-sensitive, making it difficult to provide a stable CI regression test for this specific OOM path.\r\n\r\nAddresses OOM-0030 from gh-151763.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

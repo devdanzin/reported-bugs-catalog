@@ -1,0 +1,97 @@
+{
+ "repo": "python/cpython",
+ "number": 146117,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146117",
+ "title": "gh-146092: Fix error handling in _BINARY_OP_ADD_UNICODE opcode",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-18T15:11:29Z",
+ "closed_at": "2026-03-18T16:23:05Z",
+ "body": "Fix also error handling in _BINARY_OP_ADD_FLOAT,\r\n_BINARY_OP_SUBTRACT_FLOAT and _BINARY_OP_MULTIPLY_FLOAT opcodes. PyStackRef_FromPyObjectSteal() must not be called with a NULL pointer.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146092 -->\n* Issue: gh-146092\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T15:15:55Z",
+   "body": "I don't know well `Python/bytecodes.c` DSL, so I'm not sure if inputs are cleared properly on error.\r\n\r\nPython 3.14 is also affected by the bug for _BINARY_OP_ADD_FLOAT, _BINARY_OP_SUBTRACT_FLOAT and _BINARY_OP_MULTIPLY_FLOAT opcodes (_BINARY_OP_ADD_UNICODE is not affected), but it needs a different fix. Once this fix will be merged, I will write a different one for 3.14.\r\n\r\ncc @Fidget-Spinner @corona10 "
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-03-18T15:38:02Z",
+   "body": "I think you accidentally committed an out of date test_frozenmain?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T15:49:59Z",
+   "body": "> I think you accidentally committed an out of date test_frozenmain?\r\n\r\nI don't know what happened, but `Programs/test_frozenmain.h` was regenerated somehow. I fixed the issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T16:04:01Z",
+   "body": "Fix for the 3.14 branch: https://github.com/python/cpython/pull/146119."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-18T16:23:09Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-18T16:23:12Z",
+   "body": "Sorry, @vstinner, I could not cleanly backport this to `3.14` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 1e4ed932109c4f8ee4f43bc3e6fdb7710a3606bd 3.14\n```\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-18T16:23:16Z",
+   "body": "Sorry, @vstinner, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 1e4ed932109c4f8ee4f43bc3e6fdb7710a3606bd 3.13\n```\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T16:27:43Z",
+   "body": "> @serhiy-storchaka added needs backport to 3.13 needs backport to 3.14 labels\r\n\r\nAs I wrote previously, the 3.14 branch needs a different fix. I wrote the PR gh-146119 for that.\r\n\r\nPython 3.13 is not affected by the bug. `PyStackRef_FromPyObjectSteal()` doesn't exist in Python 3.13 (the function was added to Python 3.14)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T16:28:02Z",
+   "body": "PR merged. Thanks for your review @Fidget-Spinner."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146092",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "1e4ed932109c4f8ee4f43bc3e6fdb7710a3606bd",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4f4627f32d8ed1da87bf20981322a28adb79489b",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

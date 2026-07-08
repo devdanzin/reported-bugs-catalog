@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 131949,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/131949",
+ "title": "[3.13] gh-131936: Strengthen check in `_suggestions._generate_suggestions` (GH-131945)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-03-31T17:31:11Z",
+ "closed_at": "2025-03-31T17:54:20Z",
+ "body": "(cherry picked from commit 511d3440a0bbb19731f4d96dde65dffbf85cdda5)\n\nCo-authored-by: Peter Bierma <zintensitydev@gmail.com>\n\n<!-- gh-issue-number: gh-131936 -->\n* Issue: gh-131936\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131945",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131936",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d52371c8cdafeb61df92e9cea6b02e3c4d052765",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

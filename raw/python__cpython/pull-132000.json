@@ -1,0 +1,121 @@
+{
+ "repo": "python/cpython",
+ "number": 132000,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132000",
+ "title": "gh-131998: Fix `NULL` dereference when using an unbound method descriptor in a specialized code path",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-04-02T02:25:39Z",
+ "closed_at": "2025-04-08T10:31:43Z",
+ "body": "\n\n<!-- gh-issue-number: gh-131998 -->\n* Issue: gh-131998\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-02T14:16:57Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\n\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-02T21:00:07Z",
+   "body": "I have made the requested changes; please review again"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-02T21:00:12Z",
+   "body": "Thanks for making the requested changes!\n\n@markshannon: please review the changes made to this pull request.\n"
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-06T13:56:04Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "hugovk",
+   "created_at": "2025-04-07T06:12:30Z",
+   "body": "This PR had a merge conflict.\r\n\r\nNext 3.13/3.14 releases are tomorrow. "
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-07T13:17:51Z",
+   "body": "Fixed the conflicts.\r\n\r\nFriendly ping @markshannon -- this is a blocker for 3.13.3."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-08T09:38:26Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\nAnd if you don't make the requested changes, you will be poked with soft cushions!\n\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-04-08T09:42:14Z",
+   "body": "FTR, here's the reproducer on main without importing `glob`.\r\n```Py\r\n>>> def call(part):\r\n...     [] + ([] + [])\r\n...     part.pop()\r\n...\r\n>>> for _ in range(3):\r\n...     call(['a'])\r\n...\r\n>>> call(list)\r\nSegmentation fault (core dumped)\r\n```"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-08T09:46:27Z",
+   "body": "I'm not going to trigger the noisy bot again, but this should be good to go."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-08T10:31:47Z",
+   "body": "Thanks @ZeroIntensity for the PR, and @Yhg1s for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-08T10:31:50Z",
+   "body": "Sorry, @ZeroIntensity and @Yhg1s, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker ac3c439cdfee8452f2bcceacd67a1f4e423ac3cf 3.13\n```\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-08T10:32:35Z",
+   "body": "I'll deal with the backport."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-08T10:39:08Z",
+   "body": "[GH-132262](https://github.com/python/cpython/pull/132262) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131998",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132018",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ac3c439cdfee8452f2bcceacd67a1f4e423ac3cf",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3fcd91c40f903d54acfd3b1f89df47a53c6cb5e5",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5911768600f6e7ff16043f9402416f0adf035b02",
+   "actor": "Yhg1s"
+  }
+ ],
+ "fetch_errors": null
+}

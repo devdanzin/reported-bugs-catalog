@@ -1,0 +1,106 @@
+{
+ "repo": "python/cpython",
+ "number": 145439,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145439",
+ "title": "gh-145335: Fix os functions when passing fd -1 as path",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-02T19:39:22Z",
+ "closed_at": "2026-03-03T12:57:08Z",
+ "body": "os.listdir(-1) and os.scandir(-1) now fail with OSError(errno.EBADF) rather than listing the current directory.\r\n\r\nos.listxattr(-1) now fails with OSError(errno.EBADF) rather than listing extended attributes of the current directory.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-145335 -->\n* Issue: gh-145335\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-bot",
+   "created_at": "2026-03-02T20:34:52Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @vstinner for commit a8942627a890689c32575d094a9932c58c3a161e :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F145439%2Fmerge\n\nIf you want to schedule another build, you need to add the <kbd>:hammer: test-with-buildbots</kbd> label again.\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-03T10:27:05Z",
+   "body": "Tests failed on 5 buildbots, but failures are unrelated to this change.\r\n\r\n> buildbot/AMD64 CentOS9 NoGIL Refleaks PR\r\n\r\n`FAIL: test_free_reference (test.test_concurrent_futures.test_thread_pool.ThreadPoolExecutorTest.test_free_reference)`\r\n\r\n> buildbot/AMD64 Fedora Stable Clang Installed PR\r\n> buildbot/PPC64LE Fedora Stable Clang Installed PR\r\n> buildbot/s390x Fedora Stable Clang Installed PR\r\n> buildbot/x86 Debian Installed with X PR\r\n\r\n3 tests failed: `test_datetime test_import test_interpreters`. It should be fixed by commit 46c5c57226862bc078bcdf0c9f5b40951b8615a5."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-03T10:27:49Z",
+   "body": "The PR is now ready for review.\r\n\r\ncc @picnixz @aisk"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-03T12:57:21Z",
+   "body": "Merged. Thanks for the review!"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-03T13:23:27Z",
+   "body": "@picnixz:\r\n> Are there actually other places where we use the path converter and that would be useful? (that is, do you plan to look at other modules as follow-up?)\r\n\r\nI had a look and I didn't find other places with the same bug.\r\n\r\n* `path_converter()` and `path_t` are specific to `posixmodule.c`.\r\n* `PyObject_AsFileDescriptor()` fails with ValueError if the file descriptor is negative, so check for errors using `fd == -1` or `fd < 0` is correct.\r\n* `_PyLong_FileDescriptor_Converter()` calls `PyObject_AsFileDescriptor()`.\r\n* Argument Clinic generates `PyObject_AsFileDescriptor()` calls when using `fildes` type.\r\n* `open()` calls `FileIO()` which also explicitly rejects negative file descriptors."
+  },
+  {
+   "author": "freakboy3742",
+   "created_at": "2026-03-05T01:00:35Z",
+   "body": "This appears to have [broken Emscripten builds](https://buildbot.python.org/#/builders/1810/builds/1927); not sure if the fix is a test skip, or if there's some additional handling required.\r\n\r\n/cc @hoodmane "
+  },
+  {
+   "author": "hoodmane",
+   "created_at": "2026-03-05T09:40:01Z",
+   "body": "I'll look into it, thanks for the ping @freakboy3742."
+  },
+  {
+   "author": "hoodmane",
+   "created_at": "2026-03-05T10:07:13Z",
+   "body": "Problem seems to be that on Emscripten `execve` is \"supported\" but always returns `ENOEXEC`."
+  },
+  {
+   "author": "hoodmane",
+   "created_at": "2026-03-05T10:12:06Z",
+   "body": "Fix here: https://github.com/python/cpython/pull/145528"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-05T10:21:56Z",
+   "body": "> This appears to have [broken Emscripten builds](https://buildbot.python.org/#/builders/1810/builds/1927); not sure if the fix is a test skip, or if there's some additional handling required.\r\n\r\nOh, I missed this buildbot failure since it's still classified as Unstable. I propose to promote it to Stable: https://github.com/python/buildmaster-config/pull/678."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145335",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145390",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "52c8efa87d028e57895d6a44f22caeb99a589711",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145180",
+   "commit": null,
+   "actor": "freakboy3742"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a70bbfe3b5f8a128d1bc963f2e8f4c25f7ac3575",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

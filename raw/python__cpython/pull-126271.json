@@ -1,0 +1,109 @@
+{
+ "repo": "python/cpython",
+ "number": 126271,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126271",
+ "title": "gh-126220: Fix crash on calls to `_lsprof.Profiler` methods with 0 args (backportable)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-01T10:04:34Z",
+ "closed_at": "2024-11-01T21:53:30Z",
+ "body": "This is the fix with no AC that we can backport. \r\n\r\nhttps://github.com/python/cpython/pull/126233 will be reworked to only apply AC to already fixed functions. I plan to merge this one first and then rebase the oirginal one.\n\n<!-- gh-issue-number: gh-126220 -->\n* Issue: gh-126220\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-01T10:09:12Z",
+   "body": "I'm changing the title of the PR just so that we don't have two PRs that look exactly the same on the issue."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-01T21:53:33Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-01T21:53:44Z",
+   "body": "[GH-126310](https://github.com/python/cpython/pull/126310) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-01T21:53:49Z",
+   "body": "[GH-126311](https://github.com/python/cpython/pull/126311) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-01T21:53:52Z",
+   "body": "Thank you! I will backport this change and go back to the original PR soon :)"
+  },
+  {
+   "author": "erlend-aasland",
+   "created_at": "2024-11-01T21:56:08Z",
+   "body": "> I'm changing the title of the PR just so that we don't have two PRs that look exactly the same on the issue.\r\n\r\nNext time, remember to edit such a change out of the squashed commit title ;)"
+  },
+  {
+   "author": "erlend-aasland",
+   "created_at": "2024-11-01T21:57:35Z",
+   "body": "Nit: ideally, the other PR would have received the title change (_adapt to Argument Clinic ..._), not this one."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126220",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "28b148fb32e4548b461137d18d1ab6d366395d36",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "144447c3cd9e1b0514b62285ab215d590e4d8cc6",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4197d4093252bd06aabdf959a58ebc7c076d221c",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b5c19bdba8f58cba80a1101ce8aad90be3486571",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1b9710c57188bad9152c0973d7c1ea766ae03247",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "590269eb7f9d3ff8cdad8f51559fadad3f16b908",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8829f6df159a47aa2fdf029645e4c3f55bc3d942",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,35 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 80,
+ "type": "pull",
+ "url": "https://github.com/dpdani/cereggii/pull/80",
+ "title": "Prevent multiple successful calls to `AtomicDict.__init__` and ensure that only one concurrent call can succeed",
+ "state": "closed",
+ "state_reason": null,
+ "author": "dpdani",
+ "author_association": "OWNER",
+ "labels": [
+  "bug",
+  "AtomicDict",
+  "fusil-fuzzer"
+ ],
+ "created_at": "2025-10-19T09:59:27Z",
+ "closed_at": "2025-10-19T13:04:48Z",
+ "body": "Fixes #78\r\nFixes #79",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9b114cba7f07671a3f43c11f27505b9e239e6f71",
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ],
+ "fetch_errors": null
+}

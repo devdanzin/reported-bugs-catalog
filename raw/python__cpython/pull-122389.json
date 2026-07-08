@@ -1,0 +1,53 @@
+{
+ "repo": "python/cpython",
+ "number": 122389,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/122389",
+ "title": "gh-122353: Handle `ValueError` during imports",
+ "state": "open",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting merge"
+ ],
+ "created_at": "2024-07-29T09:30:06Z",
+ "closed_at": null,
+ "body": "This is a simple fix but I am not an expert enough concerning the import system. The idea is to also catch the ValueError that could be raised by any function using the `path_t` AC converter (or by any other handler that is explicitly raising it).\r\n\r\n\n\n<!-- gh-issue-number: gh-122353 -->\n* Issue: gh-122353\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-08-06T22:28:52Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\n\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-08-09T08:17:52Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\n\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-08-12T15:52:05Z",
+   "body": "There is a pending doc question I have but otherwise it should be good for a second round of reviews (btw, thank you all for your time). I have made the requested changes; please review again."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-08-12T15:52:10Z",
+   "body": "Thanks for making the requested changes!\n\n@serhiy-storchaka, @zooba, @ncoghlan: please review the changes made to this pull request.\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-07T10:05:59Z",
+   "body": "@ncoghlan Could you have a look at the modified text and the question I had please (https://github.com/python/cpython/pull/122389#discussion_r1714059259)? Thank you! @zooba Could you confirm whether the latest changes are fine? Thank you!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122353",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

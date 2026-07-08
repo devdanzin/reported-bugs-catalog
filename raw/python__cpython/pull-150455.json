@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 150455,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/150455",
+ "title": "gh-150454: Fix wrong-interpreter return in import_run_extension error path",
+ "state": "closed",
+ "state_reason": null,
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-05-26T07:22:12Z",
+ "closed_at": "2026-05-29T10:03:37Z",
+ "body": "\n\n<!-- gh-issue-number: gh-150454 -->\n* Issue: gh-150454\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150454",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "686996e4d8a09ad5a301488894e3193e9a08a70f",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,102 @@
+{
+ "repo": "python/cpython",
+ "number": 137016,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/137016",
+ "title": "gh-137007: Track executor before any possible deallocations",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-07-22T16:18:08Z",
+ "closed_at": "2025-12-10T21:09:57Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-137007 -->\n* Issue: gh-137007\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-07-22T16:21:17Z",
+   "body": "There's no reproducer because I can't force _PyJIT_Compile to fail except in specific scenarios, or when the GC decides to kick in right when the executor is linked, but not yet tracked."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-22T16:51:27Z",
+   "body": "Unfortunately the patch doesn't fix the issue for me. I double checked that it's applied and still get the abort. Investigating whether the diff necessary to reproduce is the same. "
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-07-22T16:57:13Z",
+   "body": "@devdanzin can you please try again?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-22T17:00:14Z",
+   "body": "Still aborting here. Does it stop reproducing for you?"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-07T23:40:55Z",
+   "body": "@devdanzin does it still reproduce now?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-09T14:34:26Z",
+   "body": "Unfortunately I cannot reproduce the crash even without the patch applied. Tried all known MREs, tinkered with them for over two hours to try to make them repro, and fuzzed with the MREs as seeds. No luck reproducing."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-12-10T21:22:45Z",
+   "body": "Thanks @Fidget-Spinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-12-10T21:22:56Z",
+   "body": "[GH-142541](https://github.com/python/cpython/pull/142541) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/137007",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/139952",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142492",
+   "commit": null,
+   "actor": "ashm-dev"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "97e19014ddc652beae58e7eceb591f5d65a875e6",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "25a48d980938e4c7c3658287e7e7c200fc27ba6b",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "acd5b9708222e768fe0d0e1fb6071c6602acb63f",
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

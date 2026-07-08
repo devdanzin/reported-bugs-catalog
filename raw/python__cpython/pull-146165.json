@@ -1,0 +1,132 @@
+{
+ "repo": "python/cpython",
+ "number": 146165,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146165",
+ "title": "gh-146092: Raise MemoryError on allocation failure in _zoneinfo",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-19T11:25:54Z",
+ "closed_at": "2026-03-20T16:17:22Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146092 -->\n* Issue: gh-146092\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-19T16:59:02Z",
+   "body": "> Please also fix: https://github.com/python/cpython/blob/main/Modules/_zoneinfo.c#L1872-L1875\r\n\r\nparse_transition_rule() is only used in parse_tz_str() and parse_tz_str() raises ValueError on parse_transition_rule() failure. Other parse_transition_rule() error paths don't set an exception. So I didn't add PyErr_NoMemory() in parse_transition_rule()."
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2026-03-19T17:05:25Z",
+   "body": "> So I didn't add PyErr_NoMemory() in parse_transition_rule().\r\n\r\nCan you please clarify why? The `ValueError` message may be misleading: \"Malformed transition rule in TZ string\"\r\nI would update the check to only raise the  `ValueError` if no other exception is already set."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-19T22:17:15Z",
+   "body": "> I would update the check to only raise the ValueError if no other exception is already set.\r\n\r\nI tried that but I ended up with strange exceptions from a subfunction."
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2026-03-20T07:48:42Z",
+   "body": "Oh yes, I see, I was able to reproduce that. Instead we could do:\r\n\r\n```diff\r\n         if (parse_transition_rule(&p, transitions[i])) {\r\n-            PyErr_Format(PyExc_ValueError,\r\n-                         \"Malformed transition rule in TZ string: %R\",\r\n-                         tz_str_obj);\r\n+            if (!PyErr_ExceptionMatches(PyExc_MemoryError)) {\r\n+                PyErr_Format(PyExc_ValueError,\r\n+                             \"Malformed transition rule in TZ string: %R\",\r\n+                             tz_str_obj);\r\n+            }\r\n             goto error;\r\n         }\r\n     }\r\n```\r\n\r\nSince `{day,calendar}rule_new` (the subfunctions) only raise `ValueError`s."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-20T09:27:16Z",
+   "body": "Ok, I updated parse_transition_rule() to raise MemoryError and use `if (!PyErr_ExceptionMatches(PyExc_MemoryError)) {` in its caller."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-20T10:47:48Z",
+   "body": "@StanFromIreland: Please review the updated PR."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-20T16:17:27Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-20T16:17:40Z",
+   "body": "[GH-146223](https://github.com/python/cpython/pull/146223) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-20T16:17:43Z",
+   "body": "Merged, thanks for your reviews!"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-20T16:17:44Z",
+   "body": "[GH-146224](https://github.com/python/cpython/pull/146224) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146092",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6450b1d142b6254d2e3b2eba47d69125ca79b3fe",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8403da24608a0519f99a61a58d1d20d7cc7d02ef",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8025e78e9822f7ba43df4ec215325714d8bf350f",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cfd7f94c12c7ee85d51838b306b8c30596094ebc",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a2a45d7d13ceaf6d44b5b58392a36920937f63f7",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2691ad9d6a47b4beee7b5f299d878b4ef36e830c",
+   "actor": "CuriousLearner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bd94f64b736eadb1d54ba796e7854020a83cabf3",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 144965,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/144965",
+ "title": "[3.14] gh-144763: Fix race conditions in tracemalloc (#144779)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-02-18T16:57:33Z",
+ "closed_at": "2026-02-18T19:55:38Z",
+ "body": "Avoid PyUnstable_InterpreterFrame_GetLine() since it uses a critical section which can lead to a deadlock.\r\n\r\n_PyTraceMalloc_Stop() now also calls PyRefTracer_SetTracer() without holding TABLES_LOCK() to prevent another deadlock.\r\n\r\n\r\n(cherry picked from commit 83f4fffe3d78ba368c0d4864c42c7c9c9223f7d1)\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-144763 -->\n* Issue: gh-144763\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/144779",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/144763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "f67cf83a4e3c6a28522b53d985928a46aae22b77",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

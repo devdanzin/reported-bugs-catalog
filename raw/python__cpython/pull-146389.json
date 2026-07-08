@@ -1,0 +1,81 @@
+{
+ "repo": "python/cpython",
+ "number": 146389,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146389",
+ "title": "gh-146388: Add null check for `sym_new(ctx)` in `make_bottom`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "A0su",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-03-24T18:14:21Z",
+ "closed_at": "2026-03-27T14:50:30Z",
+ "body": "# optimizer_symbols.c: make_bottom NULL deref when arena full\r\n\r\n`sym_new(ctx)` at line 1535 can return NULL when the type arena is full. Result immediately dereferenced without check. Every other `sym_new` call site checks for NULL.\r\n\r\nThis is a sub-issue of https://github.com/python/cpython/issues/146102 with [gist details](https://gist.github.com/devdanzin/14a5663604e1d7fb930d121b4e0c8d25)\n\n<!-- gh-issue-number: gh-146388 -->\n* Issue: gh-146388\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-24T18:14:26Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-24T19:33:09Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-24T20:54:01Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "aisk",
+   "created_at": "2026-03-26T12:11:18Z",
+   "body": "I think this fix is simple enough which doesn't requires a test, but the news entry is required. Can you add it follow the Dev Guide? https://devguide.python.org/getting-started/pull-request-lifecycle/#updating-news-and-what-s-new-in-python"
+  },
+  {
+   "author": "A0su",
+   "created_at": "2026-03-26T16:20:11Z",
+   "body": "@aisk, blurb added. Thanks for the review!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146388",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c8ee196030b1af7ccf347567e263075ffb1aeee8",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b77d2d9cb71308f7c8a68a7a1fecade0b5afe291",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4e5cd2759e8dd0648b0cb873fd6d84f089e9cb94",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

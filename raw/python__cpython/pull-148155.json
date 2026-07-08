@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 148155,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148155",
+ "title": "gh-142659: Optimize set_swap_bodies for intersection_update",
+ "state": "open",
+ "state_reason": null,
+ "author": "Siyet",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review",
+  "skip news"
+ ],
+ "created_at": "2026-04-06T08:34:14Z",
+ "closed_at": null,
+ "body": "## Summary\n\nReplace the general-purpose `set_swap_bodies()` with a specialized `set_replace_body()` that exploits the invariant that the source argument is always a uniquely-referenced temporary set about to be discarded.\n\nFollow-up to the observation in https://github.com/python/cpython/pull/132290#discussion_r2403137517 and https://github.com/python/cpython/issues/142659.\n\n## Changes\n\n`set_swap_bodies()` was designed for arbitrary two-way swaps between any two sets, but it is only called from `set_intersection_update()` and `set_intersection_update_multi_impl()`, where the second argument (`tmp`) is always a freshly created temporary with `Py_REFCNT == 1`.\n\nThe new `set_replace_body()` exploits this invariant:\n\n- **Skip atomic stores on `src`**: the temporary is not visible to other threads, so plain assignments suffice (saves atomic fence overhead in the free-threaded build).\n- **Skip `copy_small_table` for `src`**: use plain `memcpy` instead of per-entry atomic stores when writing back to src's smalltable (`Py_GIL_DISABLED` path).\n- **Remove frozenset hash swap**: neither argument is ever a frozenset in these call sites (enforced via `assert`).\n- **Simplify shared-marking logic**: `src` is never shared (enforced via `assert`), so only one direction of the shared-marking check is needed \u2014 propagate shared status from `dst` to `src` for proper deallocation of old entries.\n- **Remove unused `Py_hash_t h` variable**.\n\nAll assumptions are guarded by `assert()` to document and enforce the contract.\n\n<!-- gh-issue-number: gh-142659 -->\n* Issue: gh-142659\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-06T08:34:20Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "eendebakpt",
+   "created_at": "2026-04-06T09:21:11Z",
+   "body": "@Siyet Could you add a few benchmarks for the affected cases?"
+  },
+  {
+   "author": "Siyet",
+   "created_at": "2026-04-06T13:07:02Z",
+   "body": "Benchmarks on a dedicated server (AMD EPYC 1 vCPU, 2 GB RAM, Ubuntu 24.04, no background load, `taskset -c 0`, 50 rounds):\n\n**Default build (with GIL):**\n\n| Benchmark | Before (ns) | After (ns) | Change |\n|---|---|---|---|\n| small (5 & 5) | 1010 \u00b1 19 | 1022 \u00b1 21 | +1.2% |\n| medium (100 & 100) | 5010 \u00b1 76 | 4930 \u00b1 58 | -1.6% |\n| large (10k & 10k) | 1141519 \u00b1 12612 | 1137019 \u00b1 11591 | -0.4% |\n| multi-arg (100 & 100 & 50) | 6042 \u00b1 50 | 6048 \u00b1 88 | +0.1% |\n| empty result (100 & 0) | 4323 \u00b1 47 | 4301 \u00b1 59 | -0.5% |\n\n**Free-threading build (`--disable-gil`):**\n\n| Benchmark | Before (ns) | After (ns) | Change |\n|---|---|---|---|\n| small (5 & 5) | 1910 \u00b1 18 | 1931 \u00b1 22 | +1.1% |\n| medium (100 & 100) | 6716 \u00b1 63 | 6650 \u00b1 91 | -1.0% |\n| large (10k & 10k) | 2407935 \u00b1 22615 | 2404563 \u00b1 25709 | -0.1% |\n| multi-arg (100 & 100 & 50) | 8371 \u00b1 91 | 8284 \u00b1 82 | -1.0% |\n| empty result (100 & 0) | 5896 \u00b1 111 | 5828 \u00b1 65 | -1.1% |\n\nThe end-to-end improvement is modest (~1%) because `set_replace_body` is a small fraction of the total `intersection_update` time \u2014 most time is spent in `set_intersection` (iteration, hashing, insertion). The main value of this change is code clarity and correctness: the new function documents its contract via assertions, removes dead branches (frozenset hash swap, bidirectional shared-marking), and skips unnecessary atomic operations on the uniquely-referenced temporary.\n\n<details>\n<summary>Benchmark script</summary>\n\n```python\n\"\"\"Benchmark set.intersection_update for gh-142659.\n\nMeasures the performance of intersection_update across different set sizes\nand usage patterns. Each benchmark recreates the set on every iteration\nto measure the full intersection_update path including set_replace_body.\n\"\"\"\nimport statistics\nimport sys\nimport timeit\n\nROUNDS = 50\n\nBENCHMARKS = {\n    \"small (5 & 5)\": {\n        \"setup\": \"\",\n        \"stmt\": \"set(range(5)).intersection_update({3, 4, 5, 6, 7})\",\n        \"number\": 2_000_000,\n    },\n    \"medium (100 & 100)\": {\n        \"setup\": \"b = set(range(50, 150))\",\n        \"stmt\": \"set(range(100)).intersection_update(b)\",\n        \"number\": 500_000,\n    },\n    \"large (10k & 10k)\": {\n        \"setup\": \"b = set(range(5000, 15000))\",\n        \"stmt\": \"set(range(10000)).intersection_update(b)\",\n        \"number\": 2_000,\n    },\n    \"multi-arg (100 & 100 & 50)\": {\n        \"setup\": \"b = set(range(50, 150)); c = set(range(75, 125))\",\n        \"stmt\": \"set(range(100)).intersection_update(b, c)\",\n        \"number\": 500_000,\n    },\n    \"empty result (100 & 0 overlap)\": {\n        \"setup\": \"b = set(range(200, 300))\",\n        \"stmt\": \"set(range(100)).intersection_update(b)\",\n        \"number\": 500_000,\n    },\n}\n\n\ndef main():\n    print(f\"Python {sys.version}\")\n    print(f\"Rounds: {ROUNDS}\")\n    print()\n    print(f\"{'Benchmark':<32} {'Mean (ns)':>10} {'Stdev':>10} {'Min':>10} {'Max':>10}\")\n    print(\"-\" * 78)\n\n    for name, bench in BENCHMARKS.items():\n        times = timeit.repeat(\n            bench[\"stmt\"],\n            setup=bench[\"setup\"],\n            number=bench[\"number\"],\n            repeat=ROUNDS,\n        )\n        per_iter = [t / bench[\"number\"] * 1e9 for t in times]\n        mean = statistics.mean(per_iter)\n        stdev = statistics.stdev(per_iter)\n        print(\n            f\"{name:<32} {mean:>10.1f} {stdev:>9.1f} {min(per_iter):>10.1f} {max(per_iter):>10.1f}\"\n        )\n\n\nif __name__ == \"__main__\":\n    main()\n```\n\n</details>"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-12T06:45:12Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-05-18T07:20:20Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/142659",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

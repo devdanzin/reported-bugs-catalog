@@ -1,0 +1,93 @@
+{
+ "repo": "numpy/numpy",
+ "number": 31775,
+ "type": "pull",
+ "url": "https://github.com/numpy/numpy/pull/31775",
+ "title": "BUG: Fix segfault in MT19937 by preventing recursive seed lists",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Adhyansinghgupta",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "00 - Bug",
+  "component: numpy.random"
+ ],
+ "created_at": "2026-06-26T21:27:31Z",
+ "closed_at": "2026-07-03T18:42:44Z",
+ "body": "PR summary\r\nThis PR fixes a Segmentation Fault (stack overflow) that occurs when initialising MT19937 with a recursive or self-referencing list.\r\nPreviously, passing a cyclic list (e.g., x = []; x.append(x)) into the generator caused an infinite loop in the Cython unpacking logic, leading to a hard crash.\r\nI added a _has_cycle helper function in bit_generator.pyx to detect self-referencing sequences early. If a cycle is detected, the SeedSequence initialisation now safely raises a ValueError instead of segfaulting.\r\n\r\nCloses #28822 \r\nFirst-time committer introduction\r\nHi everyone! I am a newer contributor looking to dive deep into the Python data science stack. I wanted my first major contribution to be on the systems level rather than just documentation, so hunting down a C/Cython memory bug seemed like a great challenge. I'm excited to learn more from the maintainers here!\r\n\r\nAI Disclosure\r\nI used an AI assistant (Google Gemini) strictly as a pair-programming tool to help navigate the Meson/Spin build system and to draft the initial logic for the _has_cycle helper function. I manually compiled the environment, reproduced the bug, and verified the fix locally.\r\n\r\n### Verification\r\nHere is the local terminal output proving the fix. Instead of a Segmentation Fault, it now safely catches the cycle and throws the expected exception:\r\n\r\n```bash\r\nTesting MT19937...\r\nTraceback (most recent call last):\r\n  File \"/workspaces/numpy/../test_bug.py\", line 5, in <module>\r\n    MT19937(x)\r\n  File \"numpy/random/_mt19937.pyx\", line 131, in numpy.random._mt19937.MT19937.__init__\r\n    BitGenerator.__init__(self, seed)\r\n  File \"numpy/random/bit_generator.pyx\", line 559, in numpy.random.bit_generator.BitGenerator.__init__\r\n    seed = SeedSequence(seed)\r\n  File \"numpy/random/bit_generator.pyx\", line 318, in numpy.random.bit_generator.SeedSequence.__init__\r\n    raise ValueError(\"Seed (entropy) cannot be a recursive or self-referencing list.\")\r\nValueError: Seed (entropy) cannot be a recursive or self-referencing list.\r\n",
+ "comments": [
+  {
+   "author": "rkern",
+   "created_at": "2026-06-26T21:55:04Z",
+   "body": "I think the proper fix for this would be to not do a full unguarded recursion in [`_coerce_to_uint32_array`](https://github.com/numpy/numpy/blob/main/numpy/random/bit_generator.pyx#L147) in the case of a sequence. We do not (intend to) accept nested sequences of any kind, just sequences of integers (or strings at that low level, but that was more of an abandoned, undocumented feature rather than a current feature). That way, we can avoid testing for the rare case and just raise an error when we actually encounter the rare case.\r\n\r\nWe're not in a rush to fix this, so I think it's worth getting right. If you are interested in carrying on with this, I welcome it. Here are a few notes to help prepare a PR for us:\r\n\r\n- Please omit the unhelpful `# --- OUR FIX ---` comments. They can't be part of the final contribution to us. You may want to look into refining your AI setup so that it doesn't do that. Modern coding agent harnesses don't do that as much as just asking the chat interfaces does.\r\n- Changes need tests added to the test suite.\r\n- New functions, even if private, need docstrings (or at least comments) to help readers understand what they are for just as much as public functions do.\r\n- There are a couple of ways to follow my implementation advice, but probably the best place to do it is inside of `_coerce_to_uint32_array` just before the recursion. The right exception (and message text) to raise [is here](https://github.com/numpy/numpy/blob/main/numpy/random/bit_generator.pyx#L310-L311).\r\n- There's a related issue #27380, and fixing both would make the PR more valuable.\r\n\r\nThank you!"
+  },
+  {
+   "author": "Adhyansinghgupta",
+   "created_at": "2026-06-27T04:51:39Z",
+   "body": "Thank you for the feedback and clarification  , will be looking forward to fixing both related issues within this PR\r\n"
+  },
+  {
+   "author": "Adhyansinghgupta",
+   "created_at": "2026-06-27T11:46:00Z",
+   "body": "\r\nI just pushed an update that moves the recursion guard down into the C-layer like you suggested. It now intercepts nested sequences right before the recursion happens and throws the TypeError you linked. I also ripped out that old pure-Python check I had earlier, so the file is much cleaner now.\r\nThis should safely handle both the original infinite recursion bug and the invalid types from Issue #27380. I dropped a couple of tests into test_seed_sequence.py to lock it in, and they are passing locally for me."
+  },
+  {
+   "author": "Adhyansinghgupta",
+   "created_at": "2026-06-27T19:29:40Z",
+   "body": "Just pushed an update to fix this! I removed the local imports and that stray comment, and also cleaned up a few formatting issues and extra blank lines in the test file.\r\n\r\nI was unaware that np.testing already had those assertion wrappers built in, so thanks for the heads-up. Everything is swapped over to use the global assert_raises and assert_raises_regex. Let me know if anything else needs tweaking"
+  },
+  {
+   "author": "rkern",
+   "created_at": "2026-06-27T20:21:00Z",
+   "body": "The lint check is failing on some formatting issues. Please run the linter before submitting.\r\n\r\nhttps://github.com/numpy/numpy/actions/runs/28299255548/job/83847957504?pr=31775"
+  },
+  {
+   "author": "rkern",
+   "created_at": "2026-06-27T20:21:32Z",
+   "body": "The [lint check](https://github.com/numpy/numpy/actions/runs/28299255548/job/83847957504?pr=31775) is failing. Please run the linter before submitting the next fix."
+  },
+  {
+   "author": "Adhyansinghgupta",
+   "created_at": "2026-06-27T20:36:22Z",
+   "body": "Sorry for the back-and-forth on the linting. I\u2019m still learning the specific automated check workflow. I've run the linter locally and verified the formatting now. Thanks for your patience."
+  },
+  {
+   "author": "Adhyansinghgupta",
+   "created_at": "2026-07-02T12:20:57Z",
+   "body": "All checks have passed, the code has no conflicts with the base branch and is ready to merge, waiting for the maintainer's review.\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "rkern"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3de1e7dd2d4ab2c36c92c336bdf04737799a44d5",
+   "actor": "charris"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "charris"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/31857",
+   "commit": null,
+   "actor": "charris"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4dee265afc098a296a62666f6356d4927b67848f",
+   "actor": "charris"
+  }
+ ],
+ "fetch_errors": null
+}

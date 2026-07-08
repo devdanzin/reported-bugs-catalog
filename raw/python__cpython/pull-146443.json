@@ -1,0 +1,96 @@
+{
+ "repo": "python/cpython",
+ "number": 146443,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146443",
+ "title": "gh-146442: Fix various bugs in compiler pipeline from bug report",
+ "state": "closed",
+ "state_reason": null,
+ "author": "A0su",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-26T03:45:11Z",
+ "closed_at": "2026-03-30T20:04:05Z",
+ "body": "# Compiler Pipeline (codegen + compile + symtable + flowgraph + assemble) | 6 FIX\r\n\r\n## codegen.c (6,632 lines) \u2014 4 FIX\r\n1. **NULL deref + ref leak in `codegen_setup_annotations_scope` (line 716-720)**: `PyLong_FromLong` result not NULL-checked, passed to `ADDOP_LOAD_CONST` which dereferences it. Also never DECREF'd even on success.\r\n2. **Ref leak of `mangled` in `codegen_nameop` (line 3280)**: `RETURN_IF_ERROR(scope)` early-returns without DECREF'ing `mangled` from `_PyCompile_MaybeMangle`.\r\n3. **Unchecked `_PyCompile_PushFBlock` in `codegen_unwind_fblock_stack` (line 669)**: Return value silently discarded, error lost, frame block stack left inconsistent.\r\n\r\n## compile.c (1,772 lines) \u2014 1 FIX\r\n1. **Ref leak of `orig` in `_PyCompile_TweakInlinedComprehensionScopes` (line 1096-1114)**: `PyDict_GetItemRef` returns new ref in `orig`, never DECREF'd on any path (success or error). Leaks on every inlined comprehension.\r\n\r\n## assemble.c (802 lines) \u2014 1 FIX\r\n1. **`assemble_emit_instr` returns ERROR without exception (line 420-421)**: Bytecode overflow check returns ERROR without `PyErr_NoMemory()` \u2192 SystemError.\r\n\r\n## symtable.c (3,355 lines) \u2014 0 FIX (clean)\r\n## flowgraph.c (4,088 lines) \u2014 0 FIX (clean)\r\n\r\n## Did not fix\r\n1. **Ref leak of `mangled` in `codegen_deferred_annotations_body` (line 792-818)**\r\n    - I do not see a simple way to fix this without overhauling the macros (ADDOP* & VISIT) that can early return\r\n\n\n<!-- gh-issue-number: gh-146102 -->\n* Issue: gh-146102\n<!-- /gh-issue-number -->\n\n\n<!-- gh-issue-number: gh-146442 -->\n* Issue: gh-146442\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-30T20:06:53Z",
+   "body": "Merged, thanks for your fixes."
+  },
+  {
+   "author": "A0su",
+   "created_at": "2026-03-30T20:30:50Z",
+   "body": "> LGTM\n> \n> ```\n>         // NOTE: ref of mangled can be leaked on ADDOP* and VISIT macros due to early returns\n>         // fixing would require an overhaul of these macros\n> ```\n> \n> That's unfortunate, but this change already fix multiple issues and is worth it. The issues described in the comment can be fixed in a follow-up change is someone is interested.\n\nWould the preferred approach here be to introduce the same macros but accepting an object to DecRef. Similar to how some of the other existing do?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-30T20:40:09Z",
+   "body": "You may move to a subfunction and DECREF(mangled) if the subfunction fails."
+  },
+  {
+   "author": "A0su",
+   "created_at": "2026-03-31T03:38:45Z",
+   "body": "Ah ok, I can raise the issue and work on the refactor over the next couple days."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146442",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ca95e979d6c9c62696bf3c162ddc21eae841c804",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9836ffa6ed66864138af8678a599de87f5f891f2",
+   "actor": "maurycy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148059",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a82862c6395a26cfcd81ad8779849027ebf5c5bd",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "edb1b9b95787fe61de0d23471cec5af3e960162c",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

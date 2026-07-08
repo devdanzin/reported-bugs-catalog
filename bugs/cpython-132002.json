@@ -8,7 +8,14 @@
  "issues": [
   "python/cpython#132002"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#132003",
+  "python/cpython#132007",
+  "python/cpython#132008"
+ ],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.12",
@@ -17,15 +24,21 @@
   "extension-modules",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "miss-islington",
+  "sobolevn"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-132002.json"
+  "raw/python__cpython/issue-132002.json",
+  "raw/python__cpython/pull-132003.json",
+  "raw/python__cpython/pull-132007.json",
+  "raw/python__cpython/pull-132008.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 143812,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143812",
+ "title": "gh-143807: Fix JIT executor overflow caused by large backoff values",
+ "state": "closed",
+ "state_reason": null,
+ "author": "VanshAgarwal24036",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-01-13T17:48:23Z",
+ "closed_at": "2026-01-13T19:26:30Z",
+ "body": "This PR fixes a JIT crash where executor table size could exceed\r\nMAX_EXECUTORS_SIZE due to excessively large initial backoff values.\r\n\r\nReducing the initial values for backward jumps and side exits keeps\r\nexecutor growth bounded while preserving existing cooldown and tracing\r\nheuristics.\r\n\r\nFixes gh-143807.\r\n\r\n<!-- readthedocs-preview cpython-previews start -->\r\n----\n\ud83d\udcda Documentation preview \ud83d\udcda: https://cpython-previews--143812.org.readthedocs.build/\n\r\n<!-- readthedocs-preview cpython-previews end -->",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2026-01-13T18:27:17Z",
+   "body": "Is the change to `JUMP_BACKWARD_INITIAL_VALUE` from 4000 to 63 intended? I only use the smaller value because it makes crashing the JIT easier."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-13T19:26:30Z",
+   "body": "Sorry but this fix doesn't seem right. The problem isn't with the warmup/backoff values."
+  },
+  {
+   "author": "VanshAgarwal24036",
+   "created_at": "2026-01-14T03:26:52Z",
+   "body": "Thanks for the clarification. That makes sense \u2014 I see now that reducing the backoff values only masks the issue rather than addressing the underlying executor growth problem. I\u2019ll take another look at how executors are tracked and bounded in get_index_for_executor to understand the real root cause. Appreciate the feedback."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-14T05:42:59Z",
+   "body": "@VanshAgarwal24036 if you're using an LLM to wholesale reply me, please look at our generative AI policy https://devguide.python.org/getting-started/generative-ai/\r\n\r\nIt's not acceptable to use genAI to wholly create a PR or reply comments. It's perfectly fine if you're using it to assist you. Please try to understand the code or comment at least after using the LLM.\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143807",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

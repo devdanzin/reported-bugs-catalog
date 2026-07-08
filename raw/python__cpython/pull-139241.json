@@ -1,0 +1,87 @@
+{
+ "repo": "python/cpython",
+ "number": 139241,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/139241",
+ "title": "GH-137218: Fix unnecessary recompile of `Programs/_freeze_module`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "savannahostrowski",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-09-22T13:57:20Z",
+ "closed_at": "2025-10-05T03:05:37Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\nAs @encukou [pointed out](https://github.com/python/cpython/issues/137218#issuecomment-3318716302), running `make` twice after merging https://github.com/python/cpython/pull/139170 resulted in an unnecessary recompile. I believe this is because of a redundant assignment of `JIT_STENCILS_H`.\r\n\n\n<!-- gh-issue-number: gh-137218 -->\n* Issue: gh-137218\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-22T13:57:37Z",
+   "body": "!buildbot FreeBSD"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-22T13:57:40Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @savannahostrowski for commit 9e4b4573a1c1ef0a94834465003d6e059cb5845a :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F139241%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `FreeBSD`\n\nThe builders matched are:\n- `AMD64 FreeBSD Refleaks PR`\n- `AMD64 FreeBSD15 PR`\n- `AMD64 FreeBSD PR`\n- `AMD64 FreeBSD14 PR`\n"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-22T14:00:57Z",
+   "body": "!buildbot FreeBSD"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-22T14:01:01Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @savannahostrowski for commit 70d5a56fd41916c2406430f8c4519d53bf89f7a5 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F139241%2Fmerge\n\nThe command will test the builders whose names match following regular expression: `FreeBSD`\n\nThe builders matched are:\n- `AMD64 FreeBSD Refleaks PR`\n- `AMD64 FreeBSD15 PR`\n- `AMD64 FreeBSD PR`\n- `AMD64 FreeBSD14 PR`\n"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-10-01T02:19:26Z",
+   "body": "@encukou Did you want to take a look at this one?"
+  },
+  {
+   "author": "encukou",
+   "created_at": "2025-10-01T20:35:46Z",
+   "body": "Sorry, I missed the notification!\r\n\r\nUnfortunately this doesn't solve the issue for me. In my config, `REGEN_JIT_COMMAND` is empty, so a `jit_stencils.h` is never created, but `make` attempts to create it and recreates its dependents (`jit_stencils.h` \u2192 `Python/jit.o` \u2192 `Programs/_freeze_module` \u2192 frozen modules).\r\n"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-10-02T04:06:44Z",
+   "body": "Okay, I think that removing the literal `jit_stencils.h` dependency fixes this. This should also still work just fine to solve the original problem since the platform-specific stencils always exist alongside `jit_stencils.h`."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/137218",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/138498",
+   "commit": null,
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9964320d155907bcb3858e5ee99ea48b140d4772",
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2c9ebd4d224f554e08344380ba90708a1764ca93",
+   "actor": "danigm"
+  }
+ ],
+ "fetch_errors": null
+}

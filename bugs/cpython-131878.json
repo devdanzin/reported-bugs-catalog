@@ -8,7 +8,16 @@
  "issues": [
   "python/cpython#131878"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#131901",
+  "python/cpython#131910",
+  "python/cpython#133030",
+  "python/cpython#133445",
+  "python/cpython#133468"
+ ],
+ "n_prs": 5,
+ "n_backports": 2,
+ "n_fix_prs": 3,
  "gists": [],
  "labels": [
   "3.13",
@@ -19,15 +28,24 @@
   "topic-repl",
   "type-bug"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "ambv",
+  "chris-eibl",
+  "sergey-miryanov"
+ ],
  "status": "closed/fixed",
  "confidence": "low",
  "needs_review": true,
  "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-131878.json"
+  "raw/python__cpython/issue-131878.json",
+  "raw/python__cpython/pull-131901.json",
+  "raw/python__cpython/pull-131910.json",
+  "raw/python__cpython/pull-133030.json",
+  "raw/python__cpython/pull-133445.json",
+  "raw/python__cpython/pull-133468.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 6
 }

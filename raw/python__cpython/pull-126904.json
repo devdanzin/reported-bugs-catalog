@@ -1,0 +1,100 @@
+{
+ "repo": "python/cpython",
+ "number": 126904,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126904",
+ "title": "gh-126881: fix finalization of dtoa state",
+ "state": "closed",
+ "state_reason": null,
+ "author": "kumaraditya303",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core"
+ ],
+ "created_at": "2024-11-16T11:06:09Z",
+ "closed_at": "2024-11-29T09:47:16Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-126881 -->\n* Issue: gh-126881\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T11:25:43Z",
+   "body": "Would a test be helpful here?"
+  },
+  {
+   "author": "cfbolz",
+   "created_at": "2024-11-17T21:28:27Z",
+   "body": "> Would a test be helpful here?\r\n\r\nYeah, I was also wondering this. Probably a bit annoying to write a regression test, but I also feel like it would be good to have one. "
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-29T09:46:27Z",
+   "body": "> Yeah, I was also wondering this. Probably a bit annoying to write a regression test, but I also feel like it would be good to have one.\r\n\r\nRegression tests for these don't work well because it relies on GC calling finalizers at late in finalization which isn't reliable, the order or when it will be called is random. As such I avoid adding such tests and manually test these changes."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-29T09:47:20Z",
+   "body": "Thanks @kumaraditya303 for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-29T09:47:39Z",
+   "body": "[GH-127395](https://github.com/python/cpython/pull/127395) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-29T10:02:10Z",
+   "body": "Ah, Python 3.12 doesn't have the _PyDtoa_Fini() function."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126881",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126901",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "762c603a866146afc7db2591fb49605e0858e9b1",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4df6666d685c1b7cfa2e2e30aeafb5d3225deb91",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "47b0f8f2972facc29ec33f1f0b353784ff94b709",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e1d9f404a5964a1d40cd864fd3818568d1cdf06c",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ee07bab15f763a295f46d8c09795c5e956b6e41c",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

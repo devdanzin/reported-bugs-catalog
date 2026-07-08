@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 148095,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148095",
+ "title": "[3.14] gh-148074: Fix `typeobject.c` missing error return (GH-148075)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-04-04T15:35:25Z",
+ "closed_at": "2026-04-04T16:01:35Z",
+ "body": "(cherry picked from commit c398490fbf15ede5de3389b4ca4e32fb9a7c5d67)\n\nCo-authored-by: Wulian233 <1055917385@qq.com>\n\n<!-- gh-issue-number: gh-148074 -->\n* Issue: gh-148074\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148075",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148074",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "61c919cf1b9b365add10915764c93119f6195b4a",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

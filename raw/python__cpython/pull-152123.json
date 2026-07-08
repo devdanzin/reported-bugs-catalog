@@ -1,0 +1,27 @@
+{
+ "repo": "python/cpython",
+ "number": 152123,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152123",
+ "title": "gh-151475: Fix data race in faulthandler watchdog on free-threaded builds",
+ "state": "open",
+ "state_reason": null,
+ "author": "timurmamedov1",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-24T19:57:31Z",
+ "closed_at": null,
+ "body": "`dump_traceback_later()` and `cancel_dump_traceback_later()` mutate the watchdog state in `_PyRuntime.faulthandler.thread` without synchronization. On free-threaded builds, concurrent calls corrupt the `cancel_event`/`running` lock handshake, since two threads can both allocate `cancel_event` (leaking one lock), or release a lock they don't hold, causing a fatal abort.\r\n\r\nFix by adding a `PyMutex` to `_faulthandler_runtime_state` and acquiring it in both `dump_traceback_later` and `cancel_dump_traceback_later` entry points. The mutex is acquired after argument validation (which may call into Python) but before any shared state access.\r\n\r\nThese are not hot paths and none run in signal-handler context, so a simple mutex is sufficient.\r\n\r\n<!-- gh-issue-number: gh-151475 -->\r\n* Issue: gh-151475\r\n<!-- /gh-issue-number -->",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151475",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

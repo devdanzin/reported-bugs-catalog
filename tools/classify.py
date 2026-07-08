@@ -63,6 +63,7 @@ GIST_RE = re.compile(r"gist\.github\.com/devdanzin/([0-9a-f]+)")
 FIX_RE = re.compile(r"\b(?:fix(?:es|ed)?|close[sd]?|resolve[sd]?)\s*:?\s*#?(?:gh-)?(\d+)", re.I)
 GH_RE = re.compile(r"\bgh-(\d{3,7})\b", re.I)
 HASH_RE = re.compile(r"(?<![\w/])#(\d{3,7})\b")
+TITLE_GH = re.compile(r"gh-(\d{3,7})", re.I)   # CPython fix-PR title: "gh-<issue>: ..."
 
 
 def full_text(d):
@@ -142,14 +143,33 @@ def extract_links(d):
             m = re.search(r"/(?:issues|pull)/(\d+)", src)
             if m:
                 links.add(int(m.group(1)))
-    # body "fixes #N" / "gh-N" / "#N"
-    body = d.get("body") or ""
+    # title + body: "fixes #N" / "gh-N" / "#N". Title matters for CPython fix-PRs
+    # which are titled "gh-<issue>: ..." and backports "[3.x] gh-<issue>: ...".
+    text = (d.get("title") or "") + "\n" + (d.get("body") or "")
     for rx in (FIX_RE, GH_RE, HASH_RE):
-        for m in rx.finditer(body):
+        for m in rx.finditer(text):
             n = int(m.group(1))
             if n != d["number"]:
                 links.add(n)
     return sorted(links)
+
+
+def extract_fix_links(d):
+    """The issue(s) a PR actually FIXES (for merging) — precise, unlike `links`
+    which includes every name-dropped #N. A CPython fix-PR is titled
+    'gh-<issue>: ...'; a backport '[3.x] gh-<issue>: ... (GH-<mainpr>)'. We take the
+    FIRST gh-<n> in the title (the fixed issue, before the parenthetical PR ref)
+    plus any body 'fixes/closes/resolves #N'. Only PRs fix things."""
+    if d["type"] != "pull":
+        return []
+    fixes = set()
+    m = TITLE_GH.search(d.get("title") or "")   # first = the issue, not the (GH-pr)
+    if m and int(m.group(1)) != d["number"]:
+        fixes.add(int(m.group(1)))
+    for mm in FIX_RE.finditer(d.get("body") or ""):
+        if int(mm.group(1)) != d["number"]:
+            fixes.add(int(mm.group(1)))
+    return sorted(fixes)
 
 
 def load_oom_overrides():
@@ -202,6 +222,7 @@ def main():
             "is_umbrella": None,   # set in group.py
             "reproduced": None,    # set later (gist-comb for repro count)
             "links": extract_links(d),
+            "fix_links": extract_fix_links(d),
             "raw": os.path.relpath(f, ROOT),
         })
     json.dump(rows, open(OUT, "w"), indent=1)

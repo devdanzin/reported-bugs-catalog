@@ -8,22 +8,32 @@
  "issues": [
   "python/cpython#142029"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#142033",
+  "python/cpython#142054"
+ ],
+ "n_prs": 2,
+ "n_backports": 0,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "interpreter-core",
   "topic-importlib",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "dr-carlos"
+ ],
  "status": "closed/fixed",
  "confidence": "low",
  "needs_review": true,
  "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-142029.json"
+  "raw/python__cpython/issue-142029.json",
+  "raw/python__cpython/pull-142033.json",
+  "raw/python__cpython/pull-142054.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

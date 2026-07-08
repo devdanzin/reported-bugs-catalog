@@ -1,0 +1,77 @@
+{
+ "repo": "python/cpython",
+ "number": 126224,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126224",
+ "title": "gh-126223: Propagate unicode errors in `_interpreters.create()`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-10-31T03:48:34Z",
+ "closed_at": "2024-10-31T14:14:37Z",
+ "body": "\n\n<!-- gh-issue-number: gh-126223 -->\n* Issue: gh-126223\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-10-31T14:14:41Z",
+   "body": "Thanks @ZeroIntensity for the PR, and @sobolevn for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 I'm not a witch! I'm not a witch!"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-10-31T14:14:59Z",
+   "body": "[GH-126242](https://github.com/python/cpython/pull/126242) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T14:15:11Z",
+   "body": "We got a Halloween easter egg, congrats \ud83c\udf89 \r\n<img width=\"924\" alt=\"\u0421\u043d\u0438\u043c\u043e\u043a \u044d\u043a\u0440\u0430\u043d\u0430 2024-10-31 \u0432 17 14 51\" src=\"https://github.com/user-attachments/assets/1628eb56-e1bf-4c1a-920f-40d1dd8aab3b\">\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126223",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "01415213d72504eafc159721a8f55d57b374fd9c",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0fe111857d3b36c9323dc98c121ad007074b4885",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "89664d4d482b9873b078df29654e4c3fa8ca066f",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a9e246e06ac7c4aef7249346733ccc9fab8c063d",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e12a733cb27bd8ee38b9925d51bdcfa5a43d2dbd",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

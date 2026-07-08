@@ -8,17 +8,24 @@
  "issues": [
   "python/cpython#152083"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#152981"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "bf9fec4554c58c2a279b05b7ff8e6d9b"
  ],
  "labels": [
+  "awaiting review",
   "stdlib",
   "topic-importlib",
   "type-crash"
  ],
  "filed_by": "maintainer",
  "filers": [
+  "deadlovelll",
   "sobolevn"
  ],
  "status": "open",
@@ -27,7 +34,8 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-152083.json"
+  "raw/python__cpython/issue-152083.json",
+  "raw/python__cpython/pull-152981.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

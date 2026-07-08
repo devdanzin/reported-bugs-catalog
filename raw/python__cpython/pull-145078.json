@@ -1,0 +1,40 @@
+{
+ "repo": "python/cpython",
+ "number": 145078,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145078",
+ "title": "gh-145064: fix JIT tracing for non-function frames",
+ "state": "closed",
+ "state_reason": null,
+ "author": "aviralgarg05",
+ "author_association": "NONE",
+ "labels": [
+  "awaiting review",
+  "invalid"
+ ],
+ "created_at": "2026-02-21T12:43:11Z",
+ "closed_at": "2026-02-21T12:56:58Z",
+ "body": "## Summary of Changes\r\n\r\n- Fixed a JIT crash path for issue #145064 gh-145064 where tracing could start from non-function frames (for example init-cleanup shim frames), which could lead to invalid assumptions about function/code availability.\r\n- Updated `/Users/aviralgarg/Everything/cpython/Python/optimizer.c`:\r\n  - Store `initial_state.func` only when `frame->f_funcobj` is a real `PyFunctionObject`.\r\n  - Assert `initial_state.code` (always required) instead of assuming `initial_state.func` is always present.\r\n- Updated `/Users/aviralgarg/Everything/cpython/Python/optimizer_analysis.c`:\r\n  - Use `initial_state.code` directly when creating the abstract frame.\r\n  - Keep `frame->func` optional and null-safe.\r\n- Added regression coverage in `/Users/aviralgarg/Everything/cpython/Lib/test/test_capi/test_opt.py`:\r\n  - New test: `test_145064`.\r\n- Added NEWS entry:\r\n  - `/Users/aviralgarg/Everything/cpython/Misc/NEWS.d/next/Core_and_Builtins/2026-02-21-18-10-00.gh-issue-145064.p8Nq2v.rst`\r\n\r\n## Testing Logs\r\n\r\n### Local build and checks\r\n\r\n- Build directory: `/tmp/cpython-build-145064`\r\n- Rebuilt JIT-enabled debug interpreter multiple times:\r\n  - `make -j8` (successful)\r\n- Style/check run:\r\n  - `make patchcheck` (completed; local output also noted expected environment state and prompted about test/refleak confirmation)\r\n\r\n### Targeted regression tests\r\n\r\n- New regression test run multiple times:\r\n  - `./python.exe -m test -j1 -v test_capi.test_opt --match test_145064`\r\n  - Result: `OK` (run repeatedly, all passes)\r\n\r\n### Related JIT regression tests\r\n\r\n- `./python.exe -m test -j1 -v test_capi.test_opt --match test_143026` \u2192 `OK`\r\n- `./python.exe -m test -j1 -v test_capi.test_opt --match test_143092` \u2192 `OK`\r\n- `./python.exe -m test -j1 -v test_capi.test_opt --match test_143183` \u2192 `OK`\r\n- `./python.exe -m test -j1 -v test_capi.test_opt --match test_143358` \u2192 `OK`\r\n- `./python.exe -m test -j1 -v test_capi.test_opt --match test_144068_daemon_thread_jit_cleanup` \u2192 `OK`\r\n- `./python.exe -m test -j1 -v test_optimizer` \u2192 `OK`\r\n\r\n### Reproduction-command stress validation (issue command)\r\n\r\n- Command exercised repeatedly:\r\n  - `PYTHON_JIT=1 ./python.exe -m mypy --no-incremental --strict -c \"pass\"`\r\n- Post-fix stress runs:\r\n  - Three batches of 25 runs each (75 total): `PASS batch=1`, `PASS batch=2`, `PASS batch=3`\r\n  - Additional 25-run verification batch: `PASS:25`\r\n\r\n### CI status observed after push\r\n\r\n- Branch: `gh-145064-jit-co-null-uop-frame`\r\n- Commit: `29faba9f94`\r\n- GitHub Actions:\r\n  - `Lint` workflow: `success`\r\n  - `JIT` workflow: in progress during observation (no failures reported at the time)\r\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-02-21T12:56:58Z",
+   "body": "Did you use an LLM to generate this? That's fine if so, but please look at the devguide on this https://devguide.python.org/getting-started/generative-ai/\r\n\r\nI don't know which model you're using, but the test is wrong, and the explanation is wrong, and the fix is also probably wrong. Sorry but I'm closing this issue to not waste reviewer time."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145064",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

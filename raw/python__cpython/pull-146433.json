@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 146433,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146433",
+ "title": "[3.13] gh-146244: Fix initconfig.c SET_ITEM macro leaks dict on expression failure (GH-146246)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-25T19:10:08Z",
+ "closed_at": "2026-03-25T19:32:21Z",
+ "body": "(cherry picked from commit 9343518c6f413b2231b17c56065e5cf823aa0d2a)\n\nCo-authored-by: Wulian233 <1055917385@qq.com>\n\n<!-- gh-issue-number: gh-146244 -->\n* Issue: gh-146244\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146244",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146246",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "fc4b4221e5f6cf53e61ccbf716165d6192b9fd40",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

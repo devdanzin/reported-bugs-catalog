@@ -1,0 +1,122 @@
+{
+ "repo": "python/cpython",
+ "number": 131208,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/131208",
+ "title": "gh-126895: fix readline module in free-threaded build",
+ "state": "closed",
+ "state_reason": null,
+ "author": "tom-pytel",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2025-03-13T19:54:23Z",
+ "closed_at": "2025-03-17T15:57:11Z",
+ "body": "This is nothing more than adding `@critical_section` to functions which use the readline library. It is not thread-safe (because readline is not thread-safe), but it doesn't crash like before.\r\n\r\nThe test `test_free_threading_doctest_difflib` is probably overkill, but included at first to show that it works. Can comment out or remove as desired.\r\n\r\nAlso, without `test_free_threading_doctest_difflib` (that uses stuff which is not free-thread safe), `test_readline` fails without crashing with `--parallel-threads`, where previously it crashed. Also without it doesn't complain when tested with TSAN.\r\n\r\nSubinterpreters are not an issue because `readline` just doesn't load in them: `module readline does not support loading in subinterpreters`\r\n\r\n<!-- gh-issue-number: gh-126895 -->\r\n* Issue: gh-126895\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-03-14T11:57:13Z",
+   "body": "ping @ZeroIntensity , @colesbury "
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-03-14T13:57:58Z",
+   "body": "> Critical sections are [per-interpreter](https://peps.python.org/pep-0684/), so this will continue to race in subinterpreters. \r\n\r\nWhat I meant above is that `readline` just straight up doesn't import in a subinterpreter, it gives that error: `module readline does not support loading in subinterpreters`, so this is not an issue.\r\n\r\n> That said, I'm not sure whether it's unsafe to call _any_ `readline` function concurrently, \r\n\r\nYou can call across threads and it won't crash because it is synchronized with GIL, you will just get wrong results. But if you called free-threaded it would crash, now it just behaves like not free-threaded and doesn't crash.\r\n\r\n> but otherwise we can go with a local static PyMutex to serialize single calls\r\n\r\nCould do that, but is that safe if one call dies in an unexpected way and mutex is left locked?\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-03-14T14:09:21Z",
+   "body": "- Oh, I thought we got everything in the stdlib over to multi-phase init :(. It might be worth fixing that and going with global locks for 3.14, but this fix makes sense for 3.13.\r\n- Yes, but I'm trying to figure out the actual implications here. Can we call unrelated `readline` functions concurrently, or does all of readline need to be protected by a single lock?\r\n- Critical sections have the same issue. We shouldn't worry about threads randomly dying and leaving things locked."
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-03-14T14:19:17Z",
+   "body": "> * Yes, but I'm trying to figure out the actual implications here. Can we call unrelated `readline` functions concurrently, or does all of readline need to be protected by a single lock?\r\n\r\nThe single lock on `module` is what I implemented here, so they are all mutually exclusive (since readline lib is specifically not thread-safe).\r\n\r\n> * Critical sections have the same issue. We shouldn't worry about threads randomly dying and leaving things locked.\r\n\r\nI was under the impression that critical sections, as opposed to pure `PyMutex`, are fairly deadlock proof? Don't they release after a period of time? And also: https://docs.python.org/3/c-api/init.html#python-critical-section-api -\r\n\r\n\"Critical sections avoid deadlocks by implicitly suspending active critical sections and releasing the locks during calls to [PyEval_SaveThread()](https://docs.python.org/3/c-api/init.html#c.PyEval_SaveThread). When [PyEval_RestoreThread()](https://docs.python.org/3/c-api/init.html#c.PyEval_RestoreThread) is called, the most recent critical section is resumed, and its locks reacquired. This means the critical section API provides weaker guarantees than traditional locks ...\""
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-03-14T14:24:08Z",
+   "body": "Critical sections are based off an object's `PyMutex`, it just implicitly releases that mutex when the thread state is detached (for example, when waiting on another lock), which prevents deadlocks. If the thread crashes, the lock is still held. (These details don't matter much here, anyway.)"
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-03-14T14:26:36Z",
+   "body": "So what's the verdict then wrt this, changes?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-03-14T14:31:42Z",
+   "body": "Let's just confirm that we really do need a global lock here; I don't want to drastically inhibit scaling if we don't have to."
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-03-14T14:43:27Z",
+   "body": "> Let's just confirm that we really do need a global lock here; I don't want to drastically inhibit scaling if we don't have to.\r\n\r\nShort: Yes it needs to be global because readline is not thread-safe. But its only applied on things that actually call into readline."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-03-15T14:40:07Z",
+   "body": "I'm fine with critical sections too, I'm just worried about basically enabling the GIL for all usage of `readline`.\n\n> Yes it needs to be global because readline is not thread-safe. But its only applied on things that actually call into readline.\n\nI think you're misinterpreting what I mean a little. \"Thread-safety\" is a blanket term; I mean that we might not need locks synchronizing the *entire* module. For example, it makes sense to me that `write_history_file` isn't thread-safe against `read_history_file`, but I see no reason that `set_startup_hook` couldn't run in another thread while those two are synchronized."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-03-15T15:04:15Z",
+   "body": "Adding a lock to the readline module is not like enabling the GIL. The GIL affects everything in the process, including things that don't touch the readline module. The readline lock only affects things that use readline. Using multiple threads to concurrently muck around with readline is not a real use case that we should optimize for. So far the only time I've seen anyone try to use readline from multiple threads at all is when fuzzing CPython.\r\n\r\n> ...but I see no reason that set_startup_hook couldn't run in another thread while those two are synchronized...\r\n\r\nIn general, we should prefer the simplest approach to thread safety that is efficient. In this case, that means a single lock for the entire readline module.\r\n"
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-03-15T15:51:47Z",
+   "body": "`read_history_file` had critical section but I did miss `write_history_file` and `append_history_file`. Other points:\r\n\r\n* `@critical_section module` -> `@critical_section`.\r\n* Added atomics instead of critical sections to `_history_length` stuff.\r\n* Removed tests but left one single minimized one because there really should be at least one to check for crash?\r\n* `readline_set_completion_display_matches_hook_impl` has critical section  because is setting `rl_` global var which may be used inside locked readline functions. Anything that touches global `rl_` stuff is critical sectioned (except setup / constructor stuff).\r\n* I didn't give stuff `set_hook` and `set_startup_hook` and the like critical sections because they just setting py vars, not readline stuff, maybe should have at least atomics, but does it matter?\r\n\r\nOne potential issue. `call_readline()` uses readline stuff but not locked here because is super low level and no clean way to access lock. Also not used here but exposed via `PyOS_ReadlineFunctionPointer` which is used by `myreadline.c` in `Parser`. Could store `module` in a global to use for lock or look it up everytime in `sys.modules` in this function, but is it worth it? Or can just count on caller to sync and that nothing else is using `readline` simultaneously?\r\n"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-03-15T16:12:24Z",
+   "body": "* `set_hook` should not have it's own critical section, but the callers should have a critical section\r\n* `call_readline` cannot (and should not) use a critical section. It's called without the GIL held in the default build.\r\n\r\n"
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-03-17T13:19:27Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @colesbury for commit 0dca261be7889bfea00a3e174bab50ab31e59dcd :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F131208%2Fmerge\n\nIf you want to schedule another build, you need to add the <kbd>:hammer: test-with-refleak-buildbots</kbd> label again.\n"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-03-17T15:58:04Z",
+   "body": "Thanks Tom!\r\n\r\nI'm not going to backport this to 3.13. I think it's unlikely that anyone is going to try to use the readline module from multiple threads concurrently outside of fuzzing."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126895",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "863d54cbaf6c0b45fff691ab275515c1483ad68d",
+   "actor": "colesbury"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "colesbury"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7455243d957db92c6f340c0ce0ad431764e22c6d",
+   "actor": "plashchynski"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8443fec705c0872f9487a511bd691a0e27006c4b",
+   "actor": "ludwigschwardt"
+  }
+ ],
+ "fetch_errors": null
+}

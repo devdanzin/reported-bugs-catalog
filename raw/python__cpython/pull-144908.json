@@ -1,0 +1,96 @@
+{
+ "repo": "python/cpython",
+ "number": 144908,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/144908",
+ "title": "gh-141510: Support frozendict in pprint",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-02-17T11:55:24Z",
+ "closed_at": "2026-02-21T16:08:25Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-141510 -->\n* Issue: gh-141510\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-18T17:27:30Z",
+   "body": "cc @freddrake"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-02-21T11:13:28Z",
+   "body": "frozendict views are standard dict views."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-21T12:02:29Z",
+   "body": "I  completed the PR. Please review again.\r\n\r\n> What about frozendict views?\r\n\r\nI added multiple tests on keys(), values() and items()."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-21T16:09:01Z",
+   "body": "Merged. Thanks for reviews! Thanks for your contribution @devdanzin!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141510",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145056",
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145070",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "770d354549914e3538e7db07e537dab17ece2610",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bb67255b8359b4c94c885f6d636af8e61930fd7f",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145887",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145894",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "21954f4b5c75470b2b21d27a935ef71d8e554e54",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

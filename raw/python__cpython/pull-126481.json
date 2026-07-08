@@ -1,0 +1,91 @@
+{
+ "repo": "python/cpython",
+ "number": 126481,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126481",
+ "title": "gh-126455: Disallow _ssl.SSLSocket instantiation",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2024-11-06T10:15:59Z",
+ "closed_at": "2024-11-06T10:59:40Z",
+ "body": "Prevent creation of incomplete/invalid _ssl.SSLSocket objects when created directly.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-126455 -->\n* Issue: gh-126455\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-06T10:59:43Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-06T10:59:56Z",
+   "body": "[GH-126486](https://github.com/python/cpython/pull/126486) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-06T11:00:04Z",
+   "body": "[GH-126487](https://github.com/python/cpython/pull/126487) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126455",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b1c4ffc20573befb4db66bbbdd569b9bd13bb127",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c5c4bd1ccf95640e63a327cc4c49b167ca171f68",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a873496b32588369c1c38d270f83bbd0cbd1ee3d",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e6fd40ba1883040224128cbb30fa002827f18392",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a084b9d60f7c6085a5f7ea28c83c6285451a8ea",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8abfb36d42f91d20e91c04bbf72e7ed2d8e3771a",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ecf4ced44f5759ea4a7a153ff8ac4498b135d771",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

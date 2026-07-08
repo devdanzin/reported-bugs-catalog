@@ -1,0 +1,129 @@
+{
+ "repo": "python/cpython",
+ "number": 144779,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/144779",
+ "title": "gh-144763: Don't detach the GIL in tracemalloc",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-02-13T10:17:04Z",
+ "closed_at": "2026-02-18T15:57:49Z",
+ "body": "tracemalloc no longer detachs the GIL to acquire its internal lock.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-144763 -->\n* Issue: gh-144763\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-13T10:23:27Z",
+   "body": "This change basically reverts commit 01157e0cdff1321a065b0a00c5a97460f52af07e (PR gh-139449) which fixed another deadlock on `tracemalloc.stop()` :-) See issue gh-139116.\r\n\r\ncc @ZeroIntensity @encukou "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-13T16:20:26Z",
+   "body": "> This change basically reverts commit https://github.com/python/cpython/commit/01157e0cdff1321a065b0a00c5a97460f52af07e (PR https://github.com/python/cpython/pull/139449) which fixed another deadlock on tracemalloc.stop() :-) See issue https://github.com/python/cpython/issues/139116.\r\n\r\nI pushed a change to avoid the deadlock on `tracemalloc.stop()`: don't call `PyRefTracer_SetTracer()` while holding `TABLES_LOCK()`."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-16T21:09:12Z",
+   "body": "> Is it necessary to keep the attached thread state in TABLES_LOCK? It seems the bulk of the fix is just calling PyRefTracer_SetTracer without holding the lock.\r\n\r\nThere are two problems:\r\n\r\n* (A) detaching the thread state in TABLES_LOCK() breaks a lot of assumptions in the `_io` module about critical sections, the GC and memory allocators leading to race conditions. See https://github.com/python/cpython/issues/144763#issuecomment-3896179544 for the problem on the `_io.TextIOWrapper.write()` method.\r\n* (B) Deadlock involving `PyRefTracer_SetTracer()` in `tracemalloc.stop()`: see issue gh-139116. My fix is to call `PyRefTracer_SetTracer()` without holding `TABLES_LOCK()` (which is safe at this point in `_PyTraceMalloc_Stop()`).\r\n\r\nYes, I think that it's necessary to keep the attached thread state in TABLES_LOCK (not detach the thread state).\r\n\r\n> Alternatively, we could just use Py_BEGIN_CRITICAL_SECTION_MUTEX instead of PyMutex_Lock.\r\n\r\nWhat would be the benefits?"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2026-02-17T22:08:17Z",
+   "body": "Using `_Py_LOCK_DONT_DETACH` in `TABLES_LOCK()` definitely seems like the right approach for the allocator calls (i.e., `tracemalloc_alloc`/`tracemalloc_free`).  We don't want to detach the thread state there.\r\n\r\nI'm not really sure about `_PyTraceMalloc_Stop()` and `_PyTraceMalloc_Start()`. Should these be safe to call concurrently? The implementation isn't thread-safe for concurrent calls to `tracemalloc.start()` or `tracemalloc.stop()`. Maybe that's fine?\r\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-17T22:15:05Z",
+   "body": "> I'm not really sure about _PyTraceMalloc_Stop() and _PyTraceMalloc_Start(). Should these be safe to call concurrently? The implementation isn't thread-safe for concurrent calls to tracemalloc.start() or tracemalloc.stop(). Maybe that's fine?\r\n\r\nI'm only aware of https://github.com/python/cpython/issues/128679 : concurrent calls to `PyTraceMalloc_Track()` and `tracemalloc.stop()` (case tested by `test_tracemalloc.test_tracemalloc_track_race()`).\r\n\r\nI don't think that two threads should be able to call `tracemalloc.stop()` and `tracemalloc.start()` in parallel. I expect that only a single thread (the main thread?) would call these two methods.\r\n\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2026-02-18T03:10:10Z",
+   "body": "Could we use `_Py_LOCK_DONT_DETACH` in `TABLES_LOCK`, but use a normal (detaching) call in `start`/`stop`? That should avoid the reftracer deadlock without needing to move the call to `PyRefTracer_SetTracer`."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2026-02-18T03:27:39Z",
+   "body": "Nevermind, that would lead to a lock-ordering deadlock:\r\n\r\n1. Thread A releases the GIL and acquires `TABLES_LOCK`.\r\n2. Thread B acquires the GIL and begins waiting on `TABLES_LOCK`.\r\n3. Thread A is waiting on the GIL, which thread B holds.\r\n4. Deadlock!\r\n\r\nIf I remember correctly, `tracemalloc` still needs more work to avoid crashes when running concurrently (particularly in subinterpreters), so I think it would be fine to leave `start`/`stop` as is in this PR and address it later."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-18T10:49:28Z",
+   "body": "@kumaraditya303 @colesbury @ZeroIntensity: So what do you think of this change? Does it look good to you?"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-02-18T16:57:43Z",
+   "body": "[GH-144965](https://github.com/python/cpython/pull/144965) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-18T16:59:09Z",
+   "body": "Backport of the fix to 3.14: https://github.com/python/cpython/pull/144965. The backport is different since the 3.14 code already avoided to detach the thread safe."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2026-02-18T21:25:59Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 FreeBSD Refleaks 3.14** (tier-3) has failed when building commit f67cf83a4e3c6a28522b53d985928a46aae22b77.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1800/builds/1004) and take a look at the build logs.\n4. Check if the failure is related to this commit (f67cf83a4e3c6a28522b53d985928a46aae22b77) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1800/builds/1004\n\nTest leaking resources:\n\n- test_events: references\n- test_events: memory blocks\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/buildbot/buildarea/3.14.ware-freebsd.refleak/build/Lib/test/support/__init__.py\", line 859, in gc_collect\n    gc.collect()\nResourceWarning: unclosed <socket.socket fd=9, family=2, type=1, proto=6, laddr=('127.0.0.1', 15216), raddr=('127.0.0.1', 15217)>\nTask was destroyed but it is pending!\ntask: <Task pending name='Task-4077' coro=<BaseSelectorEventLoop._accept_connection2() done, defined at /buildbot/buildarea/3.14.ware-freebsd.refleak/build/Lib/asyncio/selector_events.py:217> wait_for=<Future finished exception=ConnectionResetError()>>\nFuture exception was never retrieved\nfuture: <Future finished exception=ConnectionResetError()>\nTraceback (most recent call last):\n  File \"/buildbot/buildarea/3.14.ware-freebsd.refleak/build/Lib/asyncio/sslproto.py\", line 581, in _on_handshake_complete\n    raise handshake_exc\nConnectionResetError\nWarning -- Unraisable exception\nException ignored while calling deallocator <function _SelectorTransport.__del__ at 0x847dcc4d0>:\nTraceback (most recent call last):\n  File \"/buildbot/buildarea/3.14.ware-freebsd.refleak/build/Lib/asyncio/selector_events.py\", line 873, in __del__\n    _warn(f\"unclosed transport {self!r}\", ResourceWarning, source=self)\nResourceWarning: unclosed transport <_SelectorSocketTransport closing fd=9>\nk\n\n\nTraceback (most recent call last):\n  File \"/buildbot/buildarea/3.14.ware-freebsd.refleak/build/Lib/test/support/__init__.py\", line 859, in gc_collect\n    gc.collect()\nResourceWarning: unclosed <socket.socket fd=8, family=2, type=1, proto=6, laddr=('127.0.0.1', 11443), raddr=('127.0.0.1', 11444)>\nTask was destroyed but it is pending!\ntask: <Task pending name='Task-4078' coro=<BaseSelectorEventLoop._accept_connection2() done, defined at /buildbot/buildarea/3.14.ware-freebsd.refleak/build/Lib/asyncio/selector_events.py:217> wait_for=<Future pending cb=[Task.task_wakeup()]>>\nWarning -- Unraisable exception\nException ignored while calling deallocator <function _SelectorTransport.__del__ at 0x844ba84d0>:\nTraceback (most recent call last):\n  File \"/buildbot/buildarea/3.14.ware-freebsd.refleak/build/Lib/asyncio/selector_events.py\", line 873, in __del__\n    _warn(f\"unclosed transport {self!r}\", ResourceWarning, source=self)\nResourceWarning: unclosed transport <_SelectorSocketTransport closing fd=8>\nk\n\n```\n\n</details>\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/144763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "83f4fffe3d78ba368c0d4864c42c7c9c9223f7d1",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "20009b2ffb0032747449019bcdebc80da1cc5204",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "de4f844e3f5daaa5d7c82376b80a207af38dac17",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f67cf83a4e3c6a28522b53d985928a46aae22b77",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e19d9ae31bda45cfebf078e32588c2dbb940f007",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d3cd2e76a91a58d623311bbedf99dca3f8ba0fb4",
+   "actor": "ljfp"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/139448",
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

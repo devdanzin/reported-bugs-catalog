@@ -1,0 +1,69 @@
+{
+ "repo": "python/cpython",
+ "number": 151511,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151511",
+ "title": "gh-151510: Fix __lazy_import__ without frame",
+ "state": "closed",
+ "state_reason": null,
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-15T15:46:29Z",
+ "closed_at": "2026-06-17T18:09:52Z",
+ "body": "<del>I did not add a test because the fix is a straightforward, and exercising this would require extra `_testcapi` scaffolding to call `__lazy_import__` without a Python frame.</del>\r\n\r\nTest added.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n<!-- gh-issue-number: gh-151510 -->\r\n* Issue: gh-151510\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "pablogsal",
+   "created_at": "2026-06-17T18:09:46Z",
+   "body": "Thanks for the fix @aisk !"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-17T18:09:56Z",
+   "body": "Thanks @aisk for the PR, and @pablogsal for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-17T18:10:11Z",
+   "body": "[GH-151610](https://github.com/python/cpython/pull/151610) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2026-06-17T18:41:40Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 Debian root 3.x** (tier-1) has failed when building commit eff805b7a7a9678639bbcebe804864406cc4eab2.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/345/builds/14521) and take a look at the build logs.\n4. Check if the failure is related to this commit (eff805b7a7a9678639bbcebe804864406cc4eab2) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/345/builds/14521\n\nFailed tests:\n\n- test.test_multiprocessing_fork.test_misc\n\nFailed subtests:\n\n- test_large_pool - test.test_multiprocessing_fork.test_misc.MiscTestCase.test_large_pool\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/_test_multiprocessing.py\", line 7311, in test_large_pool\n    rc, out, err = script_helper.assert_python_ok(testfn)\n                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/support/script_helper.py\", line 182, in assert_python_ok\n    return _assert_python(True, *args, **env_vars)\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/support/script_helper.py\", line 167, in _assert_python\n    res.fail(cmd_line)\n    ~~~~~~~~^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/support/script_helper.py\", line 80, in fail\n    raise AssertionError(f\"Process return code is {exitcode}\\n\"\n    ...<10 lines>...\n                         f\"---\")\nAssertionError: Process return code is 1\ncommand line: ['/root/buildarea/3.x.angelico-debian-amd64/build/python', '-X', 'faulthandler', '-I', '@test_1237050_tmp\u00e6']\n\n\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import sys; from multiprocessing.forkserver import main; main(10, 11, ['__main__'], sys_argv=sys.argv[1:], **{'sys_path': ['/root/buildarea/3.x.angelico-debian-amd64/build/target/lib/python316.zip', '/root/buildarea/3.x.angelico-debian-amd64/build/Lib', '/root/buildarea/3.x.angelico-debian-amd64/build/build/lib.linux-x86_64-3.16'], 'main_path': '/root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_1237050\u00e6/@test_1237050_tmp\u00e6', 'authkey_r': 13})\n                                                             ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/forkserver.py\", line 406, in main\n    pid = os.fork()\nOSError: [Errno 12] Cannot allocate memory\nTraceback (most recent call last):\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_1237050\u00e6/@test_1237050_tmp\u00e6\", line 4, in <module>\n    with multiprocessing.Pool(200) as p:\n         ~~~~~~~~~~~~~~~~~~~~^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/context.py\", line 119, in Pool\n    return Pool(processes, initializer, initargs, maxtasksperchild,\n                context=self.get_context())\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/pool.py\", line 215, in __init__\n    self._repopulate_pool()\n    ~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/pool.py\", line 306, in _repopulate_pool\n    return self._repopulate_pool_static(self._ctx, self.Process,\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^\n                                        self._processes,\n                                        ^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n                                        self._maxtasksperchild,\n                                        ^^^^^^^^^^^^^^^^^^^^^^^\n                                        self._wrap_exception)\n                                        ^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/pool.py\", line 329, in _repopulate_pool_static\n    w.start()\n    ~~~~~~~^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/process.py\", line 121, in start\n    self._popen = self._Popen(self)\n                  ~~~~~~~~~~~^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/context.py\", line 309, in _Popen\n    return Popen(process_obj)\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/popen_forkserver.py\", line 35, in __init__\n    super().__init__(process_obj)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/popen_fork.py\", line 20, in __init__\n    self._launch(process_obj)\n    ~~~~~~~~~~~~^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/popen_forkserver.py\", line 59, in _launch\n    self.pid = forkserver.read_signed(self.sentinel)\n               ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/multiprocessing/forkserver.py\", line 472, in read_signed\n    raise EOFError('unexpected EOF')\nEOFError: unexpected EOF\n---\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "aisk",
+   "created_at": "2026-06-18T01:26:02Z",
+   "body": "The buildbot failure should be unrelated."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151510",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "eff805b7a7a9678639bbcebe804864406cc4eab2",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8fe5897853b1f5d8b7a1dc9fc2b72c6244a74983",
+   "actor": "pablogsal"
+  }
+ ],
+ "fetch_errors": null
+}

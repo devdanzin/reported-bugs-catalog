@@ -1,0 +1,70 @@
+{
+ "repo": "numpy/numpy",
+ "number": 29368,
+ "type": "pull",
+ "url": "https://github.com/numpy/numpy/pull/29368",
+ "title": "BUG: avoid segmentation fault in `string_expandtabs_length_promoter`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "riku-sakamoto",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "00 - Bug"
+ ],
+ "created_at": "2025-07-13T16:41:54Z",
+ "closed_at": "2025-10-10T07:56:41Z",
+ "body": "\r\nFix to use `Py_XINCREF` instead of `Py_INCREF` to safely handle the case where `op_dtypes[0]` is NULL\r\n\r\n### Root Cause\r\n\r\n* When calling `string_expandtabs_length_promoter`, the first item of `op_dtypes` can be NULL.\r\n\r\n### Rationale\r\n\r\n* As noted in [this comment regarding `ops`](https://github.com/numpy/numpy/blob/main/numpy/_core/src/umath/ufunc_object.c#L2315), legacy type resolution does not handle NULL well. Therefore, I changed the logic to use the second item instead.\r\n\r\n### Outcome\r\n\r\n* `numpy._core.strings._expandtabs_length.reduce(numpy.zeros(200))` now raises a `UFuncTypeError`, instead of causing a segmentation fault.\r\n",
+ "comments": [
+  {
+   "author": "ngoldbaum",
+   "created_at": "2025-07-13T17:34:41Z",
+   "body": "ping @lysnikolaou "
+  },
+  {
+   "author": "mattip",
+   "created_at": "2025-10-10T06:25:14Z",
+   "body": "Please add a test"
+  },
+  {
+   "author": "riku-sakamoto",
+   "created_at": "2025-10-10T07:36:43Z",
+   "body": "> Please add a test\r\n\r\n@mattip \r\n\r\nThank you for your check! I added a test."
+  },
+  {
+   "author": "riku-sakamoto",
+   "created_at": "2025-10-10T07:39:37Z",
+   "body": "CI tests on ARM64 are failing, and it seems to be related to the latest Python 3.11.14 release (Oct 9, 2025).  \r\nI'll investigate it."
+  },
+  {
+   "author": "mattip",
+   "created_at": "2025-10-10T07:55:59Z",
+   "body": "I checked that the fix indeed prevents the segfault, and that the tests hit the desired codepath. Note that `np._core.strings` is not exposed in `np._core.__all__`."
+  },
+  {
+   "author": "mattip",
+   "created_at": "2025-10-10T07:56:51Z",
+   "body": "Thanks @riku-sakamoto "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6bb72644e16e5e7f590533bde670c42b199edb53",
+   "actor": "mattip"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/29920",
+   "commit": null,
+   "actor": "charris"
+  }
+ ],
+ "fetch_errors": null
+}

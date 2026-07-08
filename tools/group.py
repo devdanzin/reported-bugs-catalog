@@ -12,7 +12,7 @@ Guards against over-merging:
     or a PR/issue linking to >=4 same-repo artifacts) are kept as singletons and
     flagged; their references are separate bugs, not merged in.
 """
-# pyright: reportAttributeAccessIssue=false
+# pyright: reportAttributeAccessIssue=false, reportOptionalSubscript=false
 import json, os, re, collections
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,6 +28,14 @@ UMBRELLA_TITLE = re.compile(
     r"\b(umbrella|tracking issue|analysis report|c extension analysis|"
     r"(four|five|six|seven|eight|nine|ten|\d+)\s+bugs?\b|multiple (bugs|issues|crashes))",
     re.I)
+BACKPORT_TITLE = re.compile(r"^\s*\[3\.\d+\]")   # CPython backport PR convention
+
+
+def load_backfill():
+    try:
+        return set(json.load(open(os.path.join(SRC, "backfill_prs.json"))))
+    except FileNotFoundError:
+        return set()
 
 
 def load(name):
@@ -58,10 +66,16 @@ def main():
     idx = {(r["repo"], r["number"]): r for r in rows}
     oom = oom_map()
 
+    backfill = load_backfill()
     for r in rows:
         r["_umbrella"] = is_umbrella(r)
 
-    # union-find over issue<->PR edges only, skipping umbrellas
+    # union-find. A PR merges ONLY with the issue it actually FIXES (fix_links:
+    # title "gh-<issue>" + body "fixes #N"), not every issue it name-drops — this
+    # is what keeps distinct bugs apart (a mere "#N" mention no longer bridges).
+    # A PR that fixes several distinct corpus-issues (batch fix) doesn't merge any
+    # of them (would conflate bugs); its issues stay separate. Backports share the
+    # same fix target as the main PR, so they join the same bug.
     parent = {}
     def find(k):
         parent.setdefault(k, k)
@@ -73,17 +87,16 @@ def main():
         parent[find(a)] = find(b)
 
     for r in rows:
-        key = (r["repo"], r["number"])
-        find(key)
-        if r["_umbrella"]:
+        find((r["repo"], r["number"]))
+    for r in rows:
+        if r["type"] != "pull" or r["_umbrella"]:
             continue
-        for n in r.get("links", []):
-            other = idx.get((r["repo"], n))
-            if not other or other["_umbrella"]:
-                continue
-            # only merge an issue with a PR (one of each), same repo
-            if {r["type"], other["type"]} == {"issue", "pull"}:
-                union(key, (r["repo"], n))
+        targets = [n for n in r.get("fix_links", [])
+                   if (idx.get((r["repo"], n)) or {}).get("type") == "issue"
+                   and not idx[(r["repo"], n)]["_umbrella"]]
+        if len(targets) != 1:      # 0 = no in-corpus issue; >=2 = batch fix
+            continue
+        union((r["repo"], r["number"]), (r["repo"], targets[0]))
 
     # gather clusters
     clusters = collections.defaultdict(list)
@@ -91,20 +104,37 @@ def main():
         clusters[find((r["repo"], r["number"]))].append(r)
 
     bugs = []
+    dropped_backfill = 0
     for members in clusters.values():
         repo = members[0]["repo"]
+        # a backfilled fix-PR that never merged into one of our issues is a loose
+        # cross-ref (or fixes a non-catalog issue) — not a bug of ours; drop it.
+        if len(members) == 1 and members[0]["type"] == "pull" \
+                and f"{repo}#{members[0]['number']}" in backfill:
+            dropped_backfill += 1
+            continue
         issues = sorted([m for m in members if m["type"] == "issue"], key=lambda m: m["number"])
         prs = sorted([m for m in members if m["type"] == "pull"], key=lambda m: m["number"])
+        if not (issues or prs):
+            continue
+        n_backports = sum(1 for m in prs if BACKPORT_TITLE.match(m["title"] or ""))
         umbrella = any(m["_umbrella"] for m in members)
-        # tool: highest-confidence non-'?' among members
+        # tool comes from the highest-confidence non-'?' member — but a backfilled
+        # fix-PR only INHERITS the bug's tool, so it must not determine the tool or
+        # the review flag (else a confidently-classified issue looks "tentative"
+        # because its fix-PR was heuristically guessed).
         rank = {"high": 3, "medium": 2, "low": 1}
-        cand = [m for m in members if m["tool"] not in ("?",)]
-        tool = "?"
-        mode = ""
-        if cand:
-            best = max(cand, key=lambda m: (rank.get(m["confidence"], 0),
-                                            m["tool"] != "manual"))
-            tool, mode = best["tool"], best["mode"]
+        cand = [m for m in members if m["tool"] != "?"
+                and f"{repo}#{m['number']}" not in backfill]
+        if not cand:
+            cand = [m for m in members if m["tool"] != "?"]
+        best = (max(cand, key=lambda m: (rank.get(m["confidence"], 0),
+                                         m["tool"] != "manual")) if cand else None)
+        tool = best["tool"] if best else "?"
+        mode = best["mode"] if best else ""
+        b_conf = best["confidence"] if best else "low"
+        b_review = bool(best and best.get("needs_review"))
+        b_reason = best["reason"] if b_review else None
         # primary artifact = lowest-numbered issue else lowest PR
         primary = (issues or prs)[0]
         key = (repo, primary["number"])
@@ -132,16 +162,17 @@ def main():
             "is_umbrella": umbrella,
             "issues": [f"{repo}#{m['number']}" for m in issues],
             "prs": [f"{repo}#{m['number']}" for m in prs],
+            "n_prs": len(prs),
+            "n_backports": n_backports,
+            "n_fix_prs": len(prs) - n_backports,
             "gists": sorted(set(g for m in members for g in m["gists"])),
             "labels": sorted(set(l for m in members for l in m["labels"])),
             "filed_by": filed_by,
             "filers": filers,
             "status": status,
-            "confidence": min((m["confidence"] for m in members),
-                              key=lambda c: rank.get(c, 0)),
-            "needs_review": any(m.get("needs_review") for m in members),
-            "review_reason": next((m["reason"] for m in members
-                                   if m.get("needs_review")), None),
+            "confidence": b_conf,
+            "needs_review": b_review,
+            "review_reason": b_reason,
             "reproduced": None,
             "raw": [m["raw"] for m in members],
             "n_artifacts": len(members),
@@ -156,9 +187,13 @@ def main():
     rev_ct = collections.Counter(b["tool"] for b in bugs if b["needs_review"])
     umb = [b for b in bugs if b["is_umbrella"]]
     review = [b for b in bugs if b["needs_review"]]
+    total_prs = sum(b["n_prs"] for b in bugs)
+    total_bp = sum(b["n_backports"] for b in bugs)
     print(f"{len(rows)} artifacts -> {len(bugs)} bug clusters "
-          f"(merged {len(rows) - len(bugs)} PRs into their issues)")
+          f"(dropped {dropped_backfill} unmerged backfill PRs)")
     print(f"umbrellas: {len(umb)}   needs-review bugs: {len(review)}")
+    print(f"PRs in clusters: {total_prs} ({total_bp} backports, "
+          f"{total_prs - total_bp} distinct fixes)")
     print("\nbugs per tool  (confirmed + tentative[review]):")
     for t in sorted(set(conf_ct) | set(rev_ct), key=lambda t: -(conf_ct[t] + rev_ct[t])):
         print(f"  {conf_ct[t]:4d} + {rev_ct[t]:<3} tentative   {t}")

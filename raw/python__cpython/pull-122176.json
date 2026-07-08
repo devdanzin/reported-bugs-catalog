@@ -1,0 +1,100 @@
+{
+ "repo": "python/cpython",
+ "number": 122176,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/122176",
+ "title": "gh-122170: Handle `ValueError` raised by `os.stat` in `linecache`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [
+  "stdlib"
+ ],
+ "created_at": "2024-07-23T13:46:02Z",
+ "closed_at": "2024-07-27T10:10:43Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-122170 -->\n* Issue: gh-122170\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-27T10:18:33Z",
+   "body": "@serhiy-storchaka Should I backport this one to 3.12 and 3.13? (I would say yes)"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-07-27T10:31:48Z",
+   "body": "Thanks @picnixz for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-07-27T10:31:48Z",
+   "body": "Thanks @picnixz for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-07-27T10:31:58Z",
+   "body": "[GH-122348](https://github.com/python/cpython/pull/122348) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-07-27T10:32:05Z",
+   "body": "[GH-122349](https://github.com/python/cpython/pull/122349) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2024-07-27T10:34:21Z",
+   "body": "Yes, this can be considered as a bug fix, although very minor."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122170",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122228",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7a6d4ccf0ec16e09f0d8b21c5a0c591e5e3e45f7",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "84f35b9f194090f9833563cc148718179d1ffa60",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e99304bd1a8b8b3881380ee062a32cc74593478a",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2e37d67db2a9a0ebd2f3a2cfd3d02e0f06d64522",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3648a945e447cb9c6f5f7b6b803e503e1f38f982",
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

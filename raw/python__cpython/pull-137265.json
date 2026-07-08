@@ -1,0 +1,94 @@
+{
+ "repo": "python/cpython",
+ "number": 137265,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/137265",
+ "title": "GH-137218: Update `make` for JIT stencils",
+ "state": "closed",
+ "state_reason": null,
+ "author": "savannahostrowski",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news",
+  "build",
+  "topic-JIT"
+ ],
+ "created_at": "2025-07-31T04:11:25Z",
+ "closed_at": "2025-09-19T09:36:43Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\nThis PR normalizes stencil names and then modifies the `Makefile` to select the appropriate JIT stencil header based on the host.\r\n\r\n<!-- gh-issue-number: gh-137218 -->\r\n* Issue: gh-137218\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-07-31T04:13:07Z",
+   "body": "Fixes the segfault on my machine but feel free to test if we think there's anything dubious here. I opted to remove the autoconf substitution here since this seems pretty straightforward."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-31T17:12:09Z",
+   "body": "Could we do `jit_stencils*.h` to catch both files with one pattern?\r\n\r\nAlso, does the PCbuild logic need to be updated? Or is it good?"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-08-01T03:58:07Z",
+   "body": "I'm no `make` expert, but based on my testing and what I've read, it seems like the `wildcard` keyword is required for proper glob expansion in Makefiles. It doesn't expand out in the same way as it would in a shell with `*` (see failed commits above \ud83e\udee0 ). Windows should be good since we explicitly enumerate the stencils by platform.\r\n\r\nThat said...I...I am truly perplexed as I can no longer reproduce the segfault. The first commit from last night fixed the issue locally, so I know that this did solve the issue I was seeing, but...????\r\n\r\n@brandtbucher Can you still repro?"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-08-02T19:23:58Z",
+   "body": "I know what the issue is here, will fix later."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-08-04T09:07:33Z",
+   "body": "> I am truly perplexed as I can no longer reproduce the segfault.\n\nI have the exact same problem, it suddenly stopped crashing and I haven't figured out a way to get into the segfaulting state ever since. So it seems normal for this abnormal issue. "
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2025-09-19T09:43:09Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 FreeBSD 3.x** (tier-3) has failed when building commit 85c1ef647751d18194bbc52eb2b1305871e03d10.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1223/builds/7107) and take a look at the build logs.\n4. Check if the failure is related to this commit (85c1ef647751d18194bbc52eb2b1305871e03d10) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1223/builds/7107\n\n\n\nSummary of the results of the build (if available):\n\n\n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nremote: Enumerating objects: 15, done.        \nremote: Counting objects:   6% (1/15)        \nremote: Counting objects:  13% (2/15)        \nremote: Counting objects:  20% (3/15)        \nremote: Counting objects:  26% (4/15)        \nremote: Counting objects:  33% (5/15)        \nremote: Counting objects:  40% (6/15)        \nremote: Counting objects:  46% (7/15)        \nremote: Counting objects:  53% (8/15)        \nremote: Counting objects:  60% (9/15)        \nremote: Counting objects:  66% (10/15)        \nremote: Counting objects:  73% (11/15)        \nremote: Counting objects:  80% (12/15)        \nremote: Counting objects:  86% (13/15)        \nremote: Counting objects:  93% (14/15)        \nremote: Counting objects: 100% (15/15)        \nremote: Counting objects: 100% (15/15), done.        \nremote: Compressing objects:  20% (1/5)        \nremote: Compressing objects:  40% (2/5)        \nremote: Compressing objects:  60% (3/5)        \nremote: Compressing objects:  80% (4/5)        \nremote: Compressing objects: 100% (5/5)        \nremote: Compressing objects: 100% (5/5), done.        \nremote: Total 8 (delta 7), reused 3 (delta 3), pack-reused 0 (from 0)        \nFrom https://github.com/python/cpython\n * branch                    main       -> FETCH_HEAD\nNote: switching to '85c1ef647751d18194bbc52eb2b1305871e03d10'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 85c1ef64775 GH-137218: Update `make` for JIT stencils (#137265)\nSwitched to and reset branch 'main'\n\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3291: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3293: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3295: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3297: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3299: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3301: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3303: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3305: Invalid line type\nmake: Fatal errors encountered -- cannot continue\n\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3291: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3293: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3295: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3297: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3299: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3301: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3303: Invalid line type\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3305: Invalid line type\nmake: Fatal errors encountered -- cannot continue\n```\n\n</details>\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-09-19T10:14:52Z",
+   "body": "This change broke the build on FreeBSD: https://buildbot.python.org/#/builders/1223/builds/7107\r\n\r\n```\r\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3291: Invalid line type\r\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3293: Invalid line type\r\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3295: Invalid line type\r\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3297: Invalid line type\r\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3299: Invalid line type\r\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3301: Invalid line type\r\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3303: Invalid line type\r\nmake: \"/buildbot/buildarea/3.x.ware-freebsd/build/Makefile\" line 3305: Invalid line type\r\n```"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-19T12:04:33Z",
+   "body": "Ah, sorry about that. CI didn't catch it. I understand what happened here. I'll open a PR to fix it. "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/137218",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "85c1ef647751d18194bbc52eb2b1305871e03d10",
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/139170",
+   "commit": null,
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/140454",
+   "commit": null,
+   "actor": "savannahostrowski"
+  }
+ ],
+ "fetch_errors": null
+}

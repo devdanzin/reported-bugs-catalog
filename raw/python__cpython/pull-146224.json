@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 146224,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146224",
+ "title": "[3.13] gh-146092: Raise MemoryError on allocation failure in _zoneinfo (GH-146165)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-20T16:17:35Z",
+ "closed_at": "2026-03-20T16:40:55Z",
+ "body": "(cherry picked from commit 6450b1d142b6254d2e3b2eba47d69125ca79b3fe)\n\nCo-authored-by: Victor Stinner <vstinner@python.org>\n\n<!-- gh-issue-number: gh-146092 -->\n* Issue: gh-146092\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146092",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146165",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "cfd7f94c12c7ee85d51838b306b8c30596094ebc",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

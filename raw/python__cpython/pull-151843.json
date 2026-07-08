@@ -1,0 +1,143 @@
+{
+ "repo": "python/cpython",
+ "number": 151843,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151843",
+ "title": "gh-151842: Make _PyXI_FreeExcInfo NULL-safe to fix crash on capture_exception() OOM (OOM-0031)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "amruthamodela06",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-06-21T12:44:28Z",
+ "closed_at": "2026-06-23T20:31:47Z",
+ "body": "Closes #151842 \r\n\r\n### Summary\r\n\r\n`_interpreters.capture_exception()` builds a `_PyXI_excinfo` via `_PyXI_NewExcInfo()`. Under memory pressure that allocation can fail and return `NULL`. The cleanup path in `_interpreters_capture_exception_impl` (`Modules/_interpretersmodule.c:1544`) then unconditionally calls `_PyXI_FreeExcInfo(info)` with `info == NULL`. `_PyXI_FreeExcInfo` has no NULL guard, so `_PyXI_excinfo_clear` \u2192 `_excinfo_clear_type` dereferences `&NULL->type` (offset 0) at `Python/crossinterp.c:1319` \u2192 SIGSEGV. This reproduces on all build configurations (a NULL dereference, not a debug-only assert).\r\n\r\nPart of #151763 (OOM umbrella, OOM-0031).\r\n\r\n### Reproducer\r\n\r\n```python\r\nimport faulthandler, _interpreters\r\nfaulthandler.enable()\r\nfrom _testcapi import set_nomemory, remove_mem_hooks\r\nfor start in range(0, 40):\r\n    try:\r\n        set_nomemory(start, 0)\r\n        try:\r\n            _interpreters.capture_exception(Exception())\r\n        finally:\r\n            remove_mem_hooks()\r\n    except BaseException:\r\n        pass\r\n    finally:\r\n        try: remove_mem_hooks()\r\n        except Exception: pass\r\n```\r\n\r\n### Backtrace\r\n\r\n```\r\n#0  _excinfo_clear_type                  Python/crossinterp.c:1319   # info == 0x0 -> offset-0 deref\r\n#1  _PyXI_excinfo_clear                  Python/crossinterp.c:1374\r\n#2  _PyXI_FreeExcInfo                    Python/crossinterp.c:1712   # called with info == NULL, no guard\r\n#3  _interpreters_capture_exception_impl Modules/_interpretersmodule.c:1544\r\n```\r\n\r\n### Fix\r\n\r\nMake `_PyXI_FreeExcInfo` NULL-safe, matching the surrounding `PyMem_RawFree(NULL)` idiom (and `Py_XDECREF`, `free()`, etc.). This is more defensive than guarding only the one call site, since `_PyXI_FreeExcInfo` is part of the cross-interpreter exception ABI and any future caller would otherwise have the same hazard.\r\n\r\n```c\r\nvoid\r\n_PyXI_FreeExcInfo(_PyXI_excinfo *info)\r\n{\r\n    if (info == NULL) {\r\n        return;\r\n    }\r\n    _PyXI_excinfo_clear(info);\r\n    PyMem_RawFree(info);\r\n}\r\n```\r\n\r\n### Verification\r\n\r\n- `test_interpreters` passes on the rebuilt binary (no regression in the success path).\r\n- Per the discussion in #151773 (same umbrella), no OOM-injection regression test is added \u2014 those tests rely on internal allocation counts that need re-tuning across implementation changes. The fix should be verified by running the reproducer on a debug+ASan build.\r\n\r\n\r\n\r\n<!-- gh-issue-number: gh-151842 -->\r\n* Issue: gh-151842\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "amruthamodela06",
+   "created_at": "2026-06-21T13:11:39Z",
+   "body": "Verified the BEFORE/AFTER locally on Windows release (x64):\n\n- **Before fix**: reproducer crashes with `Windows fatal exception: access violation` at `_interpreters.capture_exception(Exception())` (line 8 of the reproducer).\n- **After fix**: reproducer survives (`survived (no crash)`, exit code 0).\n- `test_interpreters` continues to pass (172 tests).\n\nThis confirms the original gist's claim that the bug reproduces on all build configurations (not just debug+ASan).\n"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2026-06-22T22:22:50Z",
+   "body": "Could you please add your reproducer to the test suite?"
+  },
+  {
+   "author": "amruthamodela06",
+   "created_at": "2026-06-23T13:37:08Z",
+   "body": "Thanks for the suggestion. @picnixz declared a policy for this umbrella ([here](https://github.com/python/cpython/issues/151773#issuecomment-4758964344)) that OOM-injection regression tests aren't added the allocation-count constants they rely on get fragile across implementation changes. The recommended verification is a core-dev before/after check, which I've pre-run on Windows release ([comment above](https://github.com/python/cpython/pull/151843#issuecomment-4762084019)) showing the crash on the unfixed binary and a clean run after the fix.\r\n\r\nHappy to add a test if a core dev specifically wants one for this PR."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-06-23T14:37:17Z",
+   "body": "Yeah I think we decided at some point to just not add tests where we check the memory errors explicitly. @ZeroIntensity @StanFromIreland do you remember where we decided this? or if we actually decided to?"
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2026-06-23T14:42:37Z",
+   "body": "I don't know of a single discussion, I think we've generally (possibly irregularly?) been rejecting such tests on PRs."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2026-06-23T16:22:42Z",
+   "body": "cc @ZeroIntensity "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-23T16:35:46Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\n\n"
+  },
+  {
+   "author": "amruthamodela06",
+   "created_at": "2026-06-23T18:17:02Z",
+   "body": "Thanks @sobolevn, @ZeroIntensity, and @StanFromIreland for the detailed feedback. Applied @sobolevn's approach (from #152013):\n\n- Reverted the NULL guard in `_PyXI_FreeExcInfo`, added the call-site `if (info != NULL)` guard in `Modules/_interpretersmodule.c:1544` instead.\n- Added `PyErr_NoMemory()` to `_PyXI_NewExcInfo` so calloc-failure raises a proper `MemoryError`, addressing the second crash @sobolevn flagged.\n- Added the `assert(info != NULL)` @ZeroIntensity suggested as a contract for future callers.\n- Simplified the NEWS entry and moved it to `Library/` per @ZeroIntensity's and @StanFromIreland's feedback.\n\nVerified locally on Windows release: the reproducer still crashes on the unfixed binary (`Windows fatal exception: access violation`, per [the earlier comment](https://github.com/python/cpython/pull/151843#issuecomment-4762084019)) and survives cleanly on the v3 binary. `test_interpreters` continues to pass.\n\nI have made the requested changes; please review again.\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-23T18:17:08Z",
+   "body": "Thanks for making the requested changes!\n\n@ZeroIntensity: please review the changes made to this pull request.\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-23T20:31:51Z",
+   "body": "Thanks @amruthamodela06 for the PR, and @ZeroIntensity for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-23T20:32:11Z",
+   "body": "[GH-152031](https://github.com/python/cpython/pull/152031) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-23T20:32:12Z",
+   "body": "Sorry, @amruthamodela06 and @ZeroIntensity, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 5e0747db2f5a063657a117e88b58a20624c848d1 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-23T20:32:16Z",
+   "body": "[GH-152032](https://github.com/python/cpython/pull/152032) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2026-06-23T20:35:08Z",
+   "body": "Looks like this isn't an issue on 3.13 because we're using stack memory there.\r\n\r\nCongrats on your first contribution, @amruthamodela06 :)"
+  },
+  {
+   "author": "amruthamodela06",
+   "created_at": "2026-06-24T09:19:59Z",
+   "body": "> Looks like this isn't an issue on 3.13 because we're using stack memory there.\r\n> \r\n> Congrats on your first contribution, @amruthamodela06 :)\r\n\r\nThanks @ZeroIntensity!! Really appreciated the detailed review :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151842",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "amruthamodela06"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152013",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5e0747db2f5a063657a117e88b58a20624c848d1",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "33b5aebfd4bf81361720bc533120a267db23ccc4",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "415e218ed5ff1d541803aa46ea1e69ddcda03062",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "64ebde30dde2d3fc75f723e85322ff6a4838a308",
+   "actor": "pyctrl"
+  }
+ ],
+ "fetch_errors": null
+}

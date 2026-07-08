@@ -1,0 +1,98 @@
+{
+ "repo": "python/cpython",
+ "number": 152163,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152163",
+ "title": "gh-152156: Fix a crash in `interpeters.create` under limited memory conditions",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting merge"
+ ],
+ "created_at": "2026-06-25T07:16:13Z",
+ "closed_at": "2026-06-26T11:41:55Z",
+ "body": "In `handle_channel_error` we already set an error. When called the second time, we get end up with `err == 0` and run this code:\r\n\r\n```python\r\nif (err == 0) {\r\n    assert(!PyErr_Occurred());\r\n    return 0;\r\n}\r\n```\r\n\r\nwhich will fail, because exception was already set by the first error. So, there's no need to call it twice.\n\n<!-- gh-issue-number: gh-152156 -->\n* Issue: gh-152156\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-06-25T08:02:38Z",
+   "body": "Are you sure that `channel_destroy` can not clear error?"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2026-06-25T08:24:16Z",
+   "body": "`PyErr_Clear` can be called in `_release_xid_data` under `XID_IGNORE_EXC`, but it resets the previous error correctly. I don't see any real ways to clear it.\r\n\r\n`PyErr_GetRaisedException` and `PyErr_Clear` are only used in `_release_xid_data` in this path."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-26T11:42:05Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-26T11:42:06Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-26T11:42:06Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-26T11:42:17Z",
+   "body": "[GH-152268](https://github.com/python/cpython/pull/152268) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-26T11:42:25Z",
+   "body": "[GH-152269](https://github.com/python/cpython/pull/152269) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-26T11:42:30Z",
+   "body": "[GH-152270](https://github.com/python/cpython/pull/152270) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152156",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3ad66bf10dbb929bcf8efd889e56a9b9068319ca",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "df7c9e1eda6a35ad2f10e522c6c1163164660217",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "62842c9ff592114ade3049d6a85aea031b783beb",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d1faedab4ea927d436c2a015d7c1c5fe50bf5a86",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

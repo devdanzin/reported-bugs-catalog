@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 127263,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127263",
+ "title": "[3.12] gh-127182: Fix `io.StringIO.__setstate__` crash when `None` is the first value (GH-127219)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-25T17:32:19Z",
+ "closed_at": "2024-11-25T17:51:22Z",
+ "body": "(cherry picked from commit a2ee89968299fc4f0da4b5a4165025b941213ba5)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\nCo-authored-by: Victor Stinner <vstinner@python.org>\n\n<!-- gh-issue-number: gh-127182 -->\n* Issue: gh-127182\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127182",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127219",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "a4d6b905dd46eedaa118b95d1ed052a7171cd608",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

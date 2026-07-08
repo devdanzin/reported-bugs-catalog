@@ -8,25 +8,43 @@
  "issues": [
   "python/cpython#126316"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#126488",
+  "python/cpython#126504",
+  "python/cpython#126506",
+  "python/cpython#127055",
+  "python/cpython#127104"
+ ],
+ "n_prs": 5,
+ "n_backports": 1,
+ "n_fix_prs": 4,
  "gists": [],
  "labels": [
   "3.13",
   "3.14",
+  "awaiting core review",
   "extension-modules",
+  "needs backport to 3.13",
   "topic-free-threading",
   "topic-subinterpreters",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "vstinner"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-126316.json"
+  "raw/python__cpython/issue-126316.json",
+  "raw/python__cpython/pull-126488.json",
+  "raw/python__cpython/pull-126504.json",
+  "raw/python__cpython/pull-126506.json",
+  "raw/python__cpython/pull-127055.json",
+  "raw/python__cpython/pull-127104.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 6
 }

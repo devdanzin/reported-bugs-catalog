@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 146271,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146271",
+ "title": "[3.13] gh-146056: Fix repr() for lists containing NULLs (GH-146129) (GH-146155)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-22T07:43:17Z",
+ "closed_at": "2026-03-22T08:06:17Z",
+ "body": "(cherry picked from commit 0f2246b1553f401da5ade47e0fd1c80ad7a8dfa5) (cherry picked from commit 796513306fdc1184452ea644b485f83511f39528)\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146056 -->\n* Issue: gh-146056\n<!-- /gh-issue-number -->\n\r\n\r\n<!-- readthedocs-preview cpython-previews start -->\r\n----\n\ud83d\udcda Documentation preview \ud83d\udcda: https://cpython-previews--146271.org.readthedocs.build/\n\r\n<!-- readthedocs-preview cpython-previews end -->",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146056",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146155",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "fab82679d3e129b804e496ebf1e5ad24948c5f50",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

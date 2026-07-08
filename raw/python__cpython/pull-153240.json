@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 153240,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/153240",
+ "title": "[3.13] gh-153068: Preserve cprofile enable errors (GH-153070)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-07-06T23:36:43Z",
+ "closed_at": "2026-07-07T00:05:44Z",
+ "body": "(cherry picked from commit dea93ce2a203a9b3aedf091faa6610d13d2b5aea)\n\nCo-authored-by: An Long <aisk@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-153068 -->\n* Issue: gh-153068\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153068",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153070",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "33948e7231a500e3d736c6bfc9f162d11c78f597",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,152 @@
+{
+ "repo": "python/cpython",
+ "number": 146129,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146129",
+ "title": "gh-146056: Fix repr() for lists and tuples containing NULLs",
+ "state": "closed",
+ "state_reason": null,
+ "author": "serhiy-storchaka",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-18T16:54:40Z",
+ "closed_at": "2026-03-19T07:59:49Z",
+ "body": "\n\n<!-- gh-issue-number: gh-146056 -->\n* Issue: gh-146056\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T17:41:23Z",
+   "body": "If you change `PyUnicodeWriter_WriteRepr()` to accept `NULL`, please apply this change to update the doc and tests:\r\n\r\n```diff\r\ndiff --git a/Doc/c-api/unicode.rst b/Doc/c-api/unicode.rst\r\nindex 4845e0f3002..3fcfe9a41c9 100644\r\n--- a/Doc/c-api/unicode.rst\r\n+++ b/Doc/c-api/unicode.rst\r\n@@ -1887,6 +1887,8 @@ object.\r\n \r\n    Call :c:func:`PyObject_Repr` on *obj* and write the output into *writer*.\r\n \r\n+   If *obj* is ``NULL``, write ``<NULL>`` into *writer*.\r\n+\r\n    On success, return ``0``.\r\n    On error, set an exception, leave the writer unchanged, and return ``-1``.\r\n \r\ndiff --git a/Lib/test/test_capi/test_unicode.py b/Lib/test/test_capi/test_unicode.py\r\nindex 6a9c60f3a6d..55120448a8a 100644\r\n--- a/Lib/test/test_capi/test_unicode.py\r\n+++ b/Lib/test/test_capi/test_unicode.py\r\n@@ -1779,6 +1779,13 @@ def test_basic(self):\r\n         self.assertEqual(writer.finish(),\r\n                          \"var=long value 'repr'\")\r\n \r\n+    def test_repr_null(self):\r\n+        writer = self.create_writer(0)\r\n+        writer.write_utf8(b'var=', -1)\r\n+        writer.write_repr(NULL)\r\n+        self.assertEqual(writer.finish(),\r\n+                         \"var=<NULL>\")\r\n+\r\n     def test_utf8(self):\r\n         writer = self.create_writer(0)\r\n         writer.write_utf8(b\"ascii\", -1)\r\ndiff --git a/Modules/_testcapi/unicode.c b/Modules/_testcapi/unicode.c\r\nindex 203282dd53d..668adc5085b 100644\r\n--- a/Modules/_testcapi/unicode.c\r\n+++ b/Modules/_testcapi/unicode.c\r\n@@ -449,6 +449,7 @@ writer_write_repr(PyObject *self_raw, PyObject *args)\r\n     if (!PyArg_ParseTuple(args, \"O\", &obj)) {\r\n         return NULL;\r\n     }\r\n+    NULLABLE(obj);\r\n \r\n     if (PyUnicodeWriter_WriteRepr(self->writer, obj) < 0) {\r\n         return NULL;\r\ndiff --git a/Objects/unicode_writer.c b/Objects/unicode_writer.c\r\nindex 2b944bf1ea8..cd2688e32df 100644\r\n--- a/Objects/unicode_writer.c\r\n+++ b/Objects/unicode_writer.c\r\n@@ -383,6 +383,10 @@ PyUnicodeWriter_WriteStr(PyUnicodeWriter *writer, PyObject *obj)\r\n int\r\n PyUnicodeWriter_WriteRepr(PyUnicodeWriter *writer, PyObject *obj)\r\n {\r\n+    if (obj == NULL) {\r\n+        return _PyUnicodeWriter_WriteASCIIString((_PyUnicodeWriter*)writer, \"<NULL>\", 6);\r\n+    }\r\n+\r\n     if (Py_TYPE(obj) == &PyLong_Type) {\r\n         return _PyLong_FormatWriter((_PyUnicodeWriter*)writer, obj, 10, 0);\r\n     }\r\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T17:43:34Z",
+   "body": "Please add a test on tuple as well:\r\n\r\n```diff\r\ndiff --git a/Lib/test/test_capi/test_tuple.py b/Lib/test/test_capi/test_tuple.py\r\nindex 0c27e81168f..51d26640865 100644\r\n--- a/Lib/test/test_capi/test_tuple.py\r\n+++ b/Lib/test/test_capi/test_tuple.py\r\n@@ -73,6 +73,11 @@ def test_tuple_new(self):\r\n         self.assertRaises(SystemError, tuple_new, PY_SSIZE_T_MIN)\r\n         self.assertRaises(MemoryError, tuple_new, PY_SSIZE_T_MAX)\r\n \r\n+\r\n+    def test_uninitialized_tuple_repr(self):\r\n+        tup = _testlimitedcapi.tuple_new(3)\r\n+        self.assertEqual(repr(tup), '(<NULL>, <NULL>, <NULL>)')\r\n+\r\n     def test_tuple_fromarray(self):\r\n         # Test PyTuple_FromArray()\r\n         tuple_fromarray = _testcapi.tuple_fromarray\r\n```"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-03-18T21:30:02Z",
+   "body": "I think this was a bug in the PyUnicodeWriter C API. When the user rewrite they code to using it, they can reasonably assume that `PyUnicodeWriter_WriteRepr()` is equivalent to `PyUnicodeWriter_WriteStr(PyObject_Repr())`. This is a mine. It is better to fix it as fast as possible.\r\n\r\nI have found few other bugs in the PyUnicodeWriter C API, working on them."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-19T07:59:53Z",
+   "body": "Thanks @serhiy-storchaka for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 I'm not a witch! I'm not a witch!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-19T07:59:56Z",
+   "body": "Sorry, @serhiy-storchaka, I could not cleanly backport this to `3.14` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 0f2246b1553f401da5ade47e0fd1c80ad7a8dfa5 3.14\n```\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-19T07:59:59Z",
+   "body": "Sorry, @serhiy-storchaka, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 0f2246b1553f401da5ade47e0fd1c80ad7a8dfa5 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-19T08:11:09Z",
+   "body": "[GH-146155](https://github.com/python/cpython/pull/146155) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-19T11:10:16Z",
+   "body": "FYI I updated `PyUnicodeWriter_WriteRepr()` in pythoncapi-compat (backport): https://github.com/python/pythoncapi-compat/pull/170."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-20T11:47:54Z",
+   "body": "[GH-146204](https://github.com/python/cpython/pull/146204) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-20T11:56:39Z",
+   "body": "[GH-146204](https://github.com/python/cpython/pull/146204) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-20T14:41:08Z",
+   "body": "[GH-146155](https://github.com/python/cpython/pull/146155) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-20T14:41:35Z",
+   "body": "[GH-146204](https://github.com/python/cpython/pull/146204) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146056",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "0f2246b1553f401da5ade47e0fd1c80ad7a8dfa5",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3af9bbbd4ca678fa812d14453bd3be3d89f63689",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146062",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fec7f555945e345c68d6bd36ce35524283980c23",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "796513306fdc1184452ea644b485f83511f39528",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "94d687d37e7d4cdf5119ecb7451d4041bcb34cb4",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bb5d229ad89ecbe4130a7c548d505d828a878f68",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fab82679d3e129b804e496ebf1e5ad24948c5f50",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e573679cb7fa32f052ae15c528ad192d1800ab05",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

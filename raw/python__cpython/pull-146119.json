@@ -1,0 +1,69 @@
+{
+ "repo": "python/cpython",
+ "number": 146119,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146119",
+ "title": "[3.14] gh-146092: Fix error handling in _BINARY_OP_ADD_FLOAT opcode",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-18T16:01:15Z",
+ "closed_at": "2026-03-19T11:14:33Z",
+ "body": "Fix error handling in _PyFloat_FromDouble_ConsumeInputs() used by _BINARY_OP_ADD_FLOAT, _BINARY_OP_SUBTRACT_FLOAT and _BINARY_OP_MULTIPLY_FLOAT opcodes. PyStackRef_FromPyObjectSteal() must not be called with a NULL pointer.\r\n\r\nFix also _BINARY_OP_INPLACE_ADD_UNICODE opcode.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n<!-- gh-issue-number: gh-146092 -->\r\n* Issue: gh-146092\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T16:04:12Z",
+   "body": "cc @Fidget-Spinner "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T16:21:46Z",
+   "body": "@Fidget-Spinner: Please review again, I found another bug in `_BINARY_OP_INPLACE_ADD_UNICODE` opcode. I updated the PR to fix this opcode as well.\r\n\r\n```c\r\n            PyUnicode_Append(&temp, right_o);\r\n            Py_DECREF(right_o);\r\n            ERROR_IF(temp == NULL);\r\n            *target_local = PyStackRef_FromPyObjectSteal(temp);\r\n```\r\n\r\nI don't know if `*target_local` should be set to `PyStackRef_NULL` on error.\r\n\r\nThe code in the main branch is different:\r\n\r\n```c\r\n            DEAD(left);\r\n            PyUnicode_Append(&temp, right_o);\r\n            _Py_DECREF_SPECIALIZED(right_o, _PyUnicode_ExactDealloc);\r\n            *target_local = PyStackRef_NULL;\r\n            ERROR_IF(temp == NULL);\r\n            res = PyStackRef_FromPyObjectSteal(temp);\r\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-03-18T16:30:21Z",
+   "body": "> I don't know if *target_local should be set to PyStackRef_NULL on error.\r\n\r\nI think setting it to PyStackRef_NULL might be wrong? Not too sure. Basically at that point, `*target_local` refcnt == 1. If we leave it in locals, it must be PyStackref_CLOSE(frame->localsplus[i]) when the frame is cleared during exception raising.\r\n\r\nIf you want to be sure. Write a test where the append fails (you can trigger an artificial failure somehow), and check if there's reference leaks. If there's refleaks, then we should not be setting it to `PyStackRef_NULL` and main is wrong."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T21:44:14Z",
+   "body": "> If you want to be sure. Write a test where the append fails (you can trigger an artificial failure somehow), and check if there's reference leaks. If there's refleaks, then we should not be setting it to PyStackRef_NULL and main is wrong.\r\n\r\nI wrote such test and main code is correct, whereas my 3.14 PR was wrong.\r\n\r\nI fixed my 3.14 PR by adding `*target_local = PyStackRef_NULL;` to the error path.\r\n\r\nHere is my patch on top of this PR to test the error path using `./python -m test test_str -m test_leak -R 3:3`:\r\n\r\n```diff\r\ndiff --git a/Lib/test/test_str.py b/Lib/test/test_str.py\r\nindex 2584fbf72d3..9fd24782a5c 100644\r\n--- a/Lib/test/test_str.py\r\n+++ b/Lib/test/test_str.py\r\n@@ -2784,6 +2784,20 @@ class Bag:\r\n         o.name2 = 4\r\n         self.assertEqual(list(o.__dict__), [name, name2])\r\n \r\n+    def test_leak(self):\r\n+        def f():\r\n+            left = b\"opazkeopakeoakezaijzoe\".decode()\r\n+            right = b\"xyz\".decode()\r\n+            try:\r\n+                left += right\r\n+            except MemoryError:\r\n+                left = \"MemoryError\"\r\n+            return left\r\n+\r\n+        f()\r\n+        strings = [f() for _ in range(1024)]\r\n+        self.assertEqual(strings[-1], \"MemoryError\")\r\n+\r\n \r\n if __name__ == \"__main__\":\r\n     unittest.main()\r\ndiff --git a/Python/bytecodes.c b/Python/bytecodes.c\r\nindex 7a33f63a051..18eda799074 100644\r\n--- a/Python/bytecodes.c\r\n+++ b/Python/bytecodes.c\r\n@@ -792,7 +792,13 @@ dummy_func(\r\n             DEAD(left);\r\n             PyObject *temp = PyStackRef_AsPyObjectSteal(*target_local);\r\n             PyObject *right_o = PyStackRef_AsPyObjectSteal(right);\r\n-            PyUnicode_Append(&temp, right_o);\r\n+            if (PyUnicode_EqualToUTF8(temp, \"opazkeopakeoakezaijzoe\") == 0) {\r\n+                PyUnicode_Append(&temp, right_o);\r\n+            }\r\n+            else {\r\n+                Py_CLEAR(temp);\r\n+                PyErr_NoMemory();\r\n+            }\r\n             Py_DECREF(right_o);\r\n             if (temp == NULL) {\r\n                 *target_local = PyStackRef_NULL;\r\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-19T11:14:48Z",
+   "body": "Merged. Thanks for your careful review @Fidget-Spinner!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146092",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146117",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7f29c1d0dabb84fc91caf874881b501345702793",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

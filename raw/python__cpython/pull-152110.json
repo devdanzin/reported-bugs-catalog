@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 152110,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152110",
+ "title": "gh-152107: Fix crash when creating a dict item iterator under MemoryError",
+ "state": "open",
+ "state_reason": null,
+ "author": "zangjiucheng",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting core review"
+ ],
+ "created_at": "2026-06-24T18:03:36Z",
+ "closed_at": null,
+ "body": "Fix: guard the untrack with `_PyObject_GC_IS_TRACKED()` so a never-tracked\r\niterator is freed cleanly.\r\n\r\nReproducer (debug build, `_strptime` drains the size-2 tuple freelist so the\r\n`di_result` allocation actually fails):\r\n\r\n```python\r\nimport _strptime\r\nfrom _testcapi import set_nomemory\r\nfor start in range(60):\r\n    set_nomemory(start)\r\n    try:\r\n        _strptime._strptime(\"\", \"\")\r\n    except BaseException:\r\n        pass\r\n```\r\n\r\nFound via OOM-injection fuzzing (OOM-0006 in #151763).\r\n\r\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\r\n\n\n<!-- gh-issue-number: gh-152107 -->\n* Issue: gh-152107\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2026-06-24T21:15:31Z",
+   "body": "Since having `di->di_dict == NULL` and `di->di_result == NULL` is a valid `dictiter` state, we can move `_PyObject_GC_TRACK` earlier in `dictiter_new()`."
+  },
+  {
+   "author": "zangjiucheng",
+   "created_at": "2026-06-24T21:33:34Z",
+   "body": "> Since having `di->di_dict == NULL` and `di->di_result == NULL` is a valid `dictiter` state, we can move `_PyObject_GC_TRACK` earlier in `dictiter_new()`.\r\n\r\nThat's a good point. The fix is identical, but we can make it early to ensure the `dictiter` valid state is met. "
+  },
+  {
+   "author": "zangjiucheng",
+   "created_at": "2026-06-24T22:59:33Z",
+   "body": "Hello everyone, thank you for your suggestions!! I\u2019ve addressed all the issues based on your feedback. \r\n\r\n> Sorry, I was running a Claude in my workspace to do some auto scan, which caused some confusion in the commit history, so I made a forced commit to resolve the issue :) "
+  },
+  {
+   "author": "zangjiucheng",
+   "created_at": "2026-06-25T13:52:46Z",
+   "body": "The CI broken seems not related to the current branch changes :("
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152107",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152237",
+   "commit": null,
+   "actor": "sergey-miryanov"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 143381,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143381",
+ "title": "gh-141504: Factor out tracing and optimization heuristics into a single object",
+ "state": "closed",
+ "state_reason": null,
+ "author": "corona10",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-01-03T07:02:03Z",
+ "closed_at": "2026-01-03T15:22:14Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-141504 -->\n* Issue: gh-141504\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-03T15:25:42Z",
+   "body": "Note: the names are a little lengthy. But considering this is an internal CPython only env var used for testing, we can determine proper names later when/if we decide to expose them."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2026-01-05T14:07:41Z",
+   "body": "I have some questions.\r\n\r\nWhy set thresholds per thread, rather than per interpreter. Why would we want per-thread values?\r\nWhy set and store the threshold and backoff separately rather than as a single backoff counter?\r\n\r\nI've added a new comment on the issue, that will hopefully clarify what I was after."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141504",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "12283f6373baba43cf1e03e5e06e34c924247f7d",
+   "actor": "corona10"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "corona10"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8ede7a5bc9884c000f574b88b3b7b05b5df12f01",
+   "actor": "thunder-coding"
+  }
+ ],
+ "fetch_errors": null
+}

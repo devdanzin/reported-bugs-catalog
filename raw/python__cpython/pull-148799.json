@@ -1,0 +1,33 @@
+{
+ "repo": "python/cpython",
+ "number": 148799,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148799",
+ "title": "gh-148798: Fix crash in _interpreters.create() on non-UTF-8 string in config",
+ "state": "open",
+ "state_reason": null,
+ "author": "rajkripal",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-04-20T15:03:19Z",
+ "closed_at": null,
+ "body": "`_config_dict_copy_str` (`Python/interpconfig.c`) passed the result of\n`PyUnicode_AsUTF8()` straight to `strncpy()`. When the string can't be\nUTF-8 encoded \u2014 e.g. it contains an unpaired surrogate \u2014 `PyUnicode_AsUTF8`\nreturns `NULL` and sets `UnicodeEncodeError`, and `strncpy` then\ndereferences `NULL`, segfaulting the interpreter.\n\nLone surrogates are reachable from pure Python (`'\\udc80'`, `chr(0xDC80)`)\nand also show up via `surrogateescape` when non-UTF-8 filenames / env\nvars / argv get forwarded into a config dict.\n\nFix: check the return of `PyUnicode_AsUTF8` and propagate the error,\nmirroring the pattern already used at `Modules/_interpretersmodule.c:425`.\n\nRegression test lives next to the existing gh-126221 case in\n`CreateTests.test_in_main`.\n\n<!-- issue-number: gh-148798 -->\n- Issue: https://github.com/python/cpython/issues/148798",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148798",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148818",
+   "commit": null,
+   "actor": "rajkripal"
+  }
+ ],
+ "fetch_errors": null
+}

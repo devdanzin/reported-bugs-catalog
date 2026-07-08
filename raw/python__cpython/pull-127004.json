@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 127004,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127004",
+ "title": "[3.13] gh-126594: Fix typeobject.c wrap_buffer() cast (GH-126754)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2024-11-19T08:13:29Z",
+ "closed_at": "2024-11-19T08:38:07Z",
+ "body": "Reject flags smaller than INT_MIN.\r\n\r\n(cherry picked from commit 84f07c3a4cbcfe488ccfb4030571be0bc4de7e45)\n\nCo-authored-by: Victor Stinner <vstinner@python.org>\nCo-authored-by: Jelle Zijlstra <jelle.zijlstra@gmail.com>\n\n<!-- gh-issue-number: gh-126594 -->\n* Issue: gh-126594\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126594",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126754",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "fd276ad3287939ff6f0c6832d76eaeda520fc038",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

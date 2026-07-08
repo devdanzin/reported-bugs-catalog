@@ -1,0 +1,101 @@
+{
+ "repo": "python/cpython",
+ "number": 143285,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143285",
+ "title": "gh-143189: fix insertdict() for non-Unicode key",
+ "state": "closed",
+ "state_reason": null,
+ "author": "methane",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2025-12-30T06:53:47Z",
+ "closed_at": "2026-01-12T11:21:24Z",
+ "body": "When iserting non unicode key into split table, matching Unicode key may be in the shared split table without its value.\r\n\n\n<!-- gh-issue-number: gh-143189 -->\n* Issue: gh-143189\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-01-12T11:21:27Z",
+   "body": "Thanks @methane for the PR, and @hugovk for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-01-12T11:21:30Z",
+   "body": "Sorry, @methane and @hugovk, I could not cleanly backport this to `3.14` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 43c76587c1ba2c3937fa6834db10cffc604e39e0 3.14\n```\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-01-12T11:21:35Z",
+   "body": "Sorry, @methane and @hugovk, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 43c76587c1ba2c3937fa6834db10cffc604e39e0 3.13\n```\n"
+  },
+  {
+   "author": "hugovk",
+   "created_at": "2026-01-12T11:23:04Z",
+   "body": "@methane Please can you check the backports?"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-01-13T04:52:32Z",
+   "body": "[GH-143771](https://github.com/python/cpython/pull/143771) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-01-13T04:53:46Z",
+   "body": "[GH-143772](https://github.com/python/cpython/pull/143772) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143189",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "43c76587c1ba2c3937fa6834db10cffc604e39e0",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ed50c2efad32bc450ac1fb7e1c578dfbf6cfc14f",
+   "actor": "reidenong"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fd7d935d224b4d2673fb23b257715b4723a20428",
+   "actor": "methane"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5d26a0410e7a64d13b5da5d189f9e2a894d71dd1",
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b739bd1d4251368be9a2269290a0019eff9ee866",
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e715ccd549c8dcc3bf35d35538b874a4406cecaf",
+   "actor": "thunder-coding"
+  }
+ ],
+ "fetch_errors": null
+}

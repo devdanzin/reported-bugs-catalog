@@ -1,0 +1,46 @@
+{
+ "repo": "python/cpython",
+ "number": 134798,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/134798",
+ "title": "[3.13] gh-134744: Fix fcntl error handling (GH-134748) (GH-134795)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "tests",
+  "skip news"
+ ],
+ "created_at": "2025-05-27T16:13:27Z",
+ "closed_at": "2025-05-28T10:54:53Z",
+ "body": "gh-134744: Fix fcntl error handling (GH-134748)\n\nFix also reference leak on buffer overflow.\n(cherry picked from commit 8a6a6f39c869a6601babc31592e156ce22478a47)\n\nCo-authored-by: Victor Stinner <vstinner@python.org>\n(cherry picked from commit 9300a596d37d058e6e58d00a2ad70617c863a3de)",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/134744",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134795",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "741040236e05a3789e5d9756530b5ff92e0bc52d",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

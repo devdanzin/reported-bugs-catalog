@@ -9,6 +9,9 @@
  "prs": [
   "python-greenlet/greenlet#502"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "5e6e52e425558ae68a5caa7a1e78697f"
  ],

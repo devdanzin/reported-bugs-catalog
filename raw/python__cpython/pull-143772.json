@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 143772,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143772",
+ "title": "[3.13] gh-143189: fix insertdict() for non-Unicode key (GH-143285)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "methane",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-01-13T04:53:38Z",
+ "closed_at": "2026-01-13T10:12:39Z",
+ "body": "(cherry picked from commit 43c76587c1ba2c3937fa6834db10cffc604e39e0)\r\n\n\n<!-- gh-issue-number: gh-143189 -->\n* Issue: gh-143189\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143189",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143285",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b739bd1d4251368be9a2269290a0019eff9ee866",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  }
+ ],
+ "fetch_errors": null
+}

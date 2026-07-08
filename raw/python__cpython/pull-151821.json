@@ -1,0 +1,33 @@
+{
+ "repo": "python/cpython",
+ "number": 151821,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151821",
+ "title": "gh-151815: Fix segfault in template_iter on allocation failure",
+ "state": "open",
+ "state_reason": null,
+ "author": "timurmamedov1",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-20T23:27:45Z",
+ "closed_at": null,
+ "body": "`template_iter()` allocates a `templateiterobject` with `PyObject_GC_New` (which does not zero memory), but only assigns `stringsiter` and `interpolationsiter` after both `PyObject_GetIter` calls succeed. If either call fails, `Py_DECREF(iter)` runs `templateiter_clear`, which calls `Py_CLEAR` on uninitialized pointers, causing a segfault.\n\nFix: initialize both fields to `NULL` immediately after allocation so `Py_CLEAR` is safe on the error paths.\n\n<!-- gh-issue-number: gh-151815 -->\n* Issue: gh-151815\n<!-- /gh-issue-number -->",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-21T18:23:46Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151815",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

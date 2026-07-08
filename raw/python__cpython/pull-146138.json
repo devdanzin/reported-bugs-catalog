@@ -1,0 +1,51 @@
+{
+ "repo": "python/cpython",
+ "number": 146138,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146138",
+ "title": "[3.13] gh-146092: Handle _PyFrame_GetFrameObject() failures properly (GH-146124) (GH-146132)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-18T17:57:17Z",
+ "closed_at": "2026-03-18T20:23:26Z",
+ "body": "gh-146092: Handle _PyFrame_GetFrameObject() failures properly (GH-146124)\n\n* Fix _PyFrame_GetLocals() and _PyFrame_GetLocals() error handling.\n* _PyEval_ExceptionGroupMatch() now fails on _PyFrame_GetLocals()\n  error.\n(cherry picked from commit 8eeb800faf5562e6ce3805416f656ab09243c9a6)\n\nCo-authored-by: Victor Stinner <vstinner@python.org>\n(cherry picked from commit e1e4852133ea548479bc9b975420a32331df7cee)",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T20:23:37Z",
+   "body": "Merged. Thanks for checking @serhiy-storchaka."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146092",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146132",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "53b544a6a7d14fbbb07a18b3c324ac5167d0597f",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

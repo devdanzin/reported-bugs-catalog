@@ -1,0 +1,53 @@
+{
+ "repo": "python/cpython",
+ "number": 148308,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148308",
+ "title": "gh-148263: Fix refcount leak in weakref proxy operations",
+ "state": "closed",
+ "state_reason": null,
+ "author": "prakashsellathurai",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-09T18:26:40Z",
+ "closed_at": "2026-04-13T05:58:31Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n\r\n<!-- gh-issue-number: gh-148263 -->\r\n* Issue: gh-148263\r\n<!-- /gh-issue-number -->\r\n\r\n\r\n## Validation:\r\n\r\nReproducer scripts ->  https://gist.github.com/prakashsellathurai/ea7ba0ec8a5cf049881464d34de31411\r\n\r\n#### before (mainline )\r\n```\r\n(venv) PS C:\\Users\\Prakash\\Documents\\work\\projects\\mainline> .\\python.bat ..\\cpython\\tmp\\final-test.py\r\nRunning Debug|x64 interpreter...\r\nbinary +: leaked 10003 refs (~1/call)\r\nternary pow: leaked 10003 refs (~1/call)\r\ncompare ==: leaked 10003 refs (~1/call)\r\n```\r\n\r\n#### After this change\r\n```\r\n(venv) PS C:\\Users\\Prakash\\Documents\\work\\projects\\cpython> .\\python.bat  .\\tmp\\final-test.py\r\nRunning Debug|x64 interpreter...\r\nbinary +: leaked 3 refs (~0/call)\r\nternary pow: leaked 3 refs (~0/call)\r\ncompare ==: leaked 3 refs (~0/call)\r\n```\r\n\r\n\r\n\r\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-09T18:26:47Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "prakashsellathurai",
+   "created_at": "2026-04-13T05:58:31Z",
+   "body": "while debugging few failed testcases multiple commits from main was reverted hence closing this pr and creating fresh pr only with my changes"
+  },
+  {
+   "author": "prakashsellathurai",
+   "created_at": "2026-04-13T07:13:30Z",
+   "body": "> I would prefer that we keep a macro form to calls. In addition, please follow [PEP-7](https://peps.python.org/7).\r\n\r\nI fixed the PEP-7 issues but when i tried to change the function calls to macro, and removing the new proxy wrapper for unary /wrap method,  mainline  downstream testcases were failing/went flaky , in doing so created multiple reverts which clouded the current PR ,hence   raising  a  new pr with clean changes  here https://github.com/python/cpython/pull/148486"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148263",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148486",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  }
+ ],
+ "fetch_errors": null
+}

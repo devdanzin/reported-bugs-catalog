@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 135449,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/135449",
+ "title": "[3.14] Revert \"gh-135410: use a critical section around `StringIO.__next__` (GH-135412)\" (GH-135439)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-06-12T22:32:38Z",
+ "closed_at": "2025-06-12T22:58:59Z",
+ "body": "This reverts commit e6c3039cb39e68ae9af9ddcaca341c5af8f9cf23.\n(cherry picked from commit 73431356d324842cac0d545018c3ad21c85bc883)\n\nCo-authored-by: Peter Bierma <zintensitydev@gmail.com>\n\n<!-- gh-issue-number: gh-135410 -->\n* Issue: gh-135410\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135439",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/135410",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b3efd3d7d3b052a8b3a1d2afa2c8001b3bac26d5",
+   "actor": "corona10"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "corona10"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,35 @@
+{
+ "repo": "numpy/numpy",
+ "number": 31857,
+ "type": "pull",
+ "url": "https://github.com/numpy/numpy/pull/31857",
+ "title": "BUG: Fix segfault in MT19937 by preventing recursive seed lists (#31775)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "charris",
+ "author_association": "MEMBER",
+ "labels": [
+  "00 - Bug",
+  "component: numpy.random",
+  "08 - Backport"
+ ],
+ "created_at": "2026-07-04T02:06:22Z",
+ "closed_at": "2026-07-04T04:46:44Z",
+ "body": "Backport of #31775.\r\n\r\nPR summary\r\nThis PR fixes a Segmentation Fault (stack overflow) that occurs when initialising MT19937 with a recursive or self-referencing list.\r\nPreviously, passing a cyclic list (e.g., x = []; x.append(x)) into the generator caused an infinite loop in the Cython unpacking logic, leading to a hard crash.\r\nI added a _has_cycle helper function in bit_generator.pyx to detect self-referencing sequences early. If a cycle is detected, the SeedSequence initialisation now safely raises a ValueError instead of segfaulting.\r\n\r\nCloses #28822 \r\nFirst-time committer introduction\r\nHi everyone! I am a newer contributor looking to dive deep into the Python data science stack. I wanted my first major contribution to be on the systems level rather than just documentation, so hunting down a C/Cython memory bug seemed like a great challenge. I'm excited to learn more from the maintainers here!\r\n\r\nAI Disclosure\r\nI used an AI assistant (Google Gemini) strictly as a pair-programming tool to help navigate the Meson/Spin build system and to draft the initial logic for the _has_cycle helper function. I manually compiled the environment, reproduced the bug, and verified the fix locally.\r\n\r\n### Verification\r\nHere is the local terminal output proving the fix. Instead of a Segmentation Fault, it now safely catches the cycle and throws the expected exception:\r\n\r\n```bash\r\nTesting MT19937...\r\nTraceback (most recent call last):\r\n  File \"/workspaces/numpy/../test_bug.py\", line 5, in <module>\r\n    MT19937(x)\r\n  File \"numpy/random/_mt19937.pyx\", line 131, in numpy.random._mt19937.MT19937.__init__\r\n    BitGenerator.__init__(self, seed)\r\n  File \"numpy/random/bit_generator.pyx\", line 559, in numpy.random.bit_generator.BitGenerator.__init__\r\n    seed = SeedSequence(seed)\r\n  File \"numpy/random/bit_generator.pyx\", line 318, in numpy.random.bit_generator.SeedSequence.__init__\r\n    raise ValueError(\"Seed (entropy) cannot be a recursive or self-referencing list.\")\r\nValueError: Seed (entropy) cannot be a recursive or self-referencing list.\r\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "4dee265afc098a296a62666f6356d4927b67848f",
+   "actor": "charris"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "charris"
+  }
+ ],
+ "fetch_errors": null
+}

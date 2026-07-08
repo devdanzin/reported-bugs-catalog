@@ -1,0 +1,81 @@
+{
+ "repo": "python/cpython",
+ "number": 127399,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127399",
+ "title": "gh-127316: fix incorrect assertion in setting `__class__` in free-threading",
+ "state": "closed",
+ "state_reason": null,
+ "author": "kumaraditya303",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news",
+  "topic-free-threading"
+ ],
+ "created_at": "2024-11-29T10:18:10Z",
+ "closed_at": "2024-11-29T16:14:20Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-127316 -->\n* Issue: gh-127316\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-29T16:14:48Z",
+   "body": "Thanks @kumaraditya303 for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-29T16:15:00Z",
+   "body": "[GH-127422](https://github.com/python/cpython/pull/127422) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127316",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "45c5cba318a19dda3ee6f9fc84781cc7a2fbde80",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5388279cee69197ebdefccba6c0353035517cfc0",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2f56c68dec97002fdd8563a0e4977b75eb191ab9",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dda892021f15750e92fb43333a65f7e56a7544b8",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "76b6bc4d70a960428a9d2338d23d152500d6356d",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "154b201773a399ada017cb555d569063a0d122c6",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,155 @@
+{
+ "repo": "python/cpython",
+ "number": 126617,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126617",
+ "title": "gh-126595: fix a crash when calling `itertools.count(sys.maxsize)`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-09T09:32:46Z",
+ "closed_at": "2024-11-12T13:10:11Z",
+ "body": "\n\n<!-- gh-issue-number: gh-126595 -->\n* Issue: gh-126595\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-09T10:36:48Z",
+   "body": "> But I doubt this should be backported.\r\n\r\nConsidering it's a bug that makes the interpreter crash, I think this should."
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2024-11-09T10:38:21Z",
+   "body": "> Considering it's a bug that makes the interpreter crash\r\n\r\nOnly for debug builds."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-09T10:54:34Z",
+   "body": "Yes, but I still think it's better to backport it since it can be used by third-party libraries (let's discuss it on the issue instead)."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-09T13:12:01Z",
+   "body": "Ok, maybe it's better to have a separate PR actually."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-09T13:37:18Z",
+   "body": "I'm reverting the `__repr__` check and delegate it to https://github.com/python/cpython/pull/126620. The rationale is that there are some free-threaded update to do and I want to ease backports."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-10T07:49:54Z",
+   "body": "I think it will be more likely to have cnt equal to maxsize rather than having an error. Which is why I put that test first."
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2024-11-10T08:18:14Z",
+   "body": "> I think it will be more likely to have cnt equal to maxsize rather than having an error.\r\n\r\nWell, in terms of probability - it's more likely to have an error (this happens on countable subset of integers), rather having cnt equal to some fixed value ;)  "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-10T08:32:25Z",
+   "body": "Actually I was wrong. I thought that the error only happened in bad situations but the overflow exception happens when you put something > maxsize so *your* fix is better!"
+  },
+  {
+   "author": "rhettinger",
+   "created_at": "2024-11-11T23:18:32Z",
+   "body": "+1 for backporting"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-12T13:10:15Z",
+   "body": "Thanks @picnixz for the PR, and @vstinner for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-12T13:10:43Z",
+   "body": "[GH-126739](https://github.com/python/cpython/pull/126739) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-12T13:13:54Z",
+   "body": "Thanks @picnixz for the PR, and @vstinner for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-12T13:14:56Z",
+   "body": "I don't know what is going on with the 3.12 backport, it seems to be stuck."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-12T13:15:29Z",
+   "body": "Merged, thanks @picnixz for the fix and thanks @devdanzin for the bug report."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-12T13:38:59Z",
+   "body": "[GH-126740](https://github.com/python/cpython/pull/126740) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126595",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126620",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6e3bb8a91380ba98d704f2dca8e98923c0abc8a8",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8e596cb9d3bac341e7268ae5e73ed37a624e1fab",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "46710ca5f263936a2e36fa5d0f140cf9f50b2618",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "865f096f51bb7290eb10b33b330f387d245c2472",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127048",
+   "commit": null,
+   "actor": "skirpichev"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c0b89e2320feab985eb563cb866b16eb416203a8",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8418d6639170a5d5d3ab6575d97342f180a9f77b",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -8,7 +8,12 @@
  "issues": [
   "python/cpython#146388"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146389"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "14a5663604e1d7fb930d121b4e0c8d25"
  ],
@@ -27,7 +32,8 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146388.json"
+  "raw/python__cpython/issue-146388.json",
+  "raw/python__cpython/pull-146389.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

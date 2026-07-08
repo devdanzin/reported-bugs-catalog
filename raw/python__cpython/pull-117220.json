@@ -1,0 +1,99 @@
+{
+ "repo": "python/cpython",
+ "number": 117220,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/117220",
+ "title": "GH-117195: Avoid assertion error in `object.__sizeof__`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "markshannon",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-03-25T15:09:23Z",
+ "closed_at": "2024-05-23T10:06:10Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-117195 -->\n* Issue: gh-117195\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-05-23T10:06:14Z",
+   "body": "Thanks @markshannon for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-05-23T10:06:28Z",
+   "body": "[GH-119456](https://github.com/python/cpython/pull/119456) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-12-04T14:54:12Z",
+   "body": "Thanks @markshannon for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-12-04T14:54:31Z",
+   "body": "[GH-127605](https://github.com/python/cpython/pull/127605) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-04T14:54:51Z",
+   "body": "Python 3.12 is also affected by the issue: https://github.com/python/cpython/issues/127603."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/117195",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "406ffb5293a8c9ca315bf63de1ee36a9b33f9aaf",
+   "actor": "markshannon"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "465e366839377f3d3c0dda701d76f2c9b8461223",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "251ef2e36f61a1c4b7c628ba9dc38a10a355a058",
+   "actor": "markshannon"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/119642",
+   "commit": null,
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "512e694f78426092a8df63548f63de7819aeb1a3",
+   "actor": "estyxx"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1ebe0e32be361faded7f25e68fc43a0b48e55b14",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0964f9f1847bcbe90345eeafd65813d06db4ba3b",
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

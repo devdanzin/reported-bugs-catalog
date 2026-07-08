@@ -1,0 +1,59 @@
+{
+ "repo": "python/cpython",
+ "number": 149478,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/149478",
+ "title": "gh-149459: Fix segfault when _LOAD_SPECIAL guard deoptimizes",
+ "state": "closed",
+ "state_reason": null,
+ "author": "cocolato",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-05-07T03:17:56Z",
+ "closed_at": "2026-05-08T11:20:28Z",
+ "body": "`LOAD_SPECIAL` expands as:\r\n`_RECORD_TOS_TYPE + _INSERT_NULL + _LOAD_SPECIAL`\r\n`_INSERT_NULL` alters the actual stack structure:\r\nBefore modification: `[..., self]`\r\nAfter modification: `[..., NULL, self]`\r\nThe optimizer has introduced `_GUARD_TYPE_VERSION`. If a guard is placed after `_INSERT_NULL`, and the guard fails resulting in a side exit, the interpreter will deopt back to the original `LOAD_SPECIAL`. However, by this point, the stack has already been modified by `_INSERT_NULL` to `[..., NULL, self]`.\n\n<!-- gh-issue-number: gh-149459 -->\n* Issue: gh-149459\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "read-the-docs-community[bot]",
+   "created_at": "2026-05-07T03:26:57Z",
+   "body": "<!-- readthedocs-883176 -->\n\n### Documentation build overview\n\n> \ud83d\udcda [cpython-previews](https://app.readthedocs.org/projects/cpython-previews/) | \ud83d\udee0\ufe0f Build [#32577173](https://app.readthedocs.org/projects/cpython-previews/builds/32577173/) | \ud83d\udcc1 Comparing 05b8b15484389d7806e94bfb2ea168550b03e1b3 against [main](https://cpython-previews.readthedocs.io/en/main/) (65ed109b5de7bab28f1051336f0ae312205c4233)\n\n[<kbd> &nbsp; \ud83d\udd0d Preview build &nbsp; </kbd>](https://cpython-previews--149478.org.readthedocs.build/en/149478/)\n\n\n<details>\n<summary>26 files changed \u00b7 <code>\u00b1</code> 26 modified</summary>\n<br>\n\n`\u00b1` **Modified**\n- [`c-api/exceptions.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/c-api/exceptions.html)\n- [`c-api/index.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/c-api/index.html)\n- [`c-api/interp-lifecycle.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/c-api/interp-lifecycle.html)\n- [`c-api/stable.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/c-api/stable.html)\n- [`c-api/threads.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/c-api/threads.html)\n- [`deprecations/index.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/deprecations/index.html)\n- [`deprecations/pending-removal-in-3.17.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/deprecations/pending-removal-in-3.17.html)\n- [`deprecations/pending-removal-in-3.19.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/deprecations/pending-removal-in-3.19.html)\n- [`howto/free-threading-extensions.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/howto/free-threading-extensions.html)\n- [`howto/perf_profiling.html`](https://cpython-previews--149478.org.readthedocs.build/en/149478/howto/perf_profiling.html)\n- *and 16 more...*\n\n</details>\n\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-08T11:20:32Z",
+   "body": "Thanks @cocolato for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-05-08T11:20:45Z",
+   "body": "[GH-149552](https://github.com/python/cpython/pull/149552) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/149459",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c341e341b25cec03d28d1b2c368bb871d76ca88b",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f9e5975deb6b01c434eadff66f28bd53e0ca4c55",
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

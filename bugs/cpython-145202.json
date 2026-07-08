@@ -8,22 +8,35 @@
  "issues": [
   "python/cpython#145202"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#145203",
+  "python/cpython#145216"
+ ],
+ "n_prs": 2,
+ "n_backports": 0,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
+  "awaiting review",
   "extension-modules",
+  "skip news",
   "topic-free-threading",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "gourijain029-del",
+  "serhiy-storchaka"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-145202.json"
+  "raw/python__cpython/issue-145202.json",
+  "raw/python__cpython/pull-145203.json",
+  "raw/python__cpython/pull-145216.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

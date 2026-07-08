@@ -1,0 +1,107 @@
+{
+ "repo": "python/cpython",
+ "number": 131910,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/131910",
+ "title": "gh-131878: Handle top level exceptions in new pyrepl and prevent of closing it",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sergey-miryanov",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-03-30T14:56:12Z",
+ "closed_at": "2025-05-05T14:54:20Z",
+ "body": "Working on gh-131878 I saw a code paths that swallows exceptions. I propose not to swallow them and bubble it up to main input loop and handle there.\r\n\r\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2025-03-30T15:05:27Z",
+   "body": "AFAICT, the swallowed exceptions are already suppressed when executing the statements. When would this `except` be hit? it's only if we're raising in one of the following:\r\n\r\n```py\r\n            ps1 = getattr(sys, \"ps1\", \">>> \")\r\n            ps2 = getattr(sys, \"ps2\", \"... \")\r\n            try:\r\n                statement = multiline_input(more_lines, ps1, ps2)\r\n            except EOFError:\r\n                break\r\n\r\n            if maybe_run_command(statement):\r\n                continue\r\n\r\n            input_name = f\"<python-input-{input_n}>\"\r\n            more = console.push(_strip_final_indent(statement), filename=input_name, _symbol=\"single\")  # type: ignore[call-arg]\r\n            assert not more\r\n            input_n += 1\r\n\r\n```\r\n\r\nAnd in this case, I think it's preferrable to make the REPL exit as it's probably in an unrecoverable state at this point."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-03-30T15:26:14Z",
+   "body": "I came from this https://github.com/python/cpython/blob/main/Lib/_pyrepl/base_eventqueue.py#L108-L114.\r\n\r\nWe swallow UnicodeError exception. And this is a reason why gh-131878 asserted in another point. And if we caught UnicodeError here it give us much more information. But here we don't have any \"tools\" to properly say about exception. And going up to stack I \"found\" an appropriate place in the simple_interact loop. \r\n\r\nOTOH I may be wrong, and we should not do this."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-03-30T15:40:45Z",
+   "body": "I think the issue is that we did not properly handled the inputs there. Or that the assertion where it crashes is incorrect. I didn't look in detail but I don't know if https://github.com/python/cpython/pull/131901 is the correct approach (ISTM that we cannot send long unicode strings but we can do it as bytes? and that we can do it for unicode strings with a single unicode code point, whether it's strings or bytes?)\r\n\r\nNevertheless, when there is a crash like that, I think it's better than we use a debugger instead. At this point of the REPL execution, its state may or may not necessarily be recoverable (I'm actually surprised that we're not aborting because we're out of memory but I guess it's to allow debuggers?)"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-03-30T16:48:13Z",
+   "body": ">ISTM that we cannot send long unicode strings but we can do it as bytes? and that we can do it for unicode strings with a single unicode code point, whether it's strings or bytes?\r\n\r\nAs long it affects only Windows so I changed only windows code path. And for both cases (if input has one or more unicode code path) input \"char\" encoded to bytes and sent to eventqueue. For one-byte unicode string it is a small pessimization.\r\n\r\nFor original issue - we have input == \"\u00f1\". If we send it as-is - it sends as str and ord(\"\u00f1\") == 241. And we just append it to `buf`. And, if we append \"\u00f1\" to buf and try to decode it - it will fail, because it is incomplete unicode char.\r\n\r\nBut if we encode it as bytes then we get two bytes - b'\\xc3\\xb1', also append them (via extend) to buf and decode will be happy."
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-06T13:56:21Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-05-05T14:54:23Z",
+   "body": "Thanks @sergey-miryanov for the PR, and @ambv for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-05-05T14:54:26Z",
+   "body": "Sorry, @sergey-miryanov and @ambv, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 99a0d7e5b3c6e80f5b9b0ec88ae439d6d620253c 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-05-05T14:56:21Z",
+   "body": "[GH-133445](https://github.com/python/cpython/pull/133445) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-05-05T15:55:17Z",
+   "body": "@ambv Thanks!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131878",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "99a0d7e5b3c6e80f5b9b0ec88ae439d6d620253c",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b75310db3b11b777ace2fff117539ab4e8052809",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "87b14c8f21bbd675a98f0ae02149d8376e8f8d3d",
+   "actor": "ambv"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130999",
+   "commit": null,
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dce813ccb6983dcb1753b8397d606a1414909f54",
+   "actor": "Pranjal095"
+  }
+ ],
+ "fetch_errors": null
+}

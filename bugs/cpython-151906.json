@@ -9,6 +9,9 @@
  "prs": [
   "python/cpython#151906"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "3c6690d0561acc62752a953e12b20197"
  ],

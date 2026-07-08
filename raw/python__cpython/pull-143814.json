@@ -1,0 +1,54 @@
+{
+ "repo": "python/cpython",
+ "number": 143814,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143814",
+ "title": "gh-143807: Limit executor growth",
+ "state": "open",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting core review",
+  "stale"
+ ],
+ "created_at": "2026-01-13T19:31:01Z",
+ "closed_at": null,
+ "body": "No unit test, because the repro provided doesn't repro on my system.\r\n\r\nThe requirement is there can only be 255 executors in a single code object, as the executor index is bounded by `oparg`, whch is a `int8_t`.\r\n\r\n<!-- gh-issue-number: gh-143807 -->\r\n* Issue: gh-143807\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "savannahostrowski",
+   "created_at": "2026-01-30T16:04:43Z",
+   "body": "Hmmm, can we confirm that this fixes the assertion failure on @devdanzin's system then at least, since this could at least be repro'd there?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-01-30T16:32:51Z",
+   "body": "I'll be able to test in about 6 hours. "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-01-31T18:31:11Z",
+   "body": "Sorry about the delay, had to bisect it not reproducing on HEAD.\r\n\r\ne370c8db52d8b0983158ba6261ab227d8158b8b4 has made it stop aborting:\r\n\r\n```\r\nfca7fec aborts Tue Jan 13 06:02:27 2026 -0800\r\n2873c31 aborts Wed Jan 14 03:11:53 2026 +0800\r\n6db952e aborts Wed Jan 14 11:34:58 2026 +0000\r\n^- Bad\r\nv- Good \r\ne370c8d works Wed Jan 14 20:23:14 2026 +0800\r\na009e78 works Thu Jan 15 12:37:30 2026 +0100\r\n```\r\n\r\nDoes that make sense?\r\n\r\nApplying the patch (edit: and running the MRE) leads to a segfault (with or without ASan), can you reproduce this?\r\n\r\nASan output:\r\n```\r\nAddressSanitizer:DEADLYSIGNAL\r\n=================================================================\r\n==1542863==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x5df3f5bc4544 bp 0x7fff285f0ce0 sp 0x7fff285f0cb0 T0)\r\n==1542863==The signal is caused by a READ memory access.\r\n==1542863==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.\r\n    #0 0x5df3f5bc4544 in _Py_ExecutorDetach /home/danzin/projects/repro_jit_cpython/Python/optimizer.c:1765:5\r\n    #1 0x5df3f5bc5462 in executor_invalidate /home/danzin/projects/repro_jit_cpython/Python/optimizer.c:1789:5\r\n    #2 0x5df3f5bbefed in uop_dealloc /home/danzin/projects/repro_jit_cpython/Python/optimizer.c:345:5\r\n    #3 0x5df3f53dc246 in _Py_Dealloc /home/danzin/projects/repro_jit_cpython/Objects/object.c:3207:5\r\n    #4 0x5df3f5bbc497 in _PyOptimizer_Optimize /home/danzin/projects/repro_jit_cpython/Python/optimizer.c:188:13\r\n    #5 0x5df3f56980a3 in stop_tracing_and_jit /home/danzin/projects/repro_jit_cpython/Python/ceval.c:1461:15\r\n    #6 0x5df3f5654939 in _PyEval_EvalFrameDefault /home/danzin/projects/repro_jit_cpython/Python/generated_cases.c.h:11868:27\r\n    #7 0x5df3f5630e67 in _PyEval_EvalFrame /home/danzin/projects/repro_jit_cpython/./Include/internal/pycore_ceval.h:118:16\r\n    #8 0x5df3f5630e67 in _PyEval_Vector /home/danzin/projects/repro_jit_cpython/Python/ceval.c:2541:12\r\n    #9 0x5df3f5630884 in PyEval_EvalCode /home/danzin/projects/repro_jit_cpython/Python/ceval.c:1005:21\r\n    #10 0x5df3f5c5b24e in run_eval_code_obj /home/danzin/projects/repro_jit_cpython/Python/pythonrun.c:1366:12\r\n    #11 0x5df3f5c5a41b in run_mod /home/danzin/projects/repro_jit_cpython/Python/pythonrun.c:1469:19\r\n    #12 0x5df3f5c54a1c in pyrun_file /home/danzin/projects/repro_jit_cpython/Python/pythonrun.c:1294:15\r\n    #13 0x5df3f5c5257c in _PyRun_SimpleFileObject /home/danzin/projects/repro_jit_cpython/Python/pythonrun.c:518:13\r\n    #14 0x5df3f5c518ed in _PyRun_AnyFileObject /home/danzin/projects/repro_jit_cpython/Python/pythonrun.c:81:15\r\n    #15 0x5df3f5cce15a in pymain_run_file_obj /home/danzin/projects/repro_jit_cpython/Modules/main.c:410:15\r\n    #16 0x5df3f5cce15a in pymain_run_file /home/danzin/projects/repro_jit_cpython/Modules/main.c:429:15\r\n    #17 0x5df3f5ccc223 in pymain_run_python /home/danzin/projects/repro_jit_cpython/Modules/main.c:691:21\r\n    #18 0x5df3f5ccc223 in Py_RunMain /home/danzin/projects/repro_jit_cpython/Modules/main.c:772:5\r\n    #19 0x5df3f5ccd126 in pymain_main /home/danzin/projects/repro_jit_cpython/Modules/main.c:802:12\r\n    #20 0x5df3f5ccd297 in Py_BytesMain /home/danzin/projects/repro_jit_cpython/Modules/main.c:826:12\r\n    #21 0x795232c2a574 in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16\r\n    #22 0x795232c2a627 in __libc_start_main csu/../csu/libc-start.c:360:3\r\n    #23 0x5df3f4ff34f4 in _start (/home/danzin/projects/repro_jit_cpython/python+0x2e14f4) (BuildId: 363d75eb6d935a25f4aa05007d344db781183568)\r\n\r\n==1542863==Register values:\r\nrax = 0xffffffffcdcdcdcd  rbx = 0x0000772231e3c8a0  rcx = 0xcdcdcdcdcdcdce9d  rdx = 0x0000772231e3c908\r\nrdi = 0x0000772231e3c900  rsi = 0x00000ee4463c7920  rbp = 0x00007fff285f0ce0  rsp = 0x00007fff285f0cb0\r\n r8 = 0x0000000000000000   r9 = 0x00000f2a46601c75  r10 = 0x19b9b9b9ad2d2d46  r11 = 0x00000bbe7ec885b0\r\nr12 = 0x0000000000000008  r13 = 0x0000765231e1dc60  r14 = 0xcdcdcdcd69696a37  r15 = 0xcdcdcdcdcdcdcdcd\r\nAddressSanitizer can not provide additional info.\r\nSUMMARY: AddressSanitizer: SEGV /home/danzin/projects/repro_jit_cpython/Python/optimizer.c:1765:5 in _Py_ExecutorDetach\r\n==1542863==ABORTING\r\n```\r\n\r\nBacktrace:\r\n```\r\nProgram received signal SIGSEGV, Segmentation fault.\r\n0x0000555556406544 in _Py_ExecutorDetach (executor=executor@entry=0x7dcff6e3c8a0) at Python/optimizer.c:1765\r\n1765        assert(instruction->op.code == ENTER_EXECUTOR);\r\n(gdb) bt\r\n#0  0x0000555556406544 in _Py_ExecutorDetach (executor=executor@entry=0x7dcff6e3c8a0) at Python/optimizer.c:1765\r\n#1  0x0000555556407463 in executor_invalidate (op=0x7dcff6e3c8a0) at Python/optimizer.c:1789\r\n#2  0x0000555556400fee in uop_dealloc (op=0x7dcff6e3c900) at Python/optimizer.c:345\r\n#3  0x0000555555c1e247 in _Py_Dealloc (op=0x7dcff6e3c8a0) at Objects/object.c:3207\r\n#4  0x00005555563fe498 in _PyOptimizer_Optimize (frame=frame@entry=0x7e8ff6de5378, tstate=tstate@entry=0x555556ed3030 <_PyRuntime+359408>) at Python/optimizer.c:188\r\n#5  0x0000555555eda0a4 in stop_tracing_and_jit (tstate=0x555556ed3030 <_PyRuntime+359408>, frame=frame@entry=0x7e8ff6de5378) at Python/ceval.c:1461\r\n#6  0x0000555555e9693a in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:11868\r\n#7  0x0000555555e72e68 in _PyEval_EvalFrame (tstate=0x555556ed3030 <_PyRuntime+359408>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\r\n#8  _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2541\r\n#9  0x0000555555e72885 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff6e863c0) at Python/ceval.c:1005\r\n#10 0x000055555649d24f in run_eval_code_obj (tstate=tstate@entry=0x555556ed3030 <_PyRuntime+359408>, co=co@entry=0x7d3ff6e15e50, globals=globals@entry=0x7c7ff6e863c0,\r\n    locals=locals@entry=0x7c7ff6e863c0) at Python/pythonrun.c:1366\r\n#11 0x000055555649c41c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\r\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1469\r\n#12 0x0000555556496a1d in pyrun_file (fp=fp@entry=0x7d4ff6defa80, filename=filename@entry=0x7ccff6dfaef0, start=start@entry=257, globals=globals@entry=0x7c7ff6e863c0,\r\n    locals=locals@entry=0x7c7ff6e863c0, closeit=closeit@entry=1, flags=0x7bfff5c1e910) at Python/pythonrun.c:1294\r\n#13 0x000055555649457d in _PyRun_SimpleFileObject (fp=<optimized out>, filename=<optimized out>, closeit=<optimized out>, flags=<optimized out>) at Python/pythonrun.c:518\r\n#14 0x00005555564938ee in _PyRun_AnyFileObject (fp=fp@entry=0x7d4ff6defa80, filename=filename@entry=0x7ccff6dfaef0, closeit=closeit@entry=1, flags=flags@entry=0x7bfff5c1e910)\r\n    at Python/pythonrun.c:81\r\n#15 0x000055555651015b in pymain_run_file_obj (program_name=0x7caff6e230d0, filename=0x7ccff6dfaef0, skip_source_first_line=0) at Modules/main.c:410\r\n#16 pymain_run_file (config=0x555556e9e0f8 <_PyRuntime+142520>) at Modules/main.c:429\r\n#17 0x000055555650e224 in pymain_run_python (exitcode=0x7bfff5c1e500) at Modules/main.c:691\r\n#18 Py_RunMain () at Modules/main.c:772\r\n#19 0x000055555650f127 in pymain_main (args=<optimized out>) at Modules/main.c:802\r\n#20 0x000055555650f298 in Py_BytesMain (argc=<optimized out>, argv=0x7fffffffdbb8) at Modules/main.c:826\r\n#21 0x00007ffff7c2a575 in __libc_start_call_main (main=main@entry=0x55555591ec40 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffdbb8) at ../sysdeps/nptl/libc_start_call_main.h:58\r\n#22 0x00007ffff7c2a628 in __libc_start_main_impl (main=0x55555591ec40 <main>, argc=2, argv=0x7fffffffdbb8, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\r\n    stack_end=0x7fffffffdba8) at ../csu/libc-start.c:360\r\n#23 0x00005555558354f5 in _start ()\r\n```\r\n\r\nOutput of running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`:\r\n[143814_segfault_lltrace_opt_debug.txt](https://github.com/user-attachments/files/24984680/143814_segfault_lltrace_opt_debug.txt)\r\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-31T19:51:57Z",
+   "body": "Thanks @devdanzin. The  backtrace looks like the original repro for that other issue that you said fixed it thougj, so thats strange\n\nIn any case, this is an actual logic bug we should fix. So even if it doesnt manifest for us we should fix it."
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-05-05T00:30:03Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143807",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

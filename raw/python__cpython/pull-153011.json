@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 153011,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/153011",
+ "title": "[3.15] gh-152851: fix a crash when copying a BLAKE-2s/2b object (GH-153008)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-07-04T10:09:52Z",
+ "closed_at": "2026-07-04T10:41:41Z",
+ "body": "(cherry picked from commit 5a400ceafbbd4456ac65fbdbcf5d62ce9e8e4f9f)\n\nCo-authored-by: B\u00e9n\u00e9dikt Tran <10796600+picnixz@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-152851 -->\n* Issue: gh-152851\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152851",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153008",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e1320ae4c3c53e09108f2089fecab545def44d23",
+   "actor": "picnixz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ],
+ "fetch_errors": null
+}

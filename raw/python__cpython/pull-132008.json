@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 132008,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132008",
+ "title": "[3.12] gh-132002: Fix crash of `ContextVar` on unhashable `str` subtype (GH-132003)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-04-02T11:48:59Z",
+ "closed_at": "2025-04-02T12:05:30Z",
+ "body": "(cherry picked from commit ab2a3dda1d3b6668162a847bf5b6aca2855a3416)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\n\n<!-- gh-issue-number: gh-132002 -->\n* Issue: gh-132002\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132002",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132003",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b3cf1f27e94d65eba4ed300bdf5851c0326a2a44",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

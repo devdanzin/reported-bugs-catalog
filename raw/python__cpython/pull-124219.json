@@ -1,0 +1,81 @@
+{
+ "repo": "python/cpython",
+ "number": 124219,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/124219",
+ "title": "Fix `make htmllive` target",
+ "state": "closed",
+ "state_reason": null,
+ "author": "zware",
+ "author_association": "MEMBER",
+ "labels": [
+  "docs",
+  "skip issue",
+  "skip news"
+ ],
+ "created_at": "2024-09-18T20:39:46Z",
+ "closed_at": "2024-09-18T21:02:20Z",
+ "body": "<!-- So much for a blank PR :( -->\r\n\r\n<!-- readthedocs-preview cpython-previews start -->\r\n----\r\n\ud83d\udcda Documentation preview \ud83d\udcda: https://cpython-previews--124219.org.readthedocs.build/\r\n\r\n<!-- readthedocs-preview cpython-previews end -->",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-09-18T21:02:24Z",
+   "body": "Thanks @zware for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-09-18T21:02:38Z",
+   "body": "[GH-124221](https://github.com/python/cpython/pull/124221) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-09-18T21:02:43Z",
+   "body": "[GH-124222](https://github.com/python/cpython/pull/124222) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9a6e2336e4b54fc13064b77826a67b03b3b45133",
+   "actor": "zware"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "zware"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "effe2c2b4cd5faa62f9386f075cb25e9996eb9ac",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "183bc9a67a999046265ce1e1130f2103e3754423",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/peps/pull/3985",
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f1f7e2981b687c7d3051d7766a0b937b678fe45a",
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "057f3faecf4455a7114c2b22a8a6d3982d2a7e93",
+   "actor": "Yhg1s"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,101 @@
+{
+ "repo": "python/cpython",
+ "number": 152229,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152229",
+ "title": "gh-152228: Fix an assertion failure in `str.replace` under a limited memory case",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-25T18:36:51Z",
+ "closed_at": "2026-06-29T16:22:23Z",
+ "body": "Because test was simple enough and was always `0` as the memory limit, I decided to include it.\n\n<!-- gh-issue-number: gh-152228 -->\n* Issue: gh-152228\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2026-06-25T20:43:16Z",
+   "body": "Created https://github.com/python/cpython/issues/152236 to track `Py_TRACE_REFS` skips. There are several tests that don't have that."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-29T15:21:26Z",
+   "body": "Strange, CI tests pass, but test_str fails when I download the PR locally:\r\n\r\n```\r\n$ ./python -m test test_str -v\r\n...\r\ntest test_str crashed -- Traceback (most recent call last):\r\n  ...\r\n  File \"/home/vstinner/python/main/Lib/test/test_str.py\", line 610, in StrTest\r\n    @support.nomemtest\r\n     ^^^^^^^^^^^^^^^^^\r\nAttributeError: module 'test.support' has no attribute 'nomemtest'. Did you mean '.bigmemtest' instead of '.nomemtest'?\r\n```\r\n\r\nDo it work on your machine? The \"Squash and merge\" should work around the issue anyway."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2026-06-29T15:57:15Z",
+   "body": "Looks like a forgot to push the merge commit. Did it now :)\r\nThanks a lot for the reviews!"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-29T16:05:38Z",
+   "body": "> Looks like a forgot to push the merge commit. Did it now :)\r\n\r\nBut it's strange that tests passed on the CI (without the merge commit)."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2026-06-29T16:21:11Z",
+   "body": "I copied this exact branch, added `assert False` to the test, executed it:\r\n<img width=\"788\" height=\"533\" alt=\"\u0421\u043d\u0438\u043c\u043e\u043a \u044d\u043a\u0440\u0430\u043d\u0430 2026-06-29 \u0432 19 19 58\" src=\"https://github.com/user-attachments/assets/a5bff32f-3979-41ad-8194-df4e3a1eeb90\" />\r\n\r\n`test_replace_oom` failed. It worked correctly for me :)"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-29T16:22:26Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 I'm not a witch! I'm not a witch!"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-29T16:22:41Z",
+   "body": "[GH-152615](https://github.com/python/cpython/pull/152615) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-29T16:22:46Z",
+   "body": "[GH-152616](https://github.com/python/cpython/pull/152616) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-29T16:22:50Z",
+   "body": "[GH-152617](https://github.com/python/cpython/pull/152617) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152228",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152236",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c5043dce1c6743682d93c71e937b95e7d27e0b35",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "79249038315b7bb8288a37415ca94e63753ec852",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e08e00383ff92566fb0a14bdf620c3f082bd1443",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

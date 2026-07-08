@@ -1,0 +1,91 @@
+{
+ "repo": "python/cpython",
+ "number": 129127,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/129127",
+ "title": "[3.13] GH-127953: Make line number lookup O(1) regardless of the size of the code object",
+ "state": "closed",
+ "state_reason": null,
+ "author": "markshannon",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-01-21T10:24:41Z",
+ "closed_at": "2025-04-07T18:15:02Z",
+ "body": "Manual backport of #128350\r\n\r\n\r\n\n\n<!-- gh-issue-number: gh-127953 -->\n* Issue: gh-127953\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "Yhg1s",
+   "created_at": "2025-04-02T13:18:28Z",
+   "body": "@markshannon What's the state of this backport? Should this be considered for 3.13.3 (scheduled next week)? What about 3.12? (There's still time to get it into 3.12 before we stop backporting bugfixes :)"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-04-02T14:52:59Z",
+   "body": "It needs a review.\r\nShould be good to go otherwise, the original PR seems to be working fine."
+  },
+  {
+   "author": "Yhg1s",
+   "created_at": "2025-04-07T18:14:57Z",
+   "body": "(Merging now so this can make it into tomorrow's release, please consider the suggested changes for follow-up.)"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-07T18:15:40Z",
+   "body": "Thanks @markshannon for the PR, and @Yhg1s for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-07T18:15:43Z",
+   "body": "Sorry, @markshannon and @Yhg1s, I could not cleanly backport this to `3.12` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 3f3863281bb3cd40efc2f1c4bed901457b8cd170 3.12\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-08T13:17:55Z",
+   "body": "[GH-132268](https://github.com/python/cpython/pull/132268) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-08T13:18:27Z",
+   "body": "[GH-132268](https://github.com/python/cpython/pull/132268) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127953",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3f3863281bb3cd40efc2f1c4bed901457b8cd170",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6e55d3fa86b052c71ae961ca3292a285eb4fc984",
+   "actor": "markshannon"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132268",
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/coveragepy/coveragepy/issues/1287",
+   "commit": null,
+   "actor": "153957"
+  }
+ ],
+ "fetch_errors": null
+}

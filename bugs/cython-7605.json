@@ -9,6 +9,9 @@
  "prs": [
   "cython/cython#7605"
  ],
+ "n_prs": 1,
+ "n_backports": 1,
+ "n_fix_prs": 0,
  "gists": [],
  "labels": [],
  "filed_by": "maintainer",

@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 151525,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151525",
+ "title": "gh-151524: Avoid using instrumentation callback result after Py_DECREF",
+ "state": "open",
+ "state_reason": null,
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting changes",
+  "skip news"
+ ],
+ "created_at": "2026-06-16T02:48:09Z",
+ "closed_at": null,
+ "body": "\n\n<!-- gh-issue-number: gh-151524 -->\n* Issue: gh-151524\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-16T05:42:01Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\n\n"
+  },
+  {
+   "author": "lpyu001",
+   "created_at": "2026-06-16T06:05:28Z",
+   "body": "> The change lgtm, but I'd create a news entry, like almost all of the fixes for the umbrella issue #146102 did so far.\r\n> \r\n> cc @pablogsal\r\n\r\nI\u2019ve submitted the news entry.thanks"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-16T09:41:34Z",
+   "body": "<!-- changes-requested -->\nA Python core developer has requested some changes be made to your pull request before we can consider merging it. If you could please address their requests along with any other requests in other reviews from core developers that would be appreciated.\n\nOnce you have made the requested changes, please leave a comment on this pull request containing the phrase `I have made the requested changes; please review again`. I will then notify any core developers who have left a review that you're ready for them to take another look at this pull request.\n<!-- /changes-requested -->\n\n\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151524",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,68 @@
+{
+ "repo": "python/cpython",
+ "number": 141989,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/141989",
+ "title": "gh-141976: Protect against non-progressing specializations in tracing JIT",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-11-26T20:00:05Z",
+ "closed_at": "2025-12-10T19:39:12Z",
+ "body": "I do not have a test for this as it's too hard to test for. We require the following scenario to happen:\r\n1. Non-progressing specialization\r\n2. that deopts\r\n\r\nWe don't have that many non-progressing specializations to begin with, so any test is a futile fight between the internal implementation details and the JIT.\r\n\r\nI have verified this fixes the test case in the issue. I'm not using the test case in the issue as it's dependent on how much stack space we reserve and consume per stack chunk. If we ever change the stack chunks size, the test will break.\n\n<!-- gh-issue-number: gh-141976 -->\n* Issue: gh-141976\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-01T16:14:07Z",
+   "body": "This doesn't look correct to me.\r\n\r\nThe tracing front-end should produce correct code. Working around it in the optimizer is a bad idea as it just hides a bug that we should be fixing.\r\nAnd the workaround doesn't make a lot of sense to me. It looks like we are missing a guard. How does checking the backoff counter help?\r\n\r\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-01T16:29:18Z",
+   "body": "> This doesn't look correct to me.\r\n> \r\n> The tracing front-end should produce correct code. Working around it in the optimizer is a bad idea as it just hides a bug that we should be fixing. \r\n\r\nThis **is** fixing a bug in the tracing front-end, not the optimizer. Please see that the function is `_PyJit_translate_single_bytecode_to_trace`.\r\n\r\nWe are not missing a guard.\r\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-02T09:32:06Z",
+   "body": "> This is fixing a bug in the tracing front-end, not the optimizer. \r\n\r\nNot what you said [here](https://github.com/python/cpython/issues/141976#issuecomment-3597471621) :wink: \r\n\r\nMaybe the tracer needs its own file.\r\n\r\nI'm still not convinced by this PR. It is probably right, but there a number of possible deopt/specialization possibilities and I'll like to see a full table/state machine to make sure we are handling all of them.\r\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-04T21:49:54Z",
+   "body": "@markshannon \r\n\r\nThese are the following states:\r\n1. _SPECIALIZED -> _SPECIALIZED\r\n2. GENERIC -> _SPECIALIZED\r\n3. _SPECIALIZED -> _GENERIC (unspecialize)\r\n4. _SPECIALIZED -> _GENERIC (did not unspecialize)\r\n\r\nStates 1 to 3 are safe, as the actual instruction executed is the right hand side. So the trace recorder recorded the correct instruction.\r\n\r\nState transition 4 is unsafe, as the actual instruction executed is _GENERIC, but since it did not unspecialize, it's recorded as  _SPECIALIZED. This is problematic as it will cause unecessary contradictions in the optimizer.\r\n\r\nI'm quite confident this will also speed up some benchmarks that are unstable/highly polymorphic, as it was in the original design of the tracer recorder before we yanked out the counting."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-05T15:36:56Z",
+   "body": "Transition 4 should be safe. We just end up recording the wrong specialization, so it will deopt immediately when the trace is executed.\r\n\r\nIf it is unsafe, then there is some other bug in the trace recorder."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-05T17:00:20Z",
+   "body": "> Transition 4 should be safe. We just end up recording the wrong specialization, so it will deopt immediately when the trace is executed.\r\n> \r\n> If it is unsafe, then there is some other bug in the trace recorder.\r\n\r\nYes it should now be safe after we fixed the optimizer."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141976",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ebf3427615b3a3d1e6048f84a4adc47331c3803d",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ],
+ "fetch_errors": null
+}

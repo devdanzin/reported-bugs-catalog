@@ -1,0 +1,75 @@
+{
+ "repo": "python/cpython",
+ "number": 126371,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126371",
+ "title": "gh-126366: Make native generators thread safe",
+ "state": "open",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "stale"
+ ],
+ "created_at": "2024-11-03T21:11:39Z",
+ "closed_at": null,
+ "body": "Co-authored-by: Ken Jin <kenjin@python.org>\r\n\r\n<!-- gh-issue-number: gh-126366 -->\r\n* Issue: gh-126366\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "corona10",
+   "created_at": "2024-11-03T23:49:00Z",
+   "body": "cc @colesbury "
+  },
+  {
+   "author": "corona10",
+   "created_at": "2024-11-03T23:49:20Z",
+   "body": "I will try to take a look at today :)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-04T19:08:56Z",
+   "body": "Closing in favor of #120327"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2024-11-06T13:35:33Z",
+   "body": "Wait I closed my PR in favour of yours... :laughing: @ZeroIntensity "
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-06T13:37:12Z",
+   "body": "Ah! I'll reopen this and list you as a co-author if yours has merge conflicts."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-01-02T17:53:40Z",
+   "body": "* Let's avoid critical sections in bytecodes.c. It's too easy to make these kinds of mistakes where you exit out of a critical section without ending it.\r\n* I don't think the generator running thread safety should use critical sections. We should use something like an atomic-compare-exchange to mark it as running"
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-04-19T12:10:04Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126366",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127426",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

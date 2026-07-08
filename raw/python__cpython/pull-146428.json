@@ -1,0 +1,36 @@
+{
+ "repo": "python/cpython",
+ "number": 146428,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146428",
+ "title": "gh-146427: Fix use-after-free when clearing interpreter's queue items",
+ "state": "open",
+ "state_reason": null,
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting review",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
+  "needs backport to 3.15"
+ ],
+ "created_at": "2026-03-25T16:27:17Z",
+ "closed_at": null,
+ "body": "Test code:\r\n\r\n```python\r\nfrom concurrent import interpreters\r\nfrom concurrent.interpreters import _queues as queues\r\n\r\nq = queues.create()\r\nq.put(1)\r\n\r\ninterp = interpreters.create()\r\ninterp.exec(f\"from concurrent.interpreters import _queues as queues; queues.Queue({q.id}).put(2, unbounditems=queues.UNBOUND_REMOVE)\")\r\n\r\n# del interp\r\ninterp.close()\r\nq.put(3)\r\n```\r\n\r\nRun with ASan before this change:\r\n\r\n```\r\n./python.exe /tmp/test_queue_uaf.py\r\npython.exe(30924,0x7ff855eaedc0) malloc: nano zone abandoned due to inability to reserve vm space.\r\n=================================================================\r\n==30924==ERROR: AddressSanitizer: heap-use-after-free on address 0x603000014758 at pc 0x0002d78f050f bp 0x7ff7b18a0b90 sp 0x7ff7b18a0b88\r\nWRITE of size 8 at 0x603000014758 thread T0\r\n    #0 0x2d78f050e in _interpqueues_put _interpqueuesmodule.c.h:265\r\n    #1 0x10eb6d600 in _Py_BuiltinCallFastWithKeywords_StackRefSteal ceval.c:859\r\n    #2 0x10eb75727 in _PyEval_EvalFrameDefault generated_cases.c.h:2444\r\n    #3 0x10eb6ab2e in PyEval_EvalCode ceval.c:686\r\n    #4 0x10ed09431 in run_mod pythonrun.c:1472\r\n    #5 0x10ed02915 in _PyRun_SimpleFileObject pythonrun.c:518\r\n    #6 0x10ed01d12 in _PyRun_AnyFileObject pythonrun.c:81\r\n    #7 0x10ed7d9d9 in Py_RunMain main.c:795\r\n    #8 0x10ed7f166 in pymain_main main.c:825\r\n    #9 0x10ed7f470 in Py_BytesMain main.c:849\r\n    #10 0x7ff81410352f in start+0xbef (dyld:x86_64+0xfffffffffffe652f)\r\n\r\n0x603000014758 is located 24 bytes inside of 32-byte region [0x603000014740,0x603000014760)\r\nfreed by thread T0 here:\r\n    #0 0x10fc07956 in free+0xa6 (libclang_rt.asan_osx_dynamic.dylib:x86_64h+0xdd956)\r\n    #1 0x2d78f486a in clear_interpreter _interpqueuesmodule.c:1470\r\n    #2 0x10ed9975e in _PyAtExit_Fini atexitmodule.c:98\r\n    #3 0x10ecf9aa3 in interpreter_clear pystate.c:871\r\n    #4 0x10ecee073 in finalize_interp_clear pylifecycle.c:2026\r\n    #5 0x10eceabec in Py_EndInterpreter pylifecycle.c:2707\r\n    #6 0x10ec150bb in _PyXI_EndInterpreter crossinterp.c:3298\r\n    #7 0x2d76e8a0f in _interpreters_destroy _interpretersmodule.c.h:162\r\n    #8 0x10e784599 in PyObject_Vectorcall call.c:327\r\n    #9 0x10eb6c631 in _Py_VectorCallInstrumentation_StackRefSteal ceval.c:775\r\n    #10 0x10eb8b3e9 in _PyEval_EvalFrameDefault generated_cases.c.h:3222\r\n    #11 0x10eb6ab2e in PyEval_EvalCode ceval.c:686\r\n    #12 0x10ed09431 in run_mod pythonrun.c:1472\r\n    #13 0x10ed02915 in _PyRun_SimpleFileObject pythonrun.c:518\r\n    #14 0x10ed01d12 in _PyRun_AnyFileObject pythonrun.c:81\r\n    #15 0x10ed7d9d9 in Py_RunMain main.c:795\r\n    #16 0x10ed7f166 in pymain_main main.c:825\r\n    #17 0x10ed7f470 in Py_BytesMain main.c:849\r\n    #18 0x7ff81410352f in start+0xbef (dyld:x86_64+0xfffffffffffe652f)\r\n\r\npreviously allocated by thread T0 here:\r\n    #0 0x10fc0780d in malloc+0x9d (libclang_rt.asan_osx_dynamic.dylib:x86_64h+0xdd80d)\r\n    #1 0x2d78f017e in _interpqueues_put _interpqueuesmodule.c.h:265\r\n    #2 0x10e784599 in PyObject_Vectorcall call.c:327\r\n    #3 0x10eb6c631 in _Py_VectorCallInstrumentation_StackRefSteal ceval.c:775\r\n    #4 0x10eb9100a in _PyEval_EvalFrameDefault generated_cases.c.h:1841\r\n    #5 0x10eb6ab2e in PyEval_EvalCode ceval.c:686\r\n    #6 0x2d76ec73b in _run_in_interpreter _interpretersmodule.c:690\r\n    #7 0x2d76e9b83 in _interpreters_exec _interpretersmodule.c.h:438\r\n    #8 0x10e784599 in PyObject_Vectorcall call.c:327\r\n    #9 0x10eb6c631 in _Py_VectorCallInstrumentation_StackRefSteal ceval.c:775\r\n    #10 0x10eb8b3e9 in _PyEval_EvalFrameDefault generated_cases.c.h:3222\r\n    #11 0x10eb6ab2e in PyEval_EvalCode ceval.c:686\r\n    #12 0x10ed09431 in run_mod pythonrun.c:1472\r\n    #13 0x10ed02915 in _PyRun_SimpleFileObject pythonrun.c:518\r\n    #14 0x10ed01d12 in _PyRun_AnyFileObject pythonrun.c:81\r\n    #15 0x10ed7d9d9 in Py_RunMain main.c:795\r\n    #16 0x10ed7f166 in pymain_main main.c:825\r\n    #17 0x10ed7f470 in Py_BytesMain main.c:849\r\n    #18 0x7ff81410352f in start+0xbef (dyld:x86_64+0xfffffffffffe652f)\r\n\r\nSUMMARY: AddressSanitizer: heap-use-after-free _interpqueuesmodule.c.h:265 in _interpqueues_put\r\nShadow bytes around the buggy address:\r\n  0x603000014480: fd fa fa fa fd fd fd fa fa fa fd fd fd fd fa fa\r\n  0x603000014500: fd fd fd fa fa fa fd fd fd fa fa fa fd fd fd fa\r\n  0x603000014580: fa fa fd fd fd fa fa fa fd fd fd fa fa fa fd fd\r\n  0x603000014600: fd fa fa fa fd fd fd fa fa fa fd fd fd fa fa fa\r\n  0x603000014680: fd fd fd fd fa fa fd fd fd fa fa fa fd fd fd fd\r\n=>0x603000014700: fa fa fd fd fd fa fa fa fd fd fd[fd]fa fa 00 00\r\n  0x603000014780: 00 00 fa fa fa fa fa fa fa fa fa fa fa fa fa fa\r\n  0x603000014800: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\r\n  0x603000014880: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\r\n  0x603000014900: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\r\n  0x603000014980: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\r\nShadow byte legend (one shadow byte represents 8 application bytes):\r\n  Addressable:           00\r\n  Partially addressable: 01 02 03 04 05 06 07\r\n  Heap left redzone:       fa\r\n  Freed heap region:       fd\r\n  Stack left redzone:      f1\r\n  Stack mid redzone:       f2\r\n  Stack right redzone:     f3\r\n  Stack after return:      f5\r\n  Stack use after scope:   f8\r\n  Global redzone:          f9\r\n  Global init order:       f6\r\n  Poisoned by user:        f7\r\n  Container overflow:      fc\r\n  Array cookie:            ac\r\n  Intra object redzone:    bb\r\n  ASan internal:           fe\r\n  Left alloca redzone:     ca\r\n  Right alloca redzone:    cb\r\n==30924==ABORTING\r\nfish: Job 1, './python.exe /tmp/test_queue_ua\u2026' terminated by signal SIGABRT (Abort)\r\n```\r\n\r\nAfter this change, runs without crash or error.\n\n<!-- gh-issue-number: gh-146427 -->\n* Issue: gh-146427\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-05-08T18:28:36Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146427",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

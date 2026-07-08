@@ -1,0 +1,66 @@
+{
+ "repo": "python/cpython",
+ "number": 143268,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143268",
+ "title": "gh-143183: Link trace to side exits, rather than stop",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Fidget-Spinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-12-29T10:50:36Z",
+ "closed_at": "2025-12-29T15:10:42Z",
+ "body": "https://github.com/python/cpython/pull/143187 caused a pretty serious regression in JIT performance, mainly because we stop the trace *prior* to the ENTER_EXECUTOR. This PR restores the old behavior, stopping the trace *at* the ENTER_EXECUTOR, allowing it to link up to the executor.\r\n\r\nThe perf regression can be clearly seen here (going up means things got slower):\r\n\r\n<img width=\"944\" height=\"391\" alt=\"image\" src=\"https://github.com/user-attachments/assets/03783394-0935-4fba-af47-f5074c4b68ff\" />\r\n\r\n\r\n\n\n<!-- gh-issue-number: gh-143183 -->\n* Issue: gh-143183\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-29T10:53:38Z",
+   "body": "Before:\r\n![graphviz (34)](https://github.com/user-attachments/assets/ed0b1561-16eb-40a6-a10f-6591591d85e4)\r\n\r\n\r\n\r\nAfter (notice how more things are linked):\r\n\r\n![graphviz (35)](https://github.com/user-attachments/assets/8397285c-8244-4e42-9ac2-720706b5b0e8)\r\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-29T11:43:00Z",
+   "body": "I fixed the test in the test suite so that it catches it. I verified that without the change, the test fails. With the change, the test passes."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-29T11:46:59Z",
+   "body": "Also verified that:\r\n\r\nAt commit 713684de5311eb9edb47f2f5fe3f4160f8d35e5a (before my previous PR), this test passes.\r\nAt commit daa9aa4c0a8490f09b01339b6928434d7fe02843 (the first commit with my PR), this test fails.\r\nAt commit a9548b8bc20a5278aaa17411abd54a7186a52389 (current  PR commit), this test passes.\r\n\r\nSo this does indeed restore the old behavior!"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-29T14:20:08Z",
+   "body": "For the following code:\r\n```\r\nTIER2_THRESHOLD = 4001\r\ndef f():\r\n    for x in range(TIER2_THRESHOLD + 3):\r\n        for y in range(TIER2_THRESHOLD + 3):\r\n            z = x + y\r\n\r\nimport sys\r\nf()\r\nsys._dump_tracelets(\"hello.gvz\")\r\n```\r\n## Current main (buggy):\r\n![graphviz (36)](https://github.com/user-attachments/assets/f85003d6-5289-4a58-a0a4-70e4cb1d35dd)\r\n\r\n## This PR (notice how the traces now link up):\r\n![graphviz (37)](https://github.com/user-attachments/assets/4a5ef697-7bc9-452f-a48a-756e5d529f71)\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143183",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6cb245d26086369bb075858501405865fc255a10",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c199e7f9a1f1672afb7f6189c208b974c84fa870",
+   "actor": "thunder-coding"
+  }
+ ],
+ "fetch_errors": null
+}

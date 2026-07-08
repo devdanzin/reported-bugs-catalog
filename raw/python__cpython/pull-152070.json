@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 152070,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152070",
+ "title": "[3.14] gh-151763: Fix possible crash on `CodeType` deallocation (GH-152034)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-24T11:46:54Z",
+ "closed_at": "2026-06-24T12:11:45Z",
+ "body": "(cherry picked from commit 22dd5b5b374c8eb4def7d55bb8de5928e345c73a)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152034",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "1b25c79af4ccd6ad7b883f1ed22d5c597dd8f601",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

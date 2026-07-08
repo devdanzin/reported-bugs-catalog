@@ -1,0 +1,28 @@
+{
+ "bug_id": "pypy-4963",
+ "title": "Add tau to cmath",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "pypy/pypy#4963"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/pull-4963.json"
+ ],
+ "n_artifacts": 1
+}

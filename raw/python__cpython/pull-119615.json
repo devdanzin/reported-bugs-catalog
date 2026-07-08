@@ -1,0 +1,125 @@
+{
+ "repo": "python/cpython",
+ "number": 119615,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/119615",
+ "title": "gh-119118: Fix performance regression in tokenize module",
+ "state": "closed",
+ "state_reason": null,
+ "author": "lysnikolaou",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-05-27T16:11:00Z",
+ "closed_at": "2024-05-28T19:17:49Z",
+ "body": "- Cache line object to avoid creating a Unicode object for all of the tokens in the same line.\r\n- Speed up byte offset to column offset conversion by using the smallest buffer possible to measure the difference.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-119118 -->\n* Issue: gh-119118\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "pablogsal",
+   "created_at": "2024-05-28T13:13:39Z",
+   "body": "Hummm, seems also that this solution fails with `test_tokenize` with `-uall`:\r\n\r\n```\r\n======================================================================\r\nERROR: test_random_files (test.test_tokenize.TestRoundtrip.test_random_files) (file='/Users/pgalindo3/github/python/main/Lib/test/test_difflib.py')\r\n----------------------------------------------------------------------\r\nTraceback (most recent call last):\r\n  File \"/Users/pgalindo3/github/python/main/Lib/test/test_tokenize.py\", line 1959, in test_random_files\r\n    self.check_roundtrip(f)\r\n    ~~~~~~~~~~~~~~~~~~~~^^^\r\n  File \"/Users/pgalindo3/github/python/main/Lib/test/test_tokenize.py\", line 1827, in check_roundtrip\r\n    tokens2_from5 = [tok[:2] for tok in tokenize.tokenize(readline5)]\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 484, in tokenize\r\n    yield from _generate_tokens_from_c_tokenizer(rl_gen.__next__, encoding, extra_tokens=True)\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 578, in _generate_tokens_from_c_tokenizer\r\n    raise e from None\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 574, in _generate_tokens_from_c_tokenizer\r\n    for info in it:\r\n        yield TokenInfo._make(info)\r\n  File \"<string>\", line 467\r\n    dateb = '3 f\u00e9v'\r\n                   ^\r\nIndentationError: unindent does not match any outer indentation level\r\n\r\n======================================================================\r\nERROR: test_random_files (test.test_tokenize.TestRoundtrip.test_random_files) (file='/Users/pgalindo3/github/python/main/Lib/test/test_html.py')\r\n----------------------------------------------------------------------\r\nTraceback (most recent call last):\r\n  File \"/Users/pgalindo3/github/python/main/Lib/test/test_tokenize.py\", line 1959, in test_random_files\r\n    self.check_roundtrip(f)\r\n    ~~~~~~~~~~~~~~~~~~~~^^^\r\n  File \"/Users/pgalindo3/github/python/main/Lib/test/test_tokenize.py\", line 1827, in check_roundtrip\r\n    tokens2_from5 = [tok[:2] for tok in tokenize.tokenize(readline5)]\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 484, in tokenize\r\n    yield from _generate_tokens_from_c_tokenizer(rl_gen.__next__, encoding, extra_tokens=True)\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 578, in _generate_tokens_from_c_tokenizer\r\n    raise e from None\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 574, in _generate_tokens_from_c_tokenizer\r\n    for info in it:\r\n        yield TokenInfo._make(info)\r\n  File \"<string>\", line 85\r\n    check('&notin;', '\u2209')\r\n                         ^\r\nIndentationError: unindent does not match any outer indentation level\r\n\r\n======================================================================\r\nERROR: test_random_files (test.test_tokenize.TestRoundtrip.test_random_files) (file='/Users/pgalindo3/github/python/main/Lib/test/test_str.py')\r\n----------------------------------------------------------------------\r\nTraceback (most recent call last):\r\n  File \"/Users/pgalindo3/github/python/main/Lib/test/test_tokenize.py\", line 1959, in test_random_files\r\n    self.check_roundtrip(f)\r\n    ~~~~~~~~~~~~~~~~~~~~^^^\r\n  File \"/Users/pgalindo3/github/python/main/Lib/test/test_tokenize.py\", line 1827, in check_roundtrip\r\n    tokens2_from5 = [tok[:2] for tok in tokenize.tokenize(readline5)]\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 484, in tokenize\r\n    yield from _generate_tokens_from_c_tokenizer(rl_gen.__next__, encoding, extra_tokens=True)\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 578, in _generate_tokens_from_c_tokenizer\r\n    raise e from None\r\n  File \"/Users/pgalindo3/github/python/main/Lib/tokenize.py\", line 574, in _generate_tokens_from_c_tokenizer\r\n    for info in it:\r\n        yield TokenInfo._make(info)\r\n  File \"<string>\", line 1008\r\n    try:\r\n        ^\r\nIndentationError: unindent does not match any outer indentation level\r\n\r\n----------------------------------------------------------------------\r\n````"
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-05-28T13:37:46Z",
+   "body": "Another idea: we do have the token already as unicode (`str`) so if the line has not changed we can keep adding the size of the token itself to our state and take into account the number of whitespace characters between the tokens (but this is always ASCII so we can basically just calculate as the diff of two pointers)."
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-05-28T14:08:12Z",
+   "body": "I'm discussing another fix with @lysnikolaou offline"
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-05-28T15:55:44Z",
+   "body": "The docs failure seems unrelated. @hugovk do we know what may be happening here?"
+  },
+  {
+   "author": "lysnikolaou",
+   "created_at": "2024-05-28T17:41:35Z",
+   "body": "The latest results are:\r\n\r\n```\r\ncpython on \ue0a0 performance-tokenize [$] via C v15.0.0-clang via \ud83d\udc0d v3.11.3 \r\n\u276f python tmp/t.py\r\ncpython darwin 3.11.3 (main, May  8 2023, 13:16:43) [Clang 14.0.3 (clang-1403.0.22.14.1)]\r\nTime taken: 0.5428769588470459\r\n\r\ncpython on \ue0a0 performance-tokenize [$] via C v15.0.0-clang via \ud83d\udc0d v3.11.3 \r\n\u276f ./python.exe tmp/t.py\r\ncpython darwin 3.14.0a0 (heads/performance-tokenize-dirty:ab3437096a7, May 28 2024, 19:26:19) [Clang 15.0.0 (clang-1500.3.9.4)]\r\nTime taken: 0.4570140838623047\r\n```\r\n\r\nThe test failures appear to be unrelated. We can probably merge this."
+  },
+  {
+   "author": "hugovk",
+   "created_at": "2024-05-28T18:16:08Z",
+   "body": "> The docs failure seems unrelated. @hugovk do we know what may be happening here?\r\n\r\nYep, need to merge in latest `main`, the new option has been added there (re: https://github.com/python/cpython/pull/119221).\r\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-05-28T19:17:53Z",
+   "body": "Thanks @lysnikolaou for the PR, and @pablogsal for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-05-28T19:18:05Z",
+   "body": "[GH-119682](https://github.com/python/cpython/pull/119682) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-05-28T19:18:12Z",
+   "body": "[GH-119683](https://github.com/python/cpython/pull/119683) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/119118",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/119654",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d87b0151062e36e67f9e42e1595fba5bf23a485c",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "64be1b7aee2d42e44b568a3ee93260e3ddca9651",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8e935c9e388c8dbd53f8e9e4ad3189b9fdf890eb",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0d0be6b3efeace4743329f81c08f9720cc221207",
+   "actor": "lysnikolaou"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4a0af0cfdcc0b81da5d78dc219df4985c4403f9c",
+   "actor": "lysnikolaou"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e530584527acdcad01dba886ac391bf559174f8d",
+   "actor": "noahbkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2b2bd1146f2e18ae67e863cf824aa71fc6336dd5",
+   "actor": "estyxx"
+  }
+ ],
+ "fetch_errors": null
+}

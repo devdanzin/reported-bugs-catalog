@@ -1,0 +1,121 @@
+{
+ "repo": "python/cpython",
+ "number": 146573,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146573",
+ "title": "gh-146080: fix a crash in SNI callbacks when the SSL object is gone",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-28T12:23:04Z",
+ "closed_at": "2026-03-29T12:27:22Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146080 -->\n* Issue: gh-146080\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-28T12:33:20Z",
+   "body": "Urgh, I think the mnemonics are different on AWS-LC -_-. So OBVIOUSLY, my message will be different."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2026-03-28T14:57:35Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @picnixz for commit d8911ce0478082b40bf72b64cc41e422903c3572 :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F146573%2Fmerge\n\nIf you want to schedule another build, you need to add the <kbd>:hammer: test-with-buildbots</kbd> label again.\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-29T12:27:26Z",
+   "body": "Thanks @picnixz for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-29T12:27:28Z",
+   "body": "Sorry, @picnixz, I could not cleanly backport this to `3.14` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 24db78c5329dd405460bfdf76df380ced6231353 3.14\n```\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-29T12:27:32Z",
+   "body": "Sorry, @picnixz, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 24db78c5329dd405460bfdf76df380ced6231353 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-29T12:29:57Z",
+   "body": "[GH-146597](https://github.com/python/cpython/pull/146597) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-29T12:30:46Z",
+   "body": "[GH-146598](https://github.com/python/cpython/pull/146598) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146080",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "24db78c5329dd405460bfdf76df380ced6231353",
+   "actor": "picnixz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a3372303bab2f82cb1b226195275a228c7e56151",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "eee64e780dee59e1c8ce0d3b7da9155e975b37f3",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "883b6d22d17c3b2fff2ed14e1ff42ddbeb23c504",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "59f33e82ff8f530cfe589ca47a6fdff538d1a1d3",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a0ea81b65c2e41d22addc23ddd64da0782855db",
+   "actor": "maurycy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "daeca97f2ccb10108b4f0c02c3b130efcb7de191",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d40a274b7a3b80f49c4a17072bfdb1da0cf205eb",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

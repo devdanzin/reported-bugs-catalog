@@ -1,0 +1,49 @@
+{
+ "repo": "python/cpython",
+ "number": 152160,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152160",
+ "title": "[3.13] gh-151763: Fix crash in `_interpqueues.create` on `MemoryError` (GH-152131)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-25T07:04:24Z",
+ "closed_at": "2026-06-25T07:29:32Z",
+ "body": "(cherry picked from commit a6c2d4ae3bd744610e1a8b70396effdabca1593d)\n\nCo-authored-by: sobolevn <mail@sobolevn.me>\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "read-the-docs-community[bot]",
+   "created_at": "2026-06-25T07:13:05Z",
+   "body": "<!-- readthedocs-883176 -->\n\n### Documentation build overview\n\n> \ud83d\udcda [cpython-previews](https://app.readthedocs.org/projects/cpython-previews/) | \ud83d\udee0\ufe0f Build [#33302471](https://app.readthedocs.org/projects/cpython-previews/builds/33302471/) | \ud83d\udcc1 Comparing 3166ce0e8fe63754c589214d06cbb331c5f0a218 against [main](https://cpython-previews.readthedocs.io/en/main/) (a6c2d4ae3bd744610e1a8b70396effdabca1593d)\n\n[<kbd> &nbsp; \ud83d\udd0d Preview build &nbsp; </kbd>](https://cpython-previews--152160.org.readthedocs.build/en/152160/)\n\n\n<details>\n<summary>465 files changed \u00b7 <code>\u00b1</code> 425 modified \u00b7 <code>-</code> 40 deleted</summary>\n<br>\n\n`\u00b1` **Modified**\n- [`about.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/about.html)\n- [`bugs.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/bugs.html)\n- [`copyright.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/copyright.html)\n- [`glossary.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/glossary.html)\n- [`index.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/index.html)\n- [`license.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/license.html)\n- [`py-modindex.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/py-modindex.html)\n- [`c-api/allocation.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/allocation.html)\n- [`c-api/apiabiversion.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/apiabiversion.html)\n- [`c-api/arg.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/arg.html)\n- *and 415 more...*\n\n`-` **Deleted**\n- [`improve-page-nojs.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/improve-page-nojs.html)\n- [`improve-page.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/improve-page.html)\n- [`_static/tachyon-example-flamegraph.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/_static/tachyon-example-flamegraph.html)\n- [`_static/tachyon-example-heatmap.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/_static/tachyon-example-heatmap.html)\n- [`c-api/extension-modules.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/extension-modules.html)\n- [`c-api/interp-lifecycle.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/interp-lifecycle.html)\n- [`c-api/lifecycle.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/lifecycle.html)\n- [`c-api/profiling.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/profiling.html)\n- [`c-api/sentinel.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/sentinel.html)\n- [`c-api/slots.html`](https://cpython-previews--152160.org.readthedocs.build/en/152160/c-api/slots.html)\n- *and 30 more...*\n\n</details>\n\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152131",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e09bc5f0be09dab3f602702b155c9b7c98d799fc",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

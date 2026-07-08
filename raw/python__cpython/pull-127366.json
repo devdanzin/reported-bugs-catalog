@@ -1,0 +1,111 @@
+{
+ "repo": "python/cpython",
+ "number": 127366,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127366",
+ "title": "gh-127190: Fix local_setattro() error handling",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2024-11-28T14:29:17Z",
+ "closed_at": "2024-11-28T16:35:48Z",
+ "body": "Don't make the assumption that the 'name' argument is a string. Use repr() to format the 'name' argument instead.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-127190 -->\n* Issue: gh-127190\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-28T14:29:36Z",
+   "body": "cc @ZeroIntensity @sobolevn "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-28T16:17:04Z",
+   "body": "> The fix and test both look fine, but how come we're skipping a blurb entry?\r\n\r\nI don't think that regular users pass objects with a compare function which always compare to true. If you use `setattr()`, the \"lying\" object is rejected (no bug). So I don't think that it's useful to document this change for end users."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-28T16:35:51Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-28T16:36:05Z",
+   "body": "[GH-127367](https://github.com/python/cpython/pull/127367) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-28T16:36:10Z",
+   "body": "[GH-127368](https://github.com/python/cpython/pull/127368) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2024-11-28T18:10:33Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **x86-64 macOS 3.12** has failed when building commit 7d175caf212565b3b89cf3c537c38adab52306a5.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/1185/builds/1090) and take a look at the build logs.\n4. Check if the failure is related to this commit (7d175caf212565b3b89cf3c537c38adab52306a5) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/1185/builds/1090\n\nFailed tests:\n\n- test.test_multiprocessing_spawn.test_processes\n\nFailed subtests:\n\n- test_repr_rlock - test.test_multiprocessing_spawn.test_processes.WithProcessesTestLock.test_repr_rlock\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (most recent call last):\n  File \"/Users/buildbot/buildarea/3.12.billenstein-macos/build/Lib/test/_test_multiprocessing.py\", line 1479, in test_repr_rlock\n    self.assertEqual('<RLock(SomeOtherThread, nonzero)>', repr(lock))\nAssertionError: '<RLock(SomeOtherThread, nonzero)>' != '<RLock(None, 0)>'\n- <RLock(SomeOtherThread, nonzero)>\n+ <RLock(None, 0)>\n\n```\n\n</details>\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-28T20:11:45Z",
+   "body": "I don't think that's related."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127190",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "20657fbdb14d50ca4ec115da0cbef155871d8d33",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9c60d6804b5bc295b968fa4c3a4c9fffd07c42a5",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d34e204cd772106d6bb030a54c60ea09f4245964",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7d175caf212565b3b89cf3c537c38adab52306a5",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5017c81824724f1bd217ac02d5e89874cc4b162c",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c68be6bdb3a96999483632470228018b5b583621",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "73feeee1bc8c2a9e439a569c4bde079908d264e3",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

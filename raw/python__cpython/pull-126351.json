@@ -1,0 +1,102 @@
+{
+ "repo": "python/cpython",
+ "number": 126351,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126351",
+ "title": "gh-126313: Fix a crash in `curse.napms` due to incorrect error handling",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-11-03T09:45:26Z",
+ "closed_at": "2024-11-03T15:08:34Z",
+ "body": "\n\n<!-- gh-issue-number: gh-126313 -->\n* Issue: gh-126313\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-03T09:46:52Z",
+   "body": "The backports will need to be manual because they will be in conflict with the new structure of the `curses` module (I haven't changed much the macros so the backport will be easy)."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-03T14:38:57Z",
+   "body": "(I think I forgot to include the latest CI tasks in this branch, which is why it was stuck)"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-03T15:08:37Z",
+   "body": "Thanks @picnixz for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-03T15:08:40Z",
+   "body": "Sorry, @picnixz and @serhiy-storchaka, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 19d935843727fff93b2c0e09a63fd32c0d97098d 3.13\n```\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-03T15:08:44Z",
+   "body": "Sorry, @picnixz and @serhiy-storchaka, I could not cleanly backport this to `3.12` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 19d935843727fff93b2c0e09a63fd32c0d97098d 3.12\n```\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-03T15:09:16Z",
+   "body": "I won't have time for the backports, so I'll do it upon my return (Wednesday). Anyone else is free to try."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-06T12:50:21Z",
+   "body": "[GH-126493](https://github.com/python/cpython/pull/126493) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-06T12:50:47Z",
+   "body": "Update: No need for a 3.12 backport (see the issue for details)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126313",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "19d935843727fff93b2c0e09a63fd32c0d97098d",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b7d76c0305dd212ed8af624ad0a7ac1c2bdaabc7",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6e9da38866e3990df440da63bbec39a90487e261",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ea47c70865c16bd7e958b0a1ff9d9a62f6be299",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "490cd3d7c44f996a4d49a349dd3e18e5fe112aaa",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

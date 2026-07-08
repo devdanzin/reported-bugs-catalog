@@ -8,18 +8,26 @@
  "issues": [
   "h5py/h5py#2835"
  ],
- "prs": [],
+ "prs": [
+  "h5py/h5py#2887"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "dfgvaetyj3456356-hash"
+ ],
  "status": "open",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/h5py__h5py/issue-2835.json"
+  "raw/h5py__h5py/issue-2835.json",
+  "raw/h5py__h5py/pull-2887.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

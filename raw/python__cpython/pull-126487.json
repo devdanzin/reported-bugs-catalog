@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 126487,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126487",
+ "title": "[3.12] gh-126455: Disallow _ssl.SSLSocket instantiation (GH-126481)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2024-11-06T10:59:59Z",
+ "closed_at": "2024-11-06T11:21:22Z",
+ "body": "Prevent creation of incomplete/invalid _ssl.SSLSocket objects when\r\ncreated directly.\n(cherry picked from commit b1c4ffc20573befb4db66bbbdd569b9bd13bb127)\n\nCo-authored-by: Victor Stinner <vstinner@python.org>\n\n<!-- gh-issue-number: gh-126455 -->\n* Issue: gh-126455\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126481",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126455",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e6fd40ba1883040224128cbb30fa002827f18392",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

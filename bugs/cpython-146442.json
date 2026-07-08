@@ -8,10 +8,16 @@
  "issues": [
   "python/cpython#146442"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#146443"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "interpreter-core",
+  "skip news",
   "type-bug"
  ],
  "filed_by": "maintainer",
@@ -24,7 +30,8 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-146442.json"
+  "raw/python__cpython/issue-146442.json",
+  "raw/python__cpython/pull-146443.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

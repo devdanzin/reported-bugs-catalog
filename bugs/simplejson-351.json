@@ -11,6 +11,9 @@
  "prs": [
   "simplejson/simplejson#357"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [
   "e8a25ea988dc0461c2fd378efd84a8a3"
  ],

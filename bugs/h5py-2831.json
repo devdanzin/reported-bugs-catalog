@@ -6,31 +6,23 @@
  "target_repo": "h5py/h5py",
  "is_umbrella": false,
  "issues": [
-  "h5py/h5py#2831",
-  "h5py/h5py#2832",
-  "h5py/h5py#2833"
+  "h5py/h5py#2831"
  ],
- "prs": [
-  "h5py/h5py#2843"
- ],
+ "prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
  "gists": [],
- "labels": [
-  "bug"
- ],
- "filed_by": "self+maintainer",
- "filers": [
-  "neutrinoceros"
- ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/h5py__h5py/issue-2831.json",
-  "raw/h5py__h5py/issue-2832.json",
-  "raw/h5py__h5py/issue-2833.json",
-  "raw/h5py__h5py/pull-2843.json"
+  "raw/h5py__h5py/issue-2831.json"
  ],
- "n_artifacts": 4
+ "n_artifacts": 1
 }

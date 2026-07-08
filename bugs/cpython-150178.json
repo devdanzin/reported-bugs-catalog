@@ -8,17 +8,27 @@
  "issues": [
   "python/cpython#150178"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#150179",
+  "python/cpython#150301",
+  "python/cpython#150302",
+  "python/cpython#150303"
+ ],
+ "n_prs": 4,
+ "n_backports": 3,
+ "n_fix_prs": 1,
  "gists": [
   "332a120e4c7750e8a7aff47419311696"
  ],
  "labels": [
   "interpreter-core",
+  "skip news",
   "type-bug"
  ],
  "filed_by": "maintainer",
  "filers": [
-  "lpyu001"
+  "lpyu001",
+  "miss-islington"
  ],
  "status": "closed/fixed",
  "confidence": "high",
@@ -26,7 +36,11 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-150178.json"
+  "raw/python__cpython/issue-150178.json",
+  "raw/python__cpython/pull-150179.json",
+  "raw/python__cpython/pull-150301.json",
+  "raw/python__cpython/pull-150302.json",
+  "raw/python__cpython/pull-150303.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 5
 }

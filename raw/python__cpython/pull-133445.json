@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 133445,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/133445",
+ "title": "[3.13] gh-131878: Handle top level exceptions in new pyrepl and prevent of closing it (GH-131910)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ambv",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-05-05T14:56:14Z",
+ "closed_at": "2025-05-05T15:20:55Z",
+ "body": "(cherry picked from commit 99a0d7e5b3c6e80f5b9b0ec88ae439d6d620253c)\r\n\n\n<!-- gh-issue-number: gh-131878 -->\n* Issue: gh-131878\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131878",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131910",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "87b14c8f21bbd675a98f0ae02149d8376e8f8d3d",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  }
+ ],
+ "fetch_errors": null
+}

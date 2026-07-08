@@ -8,24 +8,38 @@
  "issues": [
   "python/cpython#126594"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#126754",
+  "python/cpython#127004",
+  "python/cpython#127005"
+ ],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.12",
   "3.13",
   "3.14",
   "interpreter-core",
+  "skip news",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "miss-islington",
+  "vstinner"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-126594.json"
+  "raw/python__cpython/issue-126594.json",
+  "raw/python__cpython/pull-126754.json",
+  "raw/python__cpython/pull-127004.json",
+  "raw/python__cpython/pull-127005.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

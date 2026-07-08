@@ -1,0 +1,37 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5455,
+ "type": "pull",
+ "url": "https://github.com/pypy/pypy/pull/5455",
+ "title": "gh-5118: Fix a `SystemError` when `OSError` is raised in `gc.dump_rpy_heap`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "StanFromIreland",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-04-29T16:58:10Z",
+ "closed_at": "2026-04-30T20:54:19Z",
+ "body": "Closes #5118.\r\n",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2026-04-30T20:54:27Z",
+   "body": "Thanks @StanFromIreland "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6f466610f29e01d497aa868e85756f56c7f85a43",
+   "actor": "mattip"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ],
+ "fetch_errors": null
+}

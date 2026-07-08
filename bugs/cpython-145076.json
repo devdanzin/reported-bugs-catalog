@@ -8,22 +8,37 @@
  "issues": [
   "python/cpython#145076"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#145086",
+  "python/cpython#145088"
+ ],
+ "n_prs": 2,
+ "n_backports": 0,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
+  "awaiting review",
   "interpreter-core",
+  "pending",
+  "skip news",
   "topic-importlib",
+  "topic-lazy-imports",
   "type-bug"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "andresliszt",
+  "vstinner"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-145076.json"
+  "raw/python__cpython/issue-145076.json",
+  "raw/python__cpython/pull-145086.json",
+  "raw/python__cpython/pull-145088.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

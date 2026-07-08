@@ -1,0 +1,40 @@
+{
+ "repo": "numpy/numpy",
+ "number": 28852,
+ "type": "pull",
+ "url": "https://github.com/numpy/numpy/pull/28852",
+ "title": "BUG: fix heap buffer overflow in np.strings.find",
+ "state": "closed",
+ "state_reason": null,
+ "author": "charris",
+ "author_association": "MEMBER",
+ "labels": [
+  "00 - Bug",
+  "08 - Backport"
+ ],
+ "created_at": "2025-04-28T18:08:05Z",
+ "closed_at": "2025-04-28T19:18:24Z",
+ "body": "Backport of #28804.\r\n\r\nFixes #28791 \r\n\r\nMultiplying by `sizeof(npy_ucs4)` here is nonsense. I'm the one who added this if statement originally. No idea what I was thinking.\r\n<!--         ----------------------------------------------------------------\r\n                MAKE SURE YOUR PR GETS THE ATTENTION IT DESERVES!\r\n                ----------------------------------------------------------------\r\n\r\n*  FORMAT IT RIGHT:\r\n      https://www.numpy.org/devdocs/dev/development_workflow.html#writing-the-commit-message\r\n\r\n*  IF IT'S A NEW FEATURE OR API CHANGE, TEST THE WATERS:\r\n      https://www.numpy.org/devdocs/dev/development_workflow.html#get-the-mailing-list-s-opinion\r\n\r\n*  HIT ALL THE GUIDELINES:\r\n      https://numpy.org/devdocs/dev/index.html#guidelines\r\n\r\n*  WHAT TO DO IF WE HAVEN'T GOTTEN BACK TO YOU:\r\n      https://www.numpy.org/devdocs/dev/development_workflow.html#getting-your-pr-reviewed\r\n-->\r\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7f273fcff4d93616b193a9eea858922eaaee7f09",
+   "actor": "charris"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "charris"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/Hidden-History/ai-memory/pull/49",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

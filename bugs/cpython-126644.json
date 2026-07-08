@@ -8,7 +8,12 @@
  "issues": [
   "python/cpython#126644"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#126696"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
   "3.13",
@@ -18,15 +23,18 @@
   "topic-subinterpreters",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "ZeroIntensity"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-126644.json"
+  "raw/python__cpython/issue-126644.json",
+  "raw/python__cpython/pull-126696.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

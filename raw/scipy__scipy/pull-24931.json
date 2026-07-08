@@ -1,0 +1,52 @@
+{
+ "repo": "scipy/scipy",
+ "number": 24931,
+ "type": "pull",
+ "url": "https://github.com/scipy/scipy/pull/24931",
+ "title": "BUG: fix crashes, reference leaks, and NaN corruption in C extensions",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ssam18",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "defect",
+  "scipy.stats",
+  "scipy.special",
+  "scipy.sparse.linalg",
+  "scipy.linalg",
+  "scipy.optimize",
+  "scipy.interpolate",
+  "scipy.integrate",
+  "C/C++"
+ ],
+ "created_at": "2026-03-28T21:27:26Z",
+ "closed_at": "2026-03-29T02:07:16Z",
+ "body": "Fixes several bugs found via static analysis of C extensions, reported in the bug #24927.\n\nARPACK was calling PyErr_SetString with a NULL exception object because arpack_error_obj was never initialized \u2014 added a Py_mod_exec slot to create it at module init. The unuran callback was doing Py_XDECREF after PyGILState_Release (GIL violation), SuperLUGlobal_dealloc had key and value swapped so it freed Py_None instead of tracked pointers, and sf_error_v leaked a new SpecialFunctionWarning type object on every call due to the variable being static.\n\nComplex number construction using real + imag\\*I was left unfixed in four locations (ARPACK, PROPACK, ZVODE, linalg headers) after the earlier fix to _complexstuff.h \u2014 switched to CMPLX()/CMPLXF() which avoids corrupting the real part when imag is NaN. Various OOM paths in DVODE, ZVODE, DOP853, DIRECT, and SuperLU were missing NULL checks after PyTuple_New/PyList_New/PyDict_New/malloc, leading to guaranteed segfaults or aborts under memory pressure.",
+ "comments": [
+  {
+   "author": "j-bowhay",
+   "created_at": "2026-03-29T02:07:16Z",
+   "body": "Thank you for your interest in contributing to SciPy. Unfortunately, you PR is missing an AI declaration as per https://scipy.github.io/devdocs/dev/conduct/ai_policy.html. Please feel free to reopen with the PR template filled in."
+  },
+  {
+   "author": "j-bowhay",
+   "created_at": "2026-03-29T02:07:47Z",
+   "body": "Also please can you double check you are not duplicating other recent prs"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "j-bowhay"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24935",
+   "commit": null,
+   "actor": "ssam18"
+  }
+ ],
+ "fetch_errors": null
+}

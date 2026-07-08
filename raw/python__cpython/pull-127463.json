@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 127463,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127463",
+ "title": "[3.13] gh-127165: Disallow embedded NULL characters in `_interpreters` (GH-127199)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2024-12-01T06:33:50Z",
+ "closed_at": "2024-12-01T06:55:56Z",
+ "body": "(cherry picked from commit 46bfd26fb294a8769ef6d0c056ee6c9df022a037)\n\nCo-authored-by: Peter Bierma <zintensitydev@gmail.com>\n\n<!-- gh-issue-number: gh-127165 -->\n* Issue: gh-127165\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127165",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127199",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "2813a6167560a8d649465249f27ff1c134151387",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

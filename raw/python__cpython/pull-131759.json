@@ -1,0 +1,93 @@
+{
+ "repo": "python/cpython",
+ "number": 131759,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/131759",
+ "title": "gh-131712: Build _suggestions extension on Windows",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-03-26T11:00:19Z",
+ "closed_at": "2025-03-27T08:53:40Z",
+ "body": "Add a test checking that the '_suggestions' extension is available.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-131712 -->\n* Issue: gh-131712\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-26T11:02:09Z",
+   "body": "cc @devdanzin "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-26T11:26:12Z",
+   "body": "The code is already built:\r\n\r\n```\r\n$ grep _suggestions PCbuild/pythoncore.vcxproj\r\n    <ClCompile Include=\"..\\Modules\\_suggestions.c\" />\r\n```\r\n\r\nThis PR only makes the extension available in Python."
+  },
+  {
+   "author": "zooba",
+   "created_at": "2025-03-26T15:54:33Z",
+   "body": "If we've had any releases with this broken, we should probably add a `NEWS` entry to mention that it's been fixed (describing the user-visible impact, rather than the module itself)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-26T16:29:27Z",
+   "body": "> If we've had any releases with this broken, we should probably add a NEWS entry to mention that it's been fixed (describing the user-visible impact, rather than the module itself).\r\n\r\nI added \"skip news\" label since there is no impact on users, since there is a fallback implementation in Python: https://github.com/python/cpython/issues/131712#issuecomment-2751287484"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-27T08:53:53Z",
+   "body": "Merged, thanks for the review @zooba."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-03-27T08:54:35Z",
+   "body": "Thanks @vstinner for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-03-27T08:55:06Z",
+   "body": "[GH-131790](https://github.com/python/cpython/pull/131790) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131712",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9ef9d687ff7cfc4bbf422ba61db04207b7f343d2",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2a7bb708a625feb5d0d5b19c2fe2169b4d4ee424",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5c0be8ced6fcdb4372eb946ce816c4f689f2917b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0d4b3768bd5da234ed699eb236f1ac0545bce5e8",
+   "actor": "diegorusso"
+  }
+ ],
+ "fetch_errors": null
+}

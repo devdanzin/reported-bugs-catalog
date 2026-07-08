@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 145203,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145203",
+ "title": "gh-145202: Fix segfault in unicodedata.iter_graphemes when cleared by GC",
+ "state": "closed",
+ "state_reason": null,
+ "author": "gourijain029-del",
+ "author_association": "FIRST_TIME_CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-02-25T09:11:51Z",
+ "closed_at": "2026-02-26T09:30:27Z",
+ "body": "This PR fixes a segmentation fault in `unicodedata.iter_graphemes` and its segment objects, which occurred when the objects were cleared by the garbage collector before being deallocated.\r\n\r\nIn [Modules/unicodedata.c](cci:7://file:///Users/gourijain/cpython/Modules/unicodedata.c:0:0-0:0), both `GraphemeBreakIterator` and `SegmentObject` have `tp_clear` implementations that set their string references to NULL. However, their deallocators were using `Py_DECREF` instead of `Py_XDECREF`. This led to a crash if a GC cycle (or interpreter shutdown) cleared the objects before they reached the deallocation path.\r\n\r\nI've updated [GBI_dealloc](cci:1://file:///Users/gourijain/cpython/Modules/unicodedata.c:1986:0-1994:1) and [Segment_dealloc](cci:1://file:///Users/gourijain/cpython/Modules/unicodedata.c:1910:0-1918:1) to use `Py_XDECREF` to safely handle these NULL references.\r\n\r\nFixes gh-145202.\r\n",
+ "comments": [
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-02-25T14:06:46Z",
+   "body": "#145216 is an alternative solution. I do not think we need `tp_clear` here at first place."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145202",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,51 @@
+{
+ "repo": "python/cpython",
+ "number": 150301,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/150301",
+ "title": "[3.13] gh-150178: Fix refcount leaks in hamt allocation failure paths (GH-150179)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-05-23T08:41:05Z",
+ "closed_at": "2026-05-23T09:24:12Z",
+ "body": "(cherry picked from commit 32823af153b76b7042fbce28ea8a6e0c3c4f1ca8)\n\nCo-authored-by: pengyu lee <lipengyu@kylinos.cn>\n\n<!-- gh-issue-number: gh-150178 -->\n* Issue: gh-150178\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "read-the-docs-community[bot]",
+   "created_at": "2026-05-23T08:46:23Z",
+   "body": "<!-- readthedocs-883176 -->\n\n### Documentation build overview\n\n> \ud83d\udcda [cpython-previews](https://app.readthedocs.org/projects/cpython-previews/) | \ud83d\udee0\ufe0f Build [#32820580](https://app.readthedocs.org/projects/cpython-previews/builds/32820580/) | \ud83d\udcc1 Comparing 56c62672cc29755911de6d397b6753708cac5473 against [main](https://cpython-previews.readthedocs.io/en/main/) (32823af153b76b7042fbce28ea8a6e0c3c4f1ca8)\n\n[<kbd> &nbsp; \ud83d\udd0d Preview build &nbsp; </kbd>](https://cpython-previews--150301.org.readthedocs.build/en/150301/)\n\n\n<details>\n<summary>454 files changed \u00b7 <code>\u00b1</code> 416 modified \u00b7 <code>-</code> 38 deleted</summary>\n<br>\n\n`\u00b1` **Modified**\n- [`about.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/about.html)\n- [`bugs.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/bugs.html)\n- [`copyright.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/copyright.html)\n- [`glossary.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/glossary.html)\n- [`index.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/index.html)\n- [`license.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/license.html)\n- [`py-modindex.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/py-modindex.html)\n- [`c-api/allocation.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/allocation.html)\n- [`c-api/apiabiversion.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/apiabiversion.html)\n- [`c-api/arg.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/arg.html)\n- *and 406 more...*\n\n`-` **Deleted**\n- [`improve-page-nojs.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/improve-page-nojs.html)\n- [`improve-page.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/improve-page.html)\n- [`_static/tachyon-example-flamegraph.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/_static/tachyon-example-flamegraph.html)\n- [`_static/tachyon-example-heatmap.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/_static/tachyon-example-heatmap.html)\n- [`c-api/extension-modules.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/extension-modules.html)\n- [`c-api/interp-lifecycle.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/interp-lifecycle.html)\n- [`c-api/lifecycle.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/lifecycle.html)\n- [`c-api/profiling.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/profiling.html)\n- [`c-api/sentinel.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/sentinel.html)\n- [`c-api/slots.html`](https://cpython-previews--150301.org.readthedocs.build/en/150301/c-api/slots.html)\n- *and 28 more...*\n\n</details>\n\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150178",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150179",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "95c93239be9d6e7f047ab3fba41b6bff3e9aca0c",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,194 @@
+{
+ "repo": "python/cpython",
+ "number": 126233,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126233",
+ "title": "gh-126220: Adapt `_lsprof` to Argument Clinic",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2024-10-31T11:08:22Z",
+ "closed_at": "2024-11-04T16:18:21Z",
+ "body": "I decided to go with the AC, because:\r\n1. It is supported in this module\r\n2. It solves the problem\r\n3. It fixes multiple signatures\r\n\r\nBut, I believe it will be slower. If we really want to preserve speed in this case, I can add manual `size` checks for `args`.\r\n\r\nRefs https://github.com/python/cpython/pull/103534\n\n<!-- gh-issue-number: gh-126220 -->\n* Issue: gh-126220\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-10-31T12:53:29Z",
+   "body": "What's the perf impact here?"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T13:39:46Z",
+   "body": "@gaogaotiantian I've never had experience with profiling `cProfile`. Do you have any links / suggestions on how to do that?"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-10-31T13:48:51Z",
+   "body": "Just do a quick fib() with cprofile and compare it with the previous implementation would do. Maybe also with one without cprofile."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T14:12:14Z",
+   "body": "@gaogaotiantian maybe I did something wrong, but looks like we also got a speedup from my numbers \ud83d\ude05  (I have little idea about how `cProfile` works).\r\n\r\n```python\r\n# Test code: ex.py\r\ndef test():\r\n    def fib():\r\n        start, nextn = 0, 1\r\n        while True:\r\n            yield start\r\n            start, nextn = nextn, start + nextn\r\n\r\n    gen = fib()\r\n    for _ in range(100000):\r\n        next(gen)\r\n\r\nimport cProfile\r\ncProfile.run(test.__code__)\r\n```\r\n\r\nRunning it on `main`:\r\n\r\n```\r\n\u00bb ./python.exe ex.py\r\n         200003 function calls in 0.188 seconds\r\n\r\n   Ordered by: standard name\r\n\r\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\r\n        1    0.017    0.017    0.188    0.188 ex.py:1(test)\r\n   100000    0.147    0.000    0.147    0.000 ex.py:2(fib)\r\n        1    0.000    0.000    0.188    0.188 {built-in method builtins.exec}\r\n   100000    0.024    0.000    0.171    0.000 {built-in method builtins.next}\r\n        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}\r\n```\r\n\r\nRunning on this PR:\r\n\r\n```\r\n\u00bb ./python.exe ex.py                                                     \r\n         200003 function calls in 0.185 seconds\r\n\r\n   Ordered by: standard name\r\n\r\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\r\n        1    0.016    0.016    0.185    0.185 ex.py:1(test)\r\n   100000    0.145    0.000    0.145    0.000 ex.py:2(fib)\r\n        1    0.000    0.000    0.185    0.185 {built-in method builtins.exec}\r\n   100000    0.024    0.000    0.168    0.000 {built-in method builtins.next}\r\n        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}\r\n```\r\n\r\nAm I missing something?"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-10-31T14:50:56Z",
+   "body": "Sorry I meant a recursive `fib()`.\r\n\r\n```python\r\nimport time\r\ndef fib(n):\r\n    if n <= 1:\r\n        return 1\r\n    return fib(n - 1) + fib(n - 2)\r\nstart = time.time()\r\n# enable profiler\r\nfib(24)\r\n# disable profiler\r\nprint(time.time() - start)\r\n```\r\n\r\nWe need to consider the worst case for cprofile, which is when the code has a lot of function calls. We need to know the overhead of the profiler, and how that is compared with before.\r\n\r\nYou can also refer to #103533, there's a profiling code listed. That might give some extra information.\r\n\r\nMoving to `sys.monitoring` gave us a 20%+ improvement on overhead, just want to check what's the regression with clinic and whether it's acceptable. Profiler is a bit sensitive to performance because the more overhead there is, the less useful it is."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T14:57:48Z",
+   "body": "It still gives me a perf boost for some reason \ud83e\udd14 \r\n\r\n```python\r\nimport time\r\nimport cProfile\r\n\r\nprofiler = cProfile.Profile()\r\n\r\ndef fib(n):\r\n    if n <= 1:\r\n        return 1\r\n    return fib(n - 1) + fib(n - 2)\r\nstart = time.perf_counter()\r\nprofiler.enable()\r\nfib(30)  # 100th\r\nprofiler.disable()\r\nprint(time.perf_counter() - start)\r\n# Old: 0.9349823750017094\r\n# New: 0.9253051670020795\r\n# 1% faster \r\n```"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-10-31T15:07:41Z",
+   "body": "Is the boost stable(reproducible)?"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T15:09:17Z",
+   "body": "Yes, it is pretty much the same on m2 macos:\r\n\r\n```\r\n(.venv) ~/Desktop/cpython2  main \u2717                                                        \r\n\u00bb ./python.exe ex.py                                                     \r\n0.9349823750017094\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  main \u2717                                                        \r\n\u00bb ./python.exe ex.py\r\n0.9357958749969839\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  main \u2717                                                        \r\n\u00bb ./python.exe ex.py\r\n0.9352227920026053\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  main \u2717                                                        \r\n\u00bb ./python.exe ex.py\r\n0.924946416002058\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  main \u2717                                                        \r\n\u00bb ./python.exe ex.py\r\n0.926337541997782\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  main \u2717                                                        \r\n\u00bb ./python.exe ex.py\r\n0.9347994170000311\r\n```\r\n\r\n```\r\n(.venv) ~/Desktop/cpython2  issue-126220 \u2717  \r\n\u00bb ./python.exe ex.py\r\n0.9370929580036318\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  issue-126220 \u2717                                                \r\n\u00bb ./python.exe ex.py\r\n0.9262957079990883\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  issue-126220 \u2717                                                \r\n\u00bb ./python.exe ex.py\r\n0.9328266249940498\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  issue-126220 \u2717                                                \r\n\u00bb ./python.exe ex.py\r\n0.9382220000011148\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  issue-126220 \u2717                                                \r\n\u00bb ./python.exe ex.py\r\n0.9285237919984502\r\n                                                                                           \r\n(.venv) ~/Desktop/cpython2  issue-126220 \u2717                                                \r\n\u00bb ./python.exe ex.py\r\n0.9296539580027456\r\n```"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-10-31T15:21:03Z",
+   "body": "Yeah from the result I don't think there's an observable boost. On the other hand, that's good, because no observable regression either."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T15:24:58Z",
+   "body": "@gaogaotiantian sorry, I forgot to highlight it initially. Please, double check params names that I introduced. Are they correct? "
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-10-31T15:46:23Z",
+   "body": "Actually, I have some doubts about the changes for functions that are not crashing. This is a bug fix, which would be backported. I don't think we should mix in the code polish to the PR. Even though I think changing this in `main` would be fine, I would prefer having only the crash fix (could be with AC) in one PR, and the rest in the other. One thing that bothers me immediately is that I can't quickly convince myself the changes to `__init__` is purely equivalent.\r\n\r\nAs for the argument name, the `obj` in the callbacks should be either `unused` or `instruction_offset`(which is what it is)."
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-10-31T15:47:39Z",
+   "body": "Can we split this PR into 2? One with the changes to only the 4 callbacks, and the other with all the other methods?"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T15:57:45Z",
+   "body": "Fair enough, I would split this PR later! \ud83d\udc4d \r\nThank you!"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T21:56:54Z",
+   "body": "@erlend-aasland maybe you would be interested in double checking the AC part? :)"
+  },
+  {
+   "author": "erlend-aasland",
+   "created_at": "2024-11-01T07:56:24Z",
+   "body": "We generally do not backport Argument Clinic adaptions; would it be possible to solve the issue without Argument Clinic first, and backport that bugfix; then apply Argument Clinic?"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-01T08:01:20Z",
+   "body": "@erlend-aasland I think that this case is rather special. This is not just \"convert X to use AC\" type of PR. This PR solves a crash that was caused by incorrect function args handling. Basically, I can use `PyArg_ParseTuple*` to do the same, but I don't see a point in doing that and then converting it to AC in 3.14 only. \r\n\r\nI can go with simple:\r\n\r\n```c\r\nif (size < REQUIRED_ARGS) {\r\n    PyErr_Format(PyExc_TypeError, \"got %d arguments, expected %d\", ...);\r\n    return NULL;\r\n}\r\n```\r\n\r\nThis will kinda solve this case, but will be rather ugly."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-01T08:21:27Z",
+   "body": "@erlend-aasland sorry for bothering, but I cannot decode your \ud83d\udc4d reaction :)\r\nDoes it mean:\r\n1. Let's go with `if (size)`?\r\n2. Let's keep it as is? \r\n\r\n:)"
+  },
+  {
+   "author": "erlend-aasland",
+   "created_at": "2024-11-01T08:26:13Z",
+   "body": "> This will kinda solve this case, but will be rather ugly.\r\n\r\nI see, and thanks for the explanation. I think I still would feel better with such workarounds[^1] for 3.13 and 3.12, and then introduce the Argument Clinic adaptions in 3.14. Mixing features and bugfixes is seldom a good thing.\r\n\r\n[^1]: IMO, they are not _that_ ugly"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-01T09:02:53Z",
+   "body": "Ok, I will open a new PR with the fix we can backport and then rebase this one and apply all AC fixes from the initial version. Thanks for the feedback! \ud83d\udc4d "
+  },
+  {
+   "author": "erlend-aasland",
+   "created_at": "2024-11-01T22:06:07Z",
+   "body": "Please amend the title to reflect the actual change :)"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-04T08:37:38Z",
+   "body": "Done!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-04T16:18:25Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-04T16:18:31Z",
+   "body": "Thanks everyone!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-04T16:18:38Z",
+   "body": "Sorry, @sobolevn, I could not cleanly backport this to `3.12` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker c806cd5af677c385470001efc68da38a32919196 3.12\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-04T16:18:39Z",
+   "body": "[GH-126402](https://github.com/python/cpython/pull/126402) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-04T16:18:49Z",
+   "body": "Oups, backports are not needed anymore. Closing them."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126220",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126271",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c806cd5af677c385470001efc68da38a32919196",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9eaf3e617239d09e746b6699cd9c5a3461816f27",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c86f49b3ad47b5638f57c2d983180a26ff60074f",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2081eee7316615819e29224a27fdc3e1eeff2c15",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

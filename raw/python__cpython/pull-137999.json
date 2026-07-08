@@ -1,0 +1,60 @@
+{
+ "repo": "python/cpython",
+ "number": 137999,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/137999",
+ "title": "[3.14] gh-137728 gh-137762: Fix bugs in the JIT with many local variables (GH-137764)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-08-20T14:54:02Z",
+ "closed_at": "2025-08-21T14:00:05Z",
+ "body": "(cherry picked from commit 7fda8b66debb24e0520b94c3769b648c7305f84e)\n\nCo-authored-by: Ken Jin <kenjin@python.org>\n\n<!-- gh-issue-number: gh-137728 -->\n* Issue: gh-137728\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-08-21T13:22:03Z",
+   "body": "@hugovk we have another peer approval now, can you merge this please?"
+  },
+  {
+   "author": "hugovk",
+   "created_at": "2025-08-21T14:00:09Z",
+   "body": "Merged, thanks!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/137728",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/137764",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "cf5c170c1bec7ab191198770e3ac7623288df9d6",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3eaa82b15380f10fd25c64d1efd28785f4acade",
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

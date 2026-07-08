@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 152031,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152031",
+ "title": "[3.15] gh-151842: Fix crash upon OOM in `_interpreters.capture_exception` (GH-151843)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-23T20:32:04Z",
+ "closed_at": "2026-06-23T20:58:11Z",
+ "body": "(cherry picked from commit 5e0747db2f5a063657a117e88b58a20624c848d1)\n\nCo-authored-by: Amrutha <amruthamodela06@gmail.com>\n\n<!-- gh-issue-number: gh-151842 -->\n* Issue: gh-151842\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151842",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151843",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "415e218ed5ff1d541803aa46ea1e69ddcda03062",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

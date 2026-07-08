@@ -8,15 +8,22 @@
  "issues": [
   "python/cpython#151815"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#151821"
+ ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
  "labels": [
+  "awaiting review",
   "interpreter-core",
   "type-crash"
  ],
  "filed_by": "maintainer",
  "filers": [
-  "amruthamodela06"
+  "amruthamodela06",
+  "timurmamedov1"
  ],
  "status": "open",
  "confidence": "high",
@@ -24,7 +31,8 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-151815.json"
+  "raw/python__cpython/issue-151815.json",
+  "raw/python__cpython/pull-151821.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 2
 }

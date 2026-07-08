@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 122349,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/122349",
+ "title": "[3.12] gh-122170: Handle ValueError raised by os.stat() in linecache (GH-122176)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-07-27T10:31:59Z",
+ "closed_at": "2024-07-27T10:48:15Z",
+ "body": "(cherry picked from commit 7a6d4ccf0ec16e09f0d8b21c5a0c591e5e3e45f7)\n\nCo-authored-by: B\u00e9n\u00e9dikt Tran <10796600+picnixz@users.noreply.github.com>\n\n<!-- gh-issue-number: gh-122170 -->\n* Issue: gh-122170\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122170",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122176",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "2e37d67db2a9a0ebd2f3a2cfd3d02e0f06d64522",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ],
+ "fetch_errors": null
+}

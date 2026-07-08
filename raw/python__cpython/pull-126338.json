@@ -1,0 +1,109 @@
+{
+ "repo": "python/cpython",
+ "number": 126338,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126338",
+ "title": "gh-126312: Don't traverse frozen objects on the free-threaded build",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2024-11-02T18:50:54Z",
+ "closed_at": "2024-11-15T10:21:31Z",
+ "body": "\n\n<!-- gh-issue-number: gh-126312 -->\n* Issue: gh-126312\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-02T18:59:33Z",
+   "body": "Apparently, the fix isn't as stable as I thought. Marking as draft temporarily."
+  },
+  {
+   "author": "rruuaanng",
+   "created_at": "2024-11-03T01:09:15Z",
+   "body": "It looks good."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-05T18:37:59Z",
+   "body": "Please also fix `visit_freeze` to avoid marking objects with _PyGC_BITS_UNREACHABLE"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-05T18:51:08Z",
+   "body": "> Please also fix `visit_freeze` to avoid marking objects with _PyGC_BITS_UNREACHABLE\r\n\r\nDone. I'll see if I can come up with a quick test case. If not, it's probably fine to merge that untested, as it's such a small change."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-15T10:21:34Z",
+   "body": "Thanks @ZeroIntensity for the PR, and @vstinner for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-11-15T10:21:38Z",
+   "body": "Sorry, @ZeroIntensity and @vstinner, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker d4c72fed8cba8e15ab7bb6c30a92bc9f2c8f0a2c 3.13\n```\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-15T10:22:11Z",
+   "body": "@ZeroIntensity: Oh, the automated backport to 3.13 failed. Do you want to attempt to fix the cherry-pick conflict?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-15T10:22:24Z",
+   "body": "Merged, thanks @ZeroIntensity."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-11-15T12:19:44Z",
+   "body": "[GH-126866](https://github.com/python/cpython/pull/126866) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126312",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d4c72fed8cba8e15ab7bb6c30a92bc9f2c8f0a2c",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "780e19dd578bf197f074b563fdc5561efc4a8709",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ecda3ae2a51cdec65996005690391172bc25ca4b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "79813c47aded7a6e5e54a5bc8ab678a8faa1ccfd",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c30d166341ea5a88908d24bc231a6023e7b354b1",
+   "actor": "ebonnal"
+  }
+ ],
+ "fetch_errors": null
+}

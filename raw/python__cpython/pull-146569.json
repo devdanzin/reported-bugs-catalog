@@ -1,0 +1,112 @@
+{
+ "repo": "python/cpython",
+ "number": 146569,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146569",
+ "title": "gh-146090: fix memory management of internal `sqlite3` callback contexts",
+ "state": "closed",
+ "state_reason": null,
+ "author": "picnixz",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-28T11:10:20Z",
+ "closed_at": "2026-03-29T12:21:38Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146090 -->\n* Issue: gh-146090\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-bot",
+   "created_at": "2026-03-28T14:52:03Z",
+   "body": ":robot: New build scheduled with the buildbot fleet by @picnixz for commit 926804bb3492da36c3cdcb3eaabaecb307a71a4a :robot:\n\nResults will be shown at:\n\nhttps://buildbot.python.org/all/#/grid?branch=refs%2Fpull%2F146569%2Fmerge\n\nIf you want to schedule another build, you need to add the <kbd>:hammer: test-with-refleak-buildbots</kbd> label again.\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-29T12:21:41Z",
+   "body": "Thanks @picnixz for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-29T12:21:52Z",
+   "body": "[GH-146595](https://github.com/python/cpython/pull/146595) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-29T12:21:57Z",
+   "body": "[GH-146596](https://github.com/python/cpython/pull/146596) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146090",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "connected",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "aa6680775d6d9ca571a675c3b2d655f4ade78c0c",
+   "actor": "picnixz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a0192adaed5e746593c127ed8511e37a1caf81f4",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1b5bd8e1c53421019afb2d239508691d06e7e694",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6fdf0846449064c2f5bec18296163e19ee09121e",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1458ea00658ba8284b71b93eec499cc922c510c0",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a0ea81b65c2e41d22addc23ddd64da0782855db",
+   "actor": "maurycy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "77666ccb87b1c3de1a9da2616c50026e48d1bca5",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5448ac0ad9706b7e9ba987633d0720e49c18b517",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

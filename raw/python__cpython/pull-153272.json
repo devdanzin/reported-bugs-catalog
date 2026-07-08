@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 153272,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/153272",
+ "title": "[3.15] gh-153205: Set `MemoryError` in stackref array conversion (GH-153206)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-07-07T16:03:45Z",
+ "closed_at": "2026-07-07T16:34:17Z",
+ "body": "(cherry picked from commit 08759ff1015552d58c1f6ffa13ea08b0ae32e6c0)\n\nCo-authored-by: An Long <aisk@users.noreply.github.com>\nCo-authored-by: blurb-it[bot] <43283697+blurb-it[bot]@users.noreply.github.com>\nCo-authored-by: sobolevn <mail@sobolevn.me>\n\n<!-- gh-issue-number: gh-153205 -->\n* Issue: gh-153205\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153205",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153206",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "7342e012531d46e4508f50887a66d58972f35da2",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

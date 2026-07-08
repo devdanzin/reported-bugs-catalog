@@ -1,0 +1,79 @@
+{
+ "repo": "python/cpython",
+ "number": 148075,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/148075",
+ "title": "gh-148074: Fix `typeobject.c` missing error return",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Wulian233",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-04-04T08:37:47Z",
+ "closed_at": "2026-04-04T15:34:56Z",
+ "body": "> At line 9314-9320, `PyErr_Format` sets a `SystemError` for invalid `tp_dictoffset` but falls through to `return 0` (success). Type finishes initialization with invalid offset and pending exception. Requires C extension to trigger.\r\n\r\nI think we can skip-news\n\n<!-- gh-issue-number: gh-148074 -->\n* Issue: gh-148074\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-04-04T15:35:22Z",
+   "body": "Thanks @Wulian233 for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-04-04T15:35:29Z",
+   "body": "[GH-148095](https://github.com/python/cpython/pull/148095) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-bot",
+   "created_at": "2026-04-04T15:55:16Z",
+   "body": ":warning::warning::warning: Buildbot failure :warning::warning::warning:\n------------------------------------------------------------------------\n\nHi! The buildbot **AMD64 Debian root 3.x** (tier-1) has failed when building commit c398490fbf15ede5de3389b4ca4e32fb9a7c5d67.\n\nWhat do you need to do:\n\n1. Don't panic.\n2. Check [the buildbot page in the devguide](https://devguide.python.org/buildbots/) if you don't know what the buildbots are or how they work.\n3. Go to the page of the buildbot that failed (https://buildbot.python.org/#/builders/345/builds/13847) and take a look at the build logs.\n4. Check if the failure is related to this commit (c398490fbf15ede5de3389b4ca4e32fb9a7c5d67) or if it is a false positive.\n5. If the failure is related to this commit, please, reflect that on the issue and make a new Pull Request with a fix.\n\nYou can take a look at the buildbot page here:\n\nhttps://buildbot.python.org/#/builders/345/builds/13847\n\nFailed tests:\n\n- test_zipimport\n\nFailed subtests:\n\n- testBoth - test.test_zipimport.UncompressedZipImportTestCase.testBoth\n- testGetCompiledSource - test.test_zipimport.UncompressedZipImportTestCase.testGetCompiledSource\n- testBoth - test.test_zipimport.DeflateCompressedZipImportTestCase.testBoth\n- testGetCompiledSource - test.test_zipimport.DeflateCompressedZipImportTestCase.testGetCompiledSource\n\n\nSummary of the results of the build (if available):\n\n== \n\n<details>\n<summary>Click to see traceback logs</summary>\n\n```python-traceback\nTraceback (test.test_zipimport.UncompressedZipImportTestCase.testTraceback) ... ok\n\n\nTraceback (most recent call last):\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 801, in testGetCompiledSource\n    self.doTest(pyc_ext, files, TESTMOD, call=self.assertModuleSource)\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 159, in doTest\n    self.doTestWithPreBuiltZip(expected_ext, *modules, **kw)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 173, in doTestWithPreBuiltZip\n    self.assertEqual(file, os.path.join(zip_path,\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                         *modules) + expected_ext)\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '/roo[47 chars]ld/test_python_761360\u00e6/junk95142.zip/pre/fix/ziptestmodule.py' != '/roo[47 chars]ld/test_python_761360\u00e6/junk95142.zip/pre/fix/ziptestmodule.pyc'\n- /root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_761360\u00e6/junk95142.zip/pre/fix/ziptestmodule.py\n+ /root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_761360\u00e6/junk95142.zip/pre/fix/ziptestmodule.pyc\n?                                                                                                                 +\n\n\nTraceback (test.test_zipimport.DeflateCompressedZipImportTestCase.testTraceback) ... ok\n\n\nTraceback (test.test_zipimport.ZStdCompressedZipImportTestCase.testTraceback) ... skipped 'requires zstd'\n\n\nTraceback (most recent call last):\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 801, in testGetCompiledSource\n    self.doTest(pyc_ext, files, TESTMOD, call=self.assertModuleSource)\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 159, in doTest\n    self.doTestWithPreBuiltZip(expected_ext, *modules, **kw)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 173, in doTestWithPreBuiltZip\n    self.assertEqual(file, os.path.join(zip_path,\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                         *modules) + expected_ext)\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '/roo[47 chars]ld/test_python_765254\u00e6/junk95142.zip/pre/fix/ziptestmodule.py' != '/roo[47 chars]ld/test_python_765254\u00e6/junk95142.zip/pre/fix/ziptestmodule.pyc'\n- /root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_765254\u00e6/junk95142.zip/pre/fix/ziptestmodule.py\n+ /root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_765254\u00e6/junk95142.zip/pre/fix/ziptestmodule.pyc\n?                                                                                                                 +\n\n\nTraceback (most recent call last):\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 239, in testBoth\n    self.doTest(pyc_ext, files, TESTMOD)\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 159, in doTest\n    self.doTestWithPreBuiltZip(expected_ext, *modules, **kw)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 173, in doTestWithPreBuiltZip\n    self.assertEqual(file, os.path.join(zip_path,\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                         *modules) + expected_ext)\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '/roo[47 chars]ld/test_python_765254\u00e6/junk95142.zip/pre/fix/ziptestmodule.py' != '/roo[47 chars]ld/test_python_765254\u00e6/junk95142.zip/pre/fix/ziptestmodule.pyc'\n- /root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_765254\u00e6/junk95142.zip/pre/fix/ziptestmodule.py\n+ /root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_765254\u00e6/junk95142.zip/pre/fix/ziptestmodule.pyc\n?                                                                                                                 +\n\n\nTraceback (most recent call last):\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 239, in testBoth\n    self.doTest(pyc_ext, files, TESTMOD)\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 159, in doTest\n    self.doTestWithPreBuiltZip(expected_ext, *modules, **kw)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/buildarea/3.x.angelico-debian-amd64/build/Lib/test/test_zipimport.py\", line 173, in doTestWithPreBuiltZip\n    self.assertEqual(file, os.path.join(zip_path,\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                         *modules) + expected_ext)\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '/roo[47 chars]ld/test_python_761360\u00e6/junk95142.zip/pre/fix/ziptestmodule.py' != '/roo[47 chars]ld/test_python_761360\u00e6/junk95142.zip/pre/fix/ziptestmodule.pyc'\n- /root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_761360\u00e6/junk95142.zip/pre/fix/ziptestmodule.py\n+ /root/buildarea/3.x.angelico-debian-amd64/build/build/test_python_761360\u00e6/junk95142.zip/pre/fix/ziptestmodule.pyc\n?                                                                                                                 +\n\n```\n\n</details>\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148074",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c398490fbf15ede5de3389b4ca4e32fb9a7c5d67",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9c1383350cee38336be07c2e79ebf85dee5da217",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "61c919cf1b9b365add10915764c93119f6195b4a",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4e89463a7a7b42e5c15fa2463c0127b9517c5888",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -9,16 +9,26 @@
   "python/cpython#122170"
  ],
  "prs": [
-  "python/cpython#122175"
+  "python/cpython#122175",
+  "python/cpython#122176",
+  "python/cpython#122348",
+  "python/cpython#122349"
  ],
+ "n_prs": 4,
+ "n_backports": 2,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "OS-windows",
   "awaiting review",
+  "stdlib",
   "type-bug"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "miss-islington",
+  "picnixz"
+ ],
  "status": "closed/fixed",
  "confidence": "low",
  "needs_review": true,
@@ -26,7 +36,10 @@
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-122170.json",
-  "raw/python__cpython/pull-122175.json"
+  "raw/python__cpython/pull-122175.json",
+  "raw/python__cpython/pull-122176.json",
+  "raw/python__cpython/pull-122348.json",
+  "raw/python__cpython/pull-122349.json"
  ],
- "n_artifacts": 2
+ "n_artifacts": 5
 }

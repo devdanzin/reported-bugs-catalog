@@ -8,21 +8,38 @@
  "issues": [
   "python/cpython#151818"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#151826",
+  "python/cpython#152114",
+  "python/cpython#152117"
+ ],
+ "n_prs": 3,
+ "n_backports": 0,
+ "n_fix_prs": 3,
  "gists": [],
  "labels": [
+  "awaiting core review",
+  "awaiting review",
   "interpreter-core",
+  "needs backport to 3.15",
+  "skip news",
   "type-crash"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "timurmamedov1",
+  "vstinner"
+ ],
  "status": "open",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-151818.json"
+  "raw/python__cpython/issue-151818.json",
+  "raw/python__cpython/pull-151826.json",
+  "raw/python__cpython/pull-152114.json",
+  "raw/python__cpython/pull-152117.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 4
 }

@@ -1,0 +1,194 @@
+{
+ "repo": "python/cpython",
+ "number": 132440,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132440",
+ "title": "GH-132439: Fix REPL swallowing characters entered with AltGr on cmd.exe",
+ "state": "closed",
+ "state_reason": null,
+ "author": "chris-eibl",
+ "author_association": "MEMBER",
+ "labels": [
+  "OS-windows",
+  "topic-repl"
+ ],
+ "created_at": "2025-04-12T14:31:29Z",
+ "closed_at": "2025-05-05T16:45:45Z",
+ "body": "E.g. on my keyboard with German layout, `{` is usually entered via pressing the [AltGr key](https://en.wikipedia.org/wiki/AltGr_key) and `7`, i.e. `AltGr+7`. \r\n\r\nLikewise, `}`, `[`, `]`, `\\` and some more can only be entered via `AltGr`.\r\n\r\nBut since https://github.com/python/cpython/issues/128388 / https://github.com/python/cpython/pull/128389 these are swallowed by the REPL on Windows and can no longer be entered.\r\n\r\nThis happens in legacy Windows terminals, where the virtual terminal mode is turned off (e.g. `cmd.exe`).\r\n\r\nIn virtual terminal mode there are other issues, see https://github.com/python/cpython/issues/131878.\r\n\r\n<!-- gh-issue-number: gh-132439 -->\r\n* Issue: gh-132439\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-12T14:53:03Z",
+   "body": "Adding @vstinner, @eendebakpt and @paulie4 , since they were involved in https://github.com/python/cpython/pull/128389 and already talked about AltGr."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-12T14:56:22Z",
+   "body": "PS: switching to an english keyboard layout, I can use the AltGr key like right-Alt, since it is not used in this keyboard layout :)"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-12T17:15:46Z",
+   "body": "The failing of Ubuntu (free-threading) is definitely unrelated, since this is a Windows specific change."
+  },
+  {
+   "author": "tomasr8",
+   "created_at": "2025-04-17T19:21:45Z",
+   "body": "Do you think it'd be possible to add some tests for this change to ensure we don't accidentally regress again?"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-17T19:43:44Z",
+   "body": "Yeah, I've already thought about it, but am still unsure how to best do it.\r\n\r\nATM, I am thinking of mocking\r\nhttps://github.com/python/cpython/blob/b87189deae7cdd65083da60cf3ba6e5bba117663/Lib/_pyrepl/windows_console.py#L411\r\nto be able to test\r\nhttps://github.com/python/cpython/blob/b87189deae7cdd65083da60cf3ba6e5bba117663/Lib/_pyrepl/windows_console.py#L426-L432\r\n\r\nAFAICT, all the existing tests just mock `get_event`, but for this, IMHO `get_event` itself must be tested.\r\nMocking `_read_input` seems to be the best way forward.\r\n\r\nWDYT?"
+  },
+  {
+   "author": "tomasr8",
+   "created_at": "2025-04-17T20:17:22Z",
+   "body": "Agreed that we shouldn't be mocking `get_event` since that's where we're making changes. `_read_input` seems like a good option, we can capture some real inputs and then replay them with it."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-20T11:03:19Z",
+   "body": "@sergey-miryanov since you are working on REPL issues on Windows, too: can you have a look at my PR?\r\nAnd do some more manual tests with this PR in a legacy console? The virtual terminal fixes are anyway part of your https://github.com/python/cpython/pull/131901."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-04-20T12:18:43Z",
+   "body": "@chris-eibl \r\n1. Python 3.11.9 from cmd or ps - ctrl+backspace removes whole words, alt (left or right) + [{}] - inputs just [{}]\r\n2. Python 3.13.1 from cmd or ps - ctrl+backspace removes symbol by symbol, alt (left or right) + [{}] - inputs just [{}]\r\n3. Your branch from cmd or ps - ctrl+backspace removes symbol by symbol, alt (left or right) + [ - inputs nothing, alt + [[ (or [[[ - I'm not sure sometime two repeats sometimes 3 repeats) - inputs [, also alt + [] - inputs ]."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-04-20T12:22:17Z",
+   "body": "Also on your branch if I put altgr + m - it inputs nothing."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-20T13:22:06Z",
+   "body": ">And do some more manual tests with this PR in a legacy console\r\n\r\nCan you also verify, that for `cmd` the VT is disabled?\r\n**My PR won't be any help if VT is enabled**.\r\nDepending on how the Windows Terminal is configured, it might be possible, that you are never in the legacy case?\r\nFor me, I have to manually start a `cmd`. If I start it via the Windows Terminal (`Eingabeauffordernung` in German),\r\na `cmd` instance in VT mode is started :-O\r\n\r\n![image](https://github.com/user-attachments/assets/b70d5094-89bf-45e1-b6c0-8d88fc050009)\r\n\r\n\r\n\r\nWhat is your keyboard layout?\r\nDoes your keybord feature the AltGr key?\r\nIf not, does the right Alt key behave like AltGr when you switch to a keyboard layout that uses it (like German)?\r\nHow does the main branch behave in these cases? I.e. without my changes.\r\n\r\n>Also on your branch if I put altgr + m - it inputs nothing.\r\n\r\nWhat does AltGr + m do in your editor? It should do the same in the REPL. If your keyboard layout does not feature anything on AltGr + m, then it is normal, that nothing happens. See  https://en.wikipedia.org/wiki/AltGr_key which keyboards do what.\r\n\r\nI've tested e.g. a French layout, too. For me, everything works well in the legacy terminal.\r\nMy PR doesn't touch VT, so everything is unchanged there.\r\n\r\nThat's your PR that fixes the VT for me \ud83d\ude80 \r\n\r\n\r\n"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-20T13:23:12Z",
+   "body": "@sergey-miryanov: and many thanks for testing \u2764\ufe0f "
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-20T15:00:12Z",
+   "body": "Merge with main to see whether that solves the GHA hiccup.\r\n\r\n[Edit] - it did fix GHA."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-04-20T15:38:34Z",
+   "body": "Previously I started it via cmd.exe but windows 11 has option about what terminal host to use - legacy or the new one. I disabled VT now - but get the same results. Later I will try to add German keyboard layout and test again.\r\n\r\nBtw, I have some strange case - I can't exit from multiline mode:\r\n![image](https://github.com/user-attachments/assets/f8285b9c-b048-4219-996e-ff6ba88e30fb)\r\n\r\n"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-20T16:10:59Z",
+   "body": "Oh, I am running out of ideas now. I am on Windows 10, but can't believe this is the culprit.\r\n\r\nSeems that not a sinlge thing that is working for me is working for you.\r\n\r\n**After all, my PR should not induce any change in behaviour, except**\r\n- in addition to one of the `Alt` keys a `Ctrl` key is pressed, too, and furthermore one of the keys with a blue letter according to the keyboard diagrams in https://en.wikipedia.org/wiki/AltGr_key\r\n- or the `AltGr` key is used together with such a \"blue\" key. Windows converts `AltGr` automatically into `CTRL+ALT`, so basically this is the same as above.\r\n- both of the above (e.g. `AltGr + m` or `Left Ctrl + Left Alt + m` will only do something in an appropriate keyboard layout (e.g. in German, this will result in `\u00b5`). Otherwise, nothing happens (e.g. when I switch to an English keyboard layout).\r\n\r\nSince the `Alt` or `Ctrl` code path together with e.g. arrow keys is unchanged\r\n```python\r\n            elif key == \"\\x00\":\r\n                # Handle special keys like arrow keys and translate them into the appropriate command\r\n                key = VK_MAP.get(key_event.wVirtualKeyCode)\r\n``` \r\n(admittetly except for the `raw_key` change which doesn't change the behaviour for me), all those should remain working (and do for me).\r\n\r\nWhat happens if you omit my fix?\r\n\r\nMaybe other Windows users can test, too, so we have better coverage, in case this depends on more things we do not yet know."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-04-20T17:33:58Z",
+   "body": "Maybe I misinformed you.\r\nWith DEU German (Germany) layout in cmd with vt=False I have:\r\n1. main branch - if I input altgr+8 or altgr+9 or altgr+m - nothing happens\r\n2. your branch - if I input as above - `[`, `]`, `\u00b5` inserted.\r\n\r\nWith DEU German (Germany) layout in ps with vt=True I have:\r\n2. main and your branch - if I input as above - `[`, `]` inserted, and for altgr+m I switched to unknown (for me) mode when nothing typed if I press any key, if I press `Esc` I got error as in https://github.com/python/cpython/pull/131901\r\n\r\nI hope this is helps you. Let me know if you need to test something else."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-20T18:35:58Z",
+   "body": "Oh, that helps a lot - because you can reproduce my fix in legacy terminals.\r\n\r\nAs said, my PR cannot help with VT mode quirks (and is not intended to fix it), that's why we need your https://github.com/python/cpython/pull/131901 - which looks promising, too, but we shouldn't mix them."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-05-05T16:45:48Z",
+   "body": "Thanks @chris-eibl for the PR, and @ambv for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-05-05T16:45:51Z",
+   "body": "Sorry, @chris-eibl and @ambv, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 07f416a3f063db6b91b8b99ff61a51b64b0503f1 3.13\n```\n"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-05-05T17:12:53Z",
+   "body": "Will repeat here too - problem with backport because VT support was not backported https://github.com/python/cpython/pull/130805#issuecomment-2712877535 (for completeness)"
+  },
+  {
+   "author": "ambv",
+   "created_at": "2025-05-05T17:32:09Z",
+   "body": "Yeah, I am backporting the VT support too because it's the only way we can have a sensibly similar codebase for bug fixes."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-05-05T17:46:04Z",
+   "body": "[GH-133460](https://github.com/python/cpython/pull/133460) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132439",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132871",
+   "commit": null,
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130328",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132884",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "07f416a3f063db6b91b8b99ff61a51b64b0503f1",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "366254058d755aab8947fad36c38a0c43fd5c377",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e4d68488bc489178cf0b51862eea5f819df2dd63",
+   "actor": "ambv"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/135105",
+   "commit": null,
+   "actor": "eendebakpt"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bace14d6f405e0e0bfedbd585e0d380b5b837b73",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145886",
+   "commit": null,
+   "actor": "chris-eibl"
+  }
+ ],
+ "fetch_errors": null
+}

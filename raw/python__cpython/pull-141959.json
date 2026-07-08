@@ -1,0 +1,72 @@
+{
+ "repo": "python/cpython",
+ "number": 141959,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/141959",
+ "title": "GH-141861: Fix TRACE_RECORD if full",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sergey-miryanov",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2025-11-25T19:27:51Z",
+ "closed_at": "2025-11-26T14:32:30Z",
+ "body": "Not sure about adding news entry. Will skip it now.\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-141861 -->\n* Issue: gh-141861\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-11-25T19:28:19Z",
+   "body": "@markshannon @Fidget-Spinner Could you please take a look?"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-11-25T19:42:17Z",
+   "body": "Failed as in https://github.com/python/cpython/issues/141956.\r\nSo not sure that the failed test is related to the PR."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-11-25T20:03:14Z",
+   "body": "It seems related. Looking into it."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-11-25T20:10:04Z",
+   "body": "Here https://github.com/python/cpython/pull/140310/files condition in the `test_jit_is_active` was changed from `expected = {enabled} and i == _testinternalcapi.TIER2_THRESHOLD` to `expected = {enabled} and i >= _testinternalcapi.TIER2_THRESHOLD + 1`\r\n\r\nIIUC, `TIER2_THRESHOLD` already contains a `+1` for tracing iteration. So if `i` reach `TIER2_THRESHOLD` then jit is enabled."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/141861",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "2ea67caf31453c1755bb5a5c21c5e9477d085deb",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c1071ceb64ef5ff8013c31e745b37b33ca6b3f7f",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "59d452a178118ac9a056cbf9304df18108b511c4",
+   "actor": "ashm-dev"
+  }
+ ],
+ "fetch_errors": null
+}

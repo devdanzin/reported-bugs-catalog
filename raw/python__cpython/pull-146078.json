@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 146078,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146078",
+ "title": "gh-146075: Prevent crash in `functools.partial()` from malformed `str` subclass",
+ "state": "closed",
+ "state_reason": null,
+ "author": "brijkapadia",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-03-17T19:25:53Z",
+ "closed_at": "2026-03-18T12:46:02Z",
+ "body": "In `partial_vectorcall`, an error returned by `PyDict_Contains` was considered to be a truthy value. Now, the error is handled appropriately.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146075 -->\n* Issue: gh-146075\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146075",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "64862112b7beb005523e7bca15c59c78c5319e58",
+   "actor": "encukou"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "encukou"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "19261ad013b0547980e6349929d7de1dcced72c9",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

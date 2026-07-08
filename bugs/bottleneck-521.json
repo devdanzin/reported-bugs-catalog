@@ -6,31 +6,28 @@
  "target_repo": "pydata/bottleneck",
  "is_umbrella": false,
  "issues": [
-  "pydata/bottleneck#521",
-  "pydata/bottleneck#528"
+  "pydata/bottleneck#521"
  ],
  "prs": [
-  "pydata/bottleneck#534",
-  "pydata/bottleneck#545"
+  "pydata/bottleneck#534"
  ],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
  "gists": [],
- "labels": [
-  "bug"
- ],
+ "labels": [],
  "filed_by": "self+maintainer",
  "filers": [
   "neutrinoceros"
  ],
- "status": "open",
+ "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/pydata__bottleneck/issue-521.json",
-  "raw/pydata__bottleneck/issue-528.json",
-  "raw/pydata__bottleneck/pull-534.json",
-  "raw/pydata__bottleneck/pull-545.json"
+  "raw/pydata__bottleneck/pull-534.json"
  ],
- "n_artifacts": 4
+ "n_artifacts": 2
 }

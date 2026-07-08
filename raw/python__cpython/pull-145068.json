@@ -1,0 +1,57 @@
+{
+ "repo": "python/cpython",
+ "number": 145068,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145068",
+ "title": "gh-145058: Add input validation to `_PyImport_LazyImportModuleLevelObject`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "StanFromIreland",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-lazy-imports"
+ ],
+ "created_at": "2026-02-21T09:49:53Z",
+ "closed_at": "2026-02-21T12:52:41Z",
+ "body": "This copies the checks from `PyImport_ImportModuleLevelObject` to `_PyImport_LazyImportModuleLevelObject`.\n\n<!-- gh-issue-number: gh-145058 -->\n* Issue: gh-145058\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "pablogsal",
+   "created_at": "2026-02-21T12:53:02Z",
+   "body": "Thanks a lot @StanFromIreland! \ud83d\ude80"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145058",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e1bd0cd37b1816092761e5ad5f2d0464c0e78fbb",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5fb3e72ed03f8be76120adbdfc9cdbfa7c4afcfa",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "98fcb72f0c4b5586b85d2c3e72159c72e6f5c116",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

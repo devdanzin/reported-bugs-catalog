@@ -1,0 +1,132 @@
+{
+ "repo": "python/cpython",
+ "number": 146584,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146584",
+ "title": "gh-148105: _pyrepl: switch console refresh to structured rendered screens",
+ "state": "closed",
+ "state_reason": null,
+ "author": "pablogsal",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-28T20:25:24Z",
+ "closed_at": "2026-04-08T22:42:26Z",
+ "body": "\n\n<!-- gh-issue-number: gh-148105 -->\n* Issue: gh-148105\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "pablogsal",
+   "created_at": "2026-03-31T18:40:40Z",
+   "body": "Crap I activated this copilot nonsense by mistake ..."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2026-04-07T19:46:21Z",
+   "body": "Great work - Thanks!\r\n\r\nWasn't able to do a detailed review, yet, but played a little bit with it.\r\n\r\nWhen pasting on Windows, the lines are postfixed with `^M` for me.\r\nExample:\r\n```\r\nclass foo:\r\n    pass\r\n```\r\n\r\nPasting result using Windows terminal\r\n```\r\n>>> class foo:^M\r\n...     pass^M\r\n...\r\n```\r\n\r\nHappens also using the legacy console in paste mode.\r\n"
+  },
+  {
+   "author": "johnslavik",
+   "created_at": "2026-04-07T20:39:11Z",
+   "body": "I'll check the Windows issue. Filed https://github.com/pablogsal/cpython/pull/123 for more docs, lmk if you'd like this!"
+  },
+  {
+   "author": "johnslavik",
+   "created_at": "2026-04-07T23:55:29Z",
+   "body": "On Windows I found a problem with history paging exit:\r\nhttps://github.com/user-attachments/assets/5d0960dc-c2ff-4f30-9f64-063aa908df88\r\n\r\n~~Clearing seems to be a fix on Windows, not sure it makes sense on Unix yet.~~ NVM, this breaks Unix.\r\n\r\n<details>\r\n\r\n<summary>Patch</summary>\r\n\r\n```\r\ndiff --git a/Lib/_pyrepl/commands.py b/Lib/_pyrepl/commands.py\r\nindex 90bafa288c0..744a1be71f6 100644\r\n--- a/Lib/_pyrepl/commands.py\r\n+++ b/Lib/_pyrepl/commands.py\r\n@@ -493,9 +493,10 @@ def do(self) -> None:\r\n \r\n         # We need to copy over the state so that it's consistent between\r\n         # console and reader, and console does not overwrite/append stuff\r\n+        self.reader.invalidate_prompt()\r\n         trace(\"command.show_history sync_rendered_screen\")\r\n         self.reader.console.sync_rendered_screen(\r\n-            self.reader.rendered_screen,\r\n+            RenderedScreen.empty(),\r\n             self.reader.cxy,\r\n         )\r\n```\r\n\r\n</details>\r\n\r\n"
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2026-04-08T11:00:39Z",
+   "body": "i pt a short commit with fixes. I think this should fix both Windows issues:\r\n\r\n* Paste `^M`: `ch += \"\\n\"` \u2192 `ch = \"\\n\"` to replace `\\r` instead of concatenating. Thanks @johnslavik and @chris-eibl.\r\n\r\n* I replaced `sync_rendered_screen(old_state)` with `console.clear()` + `invalidate_full()`. Uses `clear()` instead of syncing with empty screen to avoid the `grow_lines` issue on Unix that @johnslavik found.\r\n\r\n\r\nCon you pls check this fixed the issue?"
+  },
+  {
+   "author": "johnslavik",
+   "created_at": "2026-04-08T11:20:28Z",
+   "body": "Great! CRLF fixed.\r\n\r\n<details>\r\n\r\n<summary>To fix later</summary>\r\n\r\nDo we want to make sure leading lines stay rendered in history search mode?\r\nSame for paste mode\r\n\r\nhttps://github.com/user-attachments/assets/636d94f1-3438-4261-949d-64eb0ef0f976\r\n\r\nI think in `get_prompt` we'd have to examine `ps1` again for leading lines?\r\nHmm, maybe this can be fixed later, I think it might be out of scope\r\n\r\n</details>"
+  },
+  {
+   "author": "johnslavik",
+   "created_at": "2026-04-08T12:51:49Z",
+   "body": "> * I replaced `sync_rendered_screen(old_state)` with `console.clear()` + `invalidate_full()`. Uses `clear()` instead of syncing with empty screen to avoid the `grow_lines` issue on Unix that @johnslavik found.\r\n\r\nI tested it on Windows and ran into some other, new issues (discussed privately), I gave it a shot and history mode exiting should be fully fixed by https://github.com/pablogsal/cpython/pull/124."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2026-04-08T16:52:37Z",
+   "body": "> Great! CRLF fixed.\r\n\r\nYupp, works for me, too \ud83d\udc4d "
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2026-04-08T22:43:04Z",
+   "body": "Thanks a lot everyone for the help and the reviews. You rock \ud83e\udd18"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2026-05-03T02:30:57Z",
+   "body": "Hi @pablogsal , in this PR, the old logic of `_pyrepl.util.disp_str` has changed so `\\n` is not kept as it is anymore. It is now converted to `^J`. It might be an implementation detail of `_pyrepl`, but `pdb` is using this method to display code. Now the code looks like\r\n\r\n```\r\n> /home/gaogaotiantian/programs/mycpython/example.py(1)<module>()\r\n-> x = 1\r\n(Pdb) ll\r\n  1  -> x = 1^J\r\n  2     breakpoint()^J\r\n(Pdb) \r\n```\r\n\r\nIs it intentional that `disp_str` now displays `\\n` as `^J`? If so, what mitigation I should use on pdb side to make it work? I can of course strip the trailing `\\n` before passing it to `disp_str`, that's okay if that's the easiest way to make it work. Just wondering if there are more official ways to fix it."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148105",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148191",
+   "commit": null,
+   "actor": "johnslavik"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/121668",
+   "commit": null,
+   "actor": "johnslavik"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "09968dd2a9992a0171d5f4150e0a2e700d6651de",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145218",
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c424987ad18995333f4a07c724e4719501c28d28",
+   "actor": "ljfp"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145886",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/131379",
+   "commit": null,
+   "actor": "eendebakpt"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "913410635038dfed43d141e70cb2d1f138f30dbd",
+   "actor": "tanloong"
+  }
+ ],
+ "fetch_errors": null
+}

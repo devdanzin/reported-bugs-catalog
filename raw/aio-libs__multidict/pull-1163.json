@@ -1,0 +1,50 @@
+{
+ "repo": "aio-libs/multidict",
+ "number": 1163,
+ "type": "pull",
+ "url": "https://github.com/aio-libs/multidict/pull/1163",
+ "title": "Fix segfault creating view objects",
+ "state": "closed",
+ "state_reason": null,
+ "author": "bdraco",
+ "author_association": "MEMBER",
+ "labels": [
+  "bot:chronographer:provided"
+ ],
+ "created_at": "2025-05-16T20:07:33Z",
+ "closed_at": "2025-05-19T13:07:47Z",
+ "body": "fixes #1161",
+ "comments": [
+  {
+   "author": "codspeed-hq[bot]",
+   "created_at": "2025-05-16T20:16:25Z",
+   "body": "<!-- __CODSPEED_PERFORMANCE_REPORT_COMMENT__ -->\n<!-- __CODSPEED_INSTRUMENTATION_PERFORMANCE_REPORT_COMMENT__ -->\n\n## [CodSpeed Performance Report](https://codspeed.io/aio-libs/multidict/branches/segfault_protected_view_objects)\n\n### Merging #1163 will **not alter performance**\n\n<sub>Comparing <code>segfault_protected_view_objects</code> (01ef6ab) with <code>master</code> (fea968f)</sub>\n\n\n\n### Summary\n\n`\u2705 244` untouched benchmarks  \n\n\n\n"
+  },
+  {
+   "author": "codecov[bot]",
+   "created_at": "2025-05-16T20:25:39Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/aio-libs/multidict/pull/1163?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) Report\n:white_check_mark: All modified and coverable lines are covered by tests.\n:white_check_mark: Project coverage is 98.62%. Comparing base ([`fea968f`](https://app.codecov.io/gh/aio-libs/multidict/commit/fea968f9475bc5b1fb0603a838104baf992cf1d9?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs)) to head ([`01ef6ab`](https://app.codecov.io/gh/aio-libs/multidict/commit/01ef6ab2fb405e7ce03d917672e001626c2711d2?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs)).\n:warning: Report is 72 commits behind head on master.\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@           Coverage Diff           @@\n##           master    #1163   +/-   ##\n=======================================\n  Coverage   98.62%   98.62%           \n=======================================\n  Files          27       27           \n  Lines        3558     3566    +8     \n  Branches      561      561           \n=======================================\n+ Hits         3509     3517    +8     \n  Misses         17       17           \n  Partials       32       32           \n```\n\n| [Flag](https://app.codecov.io/gh/aio-libs/multidict/pull/1163/flags?src=pr&el=flags&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | Coverage \u0394 | |\n|---|---|---|\n| [CI-GHA](https://app.codecov.io/gh/aio-libs/multidict/pull/1163/flags?src=pr&el=flag&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | `98.62% <100.00%> (+<0.01%)` | :arrow_up: |\n| [MyPy](https://app.codecov.io/gh/aio-libs/multidict/pull/1163/flags?src=pr&el=flag&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | `83.18% <62.50%> (-0.05%)` | :arrow_down: |\n| [pytest](https://app.codecov.io/gh/aio-libs/multidict/pull/1163/flags?src=pr&el=flag&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs) | `100.00% <100.00%> (\u00f8)` | |\n\nFlags with carried forward coverage won't be shown. [Click here](https://docs.codecov.io/docs/carryforward-flags?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs#carryforward-flags-in-the-pull-request-comment) to find out more.\n</details>\n\n[:umbrella: View full report in Codecov by Sentry](https://app.codecov.io/gh/aio-libs/multidict/pull/1163?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=aio-libs).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "bdraco"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b5a24b7d0c7ae2518580edacb60c328754fadfce",
+   "actor": "bdraco"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "bdraco"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,102 @@
+{
+ "repo": "python/cpython",
+ "number": 146246,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146246",
+ "title": "gh-146244: Fix initconfig.c `SET_ITEM` macro leaks dict on expression failure",
+ "state": "closed",
+ "state_reason": null,
+ "author": "Wulian233",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-03-21T08:32:57Z",
+ "closed_at": "2026-03-25T19:09:56Z",
+ "body": "\n\n<!-- gh-issue-number: gh-146244 -->\n* Issue: gh-146244\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "Wulian233",
+   "created_at": "2026-03-24T13:09:49Z",
+   "body": "@serhiy-storchaka Could you please help review this PR? Thank you very much!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-03-25T19:10:00Z",
+   "body": "Thanks @Wulian233 for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-25T19:10:14Z",
+   "body": "[GH-146432](https://github.com/python/cpython/pull/146432) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-03-25T19:10:17Z",
+   "body": "[GH-146433](https://github.com/python/cpython/pull/146433) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146244",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9343518c6f413b2231b17c56065e5cf823aa0d2a",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "760194e50270c92f3b5afc9ef6bf9f98a1c596fa",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e71c2424f9b199be99d0bc811a417682dbd16632",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fc4b4221e5f6cf53e61ccbf716165d6192b9fd40",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4d61fd6b7a706762d962c4a23313d57167796a12",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "41d4bf95b3e434a0207f9d6e58f71cb0b81e91c8",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f3839293f2d47c696ea078008a918269ddaefb13",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,80 @@
+{
+ "repo": "python/cpython",
+ "number": 132018,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132018",
+ "title": "gh-132011: Fix crash on invalid `CALL_LIST_APPEND` deoptimization",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-04-02T14:48:34Z",
+ "closed_at": "2025-04-06T16:10:40Z",
+ "body": "Looks similar to https://github.com/python/cpython/pull/132000\n\n<!-- gh-issue-number: gh-132011 -->\n* Issue: gh-132011\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-03T07:15:26Z",
+   "body": "(not merging, because I am waiting for @markshannon's review as code owner)"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-06T12:51:10Z",
+   "body": "Going to merge soon, since I don't want to create and resolve merge conflicts on generated files."
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-06T13:56:02Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-06T16:11:48Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-06T16:11:51Z",
+   "body": "Sorry, @sobolevn, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker c0661df42ad20e488dbfa3e0fec22462833fc3d6 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-06T16:21:26Z",
+   "body": "[GH-132161](https://github.com/python/cpython/pull/132161) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132011",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c0661df42ad20e488dbfa3e0fec22462833fc3d6",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f8134e4191d2ef43e12279f168d0aa0f54ff09bf",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5fb9fe0e3e3f71b9a5197b19e8f6068c059d341c",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

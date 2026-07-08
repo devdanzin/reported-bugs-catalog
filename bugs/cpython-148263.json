@@ -8,11 +8,18 @@
  "issues": [
   "python/cpython#148263"
  ],
- "prs": [],
+ "prs": [
+  "python/cpython#148308",
+  "python/cpython#148486"
+ ],
+ "n_prs": 2,
+ "n_backports": 0,
+ "n_fix_prs": 2,
  "gists": [
   "f7d0c7694b2be2345f4cf85f4eedc3ee"
  ],
  "labels": [
+  "awaiting review",
   "interpreter-core",
   "type-bug"
  ],
@@ -26,7 +33,9 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-148263.json"
+  "raw/python__cpython/issue-148263.json",
+  "raw/python__cpython/pull-148308.json",
+  "raw/python__cpython/pull-148486.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

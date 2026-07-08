@@ -8,21 +8,33 @@
  "issues": [
   "numpy/numpy#28791"
  ],
- "prs": [],
+ "prs": [
+  "numpy/numpy#28804",
+  "numpy/numpy#28852"
+ ],
+ "n_prs": 2,
+ "n_backports": 0,
+ "n_fix_prs": 2,
  "gists": [],
  "labels": [
   "00 - Bug",
+  "08 - Backport",
   "component: numpy.strings"
  ],
- "filed_by": "self",
- "filers": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "charris",
+  "ngoldbaum"
+ ],
  "status": "closed/fixed",
  "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/numpy__numpy/issue-28791.json"
+  "raw/numpy__numpy/issue-28791.json",
+  "raw/numpy__numpy/pull-28804.json",
+  "raw/numpy__numpy/pull-28852.json"
  ],
- "n_artifacts": 1
+ "n_artifacts": 3
 }

@@ -1,0 +1,103 @@
+{
+ "repo": "python/cpython",
+ "number": 127935,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/127935",
+ "title": "gh-126907: Use a list for `atexit` callbacks",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ZeroIntensity",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2024-12-14T03:35:38Z",
+ "closed_at": "2024-12-16T19:31:44Z",
+ "body": "cc @colesbury, @vstinner, @kumaraditya303\r\n\r\nThis is an alternative to gh-126908, and I'm a lot happier with this. Sam's suggestion of using a list turned out to be pretty nice, with the exception of `unregister` being a little wonky. I suspect we could improve that a little by adding a private API for removing from a list more cleanly, but that's work for later. FWIW, both this PR and the other one will have trouble backporting due to the runtime structure changing size.\n\n<!-- gh-issue-number: gh-126907 -->\n* Issue: gh-126907\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-17T08:06:45Z",
+   "body": "Congrats @ZeroIntensity for this nice fix!"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-16T15:35:28Z",
+   "body": "Should this be backported or is it not worth it?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-07-16T19:24:09Z",
+   "body": "To 3.13? I don't think it's worth risking breakage. "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126907",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3b766824fe59030100964752be0556084d4461af",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126908",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "559e0a19d4ce3df955c748a0ea71c5173764a1b3",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "454d143e1324680a121f8004b217471552973818",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "458bf0fe2960332033327c9865f39c8a9a37282d",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/sagemath/sage/pull/41021",
+   "commit": null,
+   "actor": "cxzhong"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/sagemath/sage/issues/40890",
+   "commit": null,
+   "actor": "cxzhong"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c162d5192e317fbbbc06eb8b1bd6b8c545c7cf5e",
+   "actor": "vbraun"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "484598922634fe5fe4793d19e6f87413556ce1ea",
+   "actor": "vbraun"
+  }
+ ],
+ "fetch_errors": null
+}

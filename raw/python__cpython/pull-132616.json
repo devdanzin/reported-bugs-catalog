@@ -1,0 +1,199 @@
+{
+ "repo": "python/cpython",
+ "number": 132616,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132616",
+ "title": "gh-132551: make BytesIO object free-thread safe",
+ "state": "closed",
+ "state_reason": null,
+ "author": "tom-pytel",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "topic-free-threading"
+ ],
+ "created_at": "2025-04-16T21:02:34Z",
+ "closed_at": "2025-05-08T18:51:36Z",
+ "body": "Full `pyperformance` suite times (can anyone can suggest better benchmark for `BytesIO`?):\r\n```\r\n             time diff\r\n         mean    stdev\r\nGIL    -0.01% +- 2.31%\r\nnoGIL  +0.22% +- 2.93%\r\n```\r\n\r\nChanges, `*` functions had critical section added, `-` not. Atomics were added for `exports` field:\r\n\r\n```\r\nstatic PyGetSetDef bytesio_getsetlist[] = {\r\n*   {\"closed\",  bytesio_get_closed, NULL,    // @critical_section to avoid make `buf` atomic many places\r\n\r\nstatic struct PyMethodDef bytesio_methods[] = {\r\n-   _IO_BYTESIO_READABLE_METHODDEF\r\n-   _IO_BYTESIO_SEEKABLE_METHODDEF\r\n-   _IO_BYTESIO_WRITABLE_METHODDEF\r\n*   _IO_BYTESIO_CLOSE_METHODDEF\r\n-   _IO_BYTESIO_FLUSH_METHODDEF\r\n-   _IO_BYTESIO_ISATTY_METHODDEF\r\n*   _IO_BYTESIO_TELL_METHODDEF      // @critical_section to avoid make `pos` atomic many places\r\n*   _IO_BYTESIO_WRITE_METHODDEF\r\n*   _IO_BYTESIO_WRITELINES_METHODDEF\r\n*   _IO_BYTESIO_READ1_METHODDEF\r\n*   _IO_BYTESIO_READINTO_METHODDEF\r\n*   _IO_BYTESIO_READLINE_METHODDEF\r\n*   _IO_BYTESIO_READLINES_METHODDEF\r\n*   _IO_BYTESIO_READ_METHODDEF\r\n*   _IO_BYTESIO_GETBUFFER_METHODDEF\r\n*   _IO_BYTESIO_GETVALUE_METHODDEF\r\n*   _IO_BYTESIO_SEEK_METHODDEF      // @critical_section to avoid make `pos` atomic many places\r\n*   _IO_BYTESIO_TRUNCATE_METHODDEF\r\n\r\n*   {\"__getstate__\", bytesio_getstate,  METH_NOARGS, NULL},\r\n*   {\"__setstate__\", bytesio_setstate,  METH_O, NULL},\r\n*   {\"__sizeof__\",   bytesio_sizeof,     METH_NOARGS, NULL},\r\n\r\nstatic PyType_Slot bytesio_slots[] = {\r\n-   {Py_tp_dealloc,   bytesio_dealloc},\r\n-   {Py_tp_traverse,  bytesio_traverse},\r\n-   {Py_tp_clear,     bytesio_clear},\r\n-   {Py_tp_iter,      PyObject_SelfIter},\r\n*   {Py_tp_iternext,  bytesio_iternext},\r\n*   {Py_tp_init,      _io_BytesIO___init__},\r\n-   {Py_tp_new,       bytesio_new},\r\n\r\nstatic PyType_Slot bytesiobuf_slots[] = {\r\n-   {Py_tp_dealloc, bytesiobuf_dealloc},\r\n-   {Py_tp_traverse, bytesiobuf_traverse},\r\n-   {Py_bf_getbuffer, bytesiobuf_getbuffer},\r\n-   {Py_bf_releasebuffer, bytesiobuf_releasebuffer},\r\n```\r\n\r\nNotes:\r\n* Opted for critical sections in three functions instead of making `buf` and or `pos` atomic everywhere.\r\n* New test `test_free_threading.test_io.TestBytesIO` clean under `--parallel-threads` TSAN.\r\n* `bytesiobuf_getbuffer` doesn't need critical sections because as far as I see its only used for `BytesIO` in `bytesio.c` where its use is protected by a critical section in `_io_BytesIO_getbuffer_impl` (its also used for a random non-`BytesIO`-related test in `_testcapimodule.c`).\r\n\n\n<!-- gh-issue-number: gh-132551 -->\n* Issue: gh-132551\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-04-16T21:32:38Z",
+   "body": "Ping @ZeroIntensity, @serhiy-storchaka"
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-04-16T21:59:52Z",
+   "body": "> For example, I could see someone using a logger that writes to an IO-like object from multiple threads. If they wanted to log to a `BytesIO` buffer (_e.g._, for temporarily suppressing the output), then that would scale pretty terribly with critical sections. I'm speculating, though.\r\n\r\nWell, that's why I asked about a specific better benchmark to test with because `pyperformance` is not specific enough to this to show a perf hit. But as for the case you mention, if someone is writing the `BytesIO` object from multiple threads then performance is not really an issue as they will eventually segfault.\r\n\r\n```\r\n$ ./python ../t.py \r\n1\r\n2\r\nSegmentation fault (core dumped)\r\n```\r\n`t.py`:\r\n```py\r\nfrom io import BytesIO\r\nfrom random import randint\r\nimport threading\r\n\r\n\r\ndef write(barrier, b):\r\n    barrier.wait()\r\n    b.write(b'0' * randint(100, 1000))\r\n\r\n\r\ndef check(funcs, *args):\r\n    barrier = threading.Barrier(len(funcs))\r\n    thrds = []\r\n\r\n    for func in funcs:\r\n        thrd = threading.Thread(target=func, args=(barrier, *args))\r\n\r\n        thrds.append(thrd)\r\n        thrd.start()\r\n\r\n    for thrd in thrds:\r\n        thrd.join()\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    count = 0\r\n\r\n    while True:\r\n        print(count := count + 1)\r\n\r\n        check([write] * 10, BytesIO())\r\n```\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-16T22:03:43Z",
+   "body": "Well, yeah, we need to fix the races. I'm just wondering *how* we should fix it. Would you mind benchmarking (with this PR) the case I brought up against different numbers of threads? I want to see how bad the contention gets (and compare it to a GILful build as well)."
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-04-16T22:07:24Z",
+   "body": "> Well, yeah, we need to fix the races. I'm just wondering _how_ we should fix it. Would you mind benchmarking (with this PR) the case I brought up against different numbers of threads? I want to see how bad the contention gets (and compare it to a GILful build as well).\r\n\r\nOk, will do a bunch of tests tomorrow."
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-04-17T13:25:16Z",
+   "body": "EDIT: I just realized with a good bit of rewriting lock-free reads might be possible. EDIT2: Nope, see below.\r\n\r\nTL;DR: GIL build performance is same as expected while noGIL makes multithread writes possible and otherwise seems ok.\r\n\r\nDetail: noGIL PR has a minor hit to single-threaded read and a smaller hit to single-threaded write (cmdline timeit). Multithreaded timings are unstable (especially write, run the script and u will get 2x variation for that), but read looks slower than main while write is much faster than main with explicit locking (which is the only thing to compare it to as otherwise writes crash).\r\n\r\n```\r\n./python -m timeit -s \"from io import BytesIO; b = BytesIO((b'.'*99+b'\\n')*50_000)\" \"while b.read(100): pass\"\r\n./python -m timeit -s \"from io import BytesIO; b = BytesIO((b'.'*99+b'\\n')*50_000)\" \"while b.readline(): pass\"\r\n./python -m timeit -s \"from io import BytesIO; b = BytesIO(); l = b'.'*99+b'\\n'\" \"for _ in range(50_000): b.write(l)\"\r\n```\r\n\r\nTimes in ns, lower is better.\r\n\r\n```\r\nSINGLE MAIN THREAD '-m timeit' cmdline (above):  (per loop, read/readline = 20000000 loops, write = 100 loops)\r\n=====================================\r\n             read  readline     write\r\nGIL main     18.3      14.4      2580\r\nGIL PR       18.2      14.2      2590\r\nnoGIL main   18.8      14.7      3710\r\nnoGIL PR     20.3      16.1      3860\r\n\r\n\r\nMULTITHREADING benchmark script (below):\r\n========================================\r\n\r\nread:\r\n-----\r\ncfg / #thrds     1      2      3      4      5\r\nGIL main      24.4   23.6   23.8   23.7   23.7\r\nGIL PR        23.4   23.7   24.1   23.5   24.8\r\nnoGIL main    27.4   44.0   64.8    124    116\r\nnoGIL PR      28.6   57.6   90.5    129    163\r\n\r\nreadline:\r\n---------\r\ncfg / #thrds     1      2      3      4      5\r\nGIL main      22.4   22.3   22.8   22.2   23.7\r\nGIL PR        22.0   22.2   22.7   21.9   25.0\r\nnoGIL main    25.4   46.2   85.8    198    261\r\nnoGIL PR      26.1   54.7   82.8    114    152\r\n\r\nwrite:  (* = with threading.Lock for 'noGIL main', otherwise crash)\r\n------\r\ncfg / #thrds     1      2      3      4      5\r\nGIL main      22.6   22.2   24.6   22.4   23.0\r\nGIL PR        22.1   23.2   22.4   23.0   23.4\r\nnoGIL main    42.2    286*   571*   805*  1077*\r\nnoGIL PR      39.7    123    287    535    677\r\n\r\nwrite:  (different script (not below) to double check unstable timings, total time)\r\n------\r\ncfg / #thrds         1          2          3          4          5\r\nGIL main       1171556    2474471    3664172    4817181    6343492\r\nGIL PR         1195404    2442720    3698038    4949697    6276943\r\nnoGIL main     5997412   22573890*  27660777*  43626582*  61317669*\r\nnoGIL PR       2332928    6786042   19316932   38951468   31712621\r\n```\r\n\r\nPing @ZeroIntensity, timings as you requested.\r\n\r\n```py\r\nimport sys\r\nfrom io import BytesIO\r\nfrom threading import Barrier, Lock, Thread\r\nfrom time import time_ns\r\n\r\nBESTOF = 5\r\nNLINES = 50_000\r\nLINE   = b'.'*99 + b'\\n'\r\nLLEN   = len(LINE)\r\nLOCK   = Lock()\r\n\r\n\r\ndef read(barrier, out, b):\r\n    barrier.wait()\r\n    t0 = time_ns()\r\n    while b.read(LLEN): pass\r\n    out[0] = time_ns() - t0\r\n\r\ndef readline(barrier, out, b):\r\n    barrier.wait()\r\n    t0 = time_ns()\r\n    while b.readline(): pass\r\n    out[0] = time_ns() - t0\r\n\r\ndef write_locked(barrier, out, b):\r\n    barrier.wait()\r\n    t0 = time_ns()\r\n    for _ in range(NLINES):\r\n        with LOCK:\r\n            b.write(LINE)\r\n    out[0] = time_ns() - t0\r\n\r\ndef write(barrier, out, b):\r\n    barrier.wait()\r\n    t0 = time_ns()\r\n    for _ in range(NLINES):\r\n        b.write(LINE)\r\n    out[0] = time_ns() - t0\r\n\r\n\r\ndef check(func, nthrds, b, is_wr):  # is_wr compensates for write total size *= nthrds while read total size is fixed\r\n    barrier = Barrier(nthrds)\r\n    outs = []\r\n    thrds = []\r\n\r\n    for _ in range(nthrds):\r\n        out = [0]\r\n        thrd = Thread(target=func, args=(barrier, out, b))\r\n\r\n        outs.append(out)\r\n        thrds.append(thrd)\r\n        thrd.start()\r\n\r\n    for thrd in thrds:\r\n        thrd.join()\r\n\r\n    return sum(o[0] for o in outs) / ((nthrds if is_wr else 1) * NLINES)\r\n\r\ndef checkbest(func, nthrds, setup, is_wr):\r\n    best = float('inf')\r\n\r\n    for _ in range(BESTOF):\r\n        best = min(best, check(func, nthrds, setup(), is_wr))\r\n\r\n    return best\r\n\r\nif __name__ == \"__main__\":\r\n    nthrds = int((sys.argv + ['1'])[1])\r\n\r\n    print(f'read:         ', checkbest(read, nthrds, lambda: BytesIO(LINE * NLINES), False), 'ns')\r\n    print(f'readline:     ', checkbest(readline, nthrds, lambda: BytesIO(LINE * NLINES), False), 'ns')\r\n    print(f'write_locked: ', checkbest(write_locked, nthrds, lambda: BytesIO(), True), 'ns')\r\n    print(f'write:        ', checkbest(write, nthrds, lambda: BytesIO(), True), 'ns')\r\n```\r\n"
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-04-17T14:06:54Z",
+   "body": "> Many functions are just wrapped in critical section. I wonder, what if add special flag, METH_FT_SYNC, and when it set, wrap the method calling code in critical section?\r\n\r\nIf you're talking about stuff like `bytesio_sizeof`, I could have just handed that over to argument clinic to wrap but I guess I was being lazy. Argument clinic works well enough for the critical section wrapping I think."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2025-04-17T14:18:40Z",
+   "body": "I mean that this would work also for methods that do not use Argument Clinic. Was this idea discussed before?"
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-04-17T14:27:36Z",
+   "body": "> I mean that this would work also for methods that do not use Argument Clinic. Was this idea discussed before?\r\n\r\nCouldn't tell you that, I'm relatively new here (: But one drawback I can see would be that it would only work when calling via py mechanism, if u called directly from C you would still have to do the critical section on your own as opposed to a clinic-generated function which would have it, no?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-17T14:29:21Z",
+   "body": "> I mean that this would work also for methods that do not use Argument Clinic. Was this idea discussed before?\r\n\r\nYeah, I've suggested it in the past. Apparently, it's been tried and failed before. I don't know much of the details."
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-04-17T14:51:35Z",
+   "body": "Ok, had a look and lock-free reads can almost certainly be done but they would not have the data integrity guarantees you would want from a file-like object without sync. They would work in the same way lock-free multithreaded iteration works, could get dup data and might not sync position correctly wrt writes, which is not what you expect from a \"file\". So scratch that idea."
+  },
+  {
+   "author": "ngoldbaum",
+   "created_at": "2025-07-24T14:02:43Z",
+   "body": "Just to clarify - this didn't make it into 3.14, right?"
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-07-24T14:06:58Z",
+   "body": "> Just to clarify - this didn't make it into 3.14, right?\r\n\r\nLooking at the code I don't see it, so no."
+  },
+  {
+   "author": "ngoldbaum",
+   "created_at": "2025-07-24T14:14:01Z",
+   "body": "OK - I think we'll make it so pytest-run-parallel marks tests that use `BytesIO` on 3.13 and 3.14 as thread-unsafe: https://github.com/Quansight-Labs/pytest-run-parallel/issues/100 \r\n\r\nI happened to hit the issues fixed by this PR running the tests for `python-isal` under `pytest-run-parallel`."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-09-02T20:17:58Z",
+   "body": "@kumaraditya303 should this be backported?"
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-09-03T16:19:30Z",
+   "body": "> should this be backported?\r\n\r\nI didn't backport this as the change is large and it only crashes when multiple threads modify it concurrently which shouldn't be done."
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-09-05T16:09:33Z",
+   "body": "> > should this be backported?\r\n> \r\n> I didn't backport this as the change is large and it only crashes when multiple threads modify it concurrently which shouldn't be done.\r\n\r\nIt was at the end of the 3.14 cycle so a backport shouldn't be very painful, if you want I could have a look."
+  },
+  {
+   "author": "ngoldbaum",
+   "created_at": "2025-09-05T16:16:22Z",
+   "body": "> It was at the end of the 3.14 cycle so a backport shouldn't be very painful, if you want I could have a look.\n\nA backport would be appreciated, I think it would help resolve this discussion and get a downstream release supporting 3.14 out: https://github.com/pycompression/python-isal/pull/233#issuecomment-3257293987\n\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-09-05T16:56:34Z",
+   "body": "Thanks @tom-pytel for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-09-05T16:56:36Z",
+   "body": "Sorry, @tom-pytel and @kumaraditya303, I could not cleanly backport this to `3.14` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 5dd3a3a58cca4798ebfc2edd673211067453e81e 3.14\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-09-05T16:59:29Z",
+   "body": "[GH-138551](https://github.com/python/cpython/pull/138551) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-09-05T17:21:20Z",
+   "body": "I created https://github.com/python/cpython/pull/138551 to backport it if it helps, although I think that the isal issue is about sharing `io.BytesIO` in a fixture across threads and that is still incorrect."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132551",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5dd3a3a58cca4798ebfc2edd673211067453e81e",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/135410",
+   "commit": null,
+   "actor": "cmaloney"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/136218",
+   "commit": null,
+   "actor": "cmaloney"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "de1947780dc9b55153e0a86eda3198c77e684573",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/137073",
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pycompression/python-isal/pull/233",
+   "commit": null,
+   "actor": "ngoldbaum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e0543b86bbef931bcbd57f143a1f08169f1d81f4",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/138359",
+   "commit": null,
+   "actor": "uhx"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5b8cff99c74fbc094b93e1a1e81cb8aa0805f7cc",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "23cc8f789d8366573cf12c4495b5a4c9afa64005",
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 146590,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/146590",
+ "title": "gh-146589: Fix raw buffer merge in UnixConsole.getpending()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "cuiweixie",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-03-29T09:01:13Z",
+ "closed_at": "2026-03-29T09:03:56Z",
+ "body": "## Summary\n\nFixes gh-146589.\n\nWhen `getpending()` merges consecutive events from the queue, `e.raw` was\nupdated with `e.raw += e.raw` instead of appending the second event's bytes.\nUse `e.raw += e2.raw`, consistent with `e.data += e2.data`.\n\n## Test plan\n\n- Exercise pyrepl on Unix with pending input coalescing (manual), or run\n  relevant `_pyrepl` tests if present.",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-29T09:03:56Z",
+   "body": "Closing because we don't have a consensus yet in the original issue https://github.com/python/cpython/issues/145886."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-29T09:04:16Z",
+   "body": "In addition, don't use AI to generate PRs or we will restrict your access should this be overused. TiA."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146589",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ],
+ "fetch_errors": null
+}

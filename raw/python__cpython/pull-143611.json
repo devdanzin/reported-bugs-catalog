@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 143611,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/143611",
+ "title": "[3.14] gh-143191: Use _PyOS_MIN_STACK_SIZE in _thread.stack_size() (GH-143601)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-01-09T15:08:49Z",
+ "closed_at": "2026-01-09T15:34:39Z",
+ "body": "The stack size must be at least _PyOS_MIN_STACK_SIZE+SYSTEM_PAGE_SIZE\nbytes.\n(cherry picked from commit ba10100c3931b18812b82d7124e2238f01927910)\n\nCo-authored-by: Victor Stinner <vstinner@python.org>\n\n<!-- gh-issue-number: gh-143191 -->\n* Issue: gh-143191\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143191",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143601",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "0e2ed4b0e1ae36bd7dbbcb210f686deffc10f14e",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

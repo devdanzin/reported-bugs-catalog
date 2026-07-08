@@ -1,0 +1,71 @@
+{
+ "repo": "python/cpython",
+ "number": 126504,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126504",
+ "title": "gh-126316: Use mutexes in the grp module",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting core review",
+  "needs backport to 3.13"
+ ],
+ "created_at": "2024-11-06T14:26:27Z",
+ "closed_at": "2024-11-21T14:48:12Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, e.g. [3.6].\r\n\r\nGH-NNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-126316 -->\n* Issue: gh-126316\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-06T14:32:40Z",
+   "body": "Actually, we'll need a separate fix for subinterpreters on 3.12, because there's no `PyMutex` there."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T14:34:29Z",
+   "body": "> Actually, we'll need a separate fix for subinterpreters on 3.12, because there's no PyMutex there.\r\n\r\nThe regular build (not Free Threaded build) is not affected by https://github.com/python/cpython/issues/126316 since function calls are serialized by the GIL."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-06T14:38:54Z",
+   "body": "Yeah, but a subinterpreter can have its own GIL, so if these functions aren't thread safe on a system level, then it won't be thread safe across multiple interpreters. I think we just need to add a `Py_mod_multiple_interpreters` module slot with `Py_MOD_MULTIPLE_INTERPRETERS_SUPPORTED`, to indicate that subinterpreters need to use a shared GIL to use the module."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T14:43:07Z",
+   "body": "> Yeah, but a subinterpreter can have its own GIL, so if these functions aren't thread safe on a system level, then it won't be thread safe across multiple interpreters.\r\n\r\nMy change only fix free-threaded build. Should I also change the regular build for this use case?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-06T14:50:35Z",
+   "body": "On second thought, I think we should address subinterpreters in another PR for backporting reasons. The fix is what I said with the module slot above."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-21T14:48:12Z",
+   "body": "https://github.com/python/cpython/pull/127055 was merged instead. I close this issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126316",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126488",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ],
+ "fetch_errors": null
+}

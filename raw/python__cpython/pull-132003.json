@@ -1,0 +1,82 @@
+{
+ "repo": "python/cpython",
+ "number": 132003,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/132003",
+ "title": "gh-132002: Fix crash of `ContextVar` on unhashable `str` subtype",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2025-04-02T08:35:45Z",
+ "closed_at": "2025-04-02T11:48:47Z",
+ "body": "\n\n<!-- gh-issue-number: gh-132002 -->\n* Issue: gh-132002\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-04-02T11:48:51Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.12, 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-02T11:49:03Z",
+   "body": "[GH-132007](https://github.com/python/cpython/pull/132007) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-04-02T11:49:07Z",
+   "body": "[GH-132008](https://github.com/python/cpython/pull/132008) is a backport of this pull request to the [3.12 branch](https://github.com/python/cpython/tree/3.12)."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-02T11:49:10Z",
+   "body": "Thanks for the quick review :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132002",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ab2a3dda1d3b6668162a847bf5b6aca2855a3416",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "27c1e4bbcde0d19ae1764c344573be0c547bf5ad",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "af141766d83a10afc6bf00c621832ac2d233f95d",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3cf1f27e94d65eba4ed300bdf5851c0326a2a44",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "57e4f0886da453ef4125a7532e2b682e00c67843",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}
