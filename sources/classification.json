@@ -8945,7 +8945,7 @@
   "tool": "cpython-review-toolkit",
   "mode": "static-analysis",
   "confidence": "high",
-  "reason": "kw:crtk",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [],
   "is_umbrella": null,
@@ -8975,7 +8975,7 @@
   "tool": "cpython-review-toolkit",
   "mode": "static-analysis",
   "confidence": "high",
-  "reason": "kw:crtk",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [],
   "is_umbrella": null,
@@ -9033,7 +9033,7 @@
   "tool": "cpython-review-toolkit",
   "mode": "static-analysis",
   "confidence": "high",
-  "reason": "kw:crtk",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [
    "50f9880636df43efd3886f6bda2077b3"
@@ -9071,7 +9071,7 @@
   "tool": "cpython-review-toolkit",
   "mode": "static-analysis",
   "confidence": "high",
-  "reason": "kw:crtk",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [
    "69aff7ff2d64ce8c7c21622f7f36e84c"
@@ -9106,7 +9106,7 @@
   "tool": "cpython-review-toolkit",
   "mode": "static-analysis",
   "confidence": "high",
-  "reason": "kw:crtk",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [],
   "is_umbrella": null,
@@ -9137,7 +9137,7 @@
   "tool": "cpython-review-toolkit",
   "mode": "static-analysis",
   "confidence": "high",
-  "reason": "kw:crtk",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [],
   "is_umbrella": null,
@@ -9174,7 +9174,7 @@
   "tool": "cpython-review-toolkit",
   "mode": "static-analysis",
   "confidence": "high",
-  "reason": "kw:crtk",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [],
   "is_umbrella": null,
@@ -9206,7 +9206,7 @@
   "tool": "cpython-review-toolkit",
   "mode": "static-analysis",
   "confidence": "high",
-  "reason": "kw:crtk",
+  "reason": "crtk-umbrella:Objects",
   "needs_review": false,
   "gists": [
    "dceaa8b70de035607d78025337af9798"
@@ -9440,6 +9440,304 @@
  },
  {
   "repo": "python/cpython",
+  "number": 146199,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146199",
+  "title": "`code_richcompare` swallows errors",
+  "state": "closed",
+  "author": "brijkapadia",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "extension-modules"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
+  "needs_review": false,
+  "gists": [
+   "d602d174ce2b8959759c94729a35c54e"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   142529,
+   146102,
+   146200
+  ],
+  "raw": "raw/python__cpython/issue-146199.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146205,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146205",
+  "title": "selectmodule.c: errno < 0 comparison is always false",
+  "state": "closed",
+  "author": "aisk",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Modules",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   142529,
+   146102,
+   146206
+  ],
+  "raw": "raw/python__cpython/issue-146205.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146244,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146244",
+  "title": "initconfig.c: `SET_ITEM` macro leaks dict on expression failure",
+  "state": "closed",
+  "author": "Wulian233",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   142529,
+   146102,
+   146246,
+   146432,
+   146433
+  ],
+  "raw": "raw/python__cpython/issue-146244.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146245,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146245",
+  "title": "socketmodule.c: Reference and buffer leaks via audit hook failures",
+  "state": "closed",
+  "author": "aisk",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "extension-modules"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Modules",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   142529,
+   146102,
+   146247,
+   146248,
+   146274,
+   146275
+  ],
+  "raw": "raw/python__cpython/issue-146245.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146250,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146250",
+  "title": "`SyntaxError.__init__` memory leak on re-initialization",
+  "state": "closed",
+  "author": "brijkapadia",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
+  "needs_review": false,
+  "gists": [
+   "1c1e9ba549c26332c387b23406c84ad5"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   142529,
+   146102,
+   146251,
+   146517,
+   146519
+  ],
+  "raw": "raw/python__cpython/issue-146250.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146355,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146355",
+  "title": "`pythonrun.c`: main_module ref leak in `_PyRun_SimpleStringFlagsWithName`",
+  "state": "closed",
+  "author": "A0su",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [
+   "86eda5ca53243ef667773991312c2e74"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   142529,
+   146102,
+   146356
+  ],
+  "raw": "raw/python__cpython/issue-146355.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146386,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146386",
+  "title": "`modsupport.c`: Missing `va_end` in `_abiinfo_raise`",
+  "state": "closed",
+  "author": "A0su",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [
+   "d1a6ab9f62970be0cae139366ce3c482"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   142529,
+   146102,
+   146387
+  ],
+  "raw": "raw/python__cpython/issue-146386.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146388,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146388",
+  "title": "`optimizer_symbols.c`: `make_bottom` NULL deref when arena full",
+  "state": "closed",
+  "author": "A0su",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core",
+   "topic-JIT"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [
+   "14a5663604e1d7fb930d121b4e0c8d25"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   142529,
+   146102,
+   146389
+  ],
+  "raw": "raw/python__cpython/issue-146388.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146427,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146427",
+  "title": "_interpqueuesmodule.c: Use-after-free from dangling items.last pointer",
+  "state": "open",
+  "author": "aisk",
+  "filed_by": "maintainer",
+  "labels": [
+   "extension-modules",
+   "type-crash",
+   "topic-subinterpreters"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Modules",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102,
+   146428
+  ],
+  "raw": "raw/python__cpython/issue-146427.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 146442,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/146442",
+  "title": "Fix various bugs in compiler pipeline from bug report",
+  "state": "closed",
+  "author": "A0su",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   1,
+   142529,
+   146102,
+   146443
+  ],
+  "raw": "raw/python__cpython/issue-146442.json"
+ },
+ {
+  "repo": "python/cpython",
   "number": 146613,
   "type": "issue",
   "url": "https://github.com/python/cpython/issues/146613",
@@ -9498,6 +9796,33 @@
    148095
   ],
   "raw": "raw/python__cpython/issue-148074.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 148119,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/148119",
+  "title": "structseq.c: NULL dereference in get_type_attr_as_size",
+  "state": "closed",
+  "author": "Wulian233",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102,
+   148120
+  ],
+  "raw": "raw/python__cpython/issue-148119.json"
  },
  {
   "repo": "python/cpython",
@@ -9661,10 +9986,10 @@
    "type-bug",
    "interpreter-core"
   ],
-  "tool": "fusil",
-  "mode": "oom",
-  "confidence": "medium",
-  "reason": "cpython+oom/gist",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
   "needs_review": false,
   "gists": [
    "60b787bfa22651ba6a18aef3b6e1439d"
@@ -9914,10 +10239,10 @@
    "type-bug",
    "interpreter-core"
   ],
-  "tool": "fusil",
-  "mode": "oom",
-  "confidence": "medium",
-  "reason": "cpython+oom/gist",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
   "needs_review": false,
   "gists": [
    "332a120e4c7750e8a7aff47419311696"
@@ -9947,10 +10272,10 @@
    "extension-modules",
    "topic-subinterpreters"
   ],
-  "tool": "fusil",
-  "mode": "oom",
-  "confidence": "medium",
-  "reason": "cpython+oom/gist",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [
    "d9975354c27e57f2589acfd0a777a2f1"
@@ -9964,6 +10289,65 @@
    152642
   ],
   "raw": "raw/python__cpython/issue-150213.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 150374,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/150374",
+  "title": "Double release of import lock in _PyImport_LoadLazyImportTstate on PySet_Add failure",
+  "state": "closed",
+  "author": "lpyu001",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [
+   "432d9af1a8833bef53bc9ae342310622"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102,
+   150376,
+   150378
+  ],
+  "raw": "raw/python__cpython/issue-150374.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 150454,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/150454",
+  "title": "import_run_extension() can return on the wrong interpreter after _PyUnicode_Copy() failure",
+  "state": "closed",
+  "author": "lpyu001",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core",
+   "topic-importlib"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [
+   "432d9af1a8833bef53bc9ae342310622"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102,
+   150455
+  ],
+  "raw": "raw/python__cpython/issue-150454.json"
  },
  {
   "repo": "python/cpython",
@@ -10012,10 +10396,10 @@
    "type-crash",
    "topic-lazy-imports"
   ],
-  "tool": "fusil",
-  "mode": "oom",
-  "confidence": "medium",
-  "reason": "cpython+oom/gist",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
   "needs_review": false,
   "gists": [
    "cc84f43d7a5c774b47551060c061391f"
@@ -10028,6 +10412,35 @@
    151610
   ],
   "raw": "raw/python__cpython/issue-151510.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 151524,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/151524",
+  "title": "instrumentation.c: Use-after-Py_DECREF comparison in call_one_instrument",
+  "state": "open",
+  "author": "lpyu001",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [
+   "330026d6a4c40048c771a61f706ac75e"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102,
+   151525
+  ],
+  "raw": "raw/python__cpython/issue-151524.json"
  },
  {
   "repo": "python/cpython",
@@ -10293,10 +10706,10 @@
    "type-bug",
    "interpreter-core"
   ],
-  "tool": "fusil",
-  "mode": "oom",
-  "confidence": "medium",
-  "reason": "cpython+oom/gist",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
   "needs_review": false,
   "gists": [
    "577421b083bad6802aa391b909d1a725"
@@ -10323,10 +10736,10 @@
    "type-bug",
    "interpreter-core"
   ],
-  "tool": "fusil",
-  "mode": "oom",
-  "confidence": "medium",
-  "reason": "cpython+oom/gist",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
   "needs_review": false,
   "gists": [
    "577421b083bad6802aa391b909d1a725"
@@ -10338,6 +10751,35 @@
    151849
   ],
   "raw": "raw/python__cpython/issue-151847.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 152017,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/152017",
+  "title": "`deque_clear` clears `MemoryError`",
+  "state": "open",
+  "author": "brijkapadia",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "extension-modules"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Modules",
+  "needs_review": false,
+  "gists": [
+   "c0e661ad36a12581333740414e20098e"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102,
+   152018
+  ],
+  "raw": "raw/python__cpython/issue-152017.json"
  },
  {
   "repo": "python/cpython",
@@ -10619,10 +11061,10 @@
    "type-bug",
    "extension-modules"
   ],
-  "tool": "fusil",
-  "mode": "oom",
-  "confidence": "medium",
-  "reason": "cpython+oom/gist",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
   "needs_review": false,
   "gists": [
    "f7d0c7694b2be2345f4cf85f4eedc3ee"
@@ -10648,10 +11090,10 @@
    "type-bug",
    "extension-modules"
   ],
-  "tool": "fusil",
-  "mode": "oom",
-  "confidence": "medium",
-  "reason": "cpython+oom/gist",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Modules",
   "needs_review": false,
   "gists": [
    "ed7691a99c26ede561a549ab1dba00b2"
@@ -10666,6 +11108,35 @@
    153242
   ],
   "raw": "raw/python__cpython/issue-153068.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153205,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/153205",
+  "title": "ceval.c: missing PyErr_NoMemory + PyEval_GetLocals NULL",
+  "state": "closed",
+  "author": "aisk",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Python",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102,
+   153206,
+   153272,
+   153273
+  ],
+  "raw": "raw/python__cpython/issue-153205.json"
  },
  {
   "repo": "python/cpython",
@@ -11141,6 +11612,30 @@
  },
  {
   "repo": "python/cpython",
+  "number": 148226,
+  "type": "pull",
+  "url": "https://github.com/python/cpython/pull/148226",
+  "title": "gh-148222 Fix Null dereference bugs at genericaliasobject.c",
+  "state": "closed",
+  "author": "prakashsellathurai",
+  "filed_by": "maintainer",
+  "labels": [],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102,
+   148222
+  ],
+  "raw": "raw/python__cpython/pull-148226.json"
+ },
+ {
+  "repo": "python/cpython",
   "number": 149631,
   "type": "pull",
   "url": "https://github.com/python/cpython/pull/149631",
@@ -11195,6 +11690,31 @@
  },
  {
   "repo": "python/cpython",
+  "number": 151346,
+  "type": "pull",
+  "url": "https://github.com/python/cpython/pull/151346",
+  "title": "gh-146102: Fix type slot_bf_getbuffer() error handling",
+  "state": "closed",
+  "author": "vstinner",
+  "filed_by": "maintainer",
+  "labels": [
+   "skip news"
+  ],
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   146102
+  ],
+  "raw": "raw/python__cpython/pull-151346.json"
+ },
+ {
+  "repo": "python/cpython",
   "number": 151347,
   "type": "pull",
   "url": "https://github.com/python/cpython/pull/151347",
@@ -11205,10 +11725,10 @@
   "labels": [
    "skip news"
   ],
-  "tool": "manual",
-  "mode": "",
-  "confidence": "medium",
-  "reason": "cpython-feature/docs",
+  "tool": "cpython-review-toolkit",
+  "mode": "static-analysis",
+  "confidence": "high",
+  "reason": "crtk-umbrella:Objects",
   "needs_review": false,
   "gists": [],
   "is_umbrella": null,

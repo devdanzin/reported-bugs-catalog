@@ -1,24 +1,25 @@
 {
- "bug_id": "cpython-150178",
- "title": "hamt.c: sub_node leaked in bitmap_assoc and bitmap_without",
+ "bug_id": "cpython-146388",
+ "title": "`optimizer_symbols.c`: `make_bottom` NULL deref when arena full",
  "tool": "cpython-review-toolkit",
  "mode": "static-analysis",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [
-  "python/cpython#150178"
+  "python/cpython#146388"
  ],
  "prs": [],
  "gists": [
-  "332a120e4c7750e8a7aff47419311696"
+  "14a5663604e1d7fb930d121b4e0c8d25"
  ],
  "labels": [
   "interpreter-core",
+  "topic-JIT",
   "type-bug"
  ],
  "filed_by": "maintainer",
  "filers": [
-  "lpyu001"
+  "A0su"
  ],
  "status": "closed/fixed",
  "confidence": "high",
@@ -26,7 +27,7 @@
  "review_reason": null,
  "reproduced": null,
  "raw": [
-  "raw/python__cpython/issue-150178.json"
+  "raw/python__cpython/issue-146388.json"
  ],
  "n_artifacts": 1
 }

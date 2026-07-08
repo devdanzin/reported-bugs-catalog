@@ -1,0 +1,58 @@
+{
+ "repo": "python/cpython",
+ "number": 148119,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/148119",
+ "title": "structseq.c: NULL dereference in get_type_attr_as_size",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "Wulian233",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-04-05T03:11:42Z",
+ "closed_at": "2026-04-06T12:11:37Z",
+ "body": "# Bug report\n\n### Bug description:\n\nParent: #146102 \n\nWhen `PyDict_GetItemWithError` returns NULL due to error (not missing key), code falls through to `PyLong_AsSsize_t(NULL)` at line 37 \u2192 segfault. Affects `PyStructSequence_New`, `structseq_new_impl`, etc.\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-148120\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c08c7b100b5a9c8fb84aaa6b45559e6cb31c6ed6",
+   "actor": "Wulian233"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148120",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "69f51625e6314883456b336b9e3471a6221d2787",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e579626754324c70db4242a74715501b766031f2",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

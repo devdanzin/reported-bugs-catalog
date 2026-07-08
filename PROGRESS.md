@@ -75,9 +75,20 @@ OOM-catalog overrides) → `sources/classification.json`; `tools/group.py`
 (union-find on issue↔PR links, umbrella-protected, tool propagation) →
 **`bugs/<id>.json` (410 bug clusters)** from 461 artifacts (51 PRs merged).
 
-**Per-tool bugs (confirmed + tentative):** cext-review 146 · **fusil 128 (+12)** ·
-ft-review 31 · **lafleur 28 (+6)** · cpython-review 17 · cereggii 15 · manual 18 (+9).
-filed_by: self 297 · maintainer/contributor 97 · self+maintainer 16. Umbrellas 20.
+Pipeline: **classify.py → group.py → enrich.py** (enrich adds synthetic records
+for catalog bugs with no GitHub artifact). Re-run all three after any edit.
+
+**Bug counts (excl. 20 umbrella containers) = 442 total:** **fusil 152** · cext-review
+135 · **cpython-review 55** · lafleur 34 · ft-review 26 · manual 26 · cereggii 14.
+(fusil 131 artifact + 22 OOM synthetic; crtk 44 artifact + 13 synthetic.)
+filed_by: self 297 · other 114 · self+maintainer 16.
+
+**#146102 clump captured (user-flagged):** the cpython-review umbrella lists **47
+select bugs**; harvested its 18 missing sub-issues/PRs (again mostly
+contributor-authored: aisk 9, lpyu001 5, A0su 4, **vstinner 2**…), wired
+`sources/crtk_umbrella.json` as an authoritative override → **crtk 17 → 55 bugs**.
+#146103 (companion "reports" umbrella) adds no new issues — 59 review-report gists
+(findings source) + points back to #146102.
 
 **Mid-phase fixes:** (a) harvested 9 missing OOM issues by number — **12 of 15 filed
 OOM issues were authored by CONTRIBUTORS** (sobolevn ×3, prakashsellathurai…) from

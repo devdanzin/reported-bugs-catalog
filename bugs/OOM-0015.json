@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0015",
+ "title": "Abort: stale exception in `cfunction_check_kwargs` (`methodobject.c:409`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "d40d39e6abfb746bd9d96de261205190"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

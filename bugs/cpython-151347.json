@@ -1,8 +1,8 @@
 {
  "bug_id": "cpython-151347",
  "title": "gh-146102: Don't clear exception on success in odictobject.c",
- "tool": "manual",
- "mode": "",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [],
@@ -18,7 +18,7 @@
   "vstinner"
  ],
  "status": "closed/fixed",
- "confidence": "medium",
+ "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,

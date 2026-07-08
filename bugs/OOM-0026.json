@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0026",
+ "title": "Abort: err-code vs `PyErr` desync in `handle_channel_error` (`_interpchannelsmodule.c:398` / `:443`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "bf6f784d4bcd21acd471ea45b6f23c70"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

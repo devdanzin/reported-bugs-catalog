@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0022",
+ "title": "Fatal: stale `MemoryError` trips `_Py_CheckSlotResult` in `reload_singlephase_extension` (`import.c:2011`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "0964a71a7038ee90137f11c2527aad3c"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

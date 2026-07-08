@@ -1,0 +1,50 @@
+{
+ "repo": "python/cpython",
+ "number": 152017,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/152017",
+ "title": "`deque_clear` clears `MemoryError`",
+ "state": "open",
+ "state_reason": null,
+ "author": "brijkapadia",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "extension-modules"
+ ],
+ "created_at": "2026-06-23T14:56:53Z",
+ "closed_at": null,
+ "body": "# Bug report\n\n### Bug description:\n\n\nThis is a sub-issue for gh-146102 with the gist [here](https://gist.github.com/devdanzin/c0e661ad36a12581333740414e20098e).\n---\n\nIn the case that there is no memory, `deque_clear` calls `PyErr_Clear()`:\nhttps://github.com/python/cpython/blob/7928a8b730b0334c9f97c2144ab00fe0d88f1e97/Modules/_collectionsmodule.c#L749-L753\n\nThis was done to clear the error that  `newblock` raises. However, if there was originally an exception, `deque_clear` clears it.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-152018\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "rhettinger",
+   "created_at": "2026-06-26T23:32:00Z",
+   "body": "What is wrong with the current code?  If an allocation fails due to lack of memory (a very rare almost non-existent event), then an alternate path is taken that does not require additional memory.\n\nAFAICT this is a false positive from the umbrella issue."
+  },
+  {
+   "author": "brijkapadia",
+   "created_at": "2026-06-27T01:13:33Z",
+   "body": "> AFAICT this is a false positive from the umbrella issue.\n\nThere is a real error here that the reproducer catches. However, the umbrella issue gives the wrong explanation. The problem has nothing to do with `deque.copy` but `deque.copy` is one execution path for the error. \n\n<details><summary>Reproducer (for reference)</summary>\n<p>\n\n```python\nimport _testcapi\nfrom collections import deque\n\nfor n in range(1, 80):\n    d = deque(range(200))\n    _testcapi.set_nomemory(n, 0)\n    try:\n        d2 = d.copy()\n        _testcapi.remove_mem_hooks()\n        break\n    except MemoryError:\n        _testcapi.remove_mem_hooks()\n    except:\n        _testcapi.remove_mem_hooks()\n# Fatal: _Py_Dealloc: Deallocator of type 'collections.deque' cleared\n\n```\n\n</p>\n</details> \n\nThe real problem is that this debug check in `_Py_Dealloc` fails:\n<details><summary>Debug Check</summary>\n<p>\n\nhttps://github.com/python/cpython/blob/1812162f81ef034616294ec9ee53e951f99c9582/Objects/object.c#L3321-L3342\n\n</p>\n</details> \n\n---\n\nFor the specific case of the reproducer, `deque_copy_impl` calls `deque_append_lock_held` and in the case of an error, calls `Py_DECREF(new_deque)`:\nhttps://github.com/python/cpython/blob/1812162f81ef034616294ec9ee53e951f99c9582/Modules/_collectionsmodule.c#L634-L638\n\nFurthermore, `deque_append_lock_held` calls `newblock` which raises a `PyErr_NoMemory()`  in the case of OOM:\nhttps://github.com/python/cpython/blob/1812162f81ef034616294ec9ee53e951f99c9582/Modules/_collectionsmodule.c#L187\n\nThus, in the case of OOM, `Py_DECREF(new_deque)` is called with an exception already set. \n\nIn order to free the memory, eventually `deque_clear` is called. `deque_clear` calls `newblock`, which in the case of OOM, replaces the current exception with a new `PyErr_NoMemory()`. Then, `deque_clear` calls `PyErr_Clear()`, meaning that there are now no exceptions despite `deque_append_lock_held` originally setting one:\nhttps://github.com/python/cpython/blob/1812162f81ef034616294ec9ee53e951f99c9582/Modules/_collectionsmodule.c#L749-L753\n\nIn debug builds, this is caught  in `_Py_Dealloc`,\nhttps://github.com/python/cpython/blob/1812162f81ef034616294ec9ee53e951f99c9582/Objects/object.c#L3329-L3331\n\nwhich gives the error `Fatal: _Py_Dealloc: Deallocator of type 'collections.deque' cleared the current exception`."
+  },
+  {
+   "author": "stestagg",
+   "created_at": "2026-07-02T13:58:25Z",
+   "body": "EDIT: ignore my previous, it was something else.\n\nI just came across this in fuzzing, the following code reliably aborts for me:\n\n```python\nimport collections\nd =33333333333* collections.deque([10])\n```\n\ngives (in linux with 2gb ram)\n\n```\nQuitting LLDB will kill one or more processes. Do you really want to proceed: [Y/n] y\n~ # /pfm/tools/mem_limit_exec /pfm/py/bin/python3 /pfm/scratch/reproducers/t1-1.\nmin.py\nFatal Python error: _Py_Dealloc: Deallocator of type 'collections.deque' cleared the current exception\nPython runtime state: initialized\n\nCurrent thread 0x0000fffff7fee020 [python3] (most recent call first):\n  File \"<input-53>\", line 2 in <module>\n  File \"/pfm/scratch/reproducers/t1-1.min.py\", line 10 in <module>\nAborted\n~ # /pfm/tools/mem_limit_exec /pfm/py/bin/python3 /pfm/scratch/reproducers/t1-1.\nmin.py\nFatal Python error: _Py_Dealloc: Deallocator of type 'collections.deque' cleared the current exception\nPython runtime state: initialized\n\nCurrent thread 0x0000fffff7fee020 [python3] (most recent call first):\n  File \"<input-53>\", line 2 in <module>\n  File \"/pfm/scratch/reproducers/t1-1.min.py\", line 10 in <module>\nAborted\n~ #\nPython 3.16.0a0 (heads/main-dirty:f8514dc, Jul  2 2026, 09:14:40) [Clang 22.1.6 ]\n```"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152018",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  }
+ ],
+ "fetch_errors": null
+}

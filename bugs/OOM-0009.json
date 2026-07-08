@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0009",
+ "title": "Abort: stale `release1` flag trips an ownership assert in `replace` (`unicodeobject.c:10783`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "34b633230f6d2301ba17dec195ffe4b7"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

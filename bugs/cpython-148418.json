@@ -1,8 +1,8 @@
 {
  "bug_id": "cpython-148418",
  "title": "marshal.c: 8 refs leaked on corrupt TYPE_CODE marshal stream",
- "tool": "fusil",
- "mode": "oom",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [
@@ -21,7 +21,7 @@
   "Wulian233"
  ],
  "status": "closed/fixed",
- "confidence": "medium",
+ "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,

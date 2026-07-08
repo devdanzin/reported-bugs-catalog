@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0030",
+ "title": "Abort: `Py_DECREF` of NULL-data unicode in `unicode_subtype_new` (`unicodeobject.c:13986`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "fbfb9d6cd5eeb518e4f9eeab44be3893"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

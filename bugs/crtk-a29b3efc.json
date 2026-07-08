@@ -1,0 +1,25 @@
+{
+ "bug_id": "crtk-a29b3efc",
+ "title": "instrumentation.c: PyLong leak per monitoring call",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "a29b3efc400d564b195f09dc94fb6b1e"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "unfiled",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "crtk-umbrella"
+}

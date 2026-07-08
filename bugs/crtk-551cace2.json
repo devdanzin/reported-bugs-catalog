@@ -1,0 +1,25 @@
+{
+ "bug_id": "crtk-551cace2",
+ "title": "typeobject: missing return -1 in type_ready",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "551cace22f112ef0ff4ed3fdbe54d235"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "unfiled",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "crtk-umbrella"
+}

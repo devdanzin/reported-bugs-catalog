@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0023",
+ "title": "Fatal: dealloc clears the in-flight exception in `subtype_dealloc` (`typeobject.c:2719`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "dc5123e50ea0402292e841411a294d3d"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

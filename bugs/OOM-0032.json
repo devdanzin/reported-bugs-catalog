@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0032",
+ "title": "Abort: pending-exception assert from `warn_explicit` normalization (`_warnings.c:799/806`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "f7e483080647c7b76fbda79bfeb07e9c"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

@@ -1,0 +1,106 @@
+{
+ "repo": "python/cpython",
+ "number": 146244,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146244",
+ "title": "initconfig.c: `SET_ITEM` macro leaks dict on expression failure",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "Wulian233",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-03-21T08:23:22Z",
+ "closed_at": "2026-03-25T19:23:47Z",
+ "body": "# Bug report\n\n### Bug description:\n\nParent: https://github.com/python/cpython/issues/146102\n\nSET_ITEM macro at line 510-521: when the expression (e.g., `PyLong_FromLong`) `returns NULL`, return NULL at line 514 leaks the `dict` allocated at line 505. The `PyDict_SetItemString` failure path correctly uses goto fail.\n\n### CPython versions tested on:\n\nCPython main branch\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146246\n* gh-146432\n* gh-146433\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Wulian233",
+   "created_at": "2026-03-21T08:38:11Z",
+   "body": "I\u2019m currently unable to add the parent issue #146102 . I would appreciate it if someone could help add it:)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146246",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9343518c6f413b2231b17c56065e5cf823aa0d2a",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "760194e50270c92f3b5afc9ef6bf9f98a1c596fa",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e71c2424f9b199be99d0bc811a417682dbd16632",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146432",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146433",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fc4b4221e5f6cf53e61ccbf716165d6192b9fd40",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4d61fd6b7a706762d962c4a23313d57167796a12",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "41d4bf95b3e434a0207f9d6e58f71cb0b81e91c8",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f3839293f2d47c696ea078008a918269ddaefb13",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,25 @@
+{
+ "bug_id": "crtk-0a3dd4f8",
+ "title": "FrameLocalsProxy swallows/overwrites errors",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "0a3dd4f8fb0fb144efcc02c3e86665a5"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "unfiled",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "crtk-umbrella"
+}

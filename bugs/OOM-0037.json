@@ -1,0 +1,23 @@
+{
+ "bug_id": "OOM-0037",
+ "title": "Segfault: NULL `UnraisableHookArgs` type-dict deref in `PyStructSequence_New`/`make_unraisable_hook_args` during sub-interpreter finalization under OOM (`structseq.c:30`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "drafted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

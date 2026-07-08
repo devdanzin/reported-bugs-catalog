@@ -1,0 +1,23 @@
+{
+ "bug_id": "OOM-0039",
+ "title": "Fatal: `deque_clear` clears the in-flight exception via its `newblock`-failure `PyErr_Clear()` (`_collectionsmodule.c:751`)",
+ "tool": "fusil",
+ "mode": "oom-seq",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "drafted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

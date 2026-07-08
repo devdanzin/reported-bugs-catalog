@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0010",
+ "title": "Abort: `assert(_PyErr_Occurred(tstate))` in `_PyEval_EvalFrameDefault` (`generated_cases.c.h:13817`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "d3c1d06e95c006a320dbbfffcc210d52"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

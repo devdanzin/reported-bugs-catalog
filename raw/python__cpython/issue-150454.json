@@ -1,0 +1,47 @@
+{
+ "repo": "python/cpython",
+ "number": 150454,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/150454",
+ "title": "import_run_extension() can return on the wrong interpreter after _PyUnicode_Copy() failure",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core",
+  "topic-importlib"
+ ],
+ "created_at": "2026-05-26T07:15:38Z",
+ "closed_at": "2026-05-29T10:03:42Z",
+ "body": "# Bug report\n\n### Bug description:\n\n## Summary\n\n`import_run_extension()` can return `NULL` while the current thread is still switched to the main interpreter. This happens in the subinterpreter extension import path when copying `info->filename` with `_PyUnicode_Copy()` fails.\n\nThe function switches from the importing subinterpreter to the main interpreter before calling the extension module init function. For single-phase init modules, it then copies the original filename because the original object may have been allocated by the subinterpreter's obmalloc:\n\n```c\nfilename = _PyUnicode_Copy(info->filename);\nif (filename == NULL) {\n    return NULL;\n}\n```\n\nThat direct `return NULL` bypasses the `main_finally` cleanup path, including `switch_back_from_main_interpreter()`. The caller resumes with the wrong interpreter current for the thread, which can lead to a crash or interpreter state corruption.\n\nThis is a sub-issue of https://github.com/python/cpython/issues/146102 with [gist details](https://gist.github.com/devdanzin/432d9af1a8833bef53bc9ae342310622)\n\n## Affected area\n\n`Python/import.c`, in `import_run_extension()`, around the single-phase extension import handling after switching to the main interpreter.\n\n\n## Reproducer\n\nThe following script runs each attempt in a child process so that a vulnerable build can crash without taking down the driver process. It requires a CPython build tree with `_interpreters`, `_testcapi`, and `_testsinglephase` available.\n\n```python\nfrom __future__ import annotations\n\nimport argparse\nimport subprocess\nimport sys\nimport textwrap\n\n\nCHILD = r\"\"\"\nimport _interpreters\nimport _testsinglephase\n\nfilename = _testsinglephase.__file__\nscript = f'''\nimport _testcapi\nfrom test.test_import import import_extension_from_file\n\n_testcapi.set_nomemory(START, STOP)\ntry:\n    import_extension_from_file('_testsinglephase_basic_copy', {filename!r})\nfinally:\n    _testcapi.remove_mem_hooks()\n'''\n\ninterp = _interpreters.create()\ntry:\n    exc = _interpreters.run_string(interp, script)\nfinally:\n    _interpreters.destroy(interp)\n\nif exc is None:\n    print(\"import unexpectedly succeeded\")\nelse:\n    print(f\"{exc.type.__name__}: {exc.msg}\")\n\"\"\"\n\n\ndef run_one(python: str, start: int) -> subprocess.CompletedProcess[bytes]:\n    code = CHILD.replace(\"START\", str(start)).replace(\"STOP\", str(start + 1))\n    return subprocess.run(\n        [python, \"-X\", \"faulthandler\", \"-c\", code],\n        stdout=subprocess.PIPE,\n        stderr=subprocess.PIPE,\n    )\n\n\ndef main() -> int:\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"--python\", default=sys.executable)\n    parser.add_argument(\"--start\", type=int, default=1)\n    parser.add_argument(\"--stop\", type=int, default=50)\n    args = parser.parse_args()\n\n    for start in range(args.start, args.stop + 1):\n        proc = run_one(args.python, start)\n        out = proc.stdout.decode(\"utf-8\", \"replace\").strip()\n        err = proc.stderr.decode(\"utf-8\", \"replace\").strip()\n        if proc.returncode:\n            print(f\"CRASH start={start} returncode={proc.returncode}\")\n            if out:\n                print(\"stdout:\")\n                print(textwrap.indent(out, \"    \"))\n            if err:\n                print(\"stderr:\")\n                print(textwrap.indent(err, \"    \"))\n            return 1\n        print(f\"ok start={start}: {out}\")\n\n    print(\"No child process crashed in the scanned range.\")\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n```\n\nExample command on Windows:\n\n```powershell\n.\\PCbuild\\amd64\\python.exe repro_import_run_extension_copy_failure.py --start 1 --stop 50\n```\n\nOn a vulnerable build, one of the child processes can terminate with an access violation or another abnormal return code.\n\nOn a fixed build, allocation failures in this area should be converted into a controlled subinterpreter-side `ImportError`, for example:\n\n```text\nImportError: failed to import from subinterpreter due to exception\n```\n\n## Expected behavior\n\nAny error after switching to the main interpreter must go through the cleanup path that switches back to the original interpreter before returning to the caller.\n\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nWindows\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-150455\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150455",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "686996e4d8a09ad5a301488894e3193e9a08a70f",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  }
+ ],
+ "fetch_errors": null
+}

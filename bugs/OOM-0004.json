@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0004",
+ "title": "Abort/Segfault: corrupted object freelist in `clear_freelist` (`object.c:909`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "315e83b2da6a5809ce5ae1d748cdd0ae"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

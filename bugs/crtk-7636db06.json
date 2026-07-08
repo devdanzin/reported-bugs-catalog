@@ -1,0 +1,25 @@
+{
+ "bug_id": "crtk-7636db06",
+ "title": "ast.c: LEAVE_RECURSIVE missing on 30 paths",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "7636db063c4b2af5da66389171121bfc"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "unfiled",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "crtk-umbrella"
+}

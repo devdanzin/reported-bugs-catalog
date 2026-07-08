@@ -1,0 +1,26 @@
+[
+ {
+  "bug_id": "OOM-0005",
+  "folded_into": "OOM-0036"
+ },
+ {
+  "bug_id": "OOM-0011",
+  "folded_into": "OOM-0008"
+ },
+ {
+  "bug_id": "OOM-0029",
+  "folded_into": "OOM-0036"
+ },
+ {
+  "bug_id": "OOM-0033",
+  "folded_into": "OOM-0036"
+ },
+ {
+  "bug_id": "OOM-0041",
+  "folded_into": "OOM-0036"
+ },
+ {
+  "bug_id": "OOM-0042",
+  "folded_into": "OOM-0040"
+ }
+]

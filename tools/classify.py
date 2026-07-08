@@ -166,8 +166,25 @@ def load_oom_overrides():
             OVERRIDES[(repo, int(n))] = ("fusil", "oom", "high", f"oom-catalog:{b['bug_id']}")
 
 
+def load_crtk_overrides():
+    """The cpython-review-toolkit umbrella #146102 authoritatively maps 47 bugs to
+    their issue/PR. Those sub-issues rarely name the toolkit, so override them."""
+    try:
+        rows = json.load(open(os.path.join(os.path.dirname(OUT), "crtk_umbrella.json")))
+    except FileNotFoundError:
+        return
+    for r in rows:
+        if r.get("false_alarm"):
+            continue
+        for n in r.get("issues", []) + r.get("prs", []):
+            OVERRIDES[("python/cpython", n)] = (
+                "cpython-review-toolkit", "static-analysis", "high",
+                f"crtk-umbrella:{r['section']}")
+
+
 def main():
     load_oom_overrides()
+    load_crtk_overrides()
     rows = []
     for f in sorted(glob.glob(os.path.join(RAW, "*", "*.json"))):
         d = json.load(open(f))

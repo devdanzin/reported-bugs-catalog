@@ -1,0 +1,25 @@
+{
+ "bug_id": "OOM-0020",
+ "title": "Fatal: `_PyMem_DebugRawFree: bad ID` in `free_threadstate` (`pystate.c:1527`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "df523c79368baa0c44bd69e9d5ee0c7e"
+ ],
+ "labels": [],
+ "filed_by": "none",
+ "filers": [],
+ "status": "gisted",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "oom-catalog"
+}

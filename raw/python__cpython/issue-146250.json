@@ -1,0 +1,178 @@
+{
+ "repo": "python/cpython",
+ "number": 146250,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146250",
+ "title": "`SyntaxError.__init__` memory leak on re-initialization",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "brijkapadia",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-03-21T11:42:21Z",
+ "closed_at": "2026-03-27T13:59:39Z",
+ "body": "# Bug report\n\n### Bug description:\n\nThis is a sub-issue for #146102 and more information can be found [here`](https://gist.github.com/devdanzin/1c1e9ba549c26332c387b23406c84ad5).\n\n---\n\nWhen re-initializing a `SyntaxError` (by calling its `__init__` method), it currently does not decref its prior values. This reproducer crashes with ASan:\n```python \ne = SyntaxError(\"msg\", (\"file.py\", 1, 2, \"txt\", 2, 3))\ne.__init__(\"new_msg\", (\"new_file.py\", 2, 3, \"new_txt\", 3, 4))\n\n```\n\n<details><summary>ASan report</summary>\n<p>\n\n```shell\n\n=================================================================\n==576215==ERROR: LeakSanitizer: detected memory leaks\n\nDirect leak of 72 byte(s) in 1 object(s) allocated from:\n    #0 0x7fb60c520cb5 in malloc (/usr/lib/libasan.so.8+0x120cb5) (BuildId: 0b96d08695bbce2da9d4770c29ad2e72fb536f47)\n    #1 0x5600a9805972 in _PyMem_RawMalloc Objects/obmalloc.c:65\n    #2 0x5600a9804d63 in _PyMem_DebugRawAlloc Objects/obmalloc.c:3043\n    #3 0x5600a9804dc7 in _PyMem_DebugRawMalloc Objects/obmalloc.c:3076\n    #4 0x5600a9806748 in _PyMem_DebugMalloc Objects/obmalloc.c:3241\n    #5 0x5600a982ecf3 in PyObject_Malloc Objects/obmalloc.c:1649\n    #6 0x5600a98cdf45 in PyUnicode_New Objects/unicodeobject.c:1318\n    #7 0x5600a98d3471 in unicode_decode_utf8 Objects/unicodeobject.c:5273\n    #8 0x5600a98df566 in PyUnicode_DecodeUTF8Stateful Objects/unicodeobject.c:5381\n    #9 0x5600a96eeb3b in _PyPegen_decode_string Parser/string_parser.c:245\n    #10 0x5600a96ef0b0 in _PyPegen_parse_string Parser/string_parser.c:338\n    #11 0x5600a95ce09e in _PyPegen_constant_from_string Parser/action_helpers.c:1480\n    #12 0x5600a95e9b7a in string_rule Parser/parser.c:17349\n    #13 0x5600a963ed92 in _tmp_156_rule Parser/parser.c:37961\n    #14 0x5600a963f435 in _loop1_82_rule Parser/parser.c:33521\n    #15 0x5600a96486ab in strings_rule Parser/parser.c:17420\n    #16 0x5600a9605530 in atom_rule Parser/parser.c:15361\n    #17 0x5600a9607dce in primary_raw Parser/parser.c:14999\n    #18 0x5600a96083ed in primary_rule Parser/parser.c:14797\n    #19 0x5600a9608da2 in await_primary_rule Parser/parser.c:14751\n    #20 0x5600a960934c in power_rule Parser/parser.c:14627\n    #21 0x5600a960af00 in factor_rule Parser/parser.c:14577\n    #22 0x5600a960d6b4 in term_raw Parser/parser.c:14418\n    #23 0x5600a960dcd3 in term_rule Parser/parser.c:14161\n    #24 0x5600a960e9e5 in sum_raw Parser/parser.c:14114\n    #25 0x5600a960f037 in sum_rule Parser/parser.c:13993\n    #26 0x5600a9610687 in shift_expr_raw Parser/parser.c:13953\n    #27 0x5600a9610cd9 in shift_expr_rule Parser/parser.c:13813\n    #28 0x5600a9611502 in bitwise_and_raw Parser/parser.c:13773\n    #29 0x5600a9611b54 in bitwise_and_rule Parser/parser.c:13691\n\nSUMMARY: AddressSanitizer: 72 byte(s) leaked in 1 allocation(s).\n\n``` \n\n</p>\n</details> \n\nThe fix is to call `Py_XDECREF` before replacing the entries in the `SyntaxError` object.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146251\n* gh-146517\n* gh-146519\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9370f4f877b1dfaabbfef8a3c01f692ac65ee99a",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146251",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0de4e08a5990e4692feb1b1ea01c303e468a2894",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fcb10a576900d485599757444b7b3e2508d00d92",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146517",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146519",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c09ccd9c429bdfac85ee427d9d0def32af47492d",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3c434f7f0f956a11616ec745cff4bb1e4e37a55a",
+   "actor": "hugovk"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/deep-learnings/pull/11",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/botpress-accuracy-reporters/pull/83",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/coding-tests/pull/43",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-cleaners/pull/32",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-extension-converters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/github-wiki-organisers/pull/30",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/itunes-file-delimiter-replacers/pull/28",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/json-data-sorters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/natural-language-processing/pull/10",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/pr-title-printers/pull/17",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/template-creators/pull/16",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/tutorials/pull/219",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/web-scrapers/pull/14",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d8f9f4b7f9f275ba5958aebbacfd13747f355bd4",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b723bfaa7210170513b8255bb64d319c9a63ca71",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

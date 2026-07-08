@@ -1,0 +1,40 @@
+{
+ "repo": "python/cpython",
+ "number": 151524,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/151524",
+ "title": "instrumentation.c: Use-after-Py_DECREF comparison in call_one_instrument",
+ "state": "open",
+ "state_reason": null,
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-06-16T02:44:38Z",
+ "closed_at": null,
+ "body": "# Bug report\n\n### Bug description:\n\n## Summary\n\nAt line 992-993, Py_DECREF(res) then res compared to &_PyInstrumentation_DISABLE. Using a potentially-freed pointer in comparison is UB per C standard.\n\n\nThis is a sub-issue of https://github.com/python/cpython/issues/146102 with [gist details](https://gist.github.com/devdanzin/330026d6a4c40048c771a61f706ac75e)\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151525\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a4cc0af4fbb74402249540694be6a269ec6f8379",
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151525",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  }
+ ],
+ "fetch_errors": null
+}

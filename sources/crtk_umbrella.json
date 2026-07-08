@@ -1,0 +1,589 @@
+[
+ {
+  "section": "Modules",
+  "gist": "50f9880636df43efd3886f6bda2077b3",
+  "desc": "_ssl.c: Py_DECREF(NULL) in SNI callback",
+  "resolution": "[#146080](https://github.com/python/cpython/issues/146080) FIXED",
+  "issues": [
+   146080
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "69aff7ff2d64ce8c7c21622f7f36e84c",
+  "desc": "_sqlite: collation assertion + missing PyErr_NoMemory",
+  "resolution": "[#146090](https://github.com/python/cpython/issues/146090) FIXED",
+  "issues": [
+   146090
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "572a616b51ded20b0494c1107a29e63c",
+  "desc": "functools partial PyDict_Contains -1 as truthy",
+  "resolution": "[#146075](https://github.com/python/cpython/issues/146075) FIXED",
+  "issues": [
+   146075
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "efd3edd49aff97ed348c392bc6afe980",
+  "desc": "_csv.c: _set_str missing NULL check",
+  "resolution": "[#146093](https://github.com/python/cpython/issues/146093) FIXED",
+  "issues": [
+   146093
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "9f0a3f2a08edc37b8369d7f5db8d5854",
+  "desc": "_zoneinfo: SEGV in get_weak_cache",
+  "resolution": "[#146076](https://github.com/python/cpython/issues/146076) FIXED",
+  "issues": [
+   146076
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "701746869975be8c3fa673f52ef0e315",
+  "desc": "_zoneinfo: missing PyErr_NoMemory in load_data",
+  "resolution": "[#146092](https://github.com/python/cpython/issues/146092) FIXED",
+  "issues": [
+   146092
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "829b08903c28f8e345052256cb1b7cb4",
+  "desc": "termios: NULL to PyLong_AsLong",
+  "resolution": "[#146091](https://github.com/python/cpython/issues/146091) FIXED",
+  "issues": [
+   146091
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "546cf053a5b307dbe3ec9f6c6d916b87",
+  "desc": "_struct: segfault/assertion on uninitialized Struct",
+  "resolution": "Fixed in https://github.com/python/cpython/commit/515ae4078dffa0b74e5e5431462c2f",
+  "issues": [],
+  "prs": [],
+  "has_commit": true,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "6d7781857c2a0cd29b636cf759081888",
+  "desc": "pyexpat: ExternalEntityParserCreate crash",
+  "resolution": "Fixed in https://github.com/python/cpython/commit/e6b9a1406980fbb1d4032eca9cc0b4",
+  "issues": [],
+  "prs": [],
+  "has_commit": true,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "03c462108168cf6b35054fb0b85bf775",
+  "desc": "_interpqueuesmodule: use-after-free dangling last",
+  "resolution": "#146427",
+  "issues": [
+   146427
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "63348fc11425730393ef0d601078cbe2",
+  "desc": "selectmodule: errno < 0 always false",
+  "resolution": "#146205 FIXED",
+  "issues": [
+   146205
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "ed7691a99c26ede561a549ab1dba00b2",
+  "desc": "_lsprof: exception clobbering",
+  "resolution": "#153068 FIXED",
+  "issues": [
+   153068
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "c0e661ad36a12581333740414e20098e",
+  "desc": "deque.copy() ref corruption on OOM",
+  "resolution": "#152017",
+  "issues": [
+   152017
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "60aed55f44fba133ee2d34d46aa8d197",
+  "desc": "readline: begidx NULL on OOM",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "ada54523342276bbdb66228de2ec863e",
+  "desc": "zlibmodule: PyErr_NewException unchecked",
+  "resolution": "[false alarm](https://github.com/python/cpython/pull/151342)",
+  "issues": [],
+  "prs": [
+   151342
+  ],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": true
+ },
+ {
+  "section": "Modules",
+  "gist": "9f1ce3fece9407aacef0e16cd419ffb2",
+  "desc": "socketmodule: audit hook ref/buffer leaks",
+  "resolution": "#146245 FIXED",
+  "issues": [
+   146245
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "d9975354c27e57f2589acfd0a777a2f1",
+  "desc": "_interpchannelsmodule: missing PyErr_NoMemory",
+  "resolution": "https://github.com/python/cpython/issues/150213",
+  "issues": [
+   150213
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Modules",
+  "gist": "edc4c140cb2eb4d3b64ce886b1bb1c65",
+  "desc": "_interpretersmodule: SEGV on create under OOM",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "dceaa8b70de035607d78025337af9798",
+  "desc": "ExceptionGroup repr OOB \u2014 3-line segfault",
+  "resolution": "[#146096](https://github.com/python/cpython/issues/146096) FIXED",
+  "issues": [
+   146096
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "1c1e9ba549c26332c387b23406c84ad5",
+  "desc": "`SyntaxError.__init__` ref leaks on re-init",
+  "resolution": "#146250 FIXED",
+  "issues": [
+   146250
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "d602d174ce2b8959759c94729a35c54e",
+  "desc": "codeobject: code_richcompare swallows errors",
+  "resolution": "#146199 FIXED",
+  "issues": [
+   146199
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "768b5163f0f743bd940c5d96ca9e9981",
+  "desc": "codeobject: co_tlbc NULL + replacement_locations leak",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "f7d0c7694b2be2345f4cf85f4eedc3ee",
+  "desc": "weakref WRAP_BINARY ref leak (~20 operators)",
+  "resolution": "#153058",
+  "issues": [
+   153058
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "0a3dd4f8fb0fb144efcc02c3e86665a5",
+  "desc": "FrameLocalsProxy swallows/overwrites errors",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "551cace22f112ef0ff4ed3fdbe54d235",
+  "desc": "typeobject: missing return -1 in type_ready",
+  "resolution": "commit c398490fbf15ede5de3389b4ca4e32fb9a7c5d67",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "6119b9d13c24bb30a07a44b75384e8ff",
+  "desc": "typeobject: buffer leak in slot_bf_getbuffer",
+  "resolution": "https://github.com/python/cpython/pull/151346 FIXED",
+  "issues": [],
+  "prs": [
+   151346
+  ],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "196f041a81611b2fbff22684b2f7166e",
+  "desc": "object.c: PyObject_Print missing LeaveRecursiveCall",
+  "resolution": "commit e2fa10e04d3fed4c248881d69411fc208d05ad6b",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "4fe9c3299dd2269bd849bba147ade0b4",
+  "desc": "structseq: get_type_attr_as_size NULL deref",
+  "resolution": "#148119",
+  "issues": [
+   148119
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "266ca45099796a2373866a07447d5ebf",
+  "desc": "genericaliasobject: two NULL dereference bugs",
+  "resolution": "https://github.com/python/cpython/pull/148226 FIXED",
+  "issues": [],
+  "prs": [
+   148226
+  ],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "9015c335e324a94ea06932bdd643a7dc",
+  "desc": "odictobject: spurious PyErr_Clear",
+  "resolution": "https://github.com/python/cpython/pull/151347 FIXED",
+  "issues": [],
+  "prs": [
+   151347
+  ],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Objects",
+  "gist": "577421b083bad6802aa391b909d1a725",
+  "desc": "unicode_format: wrong return + PY_SSIZE_T_MIN UB",
+  "resolution": "#151845 #151847",
+  "issues": [
+   151845,
+   151847
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "432d9af1a8833bef53bc9ae342310622",
+  "desc": "import.c: wrong interpreter + double lock release",
+  "resolution": "#150454 #150374 FIXED",
+  "issues": [
+   150374,
+   150454
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "a29b3efc400d564b195f09dc94fb6b1e",
+  "desc": "instrumentation.c: PyLong leak per monitoring call",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "330026d6a4c40048c771a61f706ac75e",
+  "desc": "instrumentation.c: use-after-Py_DECREF comparison",
+  "resolution": "https://github.com/python/cpython/issues/151524",
+  "issues": [
+   151524
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "55ed5cf0d452eb6ce881e7a8fad30ddb",
+  "desc": "ceval.c: missing PyErr_NoMemory + PyEval_GetLocals NULL",
+  "resolution": "#153205 FIXED",
+  "issues": [
+   153205
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "cc84f43d7a5c774b47551060c061391f",
+  "desc": "bltinmodule: `__lazy_import__` NULL deref",
+  "resolution": "#151510 FIXED",
+  "issues": [
+   151510
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "a56b8cb579b1950b4206e8a42d6be650",
+  "desc": "crossinterp: UAF + leaked exception + shadowed var",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "1053175c252bf8430cc2c2b96671d15f",
+  "desc": "compiler pipeline: 6 ref leaks and error bugs",
+  "resolution": "https://github.com/python/cpython/issues/146442",
+  "issues": [
+   146442
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "60b787bfa22651ba6a18aef3b6e1439d",
+  "desc": "marshal: 8 refs leaked on corrupt TYPE_CODE",
+  "resolution": "#148418",
+  "issues": [
+   148418
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "b022ff2d1304a4b2b8d3d8750abd8da5",
+  "desc": "pylifecycle: 5 init/fini cleanup bugs",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "1a61f5e30036bc6aa5eac154626e4870",
+  "desc": "initconfig: SET_ITEM macro leaks dict",
+  "resolution": "#146244 FIXED",
+  "issues": [
+   146244
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "7636db063c4b2af5da66389171121bfc",
+  "desc": "ast.c: LEAVE_RECURSIVE missing on 30 paths",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "332a120e4c7750e8a7aff47419311696",
+  "desc": "hamt.c: sub_node leaked in bitmap ops",
+  "resolution": "https://github.com/python/cpython/issues/150178",
+  "issues": [
+   150178
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "86eda5ca53243ef667773991312c2e74",
+  "desc": "pythonrun: main_module ref leak",
+  "resolution": "https://github.com/python/cpython/issues/146355 FIXED",
+  "issues": [
+   146355
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "9b0cc09a0ec2dd055b9b117115842f0b",
+  "desc": "modsupport: missing va_end (UB)",
+  "resolution": "https://github.com/python/cpython/issues/146386 FIXED",
+  "issues": [
+   146386
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "d1a6ab9f62970be0cae139366ce3c482",
+  "desc": "legacy_tracing: unchecked PyLong_AsInt",
+  "resolution": "\u2014",
+  "issues": [],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": true,
+  "false_alarm": false
+ },
+ {
+  "section": "Python",
+  "gist": "14a5663604e1d7fb930d121b4e0c8d25",
+  "desc": "optimizer_symbols: make_bottom NULL deref",
+  "resolution": "https://github.com/python/cpython/issues/146388 FIXED",
+  "issues": [
+   146388
+  ],
+  "prs": [],
+  "has_commit": false,
+  "unfiled": false,
+  "false_alarm": false
+ }
+]

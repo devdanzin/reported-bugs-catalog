@@ -1,0 +1,25 @@
+{
+ "bug_id": "crtk-a56b8cb5",
+ "title": "crossinterp: UAF + leaked exception + shadowed var",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "a56b8cb579b1950b4206e8a42d6be650"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "unfiled",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "crtk-umbrella"
+}

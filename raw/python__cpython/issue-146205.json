@@ -1,0 +1,63 @@
+{
+ "repo": "python/cpython",
+ "number": 146205,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146205",
+ "title": "selectmodule.c: errno < 0 comparison is always false",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug"
+ ],
+ "created_at": "2026-03-20T12:44:09Z",
+ "closed_at": "2026-03-20T13:45:38Z",
+ "body": "# Bug report\n\n### Bug description:\n\n## Summary\n\nMultiple sites in `Modules/selectmodule.c` check `if (errno < 0)` after close/epoll_ctl calls. Since `errno` is an `int` set to positive values (POSIX), this check is always false. Close errors are silently swallowed.\n\n## Fix\n\nChange `if (errno < 0)` to `if (retval < 0)` (check the return value, not errno directly).\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146206\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146206",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9f9faa2d1a31e6d1d6271efa834b955f4acd53ee",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2691ad9d6a47b4beee7b5f299d878b4ef36e830c",
+   "actor": "CuriousLearner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fa7d654d40b074d49444133fc614b6db60695ebf",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

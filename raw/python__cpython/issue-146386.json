@@ -1,0 +1,64 @@
+{
+ "repo": "python/cpython",
+ "number": 146386,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146386",
+ "title": "`modsupport.c`: Missing `va_end` in `_abiinfo_raise`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "A0su",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-03-24T18:10:02Z",
+ "closed_at": "2026-03-25T12:54:14Z",
+ "body": "# Bug report\n\n### Bug description:\n\n# Bug Report\n\n### modsupport.c: Missing va_end in _abiinfo_raise\n\n`va_start(vargs, format)` at line 689 but `va_end(vargs)` never called on any path. UB per C99 7.15.1.\n\nThis is a sub-issue of https://github.com/python/cpython/issues/146102 with original [gist details](https://gist.github.com/devdanzin/d1a6ab9f62970be0cae139366ce3c482)\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nWindows\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146387\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146387",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "04bd54305a548f817e1a4dba0dc20aab350ee6fc",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3dcffa3160951e6bbd3b6ea1ffa9ef1cd6927ebf",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "800514c27caae9afc185e7e2de4bc2c57e4ce80b",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

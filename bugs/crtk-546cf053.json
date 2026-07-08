@@ -1,0 +1,25 @@
+{
+ "bug_id": "crtk-546cf053",
+ "title": "_struct: segfault/assertion on uninitialized Struct",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [],
+ "gists": [
+  "546cf053a5b307dbe3ec9f6c6d916b87"
+ ],
+ "labels": [],
+ "filed_by": "self+commit",
+ "filers": [],
+ "status": "fixed-in-commit",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "crtk-umbrella"
+}

@@ -1,0 +1,64 @@
+{
+ "repo": "python/cpython",
+ "number": 146355,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146355",
+ "title": "`pythonrun.c`: main_module ref leak in `_PyRun_SimpleStringFlagsWithName`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "A0su",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-03-24T02:58:29Z",
+ "closed_at": "2026-03-25T06:37:25Z",
+ "body": "# Bug report\n\n### Bug description:\n\n# Bug report\n### Bug description:\nThis is a sub-issue for #146102 and original gist details can be found [here](https://gist.github.com/devdanzin/86eda5ca53243ef667773991312c2e74)\n\nExisting code:\n```C\nint\n_PyRun_SimpleStringFlagsWithName(const char *command, const char* name, PyCompilerFlags *flags) {\n    PyObject *main_module = PyImport_AddModuleRef(\"__main__\");\n    if (main_module == NULL) {\n        return -1;\n    }\n    PyObject *dict = PyModule_GetDict(main_module);  // borrowed ref\n\n    PyObject *res = NULL;\n    if (name == NULL) {\n        res = PyRun_StringFlags(command, Py_file_input, dict, dict, flags);\n    } else {\n        PyObject* the_name = PyUnicode_FromString(name);\n        if (!the_name) {\n            PyErr_Print();\n            return -1;\n        }\n        res = _PyRun_StringFlagsWithName(command, the_name, Py_file_input, dict, dict, flags, 0);\n        Py_DECREF(the_name);\n    }\n    Py_DECREF(main_module);\n    if (res == NULL) {\n        PyErr_Print();\n        return -1;\n    }\n\n    Py_DECREF(res);\n    return 0;\n}\n```\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nWindows\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146356\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146356",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "08f6b33bf32bdfc30eeda5966707849c459da7c2",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "166013971bfbaaffca2cba8c7ac12dc479c876a8",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5f193281e7b07d0022ca6a50f71f8405e3ef4bbb",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}
