@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/kiwi",
+ "number": 223,
+ "type": "issue",
+ "url": "https://github.com/nucleic/kiwi/issues/223",
+ "title": "All 6 heap type deallocs missing Py_DECREF(Py_TYPE(self))",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T08:54:43Z",
+ "closed_at": null,
+ "body": "All 6 types in kiwisolver are created via `PyType_FromSpec` (heap types). Heap type instances hold a strong reference to their type object, which must be released in `tp_dealloc`. None of the 6 dealloc functions call `Py_DECREF(Py_TYPE(self))`, leaking one type reference per object destruction.\n\n**Reproducer**:\n\n```python\nimport sys, gc\nimport kiwisolver as ks\n\nfor name, factory in [\n    (\"Variable\", lambda: ks.Variable(\"x\")),\n    (\"Solver\", lambda: ks.Solver()),\n    (\"Constraint\", lambda: (ks.Variable(\"x\") + 1 >= 0)),\n]:\n    T = type(factory())\n    rc_before = sys.getrefcount(T)\n    for _ in range(1000):\n        del (factory())\n    gc.collect()\n    delta = sys.getrefcount(T) - rc_before\n    print(f\"{name}: {delta} type refs leaked over 1000 cycles\")\n    assert delta == 1000\n# Variable: 1000 type refs leaked over 1000 cycles\n# Solver: 1000 type refs leaked over 1000 cycles\n# Constraint: 1000 type refs leaked over 1000 cycles\n```\n\n**Affected files** (all follow the same pattern \u2014 save `tp` before `tp_free`, decref after):\n\n- `variable.cpp:84-92`\n- `term.cpp:68-73`\n- `expression.cpp:74-79`\n- `constraint.cpp:71-79`\n- `solver.cpp:37-43`\n- `strength.cpp:31-34`\n\n**Example fix** (Variable, same pattern for all 6):\n```cpp\nvoid Variable_dealloc(Variable* self)\n{\n    PyObject_GC_UnTrack(self);\n    Variable_clear(self);\n    ACQUIRE_GLOBAL_LOCK();\n    self->variable.~Variable();\n    RELEASE_GLOBAL_LOCK();\n    PyTypeObject* tp = Py_TYPE(self);\n    tp->tp_free(pyobject_cast(self));\n    Py_DECREF(tp);\n}\n```\n\nNote: the `tp_traverse` functions already correctly `Py_VISIT(Py_TYPE(self))` on 3.9+. Only the dealloc side is missing.\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

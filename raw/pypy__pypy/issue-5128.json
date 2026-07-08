@@ -1,0 +1,30 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5128,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5128",
+ "title": "` __pypy__.intop.int_mulmod(1,0,0)` will abort with a Fatal RPython error",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-20T14:19:51Z",
+ "closed_at": "2024-11-20T15:29:43Z",
+ "body": "It's possible to abort PyPy by calling `__pypy__.intop.int_mulmod` with invalid values:\r\n\r\n```python\r\nPython 3.10.14 (5cccf8d934d7, Nov 17 2024, 04:47:11)\r\n[PyPy 7.3.18-alpha0 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\n>>>> import __pypy__.intop\r\n>>>> __pypy__.intop.int_mulmod(1,0,0)\r\nRPython traceback:\r\n  File \"pypy_interpreter.c\", line 49327, in BuiltinCode3_fastcall_3\r\n  File \"implement_6.c\", line 58858, in fastfunc_int_mulmod_3\r\nFatal RPython error: AssertionError\r\nAborted\r\n```\r\nFound using fusil by @vstinner.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-11-20T15:29:43Z",
+   "body": "Fixed in 99013fc8324, thanks for reporting."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 78,
+ "type": "issue",
+ "url": "https://github.com/dpdani/cereggii/issues/78",
+ "title": "Re-initializing an `AtomicDict` in threads segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "AtomicDict",
+  "fusil-fuzzer"
+ ],
+ "created_at": "2025-10-17T23:52:31Z",
+ "closed_at": "2025-10-19T13:04:49Z",
+ "body": "This is a bug that was [rejected as invalid in CPython](https://github.com/python/cpython/issues/127192#issuecomment-2495552818): supporting re-initializing objects in different threads is not planned. I only report it here, hoping it can be of help somehow, because fusil stumbled upon this bug again.\n\n\nThe following code causes many different segfaults and at least one abort:\n\n```python\nfrom threading import Thread\nfrom time import sleep\nimport cereggii\na = cereggii.AtomicDict()\n\ndef f():\n    for x in range(100):\n        a.__init__()  # This is cheating!\n        sleep(0.005)\n        for y in range(10):\n            sleep(0.0005)\n            a[y * x] = x\n\nalive = [Thread(target=f, args=()) for _ in range(100)]\n\nfor x in alive:\n    x.start()\n```\n\nIIRC, the issue is that threads will see a half-initialized object.\n",
+ "comments": [
+  {
+   "author": "dpdani",
+   "created_at": "2025-10-19T09:05:22Z",
+   "body": "Ok, I see Sam's reasoning for the issue in CPython, that ensuring only one thread can run the init function is hard to do in general. (I'm thinking it would probably require modifications to the object headers.)\n\nBut I think this can be done pretty easily for AtomicDict, since the internal state that gets initialized inside `__init__` is handled through an [`AtomicRef`](https://dpdani.github.io/cereggii/api/AtomicRef/).\n\nIn practice, [this debugging assert](https://dpdani.github.io/cereggii/api/AtomicRef/) can be turned into a stable check, and the write can be done atomically to ensure that only one thread can run the init function."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dpdani/cereggii/pull/80",
+   "commit": null,
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ]
+}

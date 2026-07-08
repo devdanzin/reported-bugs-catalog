@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 146065,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146065",
+ "title": "`NULL` pointer dereference in `FutureIter_am_send`",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-asyncio",
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2026-03-17T15:30:37Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter by running the MRE below.\n\n### Automated diagnosis:\n\nBug: `NULL` pointer dereference in `FutureIter_am_send` (_asynciomodule.c:1877). `FutureIter_am_send` passes `it->future` to `Py_BEGIN_CRITICAL_SECTION()` without checking for `NULL`. `FutureIter_throw` (line 1973) and `FutureIter_close` (line 1997) both call `Py_CLEAR(self->future)`, setting `it->future = NULL`. After `throw()` or `close()`, any subsequent `send()`/`next()` dereferences `NULL`.\n\nFix: Add `NULL` check at the top of `FutureIter_am_send`:\n```c\n    if (it->future == NULL) {\n        PyErr_SetNone(PyExc_StopIteration);\n        *result = NULL;\n        return PYGEN_RETURN;\n    }\n```\n\nMRE:\n```python\nimport asyncio\n\nasync def exploit():\n    loop = asyncio.get_event_loop()\n    fut = loop.create_future()\n\n    it = fut.__await__()\n    it.__next__()       # yields the future, sets fut_blocking\n\n    try:\n        it.throw(RuntimeError)  # Py_CLEAR(self->future) -> NULL\n    except RuntimeError:\n        pass\n\n    it.send(None)       # SEGFAULT: Py_BEGIN_CRITICAL_SECTION(NULL)\n\nasyncio.run(exploit())\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x00005555560eb282 in FutureIter_am_send_lock_held (it=0x7c5ff71cf700, result=<optimized out>) at ./Modules/_asynciomodule.c:1849\n1849        if (fut->fut_state == STATE_PENDING) {\n(gdb) bt\n#0  0x00005555560eb282 in FutureIter_am_send_lock_held (it=0x7c5ff71cf700, result=<optimized out>) at ./Modules/_asynciomodule.c:1849\n#1  FutureIter_am_send (op=0x7c5ff71cf700, _unused_arg=<optimized out>, result=<optimized out>) at ./Modules/_asynciomodule.c:1878\n#2  FutureIter_iternext (it=0x7c5ff71cf700) at ./Modules/_asynciomodule.c:1888\n#3  0x0000555555ae6c75 in method_vectorcall_O (func=func@entry=0x7c7ff7322040, args=args@entry=0x7bfff5d36b28, nargsf=nargsf@entry=9223372036854775810, kwnames=kwnames@entry=0x0)\n    at Objects/descrobject.c:476\n#4  0x0000555555ab9e00 in _PyObject_VectorcallTstate (tstate=0x5555568f7b18 <_PyRuntime+360664>, callable=0x7c7ff7322040, args=0x7bfff5d36b28, nargsf=9223372036854775810, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:136\n#5  0x0000555555e588dd in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=<optimized out>, total_args=2, kwnames=..., call_instrumentation=<optimized out>,\n    frame=<optimized out>, this_instr=<optimized out>, tstate=<optimized out>) at Python/ceval.c:770\n#6  0x0000555555e94263 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1838\n#7  0x0000555555b1f1bb in _PyEval_EvalFrame (tstate=0x5555568f7b18 <_PyRuntime+360664>, frame=0x7d0ff724c828, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#8  gen_send_ex2 (gen=0x7d0ff724c7e0, arg=0x5555566bcfa0 <_Py_NoneStruct>, presult=0x7bfff5d36380, exc=0) at Objects/genobject.c:280\n#9  0x0000555555a6cefc in PyIter_Send (iter=<optimized out>, arg=0x5555566bcfa0 <_Py_NoneStruct>, result=<optimized out>) at Objects/abstract.c:2936\n#10 0x00005555560e584a in task_step_impl (state=<optimized out>, task=0x7d4ff704b3b0, exc=0x0) at ./Modules/_asynciomodule.c:3100\n#11 0x00005555560e5033 in task_step (state=state@entry=0x7cfff7122d50, task=0x7d4ff704b3b0, exc=0x0) at ./Modules/_asynciomodule.c:3442\n#12 0x00005555560e4977 in TaskStepMethWrapper_call (op=0x7c6ff76084d0, args=0x5555568c0b50 <_PyRuntime+135440>, kwds=0x0) at ./Modules/_asynciomodule.c:2112\n#13 0x0000555555aba90b in _PyObject_MakeTpCall (tstate=tstate@entry=0x5555568f7b18 <_PyRuntime+360664>, callable=callable@entry=0x7c6ff76084d0, args=0x7c6ff70b2c38, nargs=0,\n    keywords=keywords@entry=0x0) at Objects/call.c:242\n#14 0x0000555555f165c8 in _PyObject_VectorcallTstate (tstate=0x5555568f7b18 <_PyRuntime+360664>, callable=0x7c6ff76084d0, args=0x7fffffffff01, nargsf=<optimized out>, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:134\n#15 context_run (self=0x7c7ff737bec0, args=args@entry=0x7c6ff70b2c30, nargs=nargs@entry=1, kwnames=kwnames@entry=0x0) at Python/context.c:727\n#16 0x0000555555bde65c in cfunction_vectorcall_FASTCALL_KEYWORDS (func=func@entry=0x7c7ff737c040, args=0x7c6ff70b2c30, nargsf=1, kwnames=kwnames@entry=0x0) at Objects/methodobject.c:465\n#17 0x0000555555abc5a0 in _PyVectorcall_Call (tstate=<optimized out>, func=<optimized out>, callable=<optimized out>, tuple=0x7c6ff70b2c10, kwargs=<optimized out>) at Objects/call.c:273\n#18 0x0000555555e904e2 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:2937\n#19 0x0000555555e57778 in _PyEval_EvalFrame (tstate=0x5555568f7b18 <_PyRuntime+360664>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#20 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2134\n#21 0x0000555555e57195 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff70884c0) at Python/ceval.c:681\n#22 0x0000555556061fb0 in run_eval_code_obj (tstate=tstate@entry=0x5555568f7b18 <_PyRuntime+360664>, co=co@entry=0x7d1ff701bd50, globals=globals@entry=0x7c7ff70884c0,\n    locals=locals@entry=0x7c7ff70884c0) at Python/pythonrun.c:1368\n#23 0x000055555606117c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1471\n```\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/_asynciomodule.c all deep` command.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:99e2c5eccd2, Mar 17 2026, 08:26:50) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146304\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "kumaraditya303",
+   "created_at": "2026-03-19T12:15:42Z",
+   "body": "Can you create a PR for your fix? "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-19T16:11:06Z",
+   "body": "The fix was suggested by the tool, I'd rather let someone who knows what they're doing handle this."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "faef7f18a8b7da1716b1b8c130dea592210d39b6",
+   "actor": "VanshAgarwal24036"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146304",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ]
+}

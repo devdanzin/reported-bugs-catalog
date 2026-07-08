@@ -1,0 +1,49 @@
+{
+ "repo": "numpy/numpy",
+ "number": 28787,
+ "type": "issue",
+ "url": "https://github.com/numpy/numpy/issues/28787",
+ "title": "BUG: segfault by rounding number by large negative value",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "00 - Bug"
+ ],
+ "created_at": "2025-04-20T22:03:53Z",
+ "closed_at": "2025-04-28T20:52:49Z",
+ "body": "### Describe the issue:\n\nIt's possible to segfault the interpreter by calling `round()` with large negative values on at least float types.\n\n### Reproduce the code example:\n\n```python\nimport numpy\nnumpy.float128().round(-2**31)\n```\n\n### Error message:\n\n```shell\nThread 1 \"python\" received signal SIGSEGV, Segmentation fault.\n0x00007ffff436062a in PyArray_Round () from /home/danzin/venvs/3.13_upstream_fusil_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so\n\n#0  0x00007ffff436062a in PyArray_Round () from /home/danzin/venvs/3.13_upstream_fusil_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so\n#1  0x00007ffff43c6f31 in array_round () from /home/danzin/venvs/3.13_upstream_fusil_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so\n#2  0x0000555555b661da in cfunction_call (func=0x7fffb4d52230, args=0x7fffb4bc71d0, kwargs=0x0) at Objects/methodobject.c:540\n#3  0x0000555555a4aed3 in _PyObject_Call (tstate=0x5555566c6300 <_PyRuntime+326528>, callable=<optimized out>, args=<optimized out>, kwargs=<optimized out>) at Objects/call.c:361\n#4  0x00007ffff42c67c3 in gentype_generic_method ()\n   from /home/danzin/venvs/3.13_upstream_fusil_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so\n#5  0x0000555555a70759 in method_vectorcall_VARARGS_KEYWORDS (func=0x7fffb50472b0, args=0x529000005840, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/descrobject.c:358\n#6  0x0000555555a484db in _PyObject_VectorcallTstate (tstate=0x5555566c6300 <_PyRuntime+326528>, callable=0x7fffb50472b0, args=0x5020000058f0, nargsf=1031, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:168\n#7  0x0000555555dbd570 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:813\n#8  0x0000555555dac3eb in PyEval_EvalCode (co=co@entry=0x7fffb4d91690, globals=globals@entry=0x7fffb4755770, locals=locals@entry=0x7fffb4755770) at Python/ceval.c:604\n#9  0x0000555555da0ac6 in builtin_exec_impl (source=0x7fffb4d91690, globals=0x7fffb4755770, locals=0x7fffb4755770, closure=0x0, module=<optimized out>) at Python/bltinmodule.c:1143\n#10 builtin_exec (module=<optimized out>, args=<optimized out>, args@entry=0x5290000057e0, nargs=nargs@entry=2, kwnames=kwnames@entry=0x0) at Python/clinic/bltinmodule.c.h:556\n#11 0x0000555555b645ca in cfunction_vectorcall_FASTCALL_KEYWORDS (func=<optimized out>, args=0x5290000057e0, nargsf=<optimized out>, kwnames=0x0) at Objects/methodobject.c:441\n#12 0x0000555555a484db in _PyObject_VectorcallTstate (tstate=0x5555566c6300 <_PyRuntime+326528>, callable=0x7fffb425e780, args=0x5020000058f0, nargsf=1031, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:168\n#13 0x0000555555dbd570 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:813\n#14 0x0000555555dac3eb in PyEval_EvalCode (co=co@entry=0x7fffb4f01690, globals=globals@entry=0x7fffb4755770, locals=locals@entry=0x7fffb4755770) at Python/ceval.c:604\n#15 0x0000555555da0ac6 in builtin_exec_impl (source=0x7fffb4f01690, globals=0x7fffb4755770, locals=0x7fffb4755770, closure=0x0, module=<optimized out>) at Python/bltinmodule.c:1143\n#16 builtin_exec (module=<optimized out>, args=<optimized out>, args@entry=0x529000005380, nargs=nargs@entry=2, kwnames=kwnames@entry=0x0) at Python/clinic/bltinmodule.c.h:556\n#17 0x0000555555b645ca in cfunction_vectorcall_FASTCALL_KEYWORDS (func=<optimized out>, args=0x529000005380, nargsf=<optimized out>, kwnames=0x0) at Objects/methodobject.c:441\n#18 0x0000555555a484db in _PyObject_VectorcallTstate (tstate=0x5555566c6300 <_PyRuntime+326528>, callable=0x7fffb425e780, args=0x5020000058f0, nargsf=1031, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:168\n#19 0x0000555555dbd570 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:813\n#20 0x0000555555fbbba3 in pymain_run_module (modname=0x5555562e34a0 <str> L\"_pyrepl\", set_argv0=set_argv0@entry=0) at Modules/main.c:349\n#21 0x0000555555fbd3a9 in pymain_run_stdin (config=config@entry=0x555556697d88 <_PyRuntime+136712>) at Modules/main.c:575\n#22 0x0000555555fbac61 in pymain_run_python (exitcode=0x7fffffffd7e4) at Modules/main.c:699\n#23 Py_RunMain () at Modules/main.c:775\n#24 0x0000555555fbb73e in pymain_main (args=<optimized out>) at Modules/main.c:805\n#25 0x0000555555fbb8a4 in Py_BytesMain (argc=1, argv=<optimized out>) at Modules/main.c:829\n#26 0x00007ffff7c2a3b8 in __libc_start_call_main (main=main@entry=0x55555588a630 <main>, argc=argc@entry=1, argv=argv@entry=0x7fffffffdbc8) at ../sysdeps/nptl/libc_start_call_main.h:58\n#27 0x00007ffff7c2a47b in __libc_start_main_impl (main=0x55555588a630 <main>, argc=1, argv=0x7fffffffdbc8, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\n    stack_end=0x7fffffffdbb8) at ../csu/libc-start.c:360\n#28 0x00005555557a9105 in _start ()\n```\n\n### Python and NumPy Versions:\n\n```\n2.3.0.dev0+git20250415.e151f0d\n3.13.3+ experimental free-threading build (heads/3.13:83cb89b941b, Apr 18 2025, 20:59:43) [Clang 19.1.7 (++20250114103253+cd708029e0b2-1exp120250114103309.40)]\n```\n\n### Runtime Environment:\n\n```\n[{'numpy_version': '2.3.0.dev0+git20250415.e151f0d',\n'python': '3.13.3+ experimental free-threading build '\n'(heads/3.13:83cb89b941b, Apr 18 2025, 20:59:43) [Clang 19.1.7 '\n'(++20250114103253+cd708029e0b2-1exp120250114103309.40)]',\n'uname': uname_result(system='Linux', node='beesknees', release='6.11.0-24-generic', version='https://github.com/numpy/numpy/pull/24-Ubuntu SMP PREEMPT_DYNAMIC Fri Mar 14 18:13:56 UTC 2025', machine='x86_64')},\n{'simd_extensions': {'baseline': ['SSE', 'SSE2', 'SSE3'],\n'found': ['SSSE3',\n'SSE41',\n'POPCNT',\n'SSE42',\n'AVX',\n'F16C',\n'FMA3',\n'AVX2',\n'AVX512F',\n'AVX512CD',\n'AVX512_SKX',\n'AVX512_CLX',\n'AVX512_CNL',\n'AVX512_ICL'],\n'not_found': ['AVX512_KNL', 'AVX512_KNM', 'AVX512_SPR']}},\n{'architecture': 'SkylakeX',\n'filepath': '/home/danzin/venvs/3.13_upstream_fusil_venv/lib/python3.13t/site-packages/numpy.libs/libscipy_openblas64_-56d6093b.so',\n'internal_api': 'openblas',\n'num_threads': 16,\n'prefix': 'libscipy_openblas',\n'threading_layer': 'pthreads',\n'user_api': 'blas',\n'version': '0.3.29'}]\n```\n\n### Context for the issue:\n\nI have been fuzzing Numpy using [fusil](https://github.com/devdanzin/fusil) by @vstinner. I realize these crashes are unlikely to be triggered in normal usage and therefore might be of low priority.\n\nThe fuzzing was done with an ASAN free-threading clang build and not confirmed on a GILfull non-sanitizer GCC build yet.",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-24T09:29:10Z",
+   "body": "I have misdiagnosed this one, from other crashes seen it only happens for exactly `-2**31`. "
+  },
+  {
+   "author": "mhvk",
+   "created_at": "2025-04-24T22:57:22Z",
+   "body": "Can confirm this happens on regular numpy 2.2.4 (on debian testing). 2**-31 is of course a special number, but still a really odd error!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/fusil/issues/38",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/issues/28829",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

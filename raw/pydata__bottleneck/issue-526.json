@@ -1,0 +1,30 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 526,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/526",
+ "title": "mm_new/mm_new_nan: three unchecked malloc calls \u2014 segfault on OOM",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:35:30Z",
+ "closed_at": null,
+ "body": "`mm_new` and `mm_new_nan` each call `malloc` three times in sequence without checking any result for NULL. The second call dereferences the first result (`mm->nodes = malloc(...)` where `mm` could be NULL), and subsequent lines dereference `mm->nodes`.\n\nAdditionally, `mm_free` does not check for NULL before dereferencing its argument. This compounds with the `move_median` `window==1` fast path, which calls `mm_free(mm)` before checking if `mm` is NULL.\n\n**File(s):** `move_median/move_median.c:62-64` (mm_new), `move_median/move_median.c:170-172` (mm_new_nan), `move_template.c:564-566` (mm_free on NULL)\n\n**Suggested fix for mm_new:**\n\n```c\n// Before:\nmm_handle *mm = malloc(sizeof(mm_handle));\nmm->nodes = malloc(window * sizeof(mm_node*));\nmm->node_data = malloc(window * sizeof(mm_node));\n\n// After:\nmm_handle *mm = malloc(sizeof(mm_handle));\nif (mm == NULL) return NULL;\nmm->nodes = malloc(window * sizeof(mm_node*));\nmm->node_data = malloc(window * sizeof(mm_node));\nif (mm->nodes == NULL || mm->node_data == NULL) {\n    free(mm->node_data);\n    free(mm->nodes);\n    free(mm);\n    return NULL;\n}\n```\n\nSame pattern for `mm_new_nan`. For the `window==1` path, move the NULL check before `mm_free`:\n\n```c\nif (mm == NULL) {\n    MEMORY_ERR(\"Could not allocate memory for move_median\");\n    Py_DECREF(y);\n    return NULL;\n}\nif (window == 1) {\n    mm_free(mm);\n    return PyArray_Copy(a);\n}\n```\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/547",
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

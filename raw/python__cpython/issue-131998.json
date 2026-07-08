@@ -1,0 +1,113 @@
+{
+ "repo": "python/cpython",
+ "number": 131998,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/131998",
+ "title": "The interpreter crashes when specializing bound method calls on unbound objects",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "release-blocker",
+  "type-crash",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2025-04-02T01:30:21Z",
+ "closed_at": "2025-04-08T11:03:30Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe following code segfaults the interpreter:\n\n```python\nimport glob\n\nfor x in range(3):\n    str_globber = glob._StringGlobber(None, None)\nstr_globber.selector(set())\n\ntry:\n    str_globber.selector([True, True, False])\nexcept:\n    pass\n\nglobber_base = glob._GlobberBase(0, 0, 0, 0)\nglobber_base.selector(list)\n```\n\n(Edited by @ZeroIntensity) Smaller reproducer:\n\n```py\ndef call(part):\n    part.pop()\n\ncall(['a'])\ntry:\n    call(list)\nexcept TypeError:\n    raise\n```\n\nBacktrace:\n```gdb\nProgram received signal SIGSEGV, Segmentation fault.\n_PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555c6b558 <_PyRuntime+330424>, frame=0x7ffff7fb00a0, frame@entry=0x7ffff7fb0020, throwflag=throwflag@entry=0) at ./Include/object.h:270\n270             return ob->ob_type;\n(gdb) bt\n#0  _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555c6b558 <_PyRuntime+330424>, frame=0x7ffff7fb00a0,\n    frame@entry=0x7ffff7fb0020, throwflag=throwflag@entry=0) at ./Include/object.h:270\n#1  0x000055555585db58 in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020, tstate=0x555555c6b558 <_PyRuntime+330424>)\n    at ./Include/internal/pycore_ceval.h:119\n#2  _PyEval_Vector (tstate=tstate@entry=0x555555c6b558 <_PyRuntime+330424>, func=func@entry=0x7ffff7a91b50,\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>}, args=args@entry=0x0, argcount=argcount@entry=0,\n    kwnames=kwnames@entry=0x0) at Python/ceval.c:1908\n#3  0x000055555585dc57 in PyEval_EvalCode (co=co@entry=<code at remote 0x7ffff7b5db60>,\n    globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>},\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>}) at Python/ceval.c:836\n#4  0x00005555558eb82e in run_eval_code_obj (tstate=tstate@entry=0x555555c6b558 <_PyRuntime+330424>, co=co@entry=0x7ffff7b5db60,\n    globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>},\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>}) at Python/pythonrun.c:1365\n#5  0x00005555558ec92e in run_mod (mod=mod@entry=0x555555e0e230, filename=filename@entry='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>}, locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>}, flags=flags@entry=0x7fffffffdb68, arena=arena@entry=0x7ffff7ab3f40, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1436\n#6  0x00005555558eccdb in pyrun_file (fp=fp@entry=0x555555df2410, filename=filename@entry='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', start=start@entry=257, globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>}, locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', '__cached__': None, 'glob': <module at remote 0x7ffff7ad0170>, 'x': 2, 'str_globber': <_StringGlobber(sep=None, case_sensitive=None, case_pedantic=False, recursive=False) at remote 0x7ffff78ef630>, 'globber_base': <_GlobberBase(case_pedantic=0, case_sensitive=0, recursive=0, sep=0) at remote 0x7ffff7a7e6e0>}, closeit=closeit@entry=1, flags=0x7fffffffdb68) at Python/pythonrun.c:1293\n#7  0x00005555558eeff1 in _PyRun_SimpleFileObject (fp=fp@entry=0x555555df2410, filename=filename@entry='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', closeit=closeit@entry=1, flags=flags@entry=0x7fffffffdb68) at Python/pythonrun.c:521\n#8  0x00005555558ef2ba in _PyRun_AnyFileObject (fp=fp@entry=0x555555df2410, filename=filename@entry='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', closeit=closeit@entry=1, flags=flags@entry=0x7fffffffdb68) at Python/pythonrun.c:81\n#9  0x000055555591ebd4 in pymain_run_file_obj (program_name=program_name@entry='/home/danzin/projects/cpython/python', filename=filename@entry='/home/fusil/runs/python-12/glob-cpu_load-invalid_mem_access-0x0000000000000008/source2.py', skip_source_first_line=0) at Modules/main.c:396\n#10 0x000055555591ef72 in pymain_run_file (config=config@entry=0x555555c36688 <_PyRuntime+113640>) at Modules/main.c:415\n#11 0x000055555592050d in pymain_run_python (exitcode=exitcode@entry=0x7fffffffdcf4) at Modules/main.c:680\n#12 0x000055555592056e in Py_RunMain () at Modules/main.c:761\n#13 0x00005555559205e5 in pymain_main (args=args@entry=0x7fffffffdd50) at Modules/main.c:791\n#14 0x00005555559206a8 in Py_BytesMain (argc=<optimized out>, argv=<optimized out>) at Modules/main.c:815\n#15 0x00005555555d7926 in main (argc=<optimized out>, argv=<optimized out>) at ./Programs/python.c:15\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a6+ (heads/main:3a8cefba0b6, Apr  1 2025, 21:31:55) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132000\n* gh-132262\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-02T02:03:43Z",
+   "body": "Looks like a 3.14 regression."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-02T09:26:26Z",
+   "body": "> Looks like a 3.14 regression.\n\nI can reproduce the crash on Python 3.13."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-02T09:33:31Z",
+   "body": "Hmm, I couldn't. Let me double check."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-02T09:36:14Z",
+   "body": "I can reproduce the crash on a Python 3.13 release build (PGO+LTO). I cannot reproduce the crash on a Python 3.13 debug build (`--with-pydebug CFLAGS=\"-O0\"`)."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-02T09:51:36Z",
+   "body": "Ah, this *doesn't* occur on a 3.13.2 release build, so this will be a neat surprise in the upcoming release next week. "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-02T09:58:50Z",
+   "body": "The crash on Python 3.13.2 using the Fedora 41 package:\n\n```console\n$ cat x.py \ndef call(part):\n    part.pop()\ncall(['a'])\ntry:\n    call(list)\nexcept TypeError:\n    raise\n\n$ python3.13 -VV\nPython 3.13.2 (main, Feb  4 2025, 00:00:00) [GCC 14.2.1 20250110 (Red Hat 14.2.1-7)]\n\n$ python3.13 x.py \nErreur de segmentation (core dumped)\n```\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-02T10:02:39Z",
+   "body": "I can reproduce using that script on 3.13.2, but not the original one that @devdanzin provided."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-08T11:03:30Z",
+   "body": "Thanks everyone!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132000",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "aefcf8aac0086b83c4de9375cd66a977bee680a8",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "363acec9ec47cc25506fdacc641a4c82468762b4",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ac3c439cdfee8452f2bcceacd67a1f4e423ac3cf",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3fcd91c40f903d54acfd3b1f89df47a53c6cb5e5",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132262",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5911768600f6e7ff16043f9402416f0adf035b02",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ]
+}

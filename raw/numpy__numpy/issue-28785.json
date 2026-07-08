@@ -1,0 +1,50 @@
+{
+ "repo": "numpy/numpy",
+ "number": 28785,
+ "type": "issue",
+ "url": "https://github.com/numpy/numpy/issues/28785",
+ "title": "BUG: segfault from calling `__func__` of Cython methods",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "00 - Bug",
+  "57 - Close?"
+ ],
+ "created_at": "2025-04-20T21:48:18Z",
+ "closed_at": "2025-04-25T10:43:50Z",
+ "body": "### Describe the issue:\n\nIt's possible to segfault the interpreter by calling `__func__()` of some Cython methods.\n\n### Reproduce the code example:\n\n```python\nimport numpy.random\nnumpy.random.poisson.__func__(list)\n```\n\n### Error message:\n\n```shell\nThread 1 \"python\" received signal SIGSEGV, Segmentation fault.\nfind_name_in_mro (type=type@entry=0x55555585df76, name=name@entry=0x555555a5ff18 <_PyRuntime+48088>, error=error@entry=0x7fffffffcc14) at Objects/typeobject.c:5126\n5126        Py_INCREF(mro);\n\n#0  find_name_in_mro (type=type@entry=0x55555585df76, name=name@entry=0x555555a5ff18 <_PyRuntime+48088>, error=error@entry=0x7fffffffcc14) at Objects/typeobject.c:5126\n#1  0x00005555556b7a12 in _PyType_LookupRef (type=0x55555585df76, name=0x555555a5ff18 <_PyRuntime+48088>) at Objects/typeobject.c:5284\n#2  0x00005555556b9306 in _PyType_Lookup (type=0x55555585df76, name=0x555555a5ff18 <_PyRuntime+48088>) at Objects/typeobject.c:5321\n#3  0x00007ffff69a169d in __Pyx__PyObject_LookupSpecial.constprop.0 ()\n   from /home/danzin/venvs/3.13_release_fusil_venv/lib/python3.13t/site-packages/numpy/random/_common.cpython-313t-x86_64-linux-gnu.so\n#4  0x00007ffff69c01e6 in __pyx_f_5numpy_6random_7_common_disc ()\n   from /home/danzin/venvs/3.13_release_fusil_venv/lib/python3.13t/site-packages/numpy/random/_common.cpython-313t-x86_64-linux-gnu.so\n#5  0x00007ffff537ef20 in __pyx_pw_5numpy_6random_6mtrand_11RandomState_91poisson ()\n   from /home/danzin/venvs/3.13_release_fusil_venv/lib/python3.13t/site-packages/numpy/random/mtrand.cpython-313t-x86_64-linux-gnu.so\n#6  0x00005555556278e9 in _PyObject_VectorcallTstate (tstate=0x555555a9fff0 <_PyRuntime+310448>, callable=0x20c363cf600, args=<optimized out>, nargsf=<optimized out>,\n    kwnames=<optimized out>) at ./Include/internal/pycore_call.h:168\n#7  PyObject_Vectorcall (callable=callable@entry=0x20c363cf600, args=0x555555a5ff18 <_PyRuntime+48088>, args@entry=0x7ffff7faf648, nargsf=140737488342036, kwnames=kwnames@entry=0x0)\n    at Objects/call.c:327\n#8  0x0000555555758b12 in _PyEval_EvalFrameDefault (tstate=0x555555a9fff0 <_PyRuntime+310448>, frame=0x7ffff7faf5f0, throwflag=<optimized out>) at Python/generated_cases.c.h:813\n#9  0x0000555555751e33 in _PyEval_EvalFrame (tstate=0x555555a9fff0 <_PyRuntime+310448>, frame=0x555555a5ff18 <_PyRuntime+48088>, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#10 _PyEval_Vector (tstate=0x555555a9fff0 <_PyRuntime+310448>, func=0x20c3740b860, locals=0x20c366a9440, args=0x0, argcount=0, kwnames=0x0) at Python/ceval.c:1816\n#11 PyEval_EvalCode (co=co@entry=0x20c37351e00, globals=globals@entry=0x20c366a9440, locals=locals@entry=0x20c366a9440) at Python/ceval.c:604\n#12 0x000055555574e2bd in builtin_exec_impl (source=<optimized out>, globals=0x20c366a9440, locals=0x20c366a9440, closure=0x0, module=<optimized out>) at Python/bltinmodule.c:1143\n#13 builtin_exec (module=<optimized out>, args=<optimized out>, nargs=<optimized out>, kwnames=<optimized out>) at Python/clinic/bltinmodule.c.h:556\n#14 0x000055555568365a in cfunction_vectorcall_FASTCALL_KEYWORDS (func=0x20c36341400, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:441\n#15 0x00005555556278e9 in _PyObject_VectorcallTstate (tstate=0x555555a9fff0 <_PyRuntime+310448>, callable=0x20c36341400, args=<optimized out>, nargsf=<optimized out>,\n    kwnames=<optimized out>) at ./Include/internal/pycore_call.h:168\n#16 PyObject_Vectorcall (callable=callable@entry=0x20c36341400, args=0x555555a5ff18 <_PyRuntime+48088>, args@entry=0x7ffff7faf5e0, nargsf=140737488342036, kwnames=kwnames@entry=0x0)\n    at Objects/call.c:327\n#17 0x0000555555758b12 in _PyEval_EvalFrameDefault (tstate=0x555555a9fff0 <_PyRuntime+310448>, frame=0x7ffff7faf578, throwflag=<optimized out>) at Python/generated_cases.c.h:813\n#18 0x0000555555751e33 in _PyEval_EvalFrame (tstate=0x555555a9fff0 <_PyRuntime+310448>, frame=0x555555a5ff18 <_PyRuntime+48088>, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#19 _PyEval_Vector (tstate=0x555555a9fff0 <_PyRuntime+310448>, func=0x20c366419a0, locals=0x20c366a9440, args=0x0, argcount=0, kwnames=0x0) at Python/ceval.c:1816\n#20 PyEval_EvalCode (co=co@entry=0x20c36937080, globals=globals@entry=0x20c366a9440, locals=locals@entry=0x20c366a9440) at Python/ceval.c:604\n#21 0x000055555574e2bd in builtin_exec_impl (source=<optimized out>, globals=0x20c366a9440, locals=0x20c366a9440, closure=0x0, module=<optimized out>) at Python/bltinmodule.c:1143\n#22 builtin_exec (module=<optimized out>, args=<optimized out>, nargs=<optimized out>, kwnames=<optimized out>) at Python/clinic/bltinmodule.c.h:556\n#23 0x000055555568365a in cfunction_vectorcall_FASTCALL_KEYWORDS (func=0x20c36341400, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:441\n#24 0x00005555556278e9 in _PyObject_VectorcallTstate (tstate=0x555555a9fff0 <_PyRuntime+310448>, callable=0x20c36341400, args=<optimized out>, nargsf=<optimized out>,\n    kwnames=<optimized out>) at ./Include/internal/pycore_call.h:168\n#25 PyObject_Vectorcall (callable=callable@entry=0x20c36341400, args=0x555555a5ff18 <_PyRuntime+48088>, args@entry=0x7ffff7faf180, nargsf=140737488342036, kwnames=kwnames@entry=0x0)\n    at Objects/call.c:327\n#26 0x0000555555758b12 in _PyEval_EvalFrameDefault (tstate=0x555555a9fff0 <_PyRuntime+310448>, frame=0x7ffff7faf0d8, throwflag=<optimized out>) at Python/generated_cases.c.h:813\n#27 0x00005555557ea8df in pymain_run_module (modname=<optimized out>, set_argv0=set_argv0@entry=0) at Modules/main.c:349\n#28 0x00005555557eb139 in pymain_run_stdin (config=config@entry=0x555555a71ac8 <_PyRuntime+120712>) at Modules/main.c:575\n#29 0x00005555557ea5b5 in pymain_run_python (exitcode=0x7fffffffd69c) at Modules/main.c:699\n#30 Py_RunMain () at Modules/main.c:775\n#31 0x00005555557ea77a in pymain_main (args=args@entry=0x7fffffffd988) at Modules/main.c:805\n#32 0x00005555557ea7cc in Py_BytesMain (argc=<optimized out>, argv=0x555555a5ff18 <_PyRuntime+48088>) at Modules/main.c:829\n```\n\n### Python and NumPy Versions:\n\n```\n2.3.0.dev0+git20250415.e151f0d\n3.13.3+ experimental free-threading build (heads/3.13:83cb89b941b, Apr 18 2025, 20:59:43) [Clang 19.1.7 (++20250114103253+cd708029e0b2-1exp120250114103309.40)]\n```\n\n### Runtime Environment:\n\n```\n[{'numpy_version': '2.3.0.dev0+git20250415.e151f0d',\n'python': '3.13.3+ experimental free-threading build '\n'(heads/3.13:83cb89b941b, Apr 18 2025, 20:59:43) [Clang 19.1.7 '\n'(++20250114103253+cd708029e0b2-1exp120250114103309.40)]',\n'uname': uname_result(system='Linux', node='beesknees', release='6.11.0-24-generic', version='https://github.com/numpy/numpy/pull/24-Ubuntu SMP PREEMPT_DYNAMIC Fri Mar 14 18:13:56 UTC 2025', machine='x86_64')},\n{'simd_extensions': {'baseline': ['SSE', 'SSE2', 'SSE3'],\n'found': ['SSSE3',\n'SSE41',\n'POPCNT',\n'SSE42',\n'AVX',\n'F16C',\n'FMA3',\n'AVX2',\n'AVX512F',\n'AVX512CD',\n'AVX512_SKX',\n'AVX512_CLX',\n'AVX512_CNL',\n'AVX512_ICL'],\n'not_found': ['AVX512_KNL', 'AVX512_KNM', 'AVX512_SPR']}},\n{'architecture': 'SkylakeX',\n'filepath': '/home/danzin/venvs/3.13_upstream_fusil_venv/lib/python3.13t/site-packages/numpy.libs/libscipy_openblas64_-56d6093b.so',\n'internal_api': 'openblas',\n'num_threads': 16,\n'prefix': 'libscipy_openblas',\n'threading_layer': 'pthreads',\n'user_api': 'blas',\n'version': '0.3.29'}]\n```\n\n### Context for the issue:\n\nI have been fuzzing Numpy using [fusil](https://github.com/devdanzin/fusil) by @vstinner. I realize these crashes are unlikely to be triggered in normal usage and therefore might be of low priority.\n\nThe fuzzing was done with an ASAN free-threading clang build and not confirmed on a GILfull non-sanitizer GCC build yet.",
+ "comments": [
+  {
+   "author": "seberg",
+   "created_at": "2025-04-24T06:57:46Z",
+   "body": "Can you move this issue to Cython?  I thought, there was an issue about this in Cython already but didn't find it very quickly (I remember running into what I think is the same in a very different context).\n(Might be good to double check it's Cython, but I am certain enough.  It will probably be related to using `#cython: binding=True`)\n\n(Not saying that this is a big bug in Cython.)"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-24T09:29:48Z",
+   "body": "Will do, thanks for the feedback!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/fusil/issues/38",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "seberg"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/cython/cython/issues/6807",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

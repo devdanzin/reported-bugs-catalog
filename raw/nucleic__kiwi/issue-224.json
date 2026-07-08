@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/kiwi",
+ "number": 224,
+ "type": "issue",
+ "url": "https://github.com/nucleic/kiwi/issues/224",
+ "title": "Destructor called on unconstructed C++ object in Variable_new, Constraint_new, makecn",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T08:58:38Z",
+ "closed_at": null,
+ "body": "`Variable_new`, `Constraint_new`, and `makecn` (in `symbolics.h`) all allocate a Python object via `PyType_GenericNew`, then may return an error before the C++ member is placement-new'd. When the error return triggers `cppy::ptr`'s destructor, it calls `Py_DECREF` on the object, which invokes the type's `tp_dealloc`. The dealloc calls the C++ destructor (`~Variable()`, `~Constraint()`) on memory that was never constructed \u2014 undefined behavior.\n\n**Affected sites**:\n\n- `variable.cpp:40-48` \u2014 if `!PyUnicode_Check(name)` or `convert_pystr_to_str` fails, error return before `new(&self->variable) kiwi::Variable(...)` at line 50/56\n- `constraint.cpp:40-53` \u2014 if `reduce_expression` fails at line 45, error return before `new(&cn->constraint) kiwi::Constraint(...)` at line 50\n- `symbolics.h:575-587` (`makecn`) \u2014 same pattern as `Constraint_new`\n\n**Example** (`Variable_new` flow):\n```\nPyType_GenericNew succeeds (zero-initialized memory)\n\u2192 self->context = cppy::xincref(context)  // sets a field\n\u2192 !PyUnicode_Check(name) \u2192 return error\n\u2192 cppy::ptr destructor \u2192 Py_DECREF \u2192 Variable_dealloc\n\u2192 self->variable.~Variable()  // UB: never constructed\n```\n\n**Suggested fix**: validate input *before* allocating, or do the placement-new immediately after allocation:\n\n```cpp\n// Option A: validate first\nif (name != 0) {\n    if (!PyUnicode_Check(name))\n        return cppy::type_error(name, \"str\");\n    if (!convert_pystr_to_str(name, c_name))\n        return 0;\n}\n\ncppy::ptr pyvar(PyType_GenericNew(type, args, kwargs));\nif (!pyvar)\n    return 0;\n// Now placement-new is always reached...\n```\n\nIn practice, the UB may be benign on current platforms (kiwi destructors on zeroed memory happen to be no-ops), but it is formally undefined and could break with compiler optimizations or kiwi library changes.\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

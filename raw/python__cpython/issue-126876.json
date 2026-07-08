@@ -1,0 +1,164 @@
+{
+ "repo": "python/cpython",
+ "number": 126876,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126876",
+ "title": "Assertion failure for `socket` with too large default timeout (larger than INT_MAX)",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-15T17:21:25Z",
+ "closed_at": "2024-12-14T20:29:47Z",
+ "body": "# Crash report\n\n### What happened?\n\nA debug build will abort when calling `socket._fallback_socketpair()` after a call to `socket.setdefaulttimeout` with too high a value:\n\n```python\npython -c \"import socket; socket.setdefaulttimeout(2**31) ; socket._fallback_socketpair()\"\npython: ./Modules/socketmodule.c:819: internal_select: Assertion `ms <= INT_MAX' failed.\nAborted (core dumped)\n```\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.12, 3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.13.0+ (heads/3.13:7be8743, Nov 15 2024, 15:20:16) [GCC 13.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126968\n* gh-127002\n* gh-127003\n* gh-127517\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-15T18:48:37Z",
+   "body": "Here's my idea:\r\n\r\n```diff\r\ndiff --git Modules/socketmodule.c Modules/socketmodule.c\r\nindex 2764bd6e2b2..4c0aac92a76 100644\r\n--- Modules/socketmodule.c\r\n+++ Modules/socketmodule.c\r\n@@ -810,7 +810,7 @@ internal_select(PySocketSockObject *s, int writing, PyTime_t interval,\r\n \r\n     /* s->sock_timeout is in seconds, timeout in ms */\r\n     ms = _PyTime_AsMilliseconds(interval, _PyTime_ROUND_CEILING);\r\n-    assert(ms <= INT_MAX);\r\n+    assert(ms <= PyTime_MAX);\r\n \r\n     /* On some OSes, typically BSD-based ones, the timeout parameter of the\r\n        poll() syscall, when negative, must be exactly INFTIM, where defined,\r\n                                               \r\n```\r\n\r\nAfter that:\r\n\r\n```\r\n\u00bb ./python.exe -c \"import socket; socket.setdefaulttimeout(2**31) ; socket._fallback_socketpair()\"\r\nTraceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\n    import socket; socket.setdefaulttimeout(2**31) ; socket._fallback_socketpair()\r\n                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\r\n  File \"/Users/sobolev/Desktop/cpython2/Lib/socket.py\", line 633, in _fallback_socketpair\r\n    ssock, _ = lsock.accept()\r\n               ~~~~~~~~~~~~^^\r\n  File \"/Users/sobolev/Desktop/cpython2/Lib/socket.py\", line 298, in accept\r\n    fd, addr = self._accept()\r\n               ~~~~~~~~~~~~^^\r\nTimeoutError: timed out\r\n                       \r\n```"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-15T18:49:42Z",
+   "body": "If others agree with me - I can open a PR :)"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-18T14:04:03Z",
+   "body": "```\r\n-    assert(ms <= INT_MAX);\r\n+    assert(ms <= PyTime_MAX);\r\n```\r\n\r\nThis change is wrong: poll() last argument type is `int`. A better fix would be:\r\n\r\n```diff\r\ndiff --git a/Modules/socketmodule.c b/Modules/socketmodule.c\r\nindex 2764bd6e2b2..0ba5b4af6bc 100644\r\n--- a/Modules/socketmodule.c\r\n+++ b/Modules/socketmodule.c\r\n@@ -810,7 +810,9 @@ internal_select(PySocketSockObject *s, int writing, PyTime_t interval,\r\n \r\n     /* s->sock_timeout is in seconds, timeout in ms */\r\n     ms = _PyTime_AsMilliseconds(interval, _PyTime_ROUND_CEILING);\r\n-    assert(ms <= INT_MAX);\r\n+    if (ms > INT_MAX) {\r\n+        ms = INT_MAX;\r\n+    }\r\n \r\n     /* On some OSes, typically BSD-based ones, the timeout parameter of the\r\n        poll() syscall, when negative, must be exactly INFTIM, where defined,\r\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-18T14:31:14Z",
+   "body": "I propose PR gh-126968 to fix the issue."
+  },
+  {
+   "author": "tomasr8",
+   "created_at": "2024-12-14T20:15:30Z",
+   "body": "Can this be closed? All linked PRs have been merged."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "23f99f55e8a350ad60ad9974ec919928c30733ac",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126968",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3687ad454c4ac54c8599a10f3ace8a13ca48915",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f6930042bcf139742e8180c144171793db690429",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e51cc5be24098239f85d7f2c44a08d043fa8ac81",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127002",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127003",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c69e2d90aeb4ba082927cdae455ca4f736349272",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127517",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c46acd3588864e97d0e0fe37a41aa5e94ac7af51",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d8f36d894490ed2aac06b5c9794b56e4a112ca84",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "db50895f505def5bd15b13e253901d70720343e0",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "059114c0a0bc60c1d180eefa54e8483e3a8e9b5e",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b49e902b81a0ead84e2002f94a2a2b2ae9b09ada",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "682a2b16f440650aaa2b2fac6daed90f8d9f78a9",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4c36f2b44ffba6ce77ca4fcf1bf773e61302dbb6",
+   "actor": "ebonnal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e71dbb8dab8600bcab8b2e6c6c2a66a05877b04e",
+   "actor": "ebonnal"
+  }
+ ]
+}

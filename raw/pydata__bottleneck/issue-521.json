@@ -1,0 +1,59 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 521,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/521",
+ "title": "rankdata/nanrankdata leak 1 reference per call on non-C-contiguous arrays",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:34:23Z",
+ "closed_at": "2026-03-31T09:04:29Z",
+ "body": "In `nonreducer_axis`, when `PyArray_Ravel(a, NPY_CORDER)` is called on a non-C-contiguous array (F-order, transposed, strided), the old `a` \u2014 which had its refcount incremented via `Py_INCREF` \u2014 is overwritten without `Py_DECREF`. This leaks one reference to the input array per call. The array can never be garbage collected.\n\nAdditionally, `PyArray_Ravel`'s return value is not checked for NULL \u2014 if it fails (OOM), subsequent code or the `error:` cleanup label dereferences NULL.\n\n**File(s):** `nonreduce_axis_template.c:671-672,681-682`\n\n**Reproducer:**\n\n```python\nimport bottleneck as bn\nimport numpy as np\nimport sys\n\narr = np.asfortranarray(np.random.rand(100, 100))\nprint(f\"arr refcount before: {sys.getrefcount(arr)}\")\n\nfor _ in range(1000):\n    bn.rankdata(arr)\n\nprint(f\"arr refcount after 1000 calls: {sys.getrefcount(arr)}\")\n# Output:\n# arr refcount before: 2\n# arr refcount after 1000 calls: 1002\n```\n\nAfter 1000 calls, the input array's refcount is 1002. Even `del arr` only drops it to 1001 \u2014 the array is permanently pinned in memory.\n\nThe leak occurs when `PyArray_Ravel` must **copy** (not return a view): F-contiguous, transposed, or non-standard-stride arrays. C-contiguous arrays are not affected (Ravel returns a view).\n\n**Suggested fix:**\n\n```c\n// Before:\nif (PyArray_NDIM(a) != 1) {\n    a = (PyArrayObject *)PyArray_Ravel(a, NPY_CORDER);\n}\n\n// After:\nif (PyArray_NDIM(a) != 1) {\n    PyArrayObject *tmp = (PyArrayObject *)PyArray_Ravel(a, NPY_CORDER);\n    Py_DECREF(a);\n    if (tmp == NULL) return NULL;\n    a = tmp;\n}\n```\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-30T14:38:33Z",
+   "body": "bug and fix confirmed.\n\nWhat surprised me though is that the following line\n```py\na = (PyArrayObject *)PyArray_Ravel(a, NPY_CORDER);\n```\nappears in 4 other places that I *think* are equally incorrect, so I'm wondering if your tools just missed them (false negative) or there's something I'm not getting here (false positive on my side)."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-30T16:40:27Z",
+   "body": "nevermind I was just not reading it right. The \"4 other places\" are *generated* from the ones you found, so we're all good."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/528",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/534",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/545",
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

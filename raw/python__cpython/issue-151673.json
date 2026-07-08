@@ -1,0 +1,39 @@
+{
+ "repo": "python/cpython",
+ "number": 151673,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/151673",
+ "title": "Segfault: `Py_DECREF(NULL)` in `setup_context`/`do_warn` (`_warnings.c`) when emitting a warning under MemoryError",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2026-06-18T21:06:11Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\n_AI Disclaimer: this issue was drafted by Claude Code, which also generated the reduced reproducer._\n\nEmitting a warning while allocations are failing segfaults on a `Py_DECREF` of a NULL `filename`. `setup_context()` does not NULL-check `PyUnicode_FromString(\"<sys>\")`, and the resulting NULL is later decref'd either by `do_warn()` (success path) or by `setup_context()`'s own `handle_error:` label (which uses `Py_DECREF`, not `Py_XDECREF`).\n\n## Reproducer\n\n```python\nimport _testcapi, warnings, faulthandler\nfaulthandler.enable()\nwarnings.simplefilter(\"always\")\n_testcapi.set_nomemory(0, 0)   # fail every allocation from here on\nwarnings.warn(\"boom\")          # -> Py_DECREF(NULL) -> SIGSEGV\n```\n\nDeterministic (`start=0`). Reproduced on `main`.\n\n## Backtrace\n\n```\n#0 _Py_atomic_load_uint32_relaxed   Include/cpython/pyatomic_gcc.h\n#1 Py_DECREF                        Include/refcount.h\n#2 do_warn                          Python/_warnings.c:1139   <- Py_DECREF(filename), filename == NULL\n#3 warnings_warn_impl               Python/_warnings.c:1184\n#4 warnings_warn                    Python/clinic/_warnings.c.h:161\n```\n\n`(gdb) frame 2; print filename` \u2192 `$1 = (PyObject *) 0x0`.\n\n## Root cause\n\nIn `setup_context()` (`_warnings.c`), the `f == NULL` branch (~L1036):\n\n```c\nif (f == NULL) {\n    globals = interp->sysdict;\n    *filename = PyUnicode_FromString(\"<sys>\");   /* return value unchecked */\n    *lineno = 0;\n}\n```\n\nUnder memory pressure two allocations fail in sequence:\n1. `PyThreadState_GetFrame()` returns NULL (its frame-object allocation fails), so the `f == NULL` branch is taken; then\n2. `PyUnicode_FromString(\"<sys>\")` itself returns NULL, leaving `*filename == NULL`.\n\nThe NULL `*filename` then reaches a `Py_DECREF`:\n- if `setup_context()` returns success (registry and `__name__` already present in `globals`, so no further allocation is needed), `do_warn()` runs its cleanup `Py_DECREF(filename)` at L1139 \u2014 NULL deref; **or**\n- if `setup_context()` instead hits `handle_error:` (L1084), that path runs `Py_DECREF(*filename)` (L1087, **not** `Py_XDECREF`) \u2014 NULL deref.\n\n## Suggested fix\n\n```c\n    *filename = PyUnicode_FromString(\"<sys>\");\n    if (*filename == NULL) {\n        goto handle_error;\n    }\n```\n\nand at `handle_error:` use `Py_XDECREF(*filename)` (since `*filename` may legitimately be NULL there).\n\n## Notes\n\nFound by OOM-injection fuzzing (`set_nomemory`). Same pattern as gh-146080 (`Py_DECREF(NULL)` in an `_ssl.c` error label). Code is long-standing, so 3.13\u20133.15 are likely affected as well (unverified).\n\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.16.0a0 (heads/main:bfecfcc2a86, Jun 18 2026, 13:48:35) [Clang 22.1.2 (1ubuntu1)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151767\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151767",
+   "commit": null,
+   "actor": "Ijtihed"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e01d44b6255f383440f62215d01ebc7cd317883e",
+   "actor": "Ijtihed"
+  }
+ ]
+}

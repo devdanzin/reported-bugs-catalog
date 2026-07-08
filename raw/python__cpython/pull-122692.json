@@ -1,0 +1,80 @@
+{
+ "repo": "python/cpython",
+ "number": 122692,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/122692",
+ "title": "gh-123572: Fix key codes in VK_MAP in windows_console.py",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-08-05T14:57:11Z",
+ "closed_at": "2024-09-03T13:01:21Z",
+ "body": "This trivial PR corrects a couple Virtual-Key Codes found in `VK_MAP` in windows_console.py. It should have no impact on real use of the new REPL, as AFAIK those VKs are unused.\r\n\r\ncc @DinoV \n\n<!-- gh-issue-number: gh-123572 -->\n* Issue: gh-123572\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-09-02T08:16:34Z",
+   "body": "Can you please add a NEWS entry? you can use the formulation of https://github.com/python/cpython/pull/123573 if you want."
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-09-03T12:35:09Z",
+   "body": "@devdanzin I have pushed a news entry for you. Next time you can do as @picnixz indicates or using the [blu](https://blurb-it.herokuapp.com/add_blurb) tool."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-09-03T12:36:53Z",
+   "body": "(I haven't done much :') but thanks for the thanks)"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-09-03T13:01:25Z",
+   "body": "Thanks @devdanzin for the PR, and @pablogsal for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-09-03T13:01:35Z",
+   "body": "[GH-123632](https://github.com/python/cpython/pull/123632) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/123573",
+   "commit": null,
+   "actor": "neonene"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/123572",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "782217f28f0d67916fc3ff82b03b88573686c0e7",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "309bea0e4138ac549f0fccb5a5df62f2ff1ff930",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "67851201d8e76fd2c79c91ed5678fa5ca40cafef",
+   "actor": "pablogsal"
+  }
+ ]
+}

@@ -1,0 +1,111 @@
+{
+ "repo": "python/cpython",
+ "number": 135698,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/135698",
+ "title": "Abort in `_interpqueuesmodule` due to queue being created with negative `maxsize`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2025-06-19T02:33:16Z",
+ "closed_at": "2025-06-23T20:05:23Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe interpreter will abort when running the following MRE, which creates a queue with `maxsize=-1`:\n\n```python\nimport _interpqueues\n\n_interpqueues.create(-1, 1, 1)\n_interpqueues.is_full(1)\n```\n\nAbort backtrace:\n```shell\npython: ./Modules/_interpqueuesmodule.c:713: _queue_is_full: Assertion `queue->items.count <= queue->items.maxsize' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350575936) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140737350575936) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140737350575936, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7cdf476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc57f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7cc571b in __assert_fail_base (fmt=0x7ffff7e7a130 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\n    assertion=0x7ffff79dc020 \"queue->items.count <= queue->items.maxsize\", file=0x7ffff79dc000 \"./Modules/_interpqueuesmodule.c\", line=713,\n    function=<optimized out>) at ./assert/assert.c:94\n#6  0x00007ffff7cd6e96 in __GI___assert_fail (assertion=assertion@entry=0x7ffff79dc020 \"queue->items.count <= queue->items.maxsize\",\n    file=file@entry=0x7ffff79dc000 \"./Modules/_interpqueuesmodule.c\", line=line@entry=713,\n    function=function@entry=0x7ffff79dc980 <__PRETTY_FUNCTION__.16> \"_queue_is_full\") at ./assert/assert.c:103\n#7  0x00007ffff79d7aed in _queue_is_full (queue=0x555555de5fa0, p_is_full=p_is_full@entry=0x7fffffffd33c) at ./Modules/_interpqueuesmodule.c:713\n#8  0x00007ffff79d7cde in queue_is_full (queues=queues@entry=0x7ffff79e05a8 <_globals+8>, qid=qid@entry=1,\n    p_is_full=p_is_full@entry=0x7fffffffd33c) at ./Modules/_interpqueuesmodule.c:1248\n#9  0x00007ffff79da801 in queuesmod_is_full (self=0x7ffff7ac8590, args=args@entry=0x7ffff7a5bde0, kwds=kwds@entry=0x0)\n    at ./Modules/_interpqueuesmodule.c:1803\n#10 0x000055555570b67d in cfunction_call (func=0x7ffff7ac8ad0, args=0x7ffff7a5bde0, kwargs=0x0) at Objects/methodobject.c:565\n#11 0x0000555555689bf1 in _PyObject_MakeTpCall (tstate=tstate@entry=0x555555d6f7c0 <_PyRuntime+331232>, callable=callable@entry=0x7ffff7ac8ad0,\n    args=args@entry=0x7fffffffd668, nargs=<optimized out>, keywords=keywords@entry=0x0) at Objects/call.c:242\n#12 0x000055555568a012 in _PyObject_VectorcallTstate (tstate=0x555555d6f7c0 <_PyRuntime+331232>, callable=0x7ffff7ac8ad0, args=0x7fffffffd668,\n    nargsf=<optimized out>, kwnames=0x0) at ./Include/internal/pycore_call.h:167\n#13 0x000055555568a03e in PyObject_Vectorcall (callable=callable@entry=0x7ffff7ac8ad0, args=args@entry=0x7fffffffd668, nargsf=<optimized out>,\n    kwnames=kwnames@entry=0x0) at Objects/call.c:327\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch, 3.15, 3.14\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 (heads/main-dirty:b706ff003c5, Jun 14 2025, 23:08:39) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-135703\n* gh-135724\n* gh-135775\n* gh-135778\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-06-19T09:41:58Z",
+   "body": "I wrote https://github.com/python/cpython/pull/135703 to fix the issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fe8943898e689fccc562a907daea36d07d66dcec",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135703",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135724",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c5ea8e8e8fc725f39ed23ff6259b3cc157a0785f",
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "22ad2f869e6cd83612fd69dc0e8cb7ddaad0da04",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135775",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "35b90e8bec9cb93d10a8d08ee8c5af3096da8937",
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "efcecd93aaea089598722c013aa2f0523a7d2583",
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135778",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "666795ae34ccb912127d47fd091dcf5513dff94c",
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ericsnowcurrently"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6096098ccb528ee84a2a09fe62a419ea6c4b536f",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "725b6d33a3064982aac3efa50c95a6109aa0cf7a",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7208004cf07d8c8ffc63f2b1f8336bbc6717fe32",
+   "actor": "Agent-Hellboy"
+  }
+ ]
+}

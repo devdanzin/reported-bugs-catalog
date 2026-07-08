@@ -1,0 +1,24 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 529,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/529",
+ "title": "BUFFER_NEW macro: unchecked malloc inside GIL-released region",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:36:08Z",
+ "closed_at": null,
+ "body": "The `BUFFER_NEW(dtype)` macro expands to `dtype *B = malloc(LENGTH * sizeof(dtype));` with no NULL check. `B` is immediately used in the sorting algorithm inside a `BN_BEGIN_ALLOW_THREADS` block (GIL released), so a NULL dereference cannot even set a Python exception \u2014 it's a bare segfault. Four instances (one per dtype in `argpartition`).\n\n**File(s):** `nonreduce_axis_template.c` (BUFFER_NEW definition), used at generated lines 266, 295, 324, 353 in `nonreduce_axis.c`\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

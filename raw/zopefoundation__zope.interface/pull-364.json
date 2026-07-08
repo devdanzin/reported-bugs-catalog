@@ -1,0 +1,36 @@
+{
+ "repo": "zopefoundation/zope.interface",
+ "number": 364,
+ "type": "pull",
+ "url": "https://github.com/zopefoundation/zope.interface/pull/364",
+ "title": "Replace all PyDict_GetItem with exception-safe alternatives",
+ "state": "closed",
+ "state_reason": null,
+ "author": "jensens",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-30T00:54:49Z",
+ "closed_at": "2026-04-30T13:36:18Z",
+ "body": "## Summary\n\n- Replace all remaining `PyDict_GetItem()` calls in the C extension with\n  exception-safe alternatives (`PyDict_Contains`, `PyDict_GetItemWithError`)\n- `PyDict_GetItem` silently swallows ALL exceptions from `__hash__`/`__eq__`,\n  causing `isOrExtends()` to return `False` instead of raising `TypeError`\n  for unhashable objects (CPython 3.14 warns about this at runtime)\n- Use `PyType_GetDict()` on Python 3.13+ instead of deprecated `tp_dict`\n  for free-threading safety\n\n## Changes\n\n| Site | Before | After |\n|------|--------|-------|\n| `SB_extends` (line 335) | `PyDict_GetItem` | `PyDict_Contains` |\n| `IB__adapt__` (line 795) | `PyDict_GetItem` | `PyDict_Contains` |\n| `IB__call__` (line 906) | `PyDict_GetItem` on `tp_dict` | `PyDict_Contains` + `PyType_GetDict()` on 3.13+ |\n| Polyfill `_PyDict_GetItemRef` | `PyDict_GetItem` | `PyDict_GetItemWithError` |\n\n## Performance impact\n\n`PyDict_Contains` is **faster** than `PyDict_GetItem`: it skips the\n`PyErr_Fetch`/`PyErr_Restore` error-state save/restore that `PyDict_GetItem`\ndoes on every call (~12 memory operations saved per call on `SB_extends`,\nthe hottest function in the extension).\n\n## Test plan\n\n- [x] New tests: `test_isOrExtends_raises_TypeError_for_unhashable` (C + Py)\n- [x] New tests: `test_isOrExtends_propagates_MemoryError_from_hash` (C + Py)\n- [x] Full test suite passes: 1366 tests, both `PURE_PYTHON=0` and `PURE_PYTHON=1`\n- [x] No regressions\n\nFixes #357\n\nBased on analysis from https://gist.github.com/devdanzin/5afbad864934b165a2cc080f110aa720\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.ai/claude-code)",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/zopefoundation/zope.interface/issues/370",
+   "commit": null,
+   "actor": "jensens"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "117eefa41b4fc668dfe30254baaa7c28e69b8586",
+   "actor": "jensens"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "jensens"
+  }
+ ]
+}

@@ -1,0 +1,62 @@
+{
+ "repo": "numpy/numpy",
+ "number": 28822,
+ "type": "issue",
+ "url": "https://github.com/numpy/numpy/issues/28822",
+ "title": "BUG: Segfault/stack-overflow from initializing `numpy.random._mt19937.MT19937` with recursive list",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "00 - Bug",
+  "component: numpy.random",
+  "Priority: low"
+ ],
+ "created_at": "2025-04-25T10:14:06Z",
+ "closed_at": "2026-07-03T18:42:45Z",
+ "body": "### Describe the issue:\n\nInitializing `numpy.random._mt19937.MT19937` with a recursive list in an ASAN Python build leads to a segfault, which ASAN says comes from a stack-overflow. Confirmed to also affect `PCG64`, `Philox` etc.\n\n### Reproduce the code example:\n\n```python\nimport numpy.random._mt19937\n\nt = []\nt.append(t)\nnumpy.random._mt19937.MT19937(t)\n```\n\n### Error message:\n\n```shell\nThread 1 \"python\" received signal SIGSEGV, Segmentation fault.\n0x00007ffff75febeb in __interceptor_memset (dst=0x7fffb5dbd9a8, v=205, size=48) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:799\n799     ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc: No such file or directory.\n(gdb) bt\n#0  0x00007ffff75febeb in __interceptor_memset (dst=0x7fffb5dbd9a8, v=205, size=48)\n    at ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:799\n#1  0x0000555555ade1bf in memset (__len=<optimized out>, __ch=205, __dest=<optimized out>)\n    at /usr/include/x86_64-linux-gnu/bits/string_fortified.h:59\n#2  mi_debug_fill (size=<optimized out>, c=205, block=0x7fffb5dbd980, page=0x7fffb400d0d8) at Objects/mimalloc/alloc.c:33\n#3  _mi_page_malloc (heap=heap@entry=0x5555566118a0 <_PyRuntime+333024>, page=0x7fffb400d0d8, size=size@entry=88,\n    zero=zero@entry=false) at Objects/mimalloc/alloc.c:77\n#4  0x0000555555ade98f in mi_heap_malloc_small_zero (heap=0x5555566118a0 <_PyRuntime+333024>, size=80, zero=<optimized out>)\n    at Objects/mimalloc/alloc.c:127\n#5  0x0000555555adfb6a in _mi_heap_malloc_zero_ex (huge_alignment=0, zero=false, size=80, heap=0x5555566118a0 <_PyRuntime+333024>)\n    at Objects/mimalloc/alloc.c:156\n#6  _mi_heap_malloc_zero (zero=false, size=80, heap=0x5555566118a0 <_PyRuntime+333024>) at Objects/mimalloc/alloc.c:179\n#7  mi_heap_malloc (size=80, heap=0x5555566118a0 <_PyRuntime+333024>) at Objects/mimalloc/alloc.c:183\n#8  _PyObject_MiMalloc (ctx=<optimized out>, nbytes=80) at Objects/obmalloc.c:250\n#9  0x0000555555ab7404 in _PyMem_DebugRawAlloc (use_calloc=use_calloc@entry=0, ctx=ctx@entry=0x5555565c0758 <_PyRuntime+920>,\n    nbytes=nbytes@entry=56) at Objects/obmalloc.c:2708\n#10 0x0000555555ab746c in _PyMem_DebugRawMalloc (ctx=ctx@entry=0x5555565c0758 <_PyRuntime+920>, nbytes=nbytes@entry=56)\n    at Objects/obmalloc.c:2741\n#11 0x0000555555ab7493 in _PyMem_DebugMalloc (ctx=0x5555565c0758 <_PyRuntime+920>, nbytes=56) at Objects/obmalloc.c:2898\n#12 0x0000555555ae5dc0 in PyObject_Malloc (size=<optimized out>) at Objects/obmalloc.c:1316\n#13 0x0000555555dd4048 in _PyObject_MallocWithType (size=<optimized out>, tp=0x0) at ./Include/internal/pycore_object_alloc.h:46\n#14 gc_alloc (tp=tp@entry=0x555556459e20 <PyList_Type>, basicsize=<optimized out>, presize=0) at Python/gc_free_threading.c:1695\n#15 0x0000555555dd41c0 in _PyObject_GC_New (tp=tp@entry=0x555556459e20 <PyList_Type>) at Python/gc_free_threading.c:1716\n#16 0x0000555555a1ac71 in PyList_New (size=0) at Objects/listobject.c:279\n#17 0x00007fffb1bb1247 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array ()\n   from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#18 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array ()\n   from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#19 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array ()\n   from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#20 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array ()\n--Type <RET> for more, q to quit, c to continue without paging--c\n   from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#21 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array () from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#22 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array () from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#23 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array () from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#24 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array () from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#25 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array () from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#26 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array () from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n#27 0x00007fffb1bb1351 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array () from /home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so\n[over 2000 repetitions of this line, not sure what comes after]\n\n\nASAN error:\nAddressSanitizer:DEADLYSIGNAL\n=================================================================\n==3741772==ERROR: AddressSanitizer: stack-overflow on address 0x7fffff7fefe8 (pc 0x7ffff75febeb bp 0x7fffff7ff860 sp 0x7fffff7feff0 T0)\n    #0 0x7ffff75febeb in __interceptor_memset ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:799\n    #1 0x555555ade1be in memset /usr/include/x86_64-linux-gnu/bits/string_fortified.h:59\n    #2 0x555555ade1be in mi_debug_fill Objects/mimalloc/alloc.c:33\n    #3 0x555555ade1be in _mi_page_malloc Objects/mimalloc/alloc.c:77\n    #4 0x555555ade98e in mi_heap_malloc_small_zero Objects/mimalloc/alloc.c:127\n    #5 0x555555adfb69 in _mi_heap_malloc_zero_ex Objects/mimalloc/alloc.c:156\n    #6 0x555555adfb69 in _mi_heap_malloc_zero Objects/mimalloc/alloc.c:179\n    #7 0x555555adfb69 in mi_heap_malloc Objects/mimalloc/alloc.c:183\n    #8 0x555555adfb69 in _PyObject_MiMalloc Objects/obmalloc.c:250\n    #9 0x555555ab7403 in _PyMem_DebugRawAlloc Objects/obmalloc.c:2708\n    #10 0x555555ab746b in _PyMem_DebugRawMalloc Objects/obmalloc.c:2741\n    #11 0x555555ab7492 in _PyMem_DebugMalloc Objects/obmalloc.c:2898\n    #12 0x555555ae5dbf in PyObject_Malloc Objects/obmalloc.c:1316\n    #13 0x555555dd4047 in _PyObject_MallocWithType Include/internal/pycore_object_alloc.h:46\n    #14 0x555555dd4047 in gc_alloc Python/gc_free_threading.c:1695\n    #15 0x555555dd41bf in _PyObject_GC_New Python/gc_free_threading.c:1716\n    #16 0x555555a1ac70 in PyList_New Objects/listobject.c:279\n    #17 0x7fffb1bb1246 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array (/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so+0x17246)\n    #18 0x7fffb1bb1350 in __pyx_pw_5numpy_6random_13bit_generator_3_coerce_to_uint32_array (/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/random/bit_generator.cpython-313t-x86_64-linux-gnu.so+0x17350)\n```\n\n### Python and NumPy Versions:\n\n```\n2.2.5\n3.13.3+ experimental free-threading build (heads/3.13:d8b90117024, Apr 21 2025, 15:20:00) [GCC 11.4.0]\n```\n\n### Runtime Environment:\n\n```\n[{'numpy_version': '2.2.5',\n  'python': '3.13.3+ experimental free-threading build '\n            '(heads/3.13:d8b90117024, Apr 21 2025, 15:20:00) [GCC 11.4.0]',\n  'uname': uname_result(system='Linux', node='LAPTOP-CS6PE5KB', release='5.15.167.4-microsoft-standard-WSL2', version='#1 SMP Tue Nov 5 00:21:55 UTC 2024', machine='x86_64')},\n {'simd_extensions': {'baseline': ['SSE', 'SSE2', 'SSE3'],\n                      'found': ['SSSE3',\n                                'SSE41',\n                                'POPCNT',\n                                'SSE42',\n                                'AVX',\n                                'F16C',\n                                'FMA3',\n                                'AVX2'],\n                      'not_found': ['AVX512F',\n                                    'AVX512CD',\n                                    'AVX512_KNL',\n                                    'AVX512_KNM',\n                                    'AVX512_SKX',\n                                    'AVX512_CLX',\n                                    'AVX512_CNL',\n                                    'AVX512_ICL']}},\n {'architecture': 'Haswell',\n  'filepath': '/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy.libs/libscipy_openblas64_-6bb31eeb.so',\n  'internal_api': 'openblas',\n  'num_threads': 8,\n  'prefix': 'libscipy_openblas',\n  'threading_layer': 'pthreads',\n  'user_api': 'blas',\n  'version': '0.3.28'}]\n```\n\n### Context for the issue:\n\nI have been fuzzing Numpy using [fusil](https://github.com/devdanzin/fusil) by @vstinner. I realize these crashes are unlikely to be triggered in normal usage and therefore might be of low priority.\n\nThe fuzzing was done with an ASAN free-threading clang build and not confirmed on a GILfull non-sanitizer GCC build yet.",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-25T10:26:27Z",
+   "body": "Maybe related to #28784?"
+  },
+  {
+   "author": "seberg",
+   "created_at": "2025-04-25T10:30:12Z",
+   "body": "> Maybe related to https://github.com/numpy/numpy/issues/28784?\n\nNo, but IMO, please do start to bunch up these clearly miniscule issues.  FWIW, while this can be worked around in NumPy but it is probably again a Cython or Python issue.\n\nNot that I would consider it a real issue.  It's easy to crash the interpreter with malicious recursions."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-25T10:32:43Z",
+   "body": "> No, but IMO, please do start to bunch up these clearly miniscule issues.\n\nSure, will do. Thanks for the guidance!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/fusil/issues/38",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/31775",
+   "commit": null,
+   "actor": "Adhyansinghgupta"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "charris"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/31857",
+   "commit": null,
+   "actor": "charris"
+  }
+ ]
+}

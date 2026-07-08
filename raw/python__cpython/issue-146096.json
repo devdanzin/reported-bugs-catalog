@@ -1,0 +1,84 @@
+{
+ "repo": "python/cpython",
+ "number": 146096,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146096",
+ "title": "Out-of-bounds tuple access in `BaseExceptionGroup_repr`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.15"
+ ],
+ "created_at": "2026-03-18T01:51:19Z",
+ "closed_at": "2026-03-19T11:27:04Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter by trying to call `repr()` on an `ExceptionGroup` which has had its `args` set to an empty tuple.\n\n### Automated diagnosis:\n\nBug: At line 1094 of `exceptions.c`, `PyTuple_GET_ITEM(self->args, 1)` accesses index 1 of `self->args` without checking the tuple size. Since `args` is writable from Python, setting it to an empty tuple causes an OOB read \u2192 segfault.\n\nFile: `Objects/exceptions.c`, line 1094\n\n[Full report](https://gist.github.com/devdanzin/dceaa8b70de035607d78025337af9798)\n\nMRE:\n```python\neg = ExceptionGroup(\"msg\", [ValueError()])\neg.args = ()\nrepr(eg)\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\nBaseExceptionGroup_repr (op=0x7ffff759b260) at Objects/exceptions.c:1094\n1094            if (PyList_Check(PyTuple_GET_ITEM(self->args, 1))) {\n(gdb) bt\n#0  BaseExceptionGroup_repr (op=0x7ffff759b260) at Objects/exceptions.c:1094\n#1  0x0000555555728177 in PyObject_Repr (v=0x7ffff759b260) at Objects/object.c:782\n#2  0x00005555557206b5 in cfunction_vectorcall_O (func=func@entry=0x7ffff75bf830, args=args@entry=0x7fffffffb608, nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0)\n    at Objects/methodobject.c:536\n#3  0x00005555556a2ebe in _PyObject_VectorcallTstate (tstate=0x555555d99c08 <_PyRuntime+360664>, callable=0x7ffff75bf830, args=0x7fffffffb608, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:144\n#4  0x000055555583f859 in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=0x7ffff7fa7080, total_args=total_args@entry=1, kwnames=kwnames@entry=...,\n    call_instrumentation=false, frame=frame@entry=0x7ffff7fa7020, this_instr=0x7ffff749814a, tstate=0x555555d99c08 <_PyRuntime+360664>) at Python/ceval.c:775\n#5  0x000055555584a8e4 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:1838\n#6  0x000055555583f08b in _PyEval_EvalFrame (tstate=0x555555d99c08 <_PyRuntime+360664>, frame=0x7ffff7fa7020, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#7  _PyEval_Vector (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, func=func@entry=0x7ffff7466690, locals=locals@entry=0x7ffff746a4b0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2130\n#8  0x000055555583ee1e in PyEval_EvalCode (co=co@entry=0x7ffff7498040, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0) at Python/ceval.c:686\n#9  0x00005555559c8f8e in run_eval_code_obj (tstate=0x555555d99c08 <_PyRuntime+360664>, co=co@entry=0x7ffff7498040, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0)\n    at Python/pythonrun.c:1368\n#10 0x00005555559c8adb in run_mod (mod=mod@entry=0x555555f3d7d8, filename=filename@entry=0x7ffff74b2e40, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0,\n    flags=0x7fffffffc940, arena=arena@entry=0x7ffff74dad40, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1471\n```\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Objects/exceptions.c all deep` command.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:e0f7c1097e1, Mar 17 2026, 18:10:52) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146141\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T08:23:53Z",
+   "body": "Is it a recent regression? because we did make a recent change here with tupleization etc. "
+  },
+  {
+   "author": "Locked-chess-official",
+   "created_at": "2026-03-18T16:10:32Z",
+   "body": "The right way is to visit `BaseExceptionGroupObject->excs`\n\nHere:\nhttps://github.com/python/cpython/blob/main/Objects/exceptions.c#L1094-L1105\n\nMaybe `BaseExceptionGroup` shouldn't check the args because the original values in `PyBaseExceptionGroupObject` is different from the args, which is different fron the other exception types."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2026-03-18T18:18:03Z",
+   "body": "I will take a look tonight."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2026-03-18T19:49:18Z",
+   "body": "Bisected to ff2577f56eb2170ef0afafa90f78c693df7ca562"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2026-03-19T11:27:04Z",
+   "body": "Merged, thanks for the report @devdanzin !"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146141",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ced64605be2bcc4e4a3064aaed0ca569308458a0",
+   "actor": "iritkatriel"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a1de9c6ba30460d5d1e4fb98e62dd10e33f503ee",
+   "actor": "ljfp"
+  }
+ ]
+}

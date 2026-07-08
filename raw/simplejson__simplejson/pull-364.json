@@ -1,0 +1,48 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 364,
+ "type": "pull",
+ "url": "https://github.com/simplejson/simplejson/pull/364",
+ "title": "Replace PyDict_GetItem with PyDict_GetItemWithError (free-threading safety)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-07T09:22:25Z",
+ "closed_at": "2026-04-08T00:07:42Z",
+ "body": "Part of #362.\n\n## Summary\n\nReplace 3 `PyDict_GetItem` calls with `PyDict_GetItemWithError`. `PyDict_GetItem`\nreturns a borrowed reference and silently suppresses errors \u2014 under free-threaded\nPython, the borrowed reference can be invalidated by concurrent dict mutation between\nthe return and the subsequent `Py_INCREF`.\n\n`PyDict_GetItemWithError` also returns a borrowed reference but propagates errors.\nWe add `Py_INCREF` immediately after the non-NULL check (minimizing the race window)\nand an explicit `PyErr_Occurred()` check for the error case.\n\n## Changes\n\n3 call sites, all following the same pattern:\n\n```c\n// Before:\nmemokey = PyDict_GetItem(s->memo, key);\nif (memokey != NULL) { ... }\nelse { PyDict_SetItem(...); }\n\n// After:\nmemokey = PyDict_GetItemWithError(s->memo, key);\nif (memokey != NULL) { ... }\nelse if (PyErr_Occurred()) { goto bail; }\nelse { PyDict_SetItem(...); }\n```\n\n- Scanner memo lookup in `_parse_object_str`\n- Scanner memo lookup in `_parse_object_unicode`\n- Encoder `key_memo` lookup in `encoder_listencode_dict`\n\nNote: this also fixes a pre-existing correctness issue \u2014 `PyDict_GetItem` swallows\nlookup errors (e.g., from `__hash__` raising), which was noted in #348 as a CONSIDER\nitem.\n\n## Test plan\n\n- [x] `python -m pytest simplejson/tests/ -x -q` \u2014 147 tests pass\n- [x] Minimal diff: 11 insertions, 3 deletions\n\nFound using [ft-review-toolkit](https://github.com/devdanzin/ft-review-toolkit).\n\n<sub>This PR was drafted by Claude Code and reviewed by a human.</sub>",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e127d3de4a5108d2b21fd509864f485b2ed8b27b",
+   "actor": "etrepum"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dbf6f64fcea1b8b95ab5b9ad9502899a006990b9",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1621e6cc818b2a097e316a3f193b1458a8cb7c27",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae7cd18c2df9ba696fad92a31e2755ef468a1b25",
+   "actor": "netbsd-srcmastr"
+  }
+ ]
+}

@@ -1,0 +1,162 @@
+{
+ "repo": "python/cpython",
+ "number": 126895,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126895",
+ "title": "Segfault/aborts calling `readline.set_completer_delims` in threads in a free-threaded build",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "stdlib",
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-16T05:35:53Z",
+ "closed_at": "2025-03-17T15:58:29Z",
+ "body": "# Crash report\n\n### What happened?\n\nCalling `difflib._test` in threads in a free-threaded build (with `PYTHON_GIL=0`) will result in aborts or segfaults, apparently related to memory issues:\n\n```python\nfrom threading import Thread\nimport difflib\n\nfor x in range(100):\n    Thread(target=difflib._test, args=()).start()\n```\n\nSegfault backtrace:\n```gdb\nThread 92 \"python\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7ffeca7e4640 (LWP 631239)]\n0x00007ffff7d3f743 in unlink_chunk (p=p@entry=0x555555f56c00, av=0x7ffff7eb8c80 <main_arena>) at ./malloc/malloc.c:1634\n1634    ./malloc/malloc.c: No such file or directory.\n(gdb) bt\n#0  0x00007ffff7d3f743 in unlink_chunk (p=p@entry=0x555555f56c00, av=0x7ffff7eb8c80 <main_arena>)\n    at ./malloc/malloc.c:1634\n#1  0x00007ffff7d40d2b in _int_free (av=0x7ffff7eb8c80 <main_arena>, p=0x555555f528a0,\n    have_lock=<optimized out>) at ./malloc/malloc.c:4616\n#2  0x00007ffff7d43453 in __GI___libc_free (mem=<optimized out>) at ./malloc/malloc.c:3391\n#3  0x000055555570ed2c in _PyMem_RawFree (_unused_ctx=<optimized out>, ptr=<optimized out>)\n    at Objects/obmalloc.c:90\n#4  0x0000555555713955 in _PyMem_DebugRawFree (ctx=0x555555cdb8f8 <_PyRuntime+824>, p=0x555555f528c0)\n    at Objects/obmalloc.c:2767\n#5  0x000055555572c462 in PyMem_RawFree (ptr=ptr@entry=0x555555f528c0) at Objects/obmalloc.c:971\n#6  0x00005555559527fc in free_threadstate (tstate=tstate@entry=0x555555f528c0) at Python/pystate.c:1411\n#7  0x00005555559549c0 in _PyThreadState_DeleteCurrent (tstate=tstate@entry=0x555555f528c0)\n    at Python/pystate.c:1834\n#8  0x0000555555a11b74 in thread_run (boot_raw=boot_raw@entry=0x555555f52870)\n    at ./Modules/_threadmodule.c:355\n#9  0x0000555555974fdb in pythread_wrapper (arg=<optimized out>) at Python/thread_pthread.h:242\n#10 0x00007ffff7d32ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442\n#11 0x00007ffff7dc4850 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81\n```\n\nAbort 1 backtrace:\n```gdb\nThread 78 \"python\" received signal SIGABRT, Aborted.\n[Switching to Thread 0x7ffed17f2640 (LWP 633651)]\n__pthread_kill_implementation (no_tid=0, signo=6, threadid=140732413191744) at ./nptl/pthread_kill.c:44\n44      ./nptl/pthread_kill.c: No such file or directory.\n(gdb) bt\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140732413191744) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140732413191744) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140732413191744, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7ce0476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc67f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7d27676 in __libc_message (action=action@entry=do_abort,\n    fmt=fmt@entry=0x7ffff7e79b77 \"%s\\n\") at ../sysdeps/posix/libc_fatal.c:155\n#6  0x00007ffff7d3ecfc in malloc_printerr (\n    str=str@entry=0x7ffff7e7c6c0 \"free(): unaligned chunk detected in tcache 2\") at ./malloc/malloc.c:5664\n#7  0x00007ffff7d40e3f in _int_free (av=0x7ffff7eb8c80 <main_arena>, p=0x555555dc79b0, have_lock=0)\n    at ./malloc/malloc.c:4471\n#8  0x00007ffff7d43453 in __GI___libc_free (mem=<optimized out>) at ./malloc/malloc.c:3391\n#9  0x00007ffff41d4a2b in readline_set_completer_delims (module=<optimized out>, string=<optimized out>)\n    at ./Modules/readline.c:593\n#10 0x00005555557021ef in cfunction_vectorcall_O (\n    func=<built-in method set_completer_delims of module object at remote 0x2000297b920>,\n    args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:523\n#11 0x000055555567cc55 in _PyObject_VectorcallTstate (tstate=0x555555f15bc0,\n    callable=<built-in method set_completer_delims of module object at remote 0x2000297b920>,\n    args=0x7ffed17f15a8, nargsf=9223372036854775809, kwnames=0x0) at ./Include/internal/pycore_call.h:167\n#12 0x000055555567cd74 in PyObject_Vectorcall (\n    callable=callable@entry=<built-in method set_completer_delims of module object at remote 0x2000297b920>,\n args=args@entry=0x7ffed17f15a8, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#13 0x00005555558441f7 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555f15bc0,\n    frame=<optimized out>, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:955\n#14 0x0000555555872978 in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>, tstate=0x555555f15bc0)\n    at ./Include/internal/pycore_ceval.h:116\n```\n\nAbort 2 backtrace:\n```gdb\nThread 43 \"python\" received signal SIGABRT, Aborted.\n[Switching to Thread 0x7fff54ff9640 (LWP 636245)]\n__pthread_kill_implementation (no_tid=0, signo=6, threadid=140734619424320) at ./nptl/pthread_kill.c:44\n44      ./nptl/pthread_kill.c: No such file or directory.\n(gdb) bt\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140734619424320) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140734619424320) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140734619424320, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7ce0476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc67f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7d27676 in __libc_message (action=action@entry=do_abort,\n    fmt=fmt@entry=0x7ffff7e79b77 \"%s\\n\") at ../sysdeps/posix/libc_fatal.c:155\n#6  0x00007ffff7d3ecfc in malloc_printerr (\n    str=str@entry=0x7ffff7e7cf20 \"tcache_thread_shutdown(): unaligned tcache chunk detected\")\n    at ./malloc/malloc.c:5664\n#7  0x00007ffff7d436c4 in tcache_thread_shutdown () at ./malloc/malloc.c:3224\n#8  __malloc_arena_thread_freeres () at ./malloc/arena.c:1003\n#9  0x00007ffff7d461ca in __libc_thread_freeres () at ./malloc/thread-freeres.c:44\n#10 0x00007ffff7d3294f in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:456\n#11 0x00007ffff7dc4850 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81\n```\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.13, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main-dirty:612ac283b81, Nov 16 2024, 01:37:56) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-131208\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T11:02:46Z",
+   "body": "The `_test` function is only doing:\r\n\r\n```py\r\ndef _test():\r\n    import doctest, difflib\r\n    return doctest.testmod(difflib)\r\n```\r\n\r\nI think the issue is either with doctest or the imports, not with difflib itself.\r\n\r\ncc @ZeroIntensity \r\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T12:58:40Z",
+   "body": "I believe this is due to `doctest` using `pdb`, which seems to cause all sorts of segfaults and aborts when called from threads. Comment the marked lines out for a different crash.\r\n\r\n```python\r\nimport pdb\r\nimport sys\r\nfrom threading import Thread\r\n\r\nstdin = open(\"/dev/null\")\r\nsys.stdin = stdin\r\n\r\ndef f():\r\n    for x in range(100):\r\n        p = pdb.Pdb()\r\n        p.reset()\r\n        try:               # Comment\r\n            p.set_trace()  # these\r\n        except:            # lines\r\n            pass           # out.\r\n        p.reset()\r\n        p.set_continue()\r\n\r\nfor x in range(100):\r\n    Thread(target=f, args=()).start()\r\n```\r\nSo maybe the issue is just that `pdb` isn't free-threading ready?\r\n\r\nEdit: here's a collection of errors this causes:\r\n\r\n```Debug memory block at address p=0x561eb5b28370: API 'A'\r\n    2908176786326028288 bytes originally requested\r\n    The 7 pad bytes at p-7 are not all FORBIDDENBYTE (0xfd):\r\n        at p-7: 0x5b *** OUCH\r\n        at p-6: 0xf0 *** OUCH\r\n        at p-5: 0xf8 *** OUCH\r\n        at p-4: 0xfe *** OUCH\r\n        at p-3: 0x53 *** OUCH\r\n        at p-2: 0x1e *** OUCH\r\n        at p-1: 0x99 *** OUCH\r\n    Because memory is corrupted at the start, the count of bytes requested\r\n       may be bogus, and checking the trailing pad bytes may segfault.\r\nmimalloc: error: thread 0x7fa0154d4640: buffer overflow in heap block 0x2000a010f30 of size 40: write after 40 bytes\r\n    The 8 pad bytes at tail=0x285c417fbab28370 are Aborted\r\n```\r\n\r\n```\r\nfree(): unaligned chunk detected in tcache 2\r\nAborted\r\n```\r\n\r\n```\r\ntcache_thread_shutdown(): unaligned tcache chunk detected\r\nAborted\r\n```\r\n\r\n```\r\nfree(): invalid pointer\r\nAborted\r\n```\r\n\r\n```\r\nSegmentation fault\r\n```\r\n\r\n```\r\ndouble free or corruption (fasttop)\r\nAborted\r\n```\r\n\r\n```\r\nDebug memory block at address p=0x5572ce2f7580: API '\ufffd'\r\n    14 bytes originally requested\r\n    The 7 pad bytes at p-7 are not all FORBIDDENBYTE (0xfd):\r\n        at p-7: 0xdb *** OUCH\r\n        at p-6: 0x4c *** OUCH\r\n        at p-5: 0x84 *** OUCH\r\n        at p-4: 0x07 *** OUCH\r\n        at p-2: 0xc2 *** OUCH\r\n        at p-1: 0x3a *** OUCH\r\n    Because memory is corrupted at the start, the count of bytes requested\r\n       may be bogus, and checking the trailing pad bytes may segfault.\r\n    The 8 pad bytes at tail=0x5572ce2f758e are not all FORBIDDENBYTE (0xfd):\r\n        at tail+0: 0xdd *** OUCH\r\n        at tail+1: 0xdd *** OUCH\r\n        at tail+2: 0xdd *** OUCH\r\n        at tail+3: 0xdd *** OUCH\r\n        at tail+4: 0xdd *** OUCH\r\n        at tail+5: 0xdd *** OUCH\r\n        at tail+6: 0xdd *** OUCH\r\n        at tail+7: 0xdd *** OUCH\r\n    Data at p: dd dd dd dd dd dd dd dd dd dd dd dd dd dd\r\n\r\nEnable tracemalloc to get the memory block allocation traceback\r\n\r\nFatal Python error: _PyMem_DebugRawFree: bad ID: Allocated using API '\ufffd', verified using API 'r'\r\nPython runtime state: initialized\r\nAborted\r\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T13:15:12Z",
+   "body": "@gaogaotiantian Is there a plan to make pdb free-threaded friendly or not? if so, how can we help, if not what should we do for this issue? \r\n\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-16T14:24:18Z",
+   "body": "I'll wait for Tian's input, but I'm happy to spend a few hours covering pdb in locks if we need to."
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-11-16T16:33:00Z",
+   "body": "`pdb` is a pure Python module, without any black magic (ctypes, changing the code object, etc.). It should not be possible for it to crash (segfault) CPython, free-threaded build or not. If pdb crashes free-threaded build, that means free-threaded build has a bug, not `pdb`.\r\n\r\nFrom the code above, the conclusion I can get is `pdb` triggered a crash, and we don't know why. Protecting `pdb` with lock might hide the crash, but it does not solve the problem. We should not be able to crash CPython with pure Python code.\r\n\r\nAlso, `pdb` does not support multi-threading debugging at this point. It's really slow to move it forward for any relatively new features. That being said, I don't think it's a good time to try to protect it with locks because we need to deal with multithreading in the future."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-16T17:21:53Z",
+   "body": "Does it use some weird frames APIs (e.g. `sys._getframe`) by any chance? Those aren't thread safe IIRC."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T17:34:12Z",
+   "body": "The culprit seems to be `readline`, which `pdb` uses:\r\n```python\r\nfrom threading import Thread\r\nimport readline\r\n\r\ndef f():\r\n    for x in range(100):\r\n        readline.get_completer_delims()\r\n        readline.set_completer_delims(' \\t\\n`@#%^&*()=+[{]}\\\\|;:\\'\",<>?')\r\n        readline.set_completer_delims(' \\t\\n`@#%^&*()=+[{]}\\\\|;:\\'\",<>?')\r\n        readline.get_completer_delims()\r\n\r\nfor x in range(100):\r\n    Thread(target=f, args=()).start()\r\n```\r\n\r\nSeems to fail with the same errors as the original code."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-16T17:35:22Z",
+   "body": "It's probably the system that's not thread safe in that case."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T17:45:31Z",
+   "body": "The error appears to come from CPython code, line 593 seems to be affecting module global data, right?\r\n\r\nhttps://github.com/python/cpython/blob/2313f8421080ceb3343c6f5d291279adea85e073/Modules/readline.c#L578-L594"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-11-16T21:17:26Z",
+   "body": "I won't be surprised if `readline` is not thread safe. Actually at this point, I won't be surprised if anything crashes free-threaded CPython. It's just not ready yet. That's not saying we should ignore this, but I think we have an issue (https://github.com/python/cpython/issues/116738) to track the thread-safety for all internal C modules, and it seems like `readline` is under the category that's not inspected. This is just some work we need to do in the future, definitely not a bug in `pdb`."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-16T21:22:05Z",
+   "body": "That issue looks a little out of date, but yeah, we're still working on the thread safety. Thanks for your input, Tian!\r\n\r\n@devdanzin, would you like to author a PR for fixing the global state in `readline`? (I'm assuming we need to either make it thread-local, move it to the module state, or just put an ugly lock around it.) If not, I can do it."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T21:26:20Z",
+   "body": "I wouldn't know how, please take it if you can :)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-16T21:29:12Z",
+   "body": "Ok, I'm busy with a few other issues right now, so I'll leave this open to someone else for a bit. If nobody decides they want to do it, I'll get to it :)"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-11-16T22:02:10Z",
+   "body": "I would be a little bit more careful when dealing with `readline`, because it relies on some global variables of the readline library, so we can't simply put everything thread or module local. The variables starting with `rl_` are the extern global variables exposed by readline itself. Also, we support libedit which has a slightly different interface. The module is not the most stable one in our stdlib so tread carefully :)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-16T22:05:20Z",
+   "body": "If it has global state, I doubt the functions themself are thread safe. In that case, we probably should just mark it as needing the GIL. "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-18T08:05:42Z",
+   "body": "> In that case, we probably should just mark it as needing the GIL.\r\n\r\nOr add `@critical_section` or another lock on functions which are known to not be thread-safe."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-18T12:08:45Z",
+   "body": "That wouldn't work for subinterpreters, would it?"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-03-17T15:58:29Z",
+   "body": "This is fixed in `main`, but not backported to 3.13."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-19T11:56:27Z",
+   "body": "This seems to have regressed **in 3.13** somehow, unless it's a different issue coming from the same code. I'm getting aborts and segfaults with  the following code:\n```python\nimport readline\nfrom threading import Thread\nfrom time import sleep\n\ndef stress_readline():\n    for x in range(10):\n        readline.get_completer_delims()\n        readline.set_completer_delims(' \\t\\n`@#%^&*()=+[{]}\\\\|;:\\'\",<>?')\n        sleep(0.01)\n        readline.set_completer_delims(' \\t\\n`@#%^&*()=+[{]}\\\\|;:\\'\",<>?')\n        readline.get_completer_delims()\n\n\nalive = []\n\nfor x in range(100):\n    alive.append(Thread(target=stress_readline, args=()))\n\nfor t in alive:\n    t.start()\n\nfor t in alive:\n    t.join()\n```\n\nAbort backtrace 1:\n```\ndouble free or corruption (fasttop)\ndouble free or corruption (fasttop)\n\nThread 15 \"python\" received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7c4519e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28902 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7c2976c in __libc_message_impl (fmt=fmt@entry=0x7ffff7ddc8e2 \"%s\\n\") at ../sysdeps/posix/libc_fatal.c:134\n#6  0x00007ffff7cae565 in malloc_printerr (str=str@entry=0x7ffff7ddfd00 \"double free or corruption (fasttop)\") at ./malloc/malloc.c:5772\n#7  0x00007ffff7cb097a in _int_free (av=0x7fffb8000030, p=<optimized out>, have_lock=0) at ./malloc/malloc.c:4607\n#8  0x00007ffff7cb3641 in __GI___libc_free (mem=<optimized out>) at ./malloc/malloc.c:3398\n#9  tcache_thread_shutdown () at ./malloc/malloc.c:3234\n#10 __malloc_arena_thread_freeres () at ./malloc/arena.c:897\n#11 0x00007ffff7cb5bd2 in __libc_thread_freeres () at ./malloc/thread-freeres.c:41\n#12 0x00007ffff7ca1c27 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:458\n#13 0x00007ffff7d33a4c in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78\n```\n\nSegfault backtrace 1:\n```\ndouble free or corruption (fasttop)\n\nThread 99 \"python\" received signal SIGSEGV, Segmentation fault.\n\n#0  0x00007ffff7cb34fa in tcache_thread_shutdown () at ./malloc/malloc.c:3233\n#1  __malloc_arena_thread_freeres () at ./malloc/arena.c:897\n#2  0x00007ffff7cb5bd2 in __libc_thread_freeres () at ./malloc/thread-freeres.c:41\n#3  0x00007ffff7ca1c27 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:458\n#4  0x00007ffff7d33a4c in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78\n```\n\nSegfault backtrace 2:\n```\nThread 61 \"python\" received signal SIGSEGV, Segmentation fault.\n\n#0  0x00007ffff7cb0b1c in _int_free (av=0x7ffeb8000030, p=0x7ffeb8000be0, have_lock=0) at ./malloc/malloc.c:4534\n#1  0x00007ffff7cb33ee in __GI___libc_free (mem=0x7ffeb8000bf0) at ./malloc/malloc.c:3398\n#2  0x00007ffff7fa9732 in readline_set_completer_delims (module=<optimized out>, string=<optimized out>) at ./Modules/readline.c:599\n#3  0x0000555555683902 in cfunction_vectorcall_O (func=<optimized out>, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:512\n#4  0x00005555556278e9 in _PyObject_VectorcallTstate (tstate=0x555555c71070, callable=0x243067e5910, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>)\n    at ./Include/internal/pycore_call.h:168\n#5  PyObject_Vectorcall (callable=callable@entry=0x243067e5910, args=0x7ffeb8000be0, args@entry=0x7ffff45451f0, nargsf=48, kwnames=0x7ffebc0008e0, kwnames@entry=0x0) at Objects/call.c:327\n#6  0x0000555555758b12 in _PyEval_EvalFrameDefault (tstate=0x555555c71070, frame=0x7ffff4545188, throwflag=<optimized out>) at Python/generated_cases.c.h:813\n#7  0x000055555562a3b4 in _PyObject_VectorcallTstate (tstate=0x555555c71070, callable=0x24306915aa0, args=0x7ffec5ffce28, nargsf=1, kwnames=0x0) at ./Include/internal/pycore_call.h:168\n#8  method_vectorcall (method=<optimized out>, args=<optimized out>, nargsf=<optimized out>, kwnames=0x0) at Objects/classobject.c:70\n#9  0x0000555555843b9c in thread_run (boot_raw=boot_raw@entry=0x555555c71030) at ./Modules/_threadmodule.c:337\n#10 0x00005555557d9526 in pythread_wrapper (arg=<optimized out>) at Python/thread_pthread.h:243\n#11 0x00007ffff7ca1e2e in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:447\n#12 0x00007ffff7d33a4c in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78\n```\n\nSegfault backtrace 3:\n```\nThread 54 \"python\" received signal SIGSEGV, Segmentation fault.\n\n0x00007ffff7cb0b1c in _int_free (av=0x7ffe3c000030, p=0x7ffe3c000be0, have_lock=0) at ./malloc/malloc.c:4534\n\n#0  0x00007ffff7cb0b1c in _int_free (av=0x7ffe3c000030, p=0x7ffe3c000be0, have_lock=0) at ./malloc/malloc.c:4534\n#1  0x00007ffff7cb33ee in __GI___libc_free (mem=0x7ffe3c000bf0) at ./malloc/malloc.c:3398\n#2  0x00005555556d8490 in unicode_encode_locale (unicode=<optimized out>, error_handler=<optimized out>, current_locale=1) at Objects/unicodeobject.c:3721\n#3  0x00007ffff7fa96e3 in encode (b=0x5e2523479fe9c920) at ./Modules/readline.c:169\n#4  readline_set_completer_delims (module=<optimized out>, string=0x5e2523479fe9c920) at ./Modules/readline.c:589\n#5  0x0000555555683902 in cfunction_vectorcall_O (func=<optimized out>, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:512\n#6  0x00005555556278e9 in _PyObject_VectorcallTstate (tstate=0x555555c51e20, callable=0x510187e5910, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>)\n    at ./Include/internal/pycore_call.h:168\n#7  PyObject_Vectorcall (callable=callable@entry=0x510187e5910, args=0x7ffe3c000be0, args@entry=0x7ffff45611f0, nargsf=48, kwnames=0x7ffed80008e0, kwnames@entry=0x0) at Objects/call.c:327\n#8  0x0000555555758b12 in _PyEval_EvalFrameDefault (tstate=0x555555c51e20, frame=0x7ffff4561188, throwflag=<optimized out>) at Python/generated_cases.c.h:813\n#9  0x000055555562a3b4 in _PyObject_VectorcallTstate (tstate=0x555555c51e20, callable=0x51018915aa0, args=0x7ffee6ffde28, nargsf=1, kwnames=0x0) at ./Include/internal/pycore_call.h:168\n#10 method_vectorcall (method=<optimized out>, args=<optimized out>, nargsf=<optimized out>, kwnames=0x0) at Objects/classobject.c:70\n#11 0x0000555555843b9c in thread_run (boot_raw=boot_raw@entry=0x555555c51de0) at ./Modules/_threadmodule.c:337\n#12 0x00005555557d9526 in pythread_wrapper (arg=<optimized out>) at Python/thread_pthread.h:243\n#13 0x00007ffff7ca1e2e in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:447\n#14 0x00007ffff7d33a4c in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78\n```\n\n`python -VV`:\n```\nPython 3.13.3+ experimental free-threading build (heads/3.13:83cb89b941b, Apr 19 2025, 03:58:36) [Clang 19.1.7 (++20250114103253+cd708029e0b2-1~exp1~20250114103309.40)]\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-19T13:05:23Z",
+   "body": "Oh, never mind, according to https://github.com/python/cpython/pull/131208#issuecomment-2730050019 this wasn't backported to 3.13. Sorry for the noise."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "991ca846ab20ec7bc528db080678af47e29bca7e",
+   "actor": "tom-pytel"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131208",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "863d54cbaf6c0b45fff691ab275515c1483ad68d",
+   "actor": "colesbury"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "colesbury"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7455243d957db92c6f340c0ce0ad431764e22c6d",
+   "actor": "plashchynski"
+  }
+ ]
+}

@@ -1,0 +1,149 @@
+{
+ "repo": "python/cpython",
+ "number": 126220,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126220",
+ "title": "`_lsprof.Profiler._creturn_callback()` segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-10-31T03:07:02Z",
+ "closed_at": "2024-11-06T12:42:01Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to crash Python by simply calling the `._creturn_callback()` or the `._ccall_callback()` methods of the `Profiler` class in either `_lsprof` or `cProfile`.\n\n```python\nfrom _lsprof import Profiler\nProfiler()._creturn_callback()\nProfiler()._ccall_callback()\n```\n\nBacktrace looks like:\n```gdb\nProgram received signal SIGSEGV, Segmentation fault.\nget_cfunc_from_callable (callable=0x0, self_arg=0x7ffff7bff710, missing=0x555555c53b80 <_PyInstrumentation_MISSING>) at ./Modules/_lsprof.c:628\n628         if (PyCFunction_Check(callable)) {\n(gdb) bt\n#0  get_cfunc_from_callable (callable=0x0, self_arg=0x7ffff7bff710,\n    missing=0x555555c53b80 <_PyInstrumentation_MISSING>) at ./Modules/_lsprof.c:628\n#1  0x00007ffff79dd610 in creturn_callback (self=0x7ffff7a91050, args=<optimized out>,\n    size=<optimized out>) at ./Modules/_lsprof.c:676\n#2  0x000055555568f4b9 in method_vectorcall_FASTCALL (func=0x7ffff7aba630, args=0x7ffff7fb0078,\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/descrobject.c:401\n#3  0x000055555567ba55 in _PyObject_VectorcallTstate (tstate=0x555555cbbc70 <_PyRuntime+329232>,\n    callable=0x7ffff7aba630, args=0x7ffff7fb0078, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:167\n#4  0x000055555567bb74 in PyObject_Vectorcall (callable=callable@entry=0x7ffff7aba630,\n    args=args@entry=0x7ffff7fb0078, nargsf=<optimized out>, kwnames=kwnames@entry=0x0)\n    at Objects/call.c:327\n#5  0x0000555555827d24 in _PyEval_EvalFrameDefault (\n    tstate=tstate@entry=0x555555cbbc70 <_PyRuntime+329232>, frame=0x7ffff7fb0020,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:955\n#6  0x0000555555852fb7 in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>,\n    tstate=0x555555cbbc70 <_PyRuntime+329232>) at ./Include/internal/pycore_ceval.h:116\n#7  _PyEval_Vector (tstate=tstate@entry=0x555555cbbc70 <_PyRuntime+329232>,\n    func=func@entry=0x7ffff7a46450, locals=locals@entry=0x7ffff7a55df0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1886\n#8  0x0000555555853096 in PyEval_EvalCode (co=co@entry=0x7ffff7a58630,\n    globals=globals@entry=0x7ffff7a55df0, locals=locals@entry=0x7ffff7a55df0) at Python/ceval.c:662\n#9  0x00005555559251f4 in run_eval_code_obj (tstate=tstate@entry=0x555555cbbc70 <_PyRuntime+329232>,\n    co=co@entry=0x7ffff7a58630, globals=globals@entry=0x7ffff7a55df0, locals=locals@entry=0x7ffff7a55df0)\n    at Python/pythonrun.c:1338\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows\n\n### Output from running 'python -VV' on the command line:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126233\n* gh-126271\n* gh-126310\n* gh-126311\n* gh-126402\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2024-10-31T08:20:45Z",
+   "body": "Not just these two, but also others (like `_pystart_callback`) all from https://github.com/python/cpython/pull/103534 CC @gaogaotiantian \r\n\r\nThis happens because `args` is never checked to have a proper length. I think that `TypeError` should be raised when these function do not have enough arguments (like we always do).\r\n\r\nI am working on a fix :)"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T12:15:27Z",
+   "body": "Can we close this isue?"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "299f63f37f397c149a3067f4069903941529e376",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126233",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a748d980c19c06986535c512660d939e5b41162d",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126271",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "28b148fb32e4548b461137d18d1ab6d366395d36",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "144447c3cd9e1b0514b62285ab215d590e4d8cc6",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4197d4093252bd06aabdf959a58ebc7c076d221c",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126310",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126311",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b5c19bdba8f58cba80a1101ce8aad90be3486571",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1b9710c57188bad9152c0973d7c1ea766ae03247",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c806cd5af677c385470001efc68da38a32919196",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9eaf3e617239d09e746b6699cd9c5a3461816f27",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126402",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "590269eb7f9d3ff8cdad8f51559fadad3f16b908",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c86f49b3ad47b5638f57c2d983180a26ff60074f",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8829f6df159a47aa2fdf029645e4c3f55bc3d942",
+   "actor": "ebonnal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2081eee7316615819e29224a27fdc3e1eeff2c15",
+   "actor": "ebonnal"
+  }
+ ]
+}

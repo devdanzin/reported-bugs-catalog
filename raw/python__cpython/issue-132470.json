@@ -1,0 +1,76 @@
+{
+ "repo": "python/cpython",
+ "number": 132470,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132470",
+ "title": "Building a `ctypes.CField` with wrong `byte_size` aborts",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-ctypes",
+  "extension-modules",
+  "type-crash",
+  "3.14"
+ ],
+ "created_at": "2025-04-13T10:59:45Z",
+ "closed_at": "2025-04-28T15:10:11Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe following code will cause an abort due to `byte_size` not matching the size of `ctypes.c_byte`, failing an assertion that `byte_size == info->size`.\n\n```python\nimport ctypes\nctypes.CField(name=\"a\", type=ctypes.c_byte, byte_size=2, byte_offset=2, index=1, _internal_use=True)\n```\n\nAbort message:\n```\npython: ./Modules/_ctypes/cfield.c:102: PyCField_new_impl: Assertion `byte_size == info->size' failed.\n\nAborted (core dumped)\n```\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a6+ (heads/main:be2d2181e62, Mar 31 2025, 07:30:17) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132475\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2025-04-13T11:03:42Z",
+   "body": "`Field` wasn't meant to be used publicly for now but, since it's a real crash and if we're to expose this interface in the future, we would be happy to have this check."
+  },
+  {
+   "author": "encukou",
+   "created_at": "2025-04-28T15:10:11Z",
+   "body": "To set expectations: the `CField` initializer is indeed not public. If you use `_internal_use=True`, you are on your own -- don't blame CPython if it crashes.\n\nWith that said, thank you for testing this internal API! And thank you for the fix -- when `CField` becomes public, there'll be one less thing to do."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "45aa6a38747702d4ee7c11b5c121bf6b73b79e7f",
+   "actor": "dura0ok"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132475",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c869028ca4530b2d5ec0d3532562d71d05b5d37b",
+   "actor": "dura0ok"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c52e20f8f8bbca28ba3bc753013f06ac5b992e29",
+   "actor": "dura0ok"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3377d9a746abf9921d2ae6239d6a45cfc98c2d08",
+   "actor": "dura0ok"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3b4b56f46dbfc0c336a1f70704f127593ec1f4ce",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "encukou"
+  }
+ ]
+}

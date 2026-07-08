@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/atom",
+ "number": 258,
+ "type": "issue",
+ "url": "https://github.com/nucleic/atom/issues/258",
+ "title": "Missing PyErr_Occurred() after PyIter_Next in 3 functions + CAtom_getstate error handling gaps",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:28:37Z",
+ "closed_at": null,
+ "body": "Three `PyIter_Next` loops are missing `PyErr_Occurred()` checks after the loop terminates. `PyIter_Next` returns NULL for both StopIteration (normal) and errors. Without the check, iteration errors are silently swallowed.\n\nThe `observe`/`unobserve` functions in the same file (`catom.cpp:227,264,294`) correctly have `if(PyErr_Occurred()) return 0;` after their loops \u2014 the pattern was not propagated.\n\n### 1. `CAtom_setstate` (`catom.cpp:472-484`)\n\n**Reproducer**:\n```python\nimport gc; gc.disable()\nimport os\nfrom atom.api import Atom, Int, Str\n\nclass EvilDict(dict):\n    def __iter__(self):\n        yield \"x\"\n        raise RuntimeError(\"iteration bomb\")\n\nb = Atom.__new__(type(\"MyAtom\", (Atom,), {\"x\": Int(0)}))\ntry:\n    b.__setstate__(EvilDict({\"x\": 10}))\n    print(\"__setstate__ succeeded (BUG - error swallowed)\")\nexcept RuntimeError:\n    print(\"RuntimeError propagated (correct)\")\nos._exit(0)\n```\nOn debug builds: `Fatal Python error: _Py_CheckFunctionResult: a function returned a result with an exception set`. On release builds: error silently swallowed.\n\n### 2. `validate_set` (`atomset.cpp:76-88`)\nSame pattern \u2014 iteration error during set validation silently ignored, returns partially validated set.\n\n### 3. `SortedMap_new` (`sortedmap.cpp:320-328`)\nSame pattern \u2014 iteration error during SortedMap construction silently ignored.\n\n### Also: `CAtom_getstate` missing `PyErr_Clear` (`catom.cpp:403-407`)\nAfter `PyObject_GetAttr` fails with `AttributeError` (attribute not found), the `continue` proceeds without `PyErr_Clear()`, leaving the exception set. The comment says \"it is not an error if the attribute is not present\" but the exception is not actually cleared.\n\n### Also: `CAtom_getstate` returns NULL without exception (`catom.cpp`)\nOn certain error paths returns 0 (NULL) without ensuring an exception is set \u2192 `SystemError: returned NULL without exception`.\n\n**Fix for all PyIter_Next sites** \u2014 add after each loop:\n```cpp\nif( PyErr_Occurred() )\n    return 0;\n```\n\n**Fix for getstate PyErr_Clear** \u2014 add `PyErr_Clear();` before `continue` at line 407.\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

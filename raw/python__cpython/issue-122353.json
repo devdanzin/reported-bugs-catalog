@@ -1,0 +1,62 @@
+{
+ "repo": "python/cpython",
+ "number": 122353,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/122353",
+ "title": "Import errors with loo long entry in sys.path or PYTHONPATH in Windows",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "OS-windows",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-07-27T13:18:12Z",
+ "closed_at": null,
+ "body": "# Bug report\n\n### Bug description:\n\nHaving too long entries in `sys.path` or `PYTHONPATH` in Windows will cause different errors in imports. This was first reported on #122170, where there is some useful discussion.\n\n```python\n> $Env:PYTHONPATH=\"a\" * 33000\n> py -3.13\nException ignored in running getpath:\nTraceback (most recent call last):\n  File \"<frozen getpath>\", line 668, in <module>\nOSError: failed to make path absolute\nFatal Python error: error evaluating path\nPython runtime state: core initialized\n\nCurrent thread 0x00005a8c (most recent call first):\n  <no Python frame>\n```\n\n```python\n>>> import sys\n>>> sys.path.insert(0, \"a\" * 33000)\n>>> import email\nTraceback (most recent call last):\n  File \"<frozen importlib._bootstrap_external>\", line 1512, in _path_importer_cache\nKeyError: 'aaaaaaaaaaaaaaaaaaaaaaaa[...]aaaaaaaaaa'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<python-input-6>\", line 1, in <module>\n    import email\n  File \"<frozen importlib._bootstrap>\", line 1360, in _find_and_load\n  File \"<frozen importlib._bootstrap>\", line 1322, in _find_and_load_unlocked\n  File \"<frozen importlib._bootstrap>\", line 1262, in _find_spec\n  File \"<frozen importlib._bootstrap_external>\", line 1555, in find_spec\n  File \"<frozen importlib._bootstrap_external>\", line 1527, in _get_spec\n  File \"<frozen importlib._bootstrap_external>\", line 1514, in _path_importer_cache\n  File \"<frozen importlib._bootstrap_external>\", line 1490, in _path_hooks\n  File \"<frozen importlib._bootstrap_external>\", line 1714, in path_hook_for_FileFinder\n  File \"<frozen importlib._bootstrap_external>\", line 173, in _path_isdir\n  File \"<frozen importlib._bootstrap_external>\", line 158, in _path_is_mode_type\n  File \"<frozen importlib._bootstrap_external>\", line 152, in _path_stat\nValueError: stat: path too long for Windows\n```\n\n### CPython versions tested on:\n\n3.13, CPython main branch\n\n### Operating systems tested on:\n\nWindows\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-122389\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "eryksun",
+   "created_at": "2024-07-27T17:27:11Z",
+   "body": "As discussed in #122228, on Windows going back to 3.3, the C `path_t` converter that's used by many builtin `os` functions is implemented to raise `ValueError` if a path is longer than 32767 characters. Whether or not that behavior gets changed, calling builtin `os` functions should still handle `ValueError` if one of the arguments is a path. For example, a path string in `sys.path` might contain null characters, or, on POSIX, it might not be encodable using the filesystem encoding (e.g. if the filesystem encoding is ASCII because locale coercion and UTF-8 mode are disabled)."
+  },
+  {
+   "author": "zooba",
+   "created_at": "2024-08-06T22:27:32Z",
+   "body": "I'm not convinced that these errors should be handled. OSErrors are caused by things outside of the control of the caller (assuming correct inputs), but ValueErrors indicate that the caller passed something invalid. A path longer than 32K is never valid, so it never should've gotten in there, so the caller should be informed - in this case, the user.\r\n\r\nWhat's the real scenario where this mattered? All I see is a very contrived scenario to cause the error, but no information about how it was encountered or why simply ignoring corrupt data would've been a better result."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2024-08-07T08:27:05Z",
+   "body": "It is possible that the path to the `.py` file is below the 32K limit, but the path of the corresponding `.pyc` file exceeds it. Impossibility to create a `.pyc` is not fatal, this error should be silently ignored.\r\n"
+  },
+  {
+   "author": "zooba",
+   "created_at": "2024-08-07T09:40:27Z",
+   "body": "> Impossibility to create a `.pyc` is not fatal, this error should be silently ignored.\r\n\r\nAgreed.\r\n\r\nBut again, let's take each case like this individually - not being able to iterate over files in an invalid `sys.path` entry is fatal in other ways already, so it should be fatal in this way too."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-08-07T11:50:49Z",
+   "body": "> I'm not convinced that these errors should be handled.\r\n\r\nMe neither, I created these issues so informed decisions could be made on the need to guard against them. Thanks for analyzing \r\n the reports!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122389",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122454",
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ]
+}

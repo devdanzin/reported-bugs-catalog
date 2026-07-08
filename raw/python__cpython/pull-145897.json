@@ -1,0 +1,114 @@
+{
+ "repo": "python/cpython",
+ "number": 145897,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/145897",
+ "title": "gh-145896: Fix typos and stale docstrings in `Lib/traceback.py`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "docs",
+  "skip news",
+  "stale"
+ ],
+ "created_at": "2026-03-13T02:13:27Z",
+ "closed_at": "2026-05-25T09:45:02Z",
+ "body": "This PR fixes some typos and stale docstrings, as described by Claude Code:\r\n\r\n- Fix stale `extract_tb()` docstring: add `end_lineno`, `colno`, and `end_colno` to the listed `FrameSummary` attributes (available since 3.11)\r\n- Fix stale `extract_stack()` docstring: replace outdated \"quadruple (filename, line number, function name, text)\" with \"FrameSummary object\" (stale since 3.5)\r\n- Fix broken grammar in `FrameSummary` class docstring: `\"for the of code\"` \u2192 `\"for the code\"`\r\n- Fix inaccurate `_display_width()` docstring: `\"extra amount of width\"` \u2192 `\"amount of width\"` (the function returns total display width, not a delta)\r\n- Fix copy-paste typo in `TracebackException.__init__` comment: `\"exc_traceback, exc_value, exc_traceback\"` \u2192 `\"exc_type, exc_value, exc_traceback\"`\r\n\n\n<!-- gh-issue-number: gh-145896 -->\n* Issue: gh-145896\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-22T19:37:07Z",
+   "body": "Not sure what you mean by \"is as long as the internal one\", but I've corrected the same staleness and some typos in the traceback public documentation."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-22T19:41:59Z",
+   "body": "By \"as long as\", I meant that we were precise enough in the public docs"
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-05-08T18:27:48Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  },
+  {
+   "author": "read-the-docs-community[bot]",
+   "created_at": "2026-05-24T09:56:29Z",
+   "body": "<!-- readthedocs-883176 -->\n\n### Documentation build overview\n\n> \ud83d\udcda [cpython-previews](https://app.readthedocs.org/projects/cpython-previews/) | \ud83d\udee0\ufe0f Build [#32828306](https://app.readthedocs.org/projects/cpython-previews/builds/32828306/) | \ud83d\udcc1 Comparing 9cc4bc6cf72b41e0ee637e99032d3ac4b26dc3b8 against [main](https://cpython-previews.readthedocs.io/en/main/) (a38804bb981ba93a1efbb95a1e35a1c0b05740c7)\n\n[<kbd> &nbsp; \ud83d\udd0d Preview build &nbsp; </kbd>](https://cpython-previews--145897.org.readthedocs.build/en/145897/)\n\n\n<details open>\n<summary>1 file changed</summary>\n<br>\n<code>\u00b1</code> <a href=\"https://cpython-previews--145897.org.readthedocs.build/en/145897/library/traceback.html\"><code>library/traceback.html</code></a><br>\n</details>\n\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-05-24T10:06:03Z",
+   "body": "Thank for the review!\r\n\r\nI've removed the enumerations and adapted the wording so e.g. the reference to \"line\" makes it clear it's an attribute.\r\n\r\nI've avoided reflowing the text as per B\u00e9n\u00e9dikt's request (makes it easier to review), please let me know whether I should reflow for the final commit."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-25T09:46:15Z",
+   "body": "Thanks @devdanzin for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-25T09:46:15Z",
+   "body": "Thanks @devdanzin for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-05-25T09:46:15Z",
+   "body": "Thanks @devdanzin for the PR, and @serhiy-storchaka for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-05-25T09:46:28Z",
+   "body": "[GH-150382](https://github.com/python/cpython/pull/150382) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-05-25T09:46:34Z",
+   "body": "[GH-150383](https://github.com/python/cpython/pull/150383) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-05-25T09:46:39Z",
+   "body": "[GH-150384](https://github.com/python/cpython/pull/150384) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145896",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "832afeddcea78e40d39c47cd1893f8137e588e72",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "effcfd725dce2cdce71d2ca7b3ebd32045466b53",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "28037c2d11be131588efcd22c17c6bafa824cc8d",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0bff1182d47b084fc2e87299cac53bb4878762e9",
+   "actor": "serhiy-storchaka"
+  }
+ ]
+}

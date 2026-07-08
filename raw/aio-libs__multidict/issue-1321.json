@@ -1,0 +1,39 @@
+{
+ "repo": "aio-libs/multidict",
+ "number": 1321,
+ "type": "issue",
+ "url": "https://github.com/aio-libs/multidict/issues/1321",
+ "title": "multidict Free-Threading Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "bug",
+  "reproducer: present"
+ ],
+ "created_at": "2026-04-19T14:23:43Z",
+ "closed_at": null,
+ "body": "I ran a free threading analysis tool on multidict and it found that:\n\n> **Overall difficulty: Easy-Medium.** multidict is one of the *best-positioned* extensions for free-threading \u2014 all the hard structural work (multi-phase init, heap types, module state) is already done. What's missing is purely per-object synchronization, which is a mechanical addition of `Py_BEGIN_CRITICAL_SECTION` calls.\n\nThe full report is at https://gist.github.com/devdanzin/fa00e03ef041c030660f083116a7e1b6. It contains issue descriptions, suggested fixes, and reproducers for some of the issues.\n\nI hope it helps.",
+ "comments": [
+  {
+   "author": "webknjaz",
+   "created_at": "2026-04-28T20:56:15Z",
+   "body": "@devdanzin thanks! I think it would be useful to have the context included right in the issue so that the discussion isn't fragmented. Perhaps, as a collapsed block. \nThough, it may be better to file multiple issues that could be addressed independently. Sending PRs with just reproduces would be a great demo too."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/aio-libs/multidict/pull/1323",
+   "commit": null,
+   "actor": "Vizonex"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/aio-libs/multidict/pull/1328",
+   "commit": null,
+   "actor": "Vizonex"
+  }
+ ]
+}

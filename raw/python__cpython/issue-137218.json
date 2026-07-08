@@ -1,0 +1,158 @@
+{
+ "repo": "python/cpython",
+ "number": 137218,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/137218",
+ "title": "Main segfaults importing `_pyrepl` with low value for `JUMP_BACKWARD_INITIAL_VALUE`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "build",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-07-29T21:49:12Z",
+ "closed_at": "2025-10-05T03:06:04Z",
+ "body": "# Crash report\n\n### What happened?\n\nEdit: I'm seeing this crash even without patching `JUMP_BACKWARD_INITIAL_VALUE`. Will try to figure out a MRE for unpatched crash.\n\nIf we `#define JUMP_BACKWARD_INITIAL_VALUE 702` (or lower) in `Include/internal/pycore_backoff.h`, a debug JIT build will segfault when trying to run to the new REPL. Can also be triggered by:\n\n```\npython -m _pyrepl\n```\n\nUsing some other modules like `random` or `http.server` doesn't crash.\n\nAn even lower value like 344 will segfault earlier, during the build process.\n\nThis happens since https://github.com/python/cpython/pull/136307 landed in 377b787. \n\nThe diff below, which is part of that commit, is enough to cause the segfault together with defining `JUMP_BACKWARD_INITIAL_VALUE` to 702 or lower:\n```diff\ndiff --git a/Include/internal/pycore_global_objects_fini_generated.h b/Include/internal/pycore_global_objects_fini_generated.h\nindex 493377b4c25..5e7dda3a371 100644\n--- a/Include/internal/pycore_global_objects_fini_generated.h\n+++ b/Include/internal/pycore_global_objects_fini_generated.h\n@@ -1005,6 +1005,7 @@ _PyStaticObjects_CheckRefcnt(PyInterpreterState *interp) {\n     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(imag));\n     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(importlib));\n     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(in_fd));\n+    _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(include_aliases));\n     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(incoming));\n     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(index));\n     _PyStaticObject_CheckRefcnt((PyObject *)&_Py_ID(indexgroup));\ndiff --git a/Include/internal/pycore_global_strings.h b/Include/internal/pycore_global_strings.h\nindex 5dfea2f479d..6908cbf78f3 100644\n--- a/Include/internal/pycore_global_strings.h\n+++ b/Include/internal/pycore_global_strings.h\n@@ -496,6 +496,7 @@ struct _Py_global_strings {\n         STRUCT_FOR_ID(imag)\n         STRUCT_FOR_ID(importlib)\n         STRUCT_FOR_ID(in_fd)\n+        STRUCT_FOR_ID(include_aliases)\n         STRUCT_FOR_ID(incoming)\n         STRUCT_FOR_ID(index)\n         STRUCT_FOR_ID(indexgroup)\ndiff --git a/Include/internal/pycore_runtime_init_generated.h b/Include/internal/pycore_runtime_init_generated.h\nindex 85ced09d29d..da2ed7422c9 100644\n--- a/Include/internal/pycore_runtime_init_generated.h\n+++ b/Include/internal/pycore_runtime_init_generated.h\n@@ -1003,6 +1003,7 @@ extern \"C\" {\n     INIT_ID(imag), \\\n     INIT_ID(importlib), \\\n     INIT_ID(in_fd), \\\n+    INIT_ID(include_aliases), \\\n     INIT_ID(incoming), \\\n     INIT_ID(index), \\\n     INIT_ID(indexgroup), \\\ndiff --git a/Include/internal/pycore_unicodeobject_generated.h b/Include/internal/pycore_unicodeobject_generated.h\nindex 6018d98d156..b1f411945e7 100644\n--- a/Include/internal/pycore_unicodeobject_generated.h\n+++ b/Include/internal/pycore_unicodeobject_generated.h\n@@ -1772,6 +1772,10 @@ _PyUnicode_InitStaticStrings(PyInterpreterState *interp) {\n     _PyUnicode_InternStatic(interp, &string);\n     assert(_PyUnicode_CheckConsistency(string, 1));\n     assert(PyUnicode_GET_LENGTH(string) != 1);\n+    string = &_Py_ID(include_aliases);\n+    _PyUnicode_InternStatic(interp, &string);\n+    assert(_PyUnicode_CheckConsistency(string, 1));\n+    assert(PyUnicode_GET_LENGTH(string) != 1);\n     string = &_Py_ID(incoming);\n     _PyUnicode_InternStatic(interp, &string);\n     assert(_PyUnicode_CheckConsistency(string, 1));\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n_PyUnicode_Equal (str1=0x555555c88c18 <_PyRuntime+96088>, str2=0x555555c88c50 <_PyRuntime+96144>) at ./Include/object.h:815\n815         return ((flags & feature) != 0);\n\n#0  _PyUnicode_Equal (str1=0x555555c88c18 <_PyRuntime+96088>, str2=0x555555c88c50 <_PyRuntime+96144>) at ./Include/object.h:815\n#1  0x00007ffff731df15 in ?? ()\n#2  0x00007ffff764a751 in ?? ()\n#3  0x0000555555cc2230 in _PyRuntime ()\n#4  0x00007fffffffbfc0 in ?? ()\n#5  0x00007ffff7317017 in ?? ()\n#6  0x0000555556053f60 in ?? ()\n#7  0x00007ffff7e2a9c8 in ?? ()\n#8  0x00007ffff7317000 in ?? ()\n#9  0x00007ffff7e2a910 in ?? ()\n#10 0x0000555555cc2230 in _PyRuntime ()\n#11 0x00005555557cdcf9 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x58, throwflag=1291845632)\n    at Python/generated_cases.c.h:7796\nBacktrace stopped: previous frame inner to this frame (corrupt stack?)\n```\n\nHere's the output from running `PYTHON_LLTRACE=4 ./python -m _pyrepl`:\n[lltrace_crash.txt](https://github.com/user-attachments/files/21497684/lltrace_crash.txt)\nAnd here for `PYTHON_OPT_DEBUG=4 ./python -m _pyrepl`:\n[opt_debug_crash.txt](https://github.com/user-attachments/files/21497685/opt_debug_crash.txt)\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 (heads/main-dirty:d7e12a362a2, Jul 29 2025, 18:24:07) [GCC 13.3.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-137265\n* gh-139170\n* gh-139241\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-29T22:13:48Z",
+   "body": "This is only on JIT builds, correct? Curious to see the new unpatched reproducer."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-29T22:21:07Z",
+   "body": "> This is only on JIT builds, correct?\n\nAFAICT, after double checking, yes.\n"
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-29T22:27:33Z",
+   "body": "I suspect that the bug isn't the initial value itself, but rather the code we try to compile when the value is that low. It could be that some specialization or inline cache has a nonsense value that we're not handling well, or something."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-29T22:32:58Z",
+   "body": "> Here's the output from running `PYTHON_LLTRACE=4 ./python -m _pyrepl`:\n\nIs part of this file missing, or was the output truncated by the crash itself? The last optimized trace is incomplete (it should be length 167, but only 132 elements are printed).\n\nOr maybe we need to add a `flush` call somewhere?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-29T22:55:15Z",
+   "body": "I believe the crash truncates it, yes. "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-30T02:35:01Z",
+   "body": "I'm suspicious about such straightforward code segfaulting, hoping this isn't an operator error on my part.\n\nHere's something that triggers the right crash for me, unpatched debug JIT build, please confirm whether it repros:\n```python\nkey = \"abc\"\ns = 0\nwhile True:\n    key[s] == \"a\"\n```\n\nAnd here's something that triggers another crash, not sure what configurations are affected (will investigate tomorrow), but also crashes an  unpatched debug JIT build:\n```python\ndef p(keys):\n    s = 0\n    r = []\n    while s < len(keys):\n        ret = \"\"\n        while not ret and s < len(keys):\n                ret = keys[s]\n                s += 1\n        r.extend([s])\n    return r\n\nwhile True:\n    p(\"abc\")\n```\n\nTraceback for 2nd crash:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x00005555556da88a in PyObject_IsTrue (v=0x555555c88d38 <_PyRuntime+96376>) at Objects/object.c:2059\n2059        else if (Py_TYPE(v)->tp_as_number != NULL &&\n\n#0  0x00005555556da88a in PyObject_IsTrue (v=0x555555c88d38 <_PyRuntime+96376>) at Objects/object.c:2059\n#1  0x00005555557d8a5b in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x7ffff7e2a088, throwflag=0)\n    at Python/generated_cases.c.h:11581\n#2  0x00005555557db135 in _PyEval_EvalFrame (tstate=tstate@entry=0x555555cc2230 <_PyRuntime+331120>, frame=frame@entry=0x7ffff7e2a020,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:119\n#3  0x00005555557db306 in _PyEval_Vector (tstate=tstate@entry=0x555555cc2230 <_PyRuntime+331120>, func=func@entry=0x7ffff7a4a8d0,\n    locals=locals@entry=0x7ffff7a583b0, args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0)\n    at Python/ceval.c:1981\n#4  0x00005555557db402 in PyEval_EvalCode (co=co@entry=0x7ffff785c260, globals=globals@entry=0x7ffff7a583b0,\n    locals=locals@entry=0x7ffff7a583b0) at Python/ceval.c:872\n#5  0x00005555558bcf17 in run_eval_code_obj (tstate=tstate@entry=0x555555cc2230 <_PyRuntime+331120>, co=co@entry=0x7ffff785c260,\n    globals=globals@entry=0x7ffff7a583b0, locals=locals@entry=0x7ffff7a583b0) at Python/pythonrun.c:1365\n#6  0x00005555558bd0bd in run_mod (mod=mod@entry=0x555555ee2968, filename=filename@entry=0x7ffff7aa31b0,\n    globals=globals@entry=0x7ffff7a583b0, locals=locals@entry=0x7ffff7a583b0, flags=flags@entry=0x7fffffffd9b8,\n    arena=arena@entry=0x7ffff7ac4760, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1436\n#7  0x00005555558bd93d in pyrun_file (fp=fp@entry=0x555555e2e6d0, filename=filename@entry=0x7ffff7aa31b0, start=start@entry=257,\n    globals=globals@entry=0x7ffff7a583b0, locals=locals@entry=0x7ffff7a583b0, closeit=closeit@entry=1, flags=0x7fffffffd9b8)\n    at Python/pythonrun.c:1293\n#8  0x00005555558bf1d1 in _PyRun_SimpleFileObject (fp=fp@entry=0x555555e2e6d0, filename=filename@entry=0x7ffff7aa31b0,\n    closeit=closeit@entry=1, flags=flags@entry=0x7fffffffd9b8) at Python/pythonrun.c:521\n#9  0x00005555558bf3c7 in _PyRun_AnyFileObject (fp=fp@entry=0x555555e2e6d0, filename=filename@entry=0x7ffff7aa31b0,\n    closeit=closeit@entry=1, flags=flags@entry=0x7fffffffd9b8) at Python/pythonrun.c:81\n#10 0x00005555558e872d in pymain_run_file_obj (program_name=program_name@entry=0x7ffff7aa3d80, filename=filename@entry=0x7ffff7aa31b0,\n    skip_source_first_line=0) at Modules/main.c:410\n#11 0x00005555558e8855 in pymain_run_file (config=config@entry=0x555555c8d2d8 <_PyRuntime+114200>) at Modules/main.c:429\n#12 0x00005555558e939f in pymain_run_python (exitcode=exitcode@entry=0x7fffffffdb34) at Modules/main.c:691\n#13 0x00005555558e9654 in Py_RunMain () at Modules/main.c:772\n```\n\nHere's the output from running with `PYTHON_LLTRACE=4` for the second crash:\n[lltrace_2nd_crash.txt](https://github.com/user-attachments/files/21500023/lltrace_2nd_crash.txt)\nAnd here's the output from `PYTHON_OPT_DEBUG=4`:\n[opt_debug_2nd_crash.txt](https://github.com/user-attachments/files/21500022/opt_debug_2nd_crash.txt)"
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-30T03:23:46Z",
+   "body": "Yep! This gives me a segfault:\n\n```py\nX = \"X\"\nwhile True:\n    X[0] == \"\"\n```\n\nThis gives me an assertion failure (``_POP_TOP_UNICODE.c:121: _Py_CODEUNIT *_JIT_ENTRY(_PyInterpreterFrame *, _PyStackRef *, PyThreadState *): Assertion `PyUnicode_CheckExact(PyStackRef_AsPyObjectBorrow(value))' failed.``):\n\n```py\nX = \"X\"\nwhile True:\n    X[0]\n```\n\nYour second reproducer looks a lot like my second one here, and I wouldn't be surprised if both of these are related. Something about string indexing is broken."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-30T03:40:09Z",
+   "body": "Hm, weird. After a `make clean` and rebuild the issue goes away."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-30T03:44:07Z",
+   "body": "Maybe our `make` rule for the JIT is broken. I think we need to say that `jit.o` depends on `jit_stencils*.h`, not just `jit_stencils.h`. We now have a platform-specific header file (like `jit_stencils-x86_64-pc-linux-gnu.h`) and I'm not sure that the existing logic is picking that dependency up correctly.\n\n@devdanzin, does a clean rebuild work correctly for you?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-30T09:21:36Z",
+   "body": "> Yep! This gives me a segfault:\n\nGreat, I was really worried it was my fault \ud83d\ude04 \n\n> [@devdanzin](https://github.com/devdanzin), does a clean rebuild work correctly for you?\n\nIt still segfaults after make distclean, but if I also bypass ccache it stops crashing. Then patching and re-enabling ccache also doesn't crash, which makes no sense to me but I hope makes to you.\n\nEdit: I simply can't repro anymore, any idea about how to bring the brokenness back?\n\nEdit 2: BTW, I see `make distclean` does `rm -f jit_stencils.h`, should it also remove `jit_stencils*.h`?\n"
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-30T18:09:44Z",
+   "body": "So I'm comfortable calling this a bug in the build system, not in the JIT. Are you interested in fixing it? You can ping me for help/review. Should be a couple of fairly straightforward changes in the Makefile.\n\nCC @savannahostrowski since she might have thoughts here."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-30T19:02:40Z",
+   "body": "I'd rather not tackle this one, but thanks for asking.\n\nAre you able to get back into the broken state? I wasted too much time trying to yesterday \ud83d\ude05."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-30T19:07:06Z",
+   "body": "I think getting *into* the broken state is hard for the same reasons that getting *out of* the broken state is hard. ;)"
+  },
+  {
+   "author": "encukou",
+   "created_at": "2025-09-22T12:28:57Z",
+   "body": "Since the PR was merged, running `make` twice (on the same source) will compile `Programs/_freeze_module` again and re-freeze a bunch of modules. Would it be possible to avoid that?"
+  },
+  {
+   "author": "savannahostrowski",
+   "created_at": "2025-09-22T13:34:40Z",
+   "body": "Hmm, let me investigate this a bit."
+  },
+  {
+   "author": "encukou",
+   "created_at": "2025-09-22T13:50:23Z",
+   "body": "Thanks!\nIf you want me to look into it, just shout :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/137265",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "85c1ef647751d18194bbc52eb2b1305871e03d10",
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/139170",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "72d5ee051145c5aaf3cc6b8e807a3a2b8930ae63",
+   "actor": "encukou"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/139241",
+   "commit": null,
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9964320d155907bcb3858e5ee99ea48b140d4772",
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2c9ebd4d224f554e08344380ba90708a1764ca93",
+   "actor": "danigm"
+  }
+ ]
+}

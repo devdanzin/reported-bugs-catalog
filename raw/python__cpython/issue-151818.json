@@ -1,0 +1,160 @@
+{
+ "repo": "python/cpython",
+ "number": 151818,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/151818",
+ "title": "Double free / use-after-free in `list.append()` when the list grows under `MemoryError` (`_CALL_LIST_APPEND`)",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2026-06-20T22:13:16Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nWhen `list.append(x)` has to grow the list's backing array and that allocation fails (i.e.\nunder `MemoryError`), the appended item `x` is decref'd **twice**. If `x` is referenced\nelsewhere this is a use-after-free: the interpreter aborts with `_Py_NegativeRefcount` on a\ndebug build, or **segfaults** on a release build, instead of raising a recoverable\n`MemoryError`.\n\nThis is reachable under genuine memory pressure (a real `RLIMIT_AS` reproducer with no test\nAPI is included below), so a program that correctly catches `MemoryError` can still be left\nwith a corrupted interpreter.\n\n### Reproducer\n\nDeterministic, pure Python, using `_testcapi.set_nomemory` to fail the grow allocation at a\ncontrolled point:\n\n```python\nimport _testcapi\n\nclass C:\n    __slots__ = (\"ref\",)\n    def __init__(self, ref):\n        self.ref = ref\n\ndef fill():\n    items = [C(str(i) + \"_unique\") for i in range(200)]\n    out = []\n    for it in items:\n        out.append(it.ref)          # CALL_LIST_APPEND; it.ref is also held by the C instance\n\nfill()                              # warm up: specialize out.append(...) to CALL_LIST_APPEND\nfor start in range(1500):\n    _testcapi.set_nomemory(start, start + 1)   # fail one allocation, then resume\n    try:\n        try:\n            fill()\n        finally:\n            _testcapi.remove_mem_hooks()\n    except BaseException:\n        pass\n```\n\nOn a `--with-pydebug` build this aborts:\n\n```\n./Include/refcount.h:520: _Py_NegativeRefcount: Assertion failed: object has negative ref count\nFatal Python error: _PyObject_AssertFailed\n```\n\nOn a release build it segfaults.\n\n### Without any test API (real `MemoryError`)\n\nThe same double-free fires under a genuine allocation failure. With an `RLIMIT_AS` cap so the\nlist's grow allocation returns NULL naturally (run on a non-ASan build):\n\n```python\nimport resource\n\npool = [object() for _ in range(8_000_000)]      # uniquely-referenced items, built before the cap\nwarm = []\nfor i in range(3000):\n    warm.append(pool[i])                          # specialize CALL_LIST_APPEND\ndel warm\n\ncur = int(open(\"/proc/self/statm\").read().split()[0]) * 4096   # current virtual size\nresource.setrlimit(resource.RLIMIT_AS, (cur + 24 * 1024 * 1024,) * 2)\n\nout = []\nfor x in pool:\n    out.append(x)                                 # real list_resize failure -> double-free -> SIGSEGV\n```\n\n```\n$ ./python natural.py\nSegmentation fault            # faulthandler pins the crash to the `out.append(x)` line\n```\n\nUnder the same cap, when the failing allocation is *not* a list-append grow (e.g. appending\nlarge `bytes`), Python raises a clean, catchable `MemoryError` and does not crash \u2014 so the\nsegfault is specific to the buggy append path.\n\n## Root cause\n\nIn the specialized append bytecode `_CALL_LIST_APPEND` (`Python/bytecodes.c`):\n\n```c\nop(_CALL_LIST_APPEND, (callable, self, arg -- none, c, s)) {\n    ...\n    int err = _PyList_AppendTakeRef((PyListObject *)self_o, PyStackRef_AsPyObjectSteal(arg));\n    UNLOCK_OBJECT(self_o);\n    if (err) {\n        ERROR_NO_POP();\n    }\n    ...\n}\n```\n\n`arg` is **stolen** via `PyStackRef_AsPyObjectSteal` and handed to `_PyList_AppendTakeRef`,\nwhich consumes the reference on every path \u2014 including decref'ing the item when the grow\nfails (`_PyList_AppendTakeRefListResize` \u2192 `if (list_resize(...) < 0) { Py_DECREF(newitem);\nreturn -1; }`, `Objects/listobject.c`).\n\nBut on that failure the uop takes `ERROR_NO_POP()`, which jumps to exception handling\n**without removing `arg` from the value stack**. Since `arg`'s reference was already\nconsumed, the stale `arg` stackref is now dangling. The eval loop's `exception_unwind` then\npops the frame's value stack and `PyStackRef_XCLOSE`s every slot, closing the stale `arg`\nslot \u2014 a **second** decref of the item.\n\n(Confirmed with ASan on a `--with-pymalloc` build: the item is freed by `PyStackRef_XCLOSE`\n\u2190 `_PyEval_EvalFrameDefault` (the `exception_unwind` handler); both the item's allocation and\nthe second, use-after-free decref are visible in the report.)\n\n## Suggested fix\n\n`_CALL_LIST_APPEND` must account for the consumed `arg` on the error path \u2014 once\n`_PyList_AppendTakeRef` has taken the reference, the `arg` stackref is dead and must not be\nleft on the value stack for `exception_unwind` to close. The sibling ops already show the two\ncorrect idioms:\n\n- the comprehension element-adds (`LIST_APPEND`, `SET_ADD`, `MAP_ADD`) call the same kind of\n  steal/`*TakeRef` helper but use `ERROR_IF(...)`, so the codegen drops the consumed input on\n  the error path. Concretely, `[x for x in ...]` (`LIST_APPEND`, the *same*\n  `_PyList_AppendTakeRef` helper) does **not** crash where `lst.append(x)`\n  (`_CALL_LIST_APPEND`) does;\n- the consuming call ops (`_DO_CALL_FUNCTION_EX`, `_PY_FRAME_EX`) call `INPUTS_DEAD();\n  SYNC_SP();` before `ERROR_NO_POP()`.\n\nI audited the other specialized ops: `_CALL_LIST_APPEND` is the only one that steals a\nstack input and then takes a bare `ERROR_NO_POP()` without either form of accounting, which\nis why it is the lone op affected.\n\n## Environment\n\n- CPython `main` (3.16.0a0); reproduced on `--with-pydebug` builds (abort) and release builds\n  (segfault), both free-threaded and default GIL.\n\n---\n\n*This report and the reduced reproducers were drafted with the assistance of Claude Code; I\nhave reviewed and reproduced them.*\n\n### CPython versions tested on:\n\nCPython main branch, 3.16\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.16.0a0 (heads/main:aec0aed1978, Jun 20 2026, 17:44:00) [Clang 22.1.2 (1ubuntu1)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151826\n* gh-152114\n* gh-152117\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2026-06-20T22:43:57Z",
+   "body": "Related to #151119 / #151538, but I believe this is a distinct bug.\n\nHere's Claude analysis:\n\n> #151119 / #151538 fix the **missing eval-stack sync** before `_PyList_AppendTakeRef` \u2014 the `_Py_Dealloc` `stackpointer != NULL` assert, which fires when the appended item has no other reference and is deallocated immediately.\n> \n> This issue is the **double-free / use-after-free**: `_CALL_LIST_APPEND` steals `arg`, `_PyList_AppendTakeRef` decrefs it when `list_resize` fails, but the op then takes `ERROR_NO_POP()` and leaves the consumed `arg` on the value stack, so `exception_unwind` closes it a second time. It surfaces when the item has another live reference (so that first decref doesn't free it).\n> \n> #151538 marks the append ops `HAS_ESCAPES`, which also adds the SP-sync to `_CALL_LIST_APPEND` \u2014 but its `_CALL_LIST_APPEND` hunk *only* adds the sync; the error path still `JUMP_TO_ERROR()`s with `arg` on the stack, so the double-free survives that PR. Notably `_CALL_LIST_APPEND` is the only append op using `ERROR_NO_POP`; `LIST_APPEND` / `SET_ADD` / `MAP_ADD` use the codegen-accounted `ERROR_IF`, which drops the consumed input. So the fix here is to account for the stolen `arg` on the error path (and could be folded into #151538).\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-24T18:35:19Z",
+   "body": "Oh, I created a duplicate issue: https://github.com/python/cpython/issues/152090."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-24T18:35:53Z",
+   "body": "According to git bisect, the regression was introduced by commit 72f56654d06a6d23c91e892c05f9e4d70009315b:\n\n```\ncommit 72f56654d06a6d23c91e892c05f9e4d70009315b\nAuthor: Mark Shannon <mark@hotpy.org>\nDate:   Wed Feb 12 17:44:59 2025 +0000\n\n    GH-128682: Account for escapes in `DECREF_INPUTS` (GH-129953)\n    \n    * Handle escapes in DECREF_INPUTS\n    \n    * Mark a few more functions as escaping\n    \n    * Replace DECREF_INPUTS with PyStackRef_CLOSE where possible\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-24T18:37:27Z",
+   "body": "A simpler reproducer:\n\n```py\nimport _testcapi\nimport sys\nimport os\nimport struct\n\nsizeof_empty_list = sys.getsizeof([])\nsizeof_pointer = struct.calcsize('P')\n\ndef capacity(lst):\n    size = (sys.getsizeof(lst) - sizeof_empty_list)\n    if size % sizeof_pointer:\n        raise ValueError(\"wrong list size\")\n    capacity = size // sizeof_pointer\n    return capacity\n\ndef func(offset):\n    L=[1,2,3]\n    memory_error = False\n    small = 1024 * 1024\n    for i in range(1000):\n        # run a few iterations (25) to specialize the bytecode\n        # to CALL_LIST_APPEND\n        if i > 25 and capacity(L) == len(L):\n            # the list is full: L.append() will have to resize the list\n            os.uname()  # used as gdb traceback\n            _testcapi.set_nomemory(offset, 0)\n        try:\n            try:\n                L.append(b'x' * small)\n            finally:\n                _testcapi.remove_mem_hooks()\n        except MemoryError:\n            memory_error = True\n            break\n\nfor i in range(0, 10):\n    func(i)\nprint(\"ok\")\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-24T19:29:17Z",
+   "body": "https://github.com/python/cpython/pull/152114 and https://github.com/python/cpython/pull/152117 look like workarounds for a bug in `Tools/cases_generator/`. But well, it's better than no fix :-)\n\nI wrote https://github.com/python/cpython/pull/152117 to add a non-regression test."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-07-03T22:39:42Z",
+   "body": "**FYI \u2014 blast radius / presentations index.** fusil's OOM-injection fuzzing keeps surfacing this as superficially-unrelated crashes, but every one `rr`-reduces to this same `_CALL_LIST_APPEND` double-free (`_PyList_AppendTakeRefListResize`, `listobject.c:531`). Recording them here so the next person who hits one of these signatures finds *this* issue instead of filing a new one.\n\nOne producer, many **victim/detector sites** (depending on what the double-freed item was and what reused its freed slot) \u2014 on a debug build:\n\n| Presentation (assert / crash) | victim |\n|---|---|\n| `_Py_NegativeRefcount` / `<object is freed>` | any item with a 2nd owner |\n| `DirEntry_dealloc` (`posixmodule.c`) segv / UAF | an `os.DirEntry.path` string |\n| `pycore_stackref.h:726 PyStackRef_XCLOSE` negref | the leftover stolen stackref itself |\n| `traceback.c:313 _PyTraceBack_FromFrame` assert | an object held via a traceback frame |\n| `pycore_object.h Py_DECREF_MORTAL` \u2014 `!_Py_IsStaticImmortal(op)` | freed block read back as static-immortal |\n| `dictobject.c:961 new_dict` \u2014 `mp == NULL \\|\\| Py_IS_TYPE(mp, &PyDict_Type)` | a dict that landed on the dict freelist |\n| `tupleobject.c:48 tuple_alloc` \u2014 `PyTuple_Check(op)` | a tuple on the tuple freelist |\n| `gc.c:380 validate_list` (at shutdown) | a `co_consts` constant whose freed slot a weakref's `PyGC_Head` reused |\n\nAnd it's reachable from many ordinary stdlib operations under real memory pressure \u2014 `os.walk` / `os.scandir`, `pkgutil.get_importer` / the import machinery (importlib's `path.append`), `sys.path` mutation + `__import__` \u2014 not only a literal `list.append`. (Several of these arrived as separate reports that `rr` later folded into this one.)\n\nSince they all funnel through the single `_CALL_LIST_APPEND` steal-then-`ERROR_NO_POP`, the fix here should cover every presentation above; flagging mainly because the freelist / GC-head faces don't look like a `list.append` bug at a glance.\n\nFull triage, per-face `rr` ledgers, and reproducers for each presentation live in a sibling catalog of fusil's OOM findings \u2014 this bug is [`reports/OOM-0036-list-append-oom-double-free/`](https://github.com/devdanzin/cpython-oom-findings/tree/main/reports/OOM-0036-list-append-oom-double-free) (`report.md` + `meta.json`; per-face backtraces `backtrace_immortal.txt` / `backtrace_dict_freelist.txt` / `backtrace_validate_list.txt`; reproducers `repro.py`, `repro_natural.py` (real `RLIMIT_AS`, no test API), `repro_get_importer.py`).\n\n---\n*Investigation and comment draft by Claude Code (Opus 4.8)*\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151826",
+   "commit": null,
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c9176aefe4736b08a5bf4d73c2d1be8b2076a84c",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "81d2978b7dcc1bb742d218f8c529b6a6b23823f7",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9a54e4149ca500e19db76c88d5f9bf655d40b2bf",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152090",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/129953",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3d7b92ae9b7d4e83ab9981ab6b798b19852a7260",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e2328dd578bca6735c149b3473a4edb7deef3ac7",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152114",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152117",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c63498d7f9c92f6748fffdbe991974b8dfb5b53c",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1df2ec4dd541e2cf7a957b1c75afe2719ca79de8",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0c0f50f1e07ace79fdd943027273f63270d69330",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152147",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "tonghuaroot"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/fusil/issues/181",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/fusil/pull/182",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "637575aaaa5008c2d1fe4653542cbcc7e805f9c2",
+   "actor": "devdanzin"
+  }
+ ]
+}

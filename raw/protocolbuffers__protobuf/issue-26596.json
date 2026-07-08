@@ -1,0 +1,115 @@
+{
+ "repo": "protocolbuffers/protobuf",
+ "number": 26596,
+ "type": "issue",
+ "url": "https://github.com/protocolbuffers/protobuf/issues/26596",
+ "title": "Umbrella issue: protobuf Python C Extension Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "bug"
+ ],
+ "created_at": "2026-03-26T22:27:37Z",
+ "closed_at": null,
+ "body": "**What version of protobuf and what language are you using?**\n\nVersion: 7.34.1 (pip package), also verified against current `main` branch source at `python/` directory\n\nLanguage: Python (upb C backend)\n\n**What supported operating system version are you using?**\n\nLinux (Ubuntu, x86_64)\n\n**What supported runtime / compiler version are you using?**\n\nPython 3.14.3+ (also affects 3.10-3.13)\n\n**What did you do?**\n\nWe performed a systematic code review of the 10 C source files in `python/` (the upb-based Python backend) using static analysis and manual review. We found multiple confirmed bugs, 7 of which we reproduced from pure Python scripts. Full report with analysis details: https://gist.github.com/devdanzin/b0eca1ded22efac92de4efe928916d46\n\nThe reproducible bugs are:\n\n**1. Segfault via `strcmp(NULL)` in numpy type detection (`convert.c:213-222`)**\n\n```python\nfrom google.protobuf import descriptor_pb2, descriptor_pool, message_factory\n\npool = descriptor_pool.DescriptorPool()\npool.Add(descriptor_pb2.FileDescriptorProto(\n    name=\"test.proto\", syntax=\"proto3\",\n    message_type=[descriptor_pb2.DescriptorProto(\n        name=\"TestMsg\",\n        field=[descriptor_pb2.FieldDescriptorProto(\n            name=\"val\", number=1, type=2, label=1)],\n    )],\n))\nTestMsg = message_factory.GetMessageClass(pool.FindMessageTypeByName(\"TestMsg\"))\n\nclass NamelessMeta(type):\n    def __getattribute__(cls, name):\n        if name == \"__name__\":\n            raise AttributeError(\"no __name__\")\n        return super().__getattribute__(name)\n\nclass Nameless(metaclass=NamelessMeta):\n    def __float__(self):\n        return 1.0\n\nmsg = TestMsg()\nmsg.val = Nameless()  # Segmentation fault (core dumped)\n```\n\n**2. `MessageMeta_GetAttr` swallows `KeyboardInterrupt`/`MemoryError`/`SystemExit` (`message.c:2019`)**\n\n```python\n# (same setup as above to get TestMsg)\nclass BombDescriptor:\n    def __get__(self, obj, objtype=None):\n        raise KeyboardInterrupt(\"should not be swallowed\")\n\nTestMsg.bomb = BombDescriptor()\ntry:\n    TestMsg.bomb\nexcept AttributeError:\n    print(\"BUG: KeyboardInterrupt swallowed, replaced with AttributeError\")\n```\n\n**3. `extension_ranges` leaks memory on every access (`descriptor.c:340-342`)**\n\n```python\nimport tracemalloc, gc\nfrom google.protobuf import descriptor_pb2, descriptor_pool\n\npool = descriptor_pool.DescriptorPool()\npool.Add(descriptor_pb2.FileDescriptorProto(\n    name=\"test.proto\", syntax=\"proto3\",\n    message_type=[descriptor_pb2.DescriptorProto(\n        name=\"TestMsg\",\n        field=[descriptor_pb2.FieldDescriptorProto(name=\"x\", number=1, type=5, label=1)],\n        extension_range=[\n            descriptor_pb2.DescriptorProto.ExtensionRange(start=100, end=200),\n            descriptor_pb2.DescriptorProto.ExtensionRange(start=200, end=300),\n        ],\n    )],\n))\ndesc = pool.FindMessageTypeByName(\"TestMsg\")\n\ntracemalloc.start()\ngc.collect()\nbefore = tracemalloc.get_traced_memory()[0]\nfor _ in range(10000):\n    _ = desc.extension_ranges\ngc.collect()\nafter = tracemalloc.get_traced_memory()[0]\nprint(f\"Leaked {after - before} bytes over 10000 accesses\")\n# Leaked 321184 bytes over 10000 accesses\n```\n\n**4. Descriptor container `RichCompare` swallows exceptions (`descriptor_containers.c:249,527,752`)**\n\n```python\n# (same setup to get desc)\nfields = desc.fields_by_name\n\nclass BadEq:\n    def __eq__(self, other): raise RuntimeError(\"comparison error\")\n    def __iter__(self): return iter([])\n    def __len__(self): return 0\n\nprint(fields == BadEq())\n# Prints False -- RuntimeError silently swallowed\n```\n\n**5. `pop()` clamps out-of-range index instead of raising `IndexError` (`repeated.c:423-430`)**\n\n```python\n# (same setup to get TestMsg with repeated int32 'values' field)\nmsg = TestMsg()\nmsg.values.extend([10, 20, 30])\nprint(msg.values.pop(999999))\n# Prints 30 -- should raise IndexError\n```\n\n**6-7. C/Python parity gaps**: extended slice assignment works on C but raises `ValueError` on pure Python fallback; `RepeatedComposite.__eq__` with lists returns `True` on C but raises `TypeError` on pure Python.\n\n**What did you expect to see**\n\n1. `TypeError` or `ValueError` instead of segfault\n2. `KeyboardInterrupt` propagated, not replaced with `AttributeError`\n3. No memory growth from repeated `extension_ranges` access\n4. `RuntimeError` propagated from comparison, not silently swallowed\n5. `IndexError` for out-of-range `pop()` index\n6-7. Consistent behavior between C and Python backends\n\n**What did you see instead?**\n\n1. `Segmentation fault (core dumped)` (exit code 139)\n2. `AttributeError` raised instead of `KeyboardInterrupt`\n3. ~32 bytes leaked per access (321KB over 10K calls with 2 extension ranges)\n4. `False` returned silently\n5. Last element silently removed and returned\n6-7. C backend accepts operations that Python backend rejects\n\n**Anything else we should know about your project / environment**\n\nThe full analysis report covers approximately 30 unique bugs found across all 10 C files, including additional issues that require OOM to trigger (unchecked `malloc`/`realloc`, unchecked `PyType_GenericAlloc` at 15+ sites, double-free in descriptor container `Items` error paths) and a `Py_DECREF` on a stack-allocated C array (`map.c:549`) that is undefined behavior on every module import. The complete report with detailed analysis per bug is at the gist linked above.\n\nThe code review also identified 9 unguarded `PyErr_Clear()` calls, missing `m_traverse`/`m_clear` for module state with ~26 `PyObject*` members, and C/Python parity gaps in `MergeFrom` input handling and `ExtensionDict.__eq__` semantics.\n\nThe code review was done with https://github.com/devdanzin/cext-review-toolkit.\n",
+ "comments": [
+  {
+   "author": "anowardear062-svg",
+   "created_at": "2026-04-02T18:14:12Z",
+   "body": "Thanks for the update "
+  },
+  {
+   "author": "clin1234",
+   "created_at": "2026-06-13T13:11:18Z",
+   "body": "A more recent report generated with the same toolkit is here: https://gist.github.com/clin1234/6297dd387aac456a133888375ae52ae9"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5f0349805e74f11debecdd7678bc0339e4546835",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/protocolbuffers/protobuf/pull/26920",
+   "commit": null,
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c46e640f486311d94519a4c0a6268b85236a60eb",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/protocolbuffers/protobuf/pull/26939",
+   "commit": null,
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae4c0e3df0fa03752f690f2003da84ed1901c012",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9bd297641e24a52f534eab1d64b8bc2a25b2dbf8",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "429f9962e063a8a137bfaba7f8a2b2e3720c91ff",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f925eaeab5b166fc34bf4fa2a00fbebafef74f71",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "be1f31f7e3eb507b32c1d338dd3a38401af03ea6",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "78a09ada5c0d2668e1e0aa7cab4ec88d3b33fcd9",
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/protocolbuffers/protobuf/pull/27570",
+   "commit": null,
+   "actor": "jlaportebot"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/protocolbuffers/protobuf/issues/27981",
+   "commit": null,
+   "actor": "clin1234"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/protocolbuffers/protobuf/pull/28196",
+   "commit": null,
+   "actor": "copybara-service[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a92ef8bb1754eb2e4c01b22dbab98c371cdf62bf",
+   "actor": "copybara-service[bot]"
+  }
+ ]
+}

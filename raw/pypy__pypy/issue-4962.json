@@ -1,0 +1,109 @@
+{
+ "repo": "pypy/pypy",
+ "number": 4962,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/4962",
+ "title": "Some small missing items when compared to CPython",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-05-23T15:45:32Z",
+ "closed_at": "2024-08-21T15:17:05Z",
+ "body": "These properties are missing from PyPy 3.10 on Windows, while present on CPython 3.10:\r\n\r\n - ~~array.typecodes~~ \r\n - ~~cmath.tau~~\r\n - ~~sqlite3.complete_statement~~\r\n - ~~sqlite3.enable_callback_tracebacks~~ \r\n - ~~sqlite3.SQLITE_CREATE_VTABLE~~\r\n - ~~sqlite3.SQLITE_DROP_VTABLE~~\r\n - ~~sqlite3.SQLITE_FUNCTION~~\r\n - ~~sqlite3.SQLITE_RECURSIVE~~\r\n - ~~sqlite3.SQLITE_SAVEPOINT~~\r\n - token.SOFT_KEYWORD\r\n - ~~ssl.OP_NO_RENEGOTIATION~~\r\n - ~~ssl.VERIFY_X509_PARTIAL_CHAIN~~\r\n - ~~stat.IO_REPARSE_TAG_APPEXECLINK~~\r\n - ~~stat.IO_REPARSE_TAG_MOUNT_POINT~~\r\n - ~~stat.IO_REPARSE_TAG_SYMLINK~~\r\n\r\nPlus a bunch of `socket` and `zlib` constants that I can list if that would help.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-05-27T05:43:09Z",
+   "body": "The `stat.IO_REPARSE*` constants were added in 1f46a199"
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-08-20T14:57:39Z",
+   "body": "I added the _ssl and _sqlite3 ones. As for token.SOFT_KEYWORD, I am not sure why it is not exposed in pypy/interpreter/pyparser/pytoken.py. Maybe an oversight? I also see that lib-python/3/token.py exists. I think we should delete that, it is copied from CPython and is not relevant for PyPy."
+  },
+  {
+   "author": "mrdaybird",
+   "created_at": "2024-08-20T21:35:19Z",
+   "body": "@mattip I recently came across the issue regarding pypy's ssl module not having the `OP_NO_RENEGOTIATION` flag, nonetheless it's great to see that `ssl.OP_NO_RENEGOTIATION` is getting added to pypy. \r\nBut do you have a workaround to disabling renegotiation without this flag? FYI, RFC 9113 requires renegotiation to be disabled for HTTP/2 and it's a blocker for [urllib/3456](https://github.com/urllib3/urllib3/pull/3456)"
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-08-20T21:38:46Z",
+   "body": "You can use `OP_NO_RENEGOTIATION = 0x40000000`, that is what [I did](https://github.com/pypy/pypy/blob/421417d0bcc8953992884508b2d28a12dfe38b5e/lib_pypy/_cffi_ssl/_stdssl/__init__.py#L104)"
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-08-21T06:40:36Z",
+   "body": "> I think we should delete that, it is copied from CPython and is not relevant for PyPy.\r\n\r\nMy bad, it is needed for untranslated tests of interpreter/app_main. Restored. "
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-08-21T15:17:05Z",
+   "body": "token.SOFT_KEYWORD was added. Closing. Thanks for reporting. If there are still problems, please open a new issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4963",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4964",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4965",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4966",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4968",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4970",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4971",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/urllib3/urllib3/pull/3456",
+   "commit": null,
+   "actor": "mrdaybird"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "378cf8ff07e77bea199d22fc3110425e572408dd",
+   "actor": "cfbolz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

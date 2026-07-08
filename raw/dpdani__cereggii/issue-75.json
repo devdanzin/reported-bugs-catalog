@@ -1,0 +1,44 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 75,
+ "type": "issue",
+ "url": "https://github.com/dpdani/cereggii/issues/75",
+ "title": "Abort after getting `approx_len` of an `AtomicDict`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "fusil-fuzzer"
+ ],
+ "created_at": "2025-10-17T06:27:03Z",
+ "closed_at": "2025-10-19T16:04:27Z",
+ "body": "The code below results in an abort:\n\n```python\nimport cereggii\na = cereggii.AtomicDict()\n\nfor x in range(10000):\n    a[x] = x\n\na.approx_len()\n\nfor x in range(100):\n    a[x] = x\n```\n\nHere's the backtrace:\n```\npython: Objects/object.c:906: clear_freelist: Assertion `freelist->size == 0 || freelist->size == -1' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff744579e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff74288cd in __GI_abort () at ./stdlib/abort.c:73\n#5  0x00007ffff7428830 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff743be1f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555a53009 in clear_freelist (freelist=freelist@entry=0x5555565280d8 <_PyRuntime+379992>, is_finalization=is_finalization@entry=0,\n    dofree=dofree@entry=0x555555a5838b <free_object>) at Objects/object.c:906\n#8  0x0000555555a548ab in _PyObject_ClearFreeLists (freelists=freelists@entry=0x5555565280c8 <_PyRuntime+379976>, is_finalization=is_finalization@entry=0) at Objects/object.c:949\n#9  0x0000555555ce1b4b in _PyGC_ClearAllFreeLists (interp=interp@entry=0x5555564eb6c0 <_PyRuntime+131648>) at Python/gc_free_threading.c:2949\n#10 0x0000555555ce1f75 in gc_collect_internal (interp=0x5555564eb6c0 <_PyRuntime+131648>, state=state@entry=0x7bfff53b4080, generation=generation@entry=2) at Python/gc_free_threading.c:2229\n#11 0x0000555555ce2347 in gc_collect_main (tstate=tstate@entry=0x555556523d80 <_PyRuntime+362752>, generation=generation@entry=2, reason=reason@entry=_Py_GC_REASON_MANUAL)\n    at Python/gc_free_threading.c:2314\n#12 0x0000555555ce28e6 in PyGC_Collect () at Python/gc_free_threading.c:2608\n#13 0x0000555555d64964 in _Py_Finalize (runtime=runtime@entry=0x5555564cb480 <_PyRuntime>) at Python/pylifecycle.c:2139\n#14 0x0000555555d64a64 in Py_FinalizeEx () at Python/pylifecycle.c:2266\n#15 0x0000555555dd464d in Py_RunMain () at Modules/main.c:777\n#16 0x0000555555dd4834 in pymain_main (args=args@entry=0x7bfff52010a0) at Modules/main.c:805\n#17 0x0000555555dd4bb9 in Py_BytesMain (argc=2, argv=0x7fffffffdb88) at Modules/main.c:829\n#18 0x0000555555815676 in main (argc=<optimized out>, argv=<optimized out>) at ./Programs/python.c:15\n```",
+ "comments": [
+  {
+   "author": "dpdani",
+   "created_at": "2025-10-17T07:36:10Z",
+   "body": "The `approx_len` method is due a reimplementation so I'm inclined to mark this as \"won't fix\".\n- https://github.com/dpdani/cereggii/issues/48\n\nI'll see if I have time to take a look anyway."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3470efbcc30e68ca161b4da4a994f3c1f8b1e2e0",
+   "actor": "dpdani"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dpdani/cereggii/pull/84",
+   "commit": null,
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ]
+}

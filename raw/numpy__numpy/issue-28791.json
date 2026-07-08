@@ -1,0 +1,62 @@
+{
+ "repo": "numpy/numpy",
+ "number": 28791,
+ "type": "issue",
+ "url": "https://github.com/numpy/numpy/issues/28791",
+ "title": "BUG: ASAN detects heap-buffer-overflow from `numpy.strings.find`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "00 - Bug",
+  "component: numpy.strings"
+ ],
+ "created_at": "2025-04-21T19:55:08Z",
+ "closed_at": "2025-04-24T01:13:46Z",
+ "body": "### Describe the issue:\n\nASAN reports a heap-buffer-overflow when calling `numpy.strings.find` on specific strings. \n\n### Reproduce the code example:\n\n```python\nimport numpy.strings\n\nnumpy.strings.find(\"A\" * (2 ** 17), r\"[\\w]+\\Z\",)\n```\n\n### Error message:\n\n```shell\n=================================================================\n==1211586==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60300000c610 at pc 0x7ffff76594b5 bp 0x7fffffffbec0 sp 0x7fffffffb668\nREAD of size 4 at 0x60300000c610 thread T0\n    #0 0x7ffff76594b4 in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long) ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:861\n    #1 0x7ffff7659bc6 in __interceptor_memcmp ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:892\n    #2 0x7ffff7659bc6 in __interceptor_memcmp ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:887\n    #3 0x7fffb38ff321 in void preprocess<unsigned int>(CheckedIndexer<unsigned int>, long, prework<unsigned int>*) [clone .constprop.0] (/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so+0x2af321)\n    #4 0x7fffb3909043 in long string_find<(ENCODING)1>(Buffer<(ENCODING)1>, Buffer<(ENCODING)1>, long, long) (/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so+0x2b9043)\n    #5 0x7fffb38fd8c3 in int string_findlike_loop<(ENCODING)1>(PyArrayMethod_Context_tag*, char* const*, long const*, long const*, NpyAuxData_tag*) (/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so+0x2ad8c3)\n    #6 0x7fffb38c4905 in ufunc_generic_fastcall (/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so+0x274905)\n    #7 0x555555977b31 in _PyObject_VectorcallTstate Include/internal/pycore_call.h:168\n    #8 0x555555977c8c in PyObject_Vectorcall Objects/call.c:327\n    #9 0x555555d1e173 in _PyEval_EvalFrameDefault Python/generated_cases.c.h:813\n    #10 0x555555d514ff in _PyEval_EvalFrame Include/internal/pycore_ceval.h:119\n    #11 0x555555d514ff in _PyEval_Vector Python/ceval.c:1816\n    #12 0x555555d51726 in PyEval_EvalCode Python/ceval.c:604\n    #13 0x555555e908a8 in run_eval_code_obj Python/pythonrun.c:1381\n    #14 0x555555e93eda in run_mod Python/pythonrun.c:1466\n    #15 0x555555e9421c in pyrun_file Python/pythonrun.c:1295\n    #16 0x555555e99bb2 in _PyRun_SimpleFileObject Python/pythonrun.c:517\n    #17 0x555555e9a176 in _PyRun_AnyFileObject Python/pythonrun.c:77\n    #18 0x555555efde67 in pymain_run_file_obj Modules/main.c:410\n    #19 0x555555efe648 in pymain_run_file Modules/main.c:429\n    #20 0x555555f022f1 in pymain_run_python Modules/main.c:696\n    #21 0x555555f024c5 in Py_RunMain Modules/main.c:775\n    #22 0x555555f026ac in pymain_main Modules/main.c:805\n    #23 0x555555f02a24 in Py_BytesMain Modules/main.c:829\n    #24 0x5555557d6b05 in main Programs/python.c:15\n    #25 0x7ffff72ded8f in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58\n    #26 0x7ffff72dee3f in __libc_start_main_impl ../csu/libc-start.c:392\n    #27 0x5555557d6a34 in _start (/home/danzin/projects/3.13_upstream_cpython/python+0x282a34)\n\n0x60300000c610 is located 20 bytes to the right of 28-byte region [0x60300000c5e0,0x60300000c5fc)\nallocated by thread T0 here:\n    #0 0x7ffff7679a57 in __interceptor_calloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:154\n    #1 0x7fffb3778fad in PyDataMem_UserNEW_ZEROED (/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy/_core/_multiarray_umath.cpython-313t-x86_64-linux-gnu.so+0x128fad)\n\nSUMMARY: AddressSanitizer: heap-buffer-overflow ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:861 in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long)\nShadow bytes around the buggy address:\n  0x0c067fff9870: 00 00 fa fa 00 00 00 00 fa fa 00 00 00 00 fa fa\n  0x0c067fff9880: 00 00 00 04 fa fa 00 00 00 00 fa fa 00 00 00 00\n  0x0c067fff9890: fa fa 00 00 00 00 fa fa 00 00 00 00 fa fa 00 00\n  0x0c067fff98a0: 00 04 fa fa 00 00 00 00 fa fa 00 00 00 00 fa fa\n  0x0c067fff98b0: 00 00 00 00 fa fa 00 00 00 00 fa fa 00 00 00 04\n=>0x0c067fff98c0: fa fa[fa]fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x0c067fff98d0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x0c067fff98e0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x0c067fff98f0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x0c067fff9900: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x0c067fff9910: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\nShadow byte legend (one shadow byte represents 8 application bytes):\n  Addressable:           00\n  Partially addressable: 01 02 03 04 05 06 07\n  Heap left redzone:       fa\n  Freed heap region:       fd\n  Stack left redzone:      f1\n  Stack mid redzone:       f2\n  Stack right redzone:     f3\n  Stack after return:      f5\n  Stack use after scope:   f8\n  Global redzone:          f9\n  Global init order:       f6\n  Poisoned by user:        f7\n  Container overflow:      fc\n  Array cookie:            ac\n  Intra object redzone:    bb\n  ASan internal:           fe\n  Left alloca redzone:     ca\n  Right alloca redzone:    cb\n  Shadow gap:              cc\n==1211586==ABORTING\n```\n\n### Python and NumPy Versions:\n\n```\n2.2.5\n3.13.3+ experimental free-threading build (heads/3.13:d8b90117024, Apr 21 2025, 15:20:00) [GCC 11.4.0]\n```\n\n### Runtime Environment:\n\n```\n[{'numpy_version': '2.2.5',\n  'python': '3.13.3+ experimental free-threading build '\n            '(heads/3.13:d8b90117024, Apr 21 2025, 15:20:00) [GCC 11.4.0]',\n  'uname': uname_result(system='Linux', node='LAPTOP-CS6PE5KB', release='5.15.167.4-microsoft-standard-WSL2', version='#1 SMP Tue Nov 5 00:21:55 UTC 2024', machine='x86_64')},\n {'simd_extensions': {'baseline': ['SSE', 'SSE2', 'SSE3'],\n                      'found': ['SSSE3',\n                                'SSE41',\n                                'POPCNT',\n                                'SSE42',\n                                'AVX',\n                                'F16C',\n                                'FMA3',\n                                'AVX2'],\n                      'not_found': ['AVX512F',\n                                    'AVX512CD',\n                                    'AVX512_KNL',\n                                    'AVX512_KNM',\n                                    'AVX512_SKX',\n                                    'AVX512_CLX',\n                                    'AVX512_CNL',\n                                    'AVX512_ICL']}},\n {'architecture': 'Haswell',\n  'filepath': '/home/danzin/venvs/3.13_upstream_venv/lib/python3.13t/site-packages/numpy.libs/libscipy_openblas64_-6bb31eeb.so',\n  'internal_api': 'openblas',\n  'num_threads': 8,\n  'prefix': 'libscipy_openblas',\n  'threading_layer': 'pthreads',\n  'user_api': 'blas',\n  'version': '0.3.28'}]\n```\n\n### Context for the issue:\n\nI have been fuzzing Numpy using [fusil](https://github.com/devdanzin/fusil) by @vstinner. I realize these issues are unlikely to be triggered in normal usage and therefore might be of low priority.",
+ "comments": [
+  {
+   "author": "ngoldbaum",
+   "created_at": "2025-04-23T16:14:23Z",
+   "body": "I can reproduce this. The overflow is happening here:\n\nhttps://github.com/numpy/numpy/blob/1bc8764f132501a8ee4649696488acbe796fe50f/numpy/_core/src/umath/string_fastsearch.h#L670-L678\n\nThe `assert` probably needs to be converted to a runtime error. Also it looks like the assert isn't accounting for the fact that UCS4 is four bytes per character."
+  },
+  {
+   "author": "ngoldbaum",
+   "created_at": "2025-04-23T16:44:04Z",
+   "body": "> Also it looks like the assert isn't accounting for the fact that UCS4 is four bytes per character.\n\nOh no, it's the other way around. Multiplying by `sizeof(npy_ucs4)` is nonsense."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/fusil/issues/38",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/28804",
+   "commit": null,
+   "actor": "ngoldbaum"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "charris"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/28852",
+   "commit": null,
+   "actor": "charris"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/one-covenant/crusades/pull/28",
+   "commit": null,
+   "actor": "coderabbitai[bot]"
+  }
+ ]
+}

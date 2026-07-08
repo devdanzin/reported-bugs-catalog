@@ -1,0 +1,17 @@
+{
+ "repo": "python-lz4/python-lz4",
+ "number": 331,
+ "type": "pull",
+ "url": "https://github.com/python-lz4/python-lz4/pull/331",
+ "title": "Fix PyArg_ParseTuple format mismatch and non-NULL return with exception in stream module",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-04-01T01:58:22Z",
+ "closed_at": null,
+ "body": "## Summary\n\n- Fix `_compress_bound`: format `\"OI\"` expects `(PyObject*, unsigned int)` but only `&input_size` (`uint32_t*`) is provided \u2014 the `\"O\"` writes a `PyObject*` into a `uint32_t`, causing type mismatch and undefined behavior on every call. Changed to `\"I\"` to match the identical `_input_bound` function at line 1091.\n\n- Fix `_compress`: when `update_context_after_process` fails, `PyErr_Format` sets an exception but `goto exit_now` returns the already-created `py_dest` (non-NULL). This violates the Python/C API contract (returning a result with an exception set), causing `SystemError`. Added `Py_CLEAR(py_dest)` before the goto.\n\n## Context\n\nThe `\"OI\"` vs `\"I\"` bug appears to be a copy-paste error \u2014 `_input_bound` on line 1091 has the correct `\"I\"` format for the same single-argument pattern.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).\n\n> [!NOTE]\n> This PR was authored and submitted by [Claude Code](https://claude.ai/code) (Anthropic).\n> It was reviewed by a human before submission.\n\n## Test plan\n\n- [ ] Existing tests pass\n- [ ] `_compress_bound` now correctly parses a single unsigned int argument\n- [ ] `_compress` returns NULL (not a result) when `update_context_after_process` fails",
+ "comments": [],
+ "timeline_refs": []
+}

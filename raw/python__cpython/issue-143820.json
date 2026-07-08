@@ -1,0 +1,40 @@
+{
+ "repo": "python/cpython",
+ "number": 143820,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/143820",
+ "title": "JIT: Assertion `next_instr->op.code == STORE_FAST` failed in `_PyEval_EvalFrameDefault`",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2026-01-14T00:48:02Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to cause an abort in a patched JIT build by running the code below.\n\nNecessary patch:\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex fadd11f04ec..3e779a141af 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -125,7 +125,7 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n #define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(_PyPolicy *policy)\n@@ -139,7 +139,7 @@ initial_jump_backoff_counter(_PyPolicy *policy)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n+#define SIDE_EXIT_INITIAL_VALUE 63\n #define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n```\n\n<details><summary>MRE</summary>\n<p>\n\n```python\nimport sys\nimport random\n\nint_v1 = 981679\nint_v2 = -3791744241805517\nany_v3 = 939.217\n\ndef f1(): int_v1 ^ int_v1\n\nfor i_f1 in range(300):\n    f1()\n\ndef f2():\n    class Int(int):\n        def __index__(self):...\n\n    inf = float('inf')\n    nzero = -0\n    zero = 0.0\n    dummy = 0\n    print('', file=sys.stderr)\n\n    def f_0_dc_6103(p): return p + 1\n    def f_1_dc_6103(p): return f_0_dc_6103(p) + 1\n    def f_2_dc_6103(p): return f_1_dc_6103(p) + 1\n    def f_3_dc_6103(p): return f_2_dc_6103(p) + 1\n    def f_4_dc_6103(p): return f_3_dc_6103(p) + 1\n    def f_5_dc_6103(p): return f_4_dc_6103(p) + 1\n    def f_6_dc_6103(p): return f_5_dc_6103(p) + 1\n    def f_7_dc_6103(p): return f_6_dc_6103(p) + 1\n    def f_8_dc_6103(p): return f_7_dc_6103(p) + 1\n    def f_9_dc_6103(p): return f_8_dc_6103(p) + 1\n\n    if inf == inf: dummy += 1\n    s = ''\n    try:\n        for _ in range(10):\n            s += ''\n        s += 'y'\n    except Exception: pass\n    int_v1 ^ int_v1\n    int_v1 ^ int_v1\n    int_v1 ^ int_v1\n    int_v2 - int_v1\n    int_v2 - int_v1\n    int_v2 - int_v1\n    int_v2 - int_v1\n    int_v2 - int_v1\n    not any_v3\n    not any_v3\n    not any_v3\n\nfor i_f2 in range(300):\n    f2()\n```\n\n</p>\n</details>\n\n\n<details><summary>Backtrace</summary>\n<p>\n\n```\npython: Python/generated_cases.c.h:416: PyObject *_PyEval_EvalFrameDefault(PyThreadState *, _PyInterpreterFrame *, int): Assertion `next_instr->op.code == STORE_FAST' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555ec01ec in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:416\n#8  0x0000555555e72e68 in _PyEval_EvalFrame (tstate=0x555556ed3030 <_PyRuntime+359408>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#9  _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2541\n#10 0x0000555555e72885 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff6e863c0) at Python/ceval.c:1005\n#11 0x000055555649d01f in run_eval_code_obj (tstate=tstate@entry=0x555556ed3030 <_PyRuntime+359408>, co=co@entry=0x7d2ff6dffa10, globals=globals@entry=0x7c7ff6e863c0,\n    locals=locals@entry=0x7c7ff6e863c0) at Python/pythonrun.c:1366\n#12 0x000055555649c1ec in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1469\n#13 0x00005555564967ed in pyrun_file (fp=fp@entry=0x7d4ff6defa80, filename=filename@entry=0x7cdff6defc50, start=start@entry=257, globals=globals@entry=0x7c7ff6e863c0,\n    locals=locals@entry=0x7c7ff6e863c0, closeit=closeit@entry=1, flags=0x7bfff5c1e910) at Python/pythonrun.c:1294\n#14 0x000055555649434d in _PyRun_SimpleFileObject (fp=<optimized out>, filename=<optimized out>, closeit=<optimized out>, flags=<optimized out>) at Python/pythonrun.c:518\n#15 0x00005555564936be in _PyRun_AnyFileObject (fp=fp@entry=0x7d4ff6defa80, filename=filename@entry=0x7cdff6defc50, closeit=closeit@entry=1, flags=flags@entry=0x7bfff5c1e910)\n    at Python/pythonrun.c:81\n#16 0x000055555650ff2b in pymain_run_file_obj (program_name=0x7caff6e230d0, filename=0x7cdff6defc50, skip_source_first_line=0) at Modules/main.c:410\n#17 pymain_run_file (config=0x555556e9e0f8 <_PyRuntime+142520>) at Modules/main.c:429\n#18 0x000055555650dff4 in pymain_run_python (exitcode=0x7bfff5c1e500) at Modules/main.c:691\n#19 Py_RunMain () at Modules/main.c:772\n#20 0x000055555650eef7 in pymain_main (args=<optimized out>) at Modules/main.c:802\n#21 0x000055555650f068 in Py_BytesMain (argc=<optimized out>, argv=0x7fffffffdb78) at Modules/main.c:826\n#22 0x00007ffff7c2a575 in __libc_start_call_main (main=main@entry=0x55555591ec40 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffdb78) at ../sysdeps/nptl/libc_start_call_main.h:58\n#23 0x00007ffff7c2a628 in __libc_start_main_impl (main=0x55555591ec40 <main>, argc=2, argv=0x7fffffffdb78, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\n    stack_end=0x7fffffffdb68) at ../csu/libc-start.c:360\n#24 0x00005555558354f5 in _start ()\n```\n\n</p>\n</details>\n\nOutput from running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`:\n[next_instr_abort_lltrace_opt_debug.txt](https://github.com/user-attachments/files/24602506/next_instr_abort_lltrace_opt_debug.txt)\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ (heads/main-dirty:fca7fec88ce, Jan 13 2026, 21:37:22) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-143894\n* gh-146324\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143894",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146324",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2e294890fadf5246909b8d339a5bf7dbfd820f03",
+   "actor": "cocolato"
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/enaml",
+ "number": 605,
+ "type": "issue",
+ "url": "https://github.com/nucleic/enaml/issues/605",
+ "title": "Modernization notes: dead version guards, deprecated/private APIs, PyDict_GetItem exception swallowing, free-threading gaps",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:35:54Z",
+ "closed_at": null,
+ "body": "Collected lower-priority findings for consideration:\n\n### Exception swallowing\n\n- **`PyDict_GetItem` x24** across `dynamicscope.cpp` (8), `signaling.cpp` (9), `weakmethod.cpp` (1), `compiler_helpers.cpp` (5, dead file) silently swallows exceptions. Hot scope resolution and signal dispatch paths are affected. Migrate to `PyDict_GetItemWithError` (available since 3.3).\n- **Unchecked `PyDict_SetItem` x2** in `compiler_helpers.cpp:239-240` \u2014 on OOM, execution continues with active exception.\n- **Unguarded `PyErr_Clear`** in `compiler_helpers.cpp:460` after `PyObject_Hash` \u2014 clears all exceptions including MemoryError. Also, `PyErr_Format` at line 461 is called without an exception type as first argument (gets a format string instead) \u2014 likely crash or garbage exception.\n\n### Version compatibility cleanup\n\n- **9 dead `#if PY_VERSION_HEX >= 0x03090000` guards** \u2014 min is 3.10, these are always true\n- **17 deprecated `PyModule_AddObject` calls** \u2014 should migrate to `PyModule_AddObjectRef` (available since 3.10)\n- **`PyWeakref_GET_OBJECT`** deprecated since 3.13, 5 sites across `callableref.cpp`, `weakmethod.cpp`, `signaling.cpp`. Replace with `PyWeakref_GetRef` (3.13+).\n- **`PyErr_Fetch`/`PyErr_Restore`** in `dynamicscope.cpp:135-136` \u2014 deprecated in 3.12\n- **`compiler_helpers.cpp`** is dead code (not in `setup.py`) \u2014 should be deleted\n\n### Private API uses\n\n- **`_Py_NewReference`** x2 (freelist reuse in `signaling.cpp:951`, `declarative_function.cpp:487`) \u2014 private, may change\n- **`_PyObject_GetDictPtr`** x4 (`dynamicscope.cpp:100,196,267`, `signaling.cpp:93`) \u2014 private, no public equivalent with same semantics\n- **`_PyType_Lookup`** x3 (`dynamicscope.cpp:91,178,257`) \u2014 private, used for MRO lookup without descriptor invocation\n\n### GC and type notes\n\n- **Alias, Color, Font** have `PyObject*` members but no `Py_TPFLAGS_HAVE_GC` / `tp_traverse` \u2014 cycles through these types can't be collected\n- **`Signal`** has `Py_TPFLAGS_HAVE_GC` but no `PyObject*` members (minor overhead, forward-looking)\n- **`weak_methods` dict** in `weakmethod.cpp` \u2014 growing mutable global, never cleaned up\n\n### Free-threading readiness\n\n- **2 freelists** (BoundSignal, BoundDMethod) without synchronization\n- **~18 global `PyObject*`** across modules \u2014 all `m_size=0`\n- **No `Py_MOD_GIL_NOT_USED`** on any module\n- **`pythoncapi-compat`** adoption would help with `PyModule_AddObjectRef`, `PyErr_GetRaisedException` migrations\n\n### Other\n\n- **Copy-paste naming**: `Nonlocals_Type_slots` in `fontext.cpp:239` should be `Font_Type_slots`\n- **`add_alias` incomplete** in `compiler_helpers.cpp:691-693` \u2014 empty branch, never creates the alias\n- **`BoundSignal_disconnect`** leaks `CallableRef` on method-path disconnect (`signaling.cpp:854,867`)\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

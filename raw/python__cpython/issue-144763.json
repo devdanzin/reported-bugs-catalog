@@ -1,0 +1,114 @@
+{
+ "repo": "python/cpython",
+ "number": 144763,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/144763",
+ "title": "Crash in `_io_TextIOWrapper_write_impl` when running `tracemalloc.clear_traces` in threads",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2026-02-12T21:04:13Z",
+ "closed_at": "2026-02-18T17:46:55Z",
+ "body": "# Crash report\n\n### What happened?\n\nRunning the code below will non-deterministically cause a segfault or abort in `_io_TextIOWrapper_write_impl` in the `!PyList_CheckExact(self->pending_bytes)` assertion.\n\n```python\nfrom sys import stdout\nfrom threading import Thread\nfrom time import sleep\nfrom tracemalloc import clear_traces, start, get_traceback_limit\n\ndef print_to_file(text):\n    get_traceback_limit()\n    stdout.write(\"\")\n    clear_traces()\n    sleep(0.04)\n    clear_traces()\n\nalive = []\n\nstart()\nfor i in range(300):\n    alive.append(Thread(target=print_to_file, args=(\"a\" * 800,)))\n\nfor t in alive:\n    t.start()\n    print(object)\n```\n\n<details><summary>Segfault backtrace</summary>\n<p>\n\n```\nThread 143 \"Thread-142 (pri\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7bfec37d66c0 (LWP 1476230)]\n0x000055555622f434 in _Py_TYPE_impl (ob=0x0) at ./Include/object.h:313\n313         return ob->ob_type;\n\n#0  0x000055555622f434 in _Py_TYPE_impl (ob=0x0) at ./Include/object.h:313\n#1  _Py_IS_TYPE_impl (ob=0x0, type=<optimized out>) at ./Include/object.h:328\n#2  _io_TextIOWrapper_write_impl (self=0x7bffb4361110, text=<optimized out>) at ./Modules/_io/textio.c:1765\n#3  _io_TextIOWrapper_write (self=0x7bffb4361110, arg=0x5555569275c8 <_PyRuntime+96968>) at ./Modules/_io/clinic/textio.c.h:803\n#4  0x0000555555ecb860 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:2499\n#5  0x0000555555e96854 in _PyEval_EvalFrame (tstate=0x7e8ff7576210, frame=0x7e8ff7404328, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#6  _PyEval_Vector (tstate=0x7e8ff7576210, func=0x7bffb449b7d0, locals=0x0, args=0x7bff33fcf520, argcount=1, kwnames=0x0) at Python/ceval.c:2125\n#7  0x0000555555ac3110 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x7e8ff7576210, callable=callable@entry=0x7bffb449b7d0, args=0x7bff33fcf520, nargsf=nargsf@entry=1,\n    kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:136\n#8  0x0000555555ac080a in method_vectorcall (method=0x7bff440d0070, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/classobject.c:74\n#9  0x0000555555f582b3 in _PyObject_VectorcallTstate (tstate=0x7e8ff7576210, callable=0x7bff440d0070, args=0x7bff440e00e7, nargsf=17042036080667, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:136\n#10 context_run (self=0x7bffb4d82770, args=0x7bfec37d47b0, nargs=1, kwnames=0x0) at Python/context.c:727\n#11 0x0000555555e997da in _PyCallMethodDescriptorFastWithKeywords_StackRefSteal (callable=callable@entry=..., meth=0x555556740560 <PyContext_methods+160>, self=self@entry=0x7bffb4d82770,\n    arguments=0x7e8ff74042f8, total_args=total_args@entry=2) at Python/ceval.c:913\n#12 0x0000555555ec9cad in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:3852\n#13 0x0000555555e96854 in _PyEval_EvalFrame (tstate=0x7e8ff7576210, frame=0x7e8ff7404220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#14 _PyEval_Vector (tstate=0x7e8ff7576210, func=0x7bffb449b8b0, locals=0x0, args=0x7bff33fcd120, argcount=1, kwnames=0x0) at Python/ceval.c:2125\n#15 0x0000555555ac3110 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x7e8ff7576210, callable=callable@entry=0x7bffb449b8b0, args=0x7bff33fcd120, nargsf=nargsf@entry=1,\n    kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:136\n#16 0x0000555555ac080a in method_vectorcall (method=0x7bffb457ff70, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/classobject.c:74\n#17 0x0000555555ab955f in _PyVectorcall_Call (tstate=<optimized out>, func=<optimized out>, callable=<optimized out>, tuple=0x55555693a1f8 <_PyRuntime+173816>, kwargs=<optimized out>)\n    at Objects/call.c:273\n#18 0x00005555562b0b59 in thread_run (boot_raw=boot_raw@entry=0x7c6ff6fe83e0) at ./Modules/_threadmodule.c:387\n#19 0x00005555560f8a26 in pythread_wrapper (arg=0x7c3ff70fa0a0) at Python/thread_pthread.h:234\n#20 0x000055555589b34b in asan_thread_start(void*) ()\n#21 0x00007ffff7ca3d64 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:448\n#22 0x00007ffff7d373fc in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78\n```\n\n</p>\n</details>\n\n\n<details><summary>Abort backtrace</summary>\n<p>\n\n```\npython: ./Modules/_io/textio.c:1765: PyObject *_io_TextIOWrapper_write_impl(textio *, PyObject *): Assertion `!PyList_CheckExact(self->pending_bytes)' failed.\n\nThread 65 \"Thread-64 (prin\" received signal SIGABRT, Aborted.\n[Switching to Thread 0x7bff14a596c0 (LWP 1478715)]\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x000055555622f965 in _io_TextIOWrapper_write_impl (self=0x7bffb4361110, text=<optimized out>) at ./Modules/_io/textio.c:1765\n#8  _io_TextIOWrapper_write (self=0x7bffb4361110, arg=0x5555569275c8 <_PyRuntime+96968>) at ./Modules/_io/clinic/textio.c.h:803\n#9  0x0000555555ecb860 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:2499\n#10 0x0000555555e96854 in _PyEval_EvalFrame (tstate=0x7e8ff741d210, frame=0x7e8ff718e328, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#11 _PyEval_Vector (tstate=0x7e8ff741d210, func=0x7bffb449b7d0, locals=0x0, args=0x7bff98169a20, argcount=1, kwnames=0x0) at Python/ceval.c:2125\n#12 0x0000555555ac3110 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x7e8ff741d210, callable=callable@entry=0x7bffb449b7d0, args=0x7bff98169a20, nargsf=nargsf@entry=1,\n    kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:136\n#13 0x0000555555ac080a in method_vectorcall (method=0x7bffda0d0070, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/classobject.c:74\n#14 0x0000555555f582b3 in _PyObject_VectorcallTstate (tstate=0x7e8ff741d210, callable=0x7bffda0d0070, args=0x7bff14a596c0, nargsf=22, kwnames=0x0) at ./Include/internal/pycore_call.h:136\n#15 context_run (self=0x7bffb4d80850, args=0x7bff14a577b0, nargs=1, kwnames=0x0) at Python/context.c:727\n#16 0x0000555555e997da in _PyCallMethodDescriptorFastWithKeywords_StackRefSteal (callable=callable@entry=..., meth=0x555556740560 <PyContext_methods+160>, self=self@entry=0x7bffb4d80850,\n    arguments=0x7e8ff718e2f8, total_args=total_args@entry=2) at Python/ceval.c:913\n#17 0x0000555555ec9cad in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:3852\n#18 0x0000555555e96854 in _PyEval_EvalFrame (tstate=0x7e8ff741d210, frame=0x7e8ff718e220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#19 _PyEval_Vector (tstate=0x7e8ff741d210, func=0x7bffb449b8b0, locals=0x0, args=0x7bff98168120, argcount=1, kwnames=0x0) at Python/ceval.c:2125\n#20 0x0000555555ac3110 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x7e8ff741d210, callable=callable@entry=0x7bffb449b8b0, args=0x7bff98168120, nargsf=nargsf@entry=1,\n    kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:136\n#21 0x0000555555ac080a in method_vectorcall (method=0x7bffb44e2a10, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/classobject.c:74\n#22 0x0000555555ab955f in _PyVectorcall_Call (tstate=<optimized out>, func=<optimized out>, callable=<optimized out>, tuple=0x55555693a1f8 <_PyRuntime+173816>, kwargs=<optimized out>)\n    at Objects/call.c:273\n#23 0x00005555562b0b59 in thread_run (boot_raw=boot_raw@entry=0x7c6ff6fe61c0) at ./Modules/_threadmodule.c:387\n#24 0x00005555560f8a26 in pythread_wrapper (arg=0x7c3ff70db460) at Python/thread_pthread.h:234\n#25 0x000055555589b34b in asan_thread_start(void*) ()\n#26 0x00007ffff7ca3d64 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:448\n#27 0x00007ffff7d373fc in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78)\n```\n\n</p>\n</details>\n\nAffected code:\nhttps://github.com/python/cpython/blob/66da7bf6fe7b81e3ecc9c0a25bd47d4616c8d1a6/Modules/_io/textio.c#L1757-L1769\n\n\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a6+ free-threading build (heads/main:b488f338cf0, Feb 12 2026, 17:28:06) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-144779\n* gh-144965\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-13T09:56:27Z",
+   "body": "`_io.TextIOWrapper` methods are protected by critical sections. Example with write:\n\n```\n/*[clinic input]\n@critical_section\n_io.TextIOWrapper.write\n```\n\nIt's used to make these methods atomic. For example, it's safe to use `self->pending_bytes` without holding a dedicated lock on `self->pending_bytes`.\n\nThen comes `tracemalloc` which injects hooks on memory allocations. `_io.TextIOWrapper.write()` calls `_io__Buffered_flush()` which calls `PyMemoryView_FromBuffer()` which calls indirectly `PyObject_Malloc()`. `tracemalloc` has a hook on `PyObject_Malloc()` and calls its `tracemalloc_alloc()` function which calls `tracemalloc` `TABLES_LOCK()`. If another thread is already holding the thread, `TABLES_LOCK()` can call `_PyThreadState_Detach()` which suspends the current critical section: `TextIOWrapper` critical section!\n\nSo while `tracemalloc` is running, it's possible that it unlocks the `TextIOWrapper` critical section and another thread can call a `TextIOWrapper` method concurrently!\n\nIn short, it's possible that `_io_TextIOWrapper_write()` runs in two threads in parallel, and so it's no longer safe to use `self->pending_bytes` without a dedicated lock.\n\nExample from `Modules/_io/textio.c`:\n\n```c\n    else if (!PyList_CheckExact(self->pending_bytes)) {\n        PyObject *list = PyList_New(2);\n        if (list == NULL) {\n            Py_DECREF(b);\n            return NULL;\n        }\n        // Since Python 3.12, allocating GC object won't trigger GC and release\n        // GIL. See https://github.com/python/cpython/issues/97922\n        assert(!PyList_CheckExact(self->pending_bytes));\n        PyList_SET_ITEM(list, 0, self->pending_bytes);\n        PyList_SET_ITEM(list, 1, b);\n        self->pending_bytes = list;\n    }\n```\n\nThe comment is interesting. When using `tracemalloc`, the comment is no longer true: allocation memory can release the GIL and suspend the critical section.\n\nI'm not sure how to solve this problem."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-13T09:57:00Z",
+   "body": "Simpler reproducer:\n\n```py\nfrom sys import stdout\nfrom threading import Thread\nfrom time import sleep\nimport tracemalloc\n\ndef print_to_file():\n    stdout.write(\".\")\n    sleep(0.04)\n\nalive = []\n\ntracemalloc.start()\nfor i in range(300):\n    alive.append(Thread(target=print_to_file))\n\nfor t in alive:\n    t.start()\n    stdout.write(\"long string in main thread\\n\")\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-13T10:30:13Z",
+   "body": "Ah, to be clear: this issue only affects free-threaded builds of Python."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-18T17:46:55Z",
+   "body": "The issue is fixed in the main branch. Thanks for your bug report!"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-18T19:58:16Z",
+   "body": "I fail to reproduce the issue in the 3.13 branch: it's not affected by the issue. In 3.13, `TABLES_LOCK()` is implemented as `PyThread_acquire_lock(tables_lock, 1)`: it doesn't detach the thread state."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "00c69d22d7e1549a99fc7c171847500d36c4d562",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/144779",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/139116",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "83f4fffe3d78ba368c0d4864c42c7c9c9223f7d1",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "20009b2ffb0032747449019bcdebc80da1cc5204",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "de4f844e3f5daaa5d7c82376b80a207af38dac17",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/144965",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f67cf83a4e3c6a28522b53d985928a46aae22b77",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e19d9ae31bda45cfebf078e32588c2dbb940f007",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d3cd2e76a91a58d623311bbedf99dca3f8ba0fb4",
+   "actor": "ljfp"
+  }
+ ]
+}

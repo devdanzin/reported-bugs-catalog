@@ -1,0 +1,135 @@
+{
+ "repo": "python/cpython",
+ "number": 141786,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/141786",
+ "title": "JIT: assertion failure in pycore_backoff.h",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-11-20T13:01:16Z",
+ "closed_at": "2026-03-23T22:15:25Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to trigger an assertion failure in a patched (diff follows) JIT build by running the code below. It's a finicky issue to reproduce, so the MRE isn't as compact as I'd like and requires a special environment, but changing minor details stops reproducing the abort.\n\nTo prepare the environment, run:\n```sh\n# Create a venv, then:\ngit clone https://github.com/devdanzin/lafleur.git\ngit clone https://github.com/devdanzin/fusil.git\npip install -e lafleur\npip install -e fusil\n```\n\nAlso, the way the script is invoked interferes with reproduction: calling it with `python`inside the  active  venv or with `path/to/venv/bin/python` works, while `path/to/built/python` doesn't work.\n\nGiven the sensitivity of the MRE to small changes, please let me know whether you can reproduce this issue.\n\nThe diff applied was (it might be possible to reduce this diff and keep reproducing):\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex 71066f1bd9f..e4a31f76ff2 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -112,8 +112,8 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n-#define JUMP_BACKWARD_INITIAL_BACKOFF 12\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n+#define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n {\n@@ -125,8 +125,8 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n-#define SIDE_EXIT_INITIAL_BACKOFF 12\n+#define SIDE_EXIT_INITIAL_VALUE 63\n+#define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n initial_temperature_backoff_counter(void)\ndiff --git a/Include/internal/pycore_optimizer.h b/Include/internal/pycore_optimizer.h\nindex e7177552cf6..0d76a5a3df0 100644\n--- a/Include/internal/pycore_optimizer.h\n+++ b/Include/internal/pycore_optimizer.h\n@@ -86,7 +86,7 @@ PyAPI_FUNC(void) _Py_Executors_InvalidateCold(PyInterpreterState *interp);\n // Used as the threshold to trigger executor invalidation when\n // executor_creation_counter is greater than this value.\n // This value is arbitrary and was not optimized.\n-#define JIT_CLEANUP_THRESHOLD 1000\n+#define JIT_CLEANUP_THRESHOLD 10000\n\n int _Py_uop_analyze_and_optimize(\n     PyFunctionObject *func,\n@@ -118,7 +118,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n }\n\n // Holds locals, stack, locals, stack ... co_consts (in that order)\n-#define MAX_ABSTRACT_INTERP_SIZE 4096\n+#define MAX_ABSTRACT_INTERP_SIZE 8192\n\n #define TY_ARENA_SIZE (UOP_MAX_TRACE_LENGTH * 5)\n\n@@ -129,7 +129,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n // progress (and inserting a new ENTER_EXECUTOR instruction). In practice, this\n // is the \"maximum amount of polymorphism\" that an isolated trace tree can\n // handle before rejoining the rest of the program.\n-#define MAX_CHAIN_DEPTH 4\n+#define MAX_CHAIN_DEPTH 16\n\n /* Symbols */\n /* See explanation in optimizer_symbols.c */\ndiff --git a/Python/optimizer.c b/Python/optimizer.c\nindex 9db894f0bf0..14cbf670dec 100644\n--- a/Python/optimizer.c\n+++ b/Python/optimizer.c\n@@ -509,7 +509,7 @@ guard_ip_uop[MAX_UOP_ID + 1] = {\n\n\n #define CONFIDENCE_RANGE 1000\n-#define CONFIDENCE_CUTOFF 333\n+#define CONFIDENCE_CUTOFF 100\n\n #ifdef Py_DEBUG\n #define DPRINTF(level, ...) \\\n ```\n \n\nThe admitedly large, but much reduced, MRE is:\n```python\nimport builtins\nimport gc\nimport math  # Not used\n\n\ndef g():\n    gc.set_threshold(5)\n    original_len = builtins.len\n    try:\n        builtins.len = lambda x: 'evil_string'\n        _ = len([])\n    except Exception:\n        pass\n    finally:\n        builtins.len = original_len\n\nTHRESHOLD = 300\n\ndef f1():\n\n    class Base1:\n        def __init__(self):\n            pass\n\n    class Sub1(Base1):\n        def __init__(self):\n            super().__init__()\n        def f(self):\n            super().f()\n            if False:\n                Sub1.__bases__ = (object,)\n\n    instance_1 = Sub1()\n    for _ in range(THRESHOLD):\n        try:\n            _ = instance_1.f()\n        except AttributeError:\n            pass\n    Sub1.__bases__ = (object,)\n\n    g()\n\n\n    class Dummy1:\n        def __init__(self):\n            pass\n        def f(self):\n            pass\n\n    class Sub2(Base1):\n        def __init__(self):\n            super().__init__()\n        def f(self):\n            super().f()\n            if False:\n                Sub2.__bases__ = (object,)\n\n    instance_2 = Sub2()\n    for _ in range(THRESHOLD):\n        try:\n            _ = instance_2.f()\n        except AttributeError:\n            pass\n    Sub2.__bases__ = (object,)\n\n    class Base2:\n        def __init__(self):\n            pass\n        def f(self):\n            pass\n\n    class Dummy2:\n        def __init__(self):\n            pass\n        def f(self):\n            pass\n\n    class Sub4(Base1):\n        def __init__(self):\n            super().__init__()\n        def f(self):\n            super().f()\n            if False:\n                Sub4.__bases__ = (object,)\n\n    instance_4 = Sub4()\n    for _ in range(THRESHOLD):\n        try:\n            _ = instance_4.f()\n        except AttributeError:\n            pass\n    Sub4.__bases__ = (object,)\n\n    class Sub3(Base2):\n        def __init__(self):\n            pass\n        def f(self):\n            super().f()\n            if self.non_existing_attribute:\n                Sub3.__bases__ = (object,)\n\n\n    instance_3 = Sub3()\n    for _ in range(THRESHOLD):\n        try:\n            _ = instance_3.f()\n        except AttributeError:\n            pass\n    Sub3.__bases__ = (object,)\n    for _ in range(50):\n        try:\n            _ = instance_3.f()\n        except AttributeError:\n            pass\n\nfor i_f1 in range(300):\n    print(i_f1)\n    f1()\n```\n\nThe backtrace (with printing of iteration number) is:\n```\n1\n[...]\n64\n65\npython: ./Include/internal/pycore_backoff.h:65: _Py_BackoffCounter restart_backoff_counter(_Py_BackoffCounter): Assertion `!is_unreachable_backoff_counter(counter)' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555ec14c5 in restart_backoff_counter (counter=...) at ./Include/internal/pycore_backoff.h:65\n#8  0x0000555555ec14c5 in stop_tracing_and_jit (tstate=0x555556aebf00 <_PyRuntime+358560>, frame=frame@entry=0x7e8ff6de5298)\n#9  0x0000555555e6e4f3 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:11712\n#10 0x0000555555e4a67b in _PyEval_EvalFrame (tstate=0x555556aebf00 <_PyRuntime+358560>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:121\n#11 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2159\n#12 0x0000555555e4a095 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff6e871c0) at Python/ceval.c:995\n#13 0x00005555561bbc6f in run_eval_code_obj (tstate=tstate@entry=0x555556aebf00 <_PyRuntime+358560>, co=co@entry=0x7d2ff6e36c10, globals=globals@entry=0x7c7ff6e871c0,\n    locals=locals@entry=0x7c7ff6e871c0) at Python/pythonrun.c:1372\n#14 0x00005555561bae3c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1475\n```\n\nOutput from running with `PYTHON_LLTRACE=4`:\n[89_abort_lltrace.txt](https://github.com/user-attachments/files/23653742/89_abort_lltrace.txt)\n\nOutput from running with `PYTHON_OPT_DEBUG=4`:\n[89_abort_opt_debug.txt](https://github.com/user-attachments/files/23653741/89_abort_opt_debug.txt)\n\nSorry for the convoluted repro steps, I've been trying to make it work with a simpler setup for many days, without success. \n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a2+ (heads/main-dirty:41b9ad5b38e, Nov 20 2025, 08:38:13) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-142286\n* gh-142344\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-20T13:48:48Z",
+   "body": "What I think is happening is the following:\n1. During trace recording of a side trace, the original parent trace's executor is cleared.\n2. When the trace record concludes, it tries to JIT the trace, though the parent executor is already cleared.\n3. The assertion fails.\n\nCan you please try the following diff and see it if still fails? Thank you\n\n```\ndiff --git a/Python/optimizer.c b/Python/optimizer.c\nindex 9db894f0bf0..9707f46c02f 100644\n--- a/Python/optimizer.c\n+++ b/Python/optimizer.c\n@@ -1671,7 +1671,7 @@ executor_clear(PyObject *op)\n     _PyExecutorObject *cold = _PyExecutor_GetColdExecutor();\n     Py_INCREF(executor);\n     for (uint32_t i = 0; i < executor->exit_count; i++) {\n-        executor->exits[i].temperature = initial_unreachable_backoff_counter();\n+        // executor->exits[i].temperature = initial_unreachable_backoff_counter();\n         _PyExecutorObject *e = executor->exits[i].executor;\n         executor->exits[i].executor = cold;\n         Py_DECREF(e);\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-20T14:04:29Z",
+   "body": "Applying the diff fixes the crash, thank you!"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-24T17:48:10Z",
+   "body": "Here's another long MRE that results in a different abort, but is fixed by the same patch above:\n\n```python\nimport random\n\nrand = random.Random(38720)\nimport sys\n\ndef b():\n    for c in range(23):\n        rand.random()\n    rand.random()\n    if rand.random() > 0.1:\n        rand.random()\n    rand.random()\n    rand.random()\n    for c in range(4):\n        rand.random()\n    if rand.random():\n        0\n    if rand.random() > 0.1:\n        rand.random()\n    rand.random()\n    if rand.random():\n        rand.random()\n    if rand.random():\n        rand.random()\n    rand.random()\n    if rand.random():\n        rand.random()\n    rand.random()\n    if rand.random():\n        if rand.random() > 0.1:\n            rand.random()\n    if rand.random() < rand.random():\n        ...\n    if rand.random() < rand.random():\n        ...\n    if rand.random():\n        ...\n    if rand.random() > 0.1:\n        rand.random()\n    rand.random()\n    for c in range(12):\n        rand.random()\n\n    def random(B):\n        if rand.random() < 0.1:\n            random(B)\n\n    def Random(B):\n        if rand.random():\n            random(B)\n\n    def b(B):\n        if rand.random():\n            Random(B)\n\n    def c(B):\n        if rand.random() < 0.1:\n            b(B)\n\n    def a(B):\n        if rand.random() > 0.1:\n            c(B)\n\n    def A(B):\n        if rand.random() > 0.1:\n            a(B)\n\n    def C(B):\n        if rand.random() > 0.1:\n            A(B)\n\n    def B(B):\n        if rand.random() < 0.1:\n            C(B)\n\n    for D in range(200):\n        try:\n            B(D)\n        except:\n            ...\n\n    class A:\n        def __del__(C):\n            b = sys._getframe(1)\n            exec(\"D=0\", b.f_globals, b.f_locals)\n\n    B = A()\n    if rand.random() < 0.1:\n        if rand.random() < 0.1:\n            if rand.random() < 0.1:\n                for D in range(D):\n                    if rand.random() < 0.1:\n                        if rand.random() > 0.1:\n                            if rand.random():\n                                if rand.random() > rand.random():\n                                    C\n                    if rand.random() < 0.1:\n                        if rand.random() < 0.1:\n                            if rand.random() < 0.1:\n                                del B\n                    if rand.random() < 0.1:\n                        if rand.random() < 0.1:\n                            if rand.random():\n                                0\n    if rand.random() > 0.1:\n        if rand.random() > 0.1:\n            rand.random()\n    rand.random()\n    if rand.random() > 0.1:\n        rand.random()\n    rand.random()\n    if rand.random() > 0.1:\n        if rand.random() > 0.1:\n            rand.random()\n    rand.random()\n    rand.random()\n    rand.random()\n    if rand.random() > 0.1:\n        if rand.random() > 0.1:\n            rand.random()\n            if rand.random() > rand.random():\n                0\n    if rand.random():\n        C\n    if rand.random() > 0.1:\n        rand.random()\n    rand.random()\n    for c in range(3):\n        if rand.random():\n            0\n    for c in range(2):\n        rand.random()\n\nfor D in range(5064):\n    b()\n```\n\n\nBacktrace:\n```\npython: ./Include/internal/pycore_backoff.h:81: _Py_BackoffCounter restart_backoff_counter(_Py_BackoffCounter): Assertion `backoff <= MAX_BACKOFF' failed.\n\nProgram received signal SIGABRT, Aborted.\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x000055555586e596 in restart_backoff_counter (counter=...) at ./Include/internal/pycore_backoff.h:81\n#8  0x000055555586e596 in stop_tracing_and_jit (tstate=tstate@entry=0x555555d988a8 <_PyRuntime+358616>, frame=frame@entry=0x7ffff7fa7090)\n#9  0x0000555555865724 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d988a8 <_PyRuntime+358616>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:11712\n#10 0x000055555582d56b in _PyEval_EvalFrame (tstate=0x555555d988a8 <_PyRuntime+358616>, frame=0x7ffff7fa7020, throwflag=0) at ./Include/internal/pycore_ceval.h:121\n#11 _PyEval_Vector (tstate=tstate@entry=0x555555d988a8 <_PyRuntime+358616>, func=func@entry=0x7ffff6bf6a50, locals=locals@entry=0x7ffff6c05190, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2159\n```\n\nThis MRE was reduced in about 8 hours, first manually then running [Shrinkray](https://github.com/DRMacIver/shrinkray)."
+  },
+  {
+   "author": "caje731",
+   "created_at": "2025-12-06T13:44:15Z",
+   "body": "With @Fidget-Spinner 's help I have now raised a PR to fix this. \u261d\ufe0f "
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-08T16:55:19Z",
+   "body": "@Fidget-Spinner when you say \"parent executor is already cleared\" do you mean that it has been invalidated?\n\nIt shouldn't have been cleared while there is a strong reference to it.\nIt tracing from a side exit, the tracer should be keeping a strong reference to the originating trace.\n\nI would have thought the simplest fix is to check for the parent's validity before linking the new trace.\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-08T17:11:08Z",
+   "body": "> [@Fidget-Spinner](https://github.com/Fidget-Spinner) when you say \"parent executor is already cleared\" do you mean that it has been invalidated?\n\nYes.\n\n> I would have thought the simplest fix is to check for the parent's validity before linking the new trace.\n\nYes the fix is indeed checking the validity. However, note that the parent executor could also be the cold executor, in which case we must just skip the check."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-03-23T19:03:04Z",
+   "body": "@devdanzin does this till repro on main?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-23T22:15:25Z",
+   "body": "No, I can't get it to reproduce. It reproduces if I checkout an old enough CPython revision, so the environment looks right to reproduce it, but it doesn't."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142286",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "56d7bb474d5a589a9bc8668f27429f633b449b07",
+   "actor": "caje731"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1806445510de7897c636a163653e4d72cdff44c8",
+   "actor": "caje731"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b5d1600967886f41abb0db191f55e6e2941413fd",
+   "actor": "caje731"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "843656a7397b5c5d91843a0989ffd05d75596b7d",
+   "actor": "caje731"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "63662b91786d654c389aa065080d46c0ec78156f",
+   "actor": "caje731"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142344",
+   "commit": null,
+   "actor": "caje731"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "36a625246871d80330feb4714486e981fc0830fb",
+   "actor": "caje731"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ade01a26e83f0f690cd28097ac304c0a415104a8",
+   "actor": "caje731"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7ab1b35fd743403f3daacba44dd3c1ab3651d5a3",
+   "actor": "caje731"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/142513",
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

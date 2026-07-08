@@ -1,0 +1,17 @@
+{
+ "repo": "zopefoundation/zope.interface",
+ "number": 362,
+ "type": "issue",
+ "url": "https://github.com/zopefoundation/zope.interface/issues/362",
+ "title": "copt: missing NULL checks for PyTuple_New and _get_adapter_hooks",
+ "state": "open",
+ "state_reason": null,
+ "author": "jensens",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-30T00:42:00Z",
+ "closed_at": null,
+ "body": "A detailed analysis of `_zope_interface_coptimizations.c` was published at\nhttps://gist.github.com/devdanzin/5afbad864934b165a2cc080f110aa720 by @devdanzin.\nWe reviewed the report with agent support and verified the findings against the\ncurrent source (zope.interface 8.2). This issue is one of several extracted from\nthat review.\n\n### Problem\n\nTwo unchecked return values lead to NULL pointer dereference (segfault):\n\n1. **`_generations_tuple` line 1857**: `PyTuple_New(l)` is not checked for NULL.\n   On OOM, `PyTuple_SET_ITEM(NULL, ...)` dereferences a NULL pointer.\n\n2. **`IB__adapt__` line 824**: `_get_adapter_hooks(Py_TYPE(self))` is not checked\n   for NULL. In the heap types path, `_get_module` can fail, making\n   `_get_adapter_hooks` return NULL. `PyList_GET_SIZE(NULL)` then segfaults.\n\nAdditionally, 6 unchecked `_get_module` returns in the heap types path have the\nsame class of bug (lower priority, only reachable with unusual type\nconfigurations).\n\n### Fix\n\n```c\n// _generations_tuple:\ngenerations = PyTuple_New(l);\nif (generations == NULL)\n    return NULL;\n\n// IB__adapt__:\nadapter_hooks = _get_adapter_hooks(Py_TYPE(self));\nif (adapter_hooks == NULL)\n    return NULL;\n```\n\n### Scope\n\n2 NULL checks for the primary fixes. Optionally 6 more for `_get_module` sites.\n\n### Tests\n\n**Not feasible from pure Python.** Both bugs require conditions that cannot be\nreliably triggered:\n\n- `PyTuple_New` NULL requires OOM at a specific allocation.\n- `_get_adapter_hooks` NULL requires `_get_module` failure, which needs a\n  corrupted type/module relationship in the heap types path.\n\nThese are defensive NULL checks. Code review is sufficient. The existing test\nsuite already exercises these functions extensively on the happy path \u2014 the NULL\nchecks only add safety on paths that would previously segfault.\n\n### Performance impact\n\nOne pointer comparison per site on the happy path. Never taken in practice (OOM\nor corrupted module state). Branch predictor cost: ~0-1 cycles each.",
+ "comments": [],
+ "timeline_refs": []
+}

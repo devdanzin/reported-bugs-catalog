@@ -1,0 +1,32 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 86,
+ "type": "issue",
+ "url": "https://github.com/dpdani/cereggii/issues/86",
+ "title": "Binary ops in `AtomicInt64` segfault when done on a `ThreadHandle`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "fusil-fuzzer"
+ ],
+ "created_at": "2025-10-25T12:41:36Z",
+ "closed_at": "2025-12-29T15:58:08Z",
+ "body": "We get a segfault running the following code:\n\n```python\nimport cereggii\n\ncereggii.AtomicInt64(1).__rmatmul__(cereggii.ThreadHandle(1))\ncereggii.AtomicInt64(1).__divmod__(cereggii.ThreadHandle(1))\n# etc.\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x000055555594f78e in _Py_TYPE (ob=0x5) at ./Include/object.h:270\n270             return ob->ob_type;\n\n#0  0x000055555594f78e in _Py_TYPE (ob=0x5) at ./Include/object.h:270\n#1  binary_op1 (v=v@entry=0x5, w=w@entry=0x7fffb2145600, op_slot=op_slot@entry=272, op_name=op_name@entry=0x5555561e76e0 \"@\")\n    at Objects/abstract.c:937\n#2  0x000055555594fc7d in binary_op (v=0x5, w=0x7fffb2145600, op_slot=op_slot@entry=272, op_name=op_name@entry=0x5555561e76e0 \"@\")\n    at Objects/abstract.c:1003\n#3  0x00005555559543f3 in PyNumber_MatrixMultiply (v=<optimized out>, w=<optimized out>) at Objects/abstract.c:1184\n#4  0x000055555594fb12 in binary_op1 (v=v@entry=0x555556772790 <_PyRuntime+30288>, w=w@entry=0x7fffb2145600, op_slot=op_slot@entry=272,\n    op_name=op_name@entry=0x5555561e76e0 \"@\") at Objects/abstract.c:972\n#5  0x000055555594fc7d in binary_op (v=0x555556772790 <_PyRuntime+30288>, w=0x7fffb2145600, op_slot=op_slot@entry=272,\n    op_name=op_name@entry=0x5555561e76e0 \"@\") at Objects/abstract.c:1003\n#6  0x00005555559543f3 in PyNumber_MatrixMultiply (v=<optimized out>, w=<optimized out>) at Objects/abstract.c:1184\n#7  0x0000555555b9045c in wrap_binaryfunc_r (self=0x7fffb29c4750, args=0x7fffb2a01bd0, wrapped=0x7ffff42d3c00 <AtomicInt64_MatrixMultiply>)\n    at Objects/typeobject.c:9214\n#8  0x00005555559df7ca in wrapperdescr_raw_call (kwds=0x0, args=0x7fffb2a01bd0, self=0x7fffb29c4750, descr=0x7fffb2a200f0)\n    at Objects/descrobject.c:532\n#9  wrapperdescr_call (_descr=_descr@entry=0x7fffb2a200f0, args=0x7fffb2a01bd0, args@entry=0x7fffb270d570, kwds=kwds@entry=0x0)\n    at Objects/descrobject.c:570\n#10 0x00005555559a99ef in _PyObject_MakeTpCall (tstate=tstate@entry=0x5555567c3a40 <_PyRuntime+362752>, callable=callable@entry=0x7fffb2a200f0,\n    args=args@entry=0x7fffffffce08, nargs=2, keywords=keywords@entry=0x0) at Objects/call.c:242\n#11 0x00005555559aa1c2 in _PyObject_VectorcallTstate (tstate=0x5555567c3a40 <_PyRuntime+362752>, callable=0x7fffb2a200f0, args=0x7fffffffce08,\n    nargsf=<optimized out>, kwnames=0x0) at ./Include/internal/pycore_call.h:167\n#12 0x00005555559aa1ee in PyObject_Vectorcall (callable=callable@entry=0x7fffb2a200f0, args=args@entry=0x7fffffffce08, nargsf=<optimized out>,\n    kwnames=kwnames@entry=0x0) at Objects/call.c:327\n```",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dpdani/cereggii/pull/105",
+   "commit": null,
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ]
+}

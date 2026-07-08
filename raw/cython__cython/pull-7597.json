@@ -1,0 +1,48 @@
+{
+ "repo": "cython/cython",
+ "number": 7597,
+ "type": "pull",
+ "url": "https://github.com/cython/cython/pull/7597",
+ "title": "Fix reference leak in Generator_Replace_StopIteration",
+ "state": "closed",
+ "state_reason": null,
+ "author": "da-woods",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-03-28T08:45:43Z",
+ "closed_at": "2026-03-31T21:18:34Z",
+ "body": "`PyErr_SetObject` doesn't steal a reference.\r\n\r\nAnother thing flagged by @devdanzin's analysis.",
+ "comments": [
+  {
+   "author": "da-woods",
+   "created_at": "2026-04-01T06:41:43Z",
+   "body": "3.2.x commit [66846de](https://github.com/cython/cython/commit/66846de4a81587b80738d4b1708927d7f07aa631)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "1da40c84668cba6264100f7a9825963fd8d1f590",
+   "actor": "matusvalo"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "matusvalo"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7f381dc28e9ae494227c87d8d22cc4279e44e259",
+   "actor": "matusvalo"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "66846de4a81587b80738d4b1708927d7f07aa631",
+   "actor": "da-woods"
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9504,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9504",
+ "title": "Allow None extents in C setimage()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "radarhere",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-26T09:52:09Z",
+ "closed_at": "2026-03-31T19:02:41Z",
+ "body": "Follow up from #9395",
+ "comments": [
+  {
+   "author": "hugovk",
+   "created_at": "2026-03-26T14:04:48Z",
+   "body": "Could this be considered a breaking change? Although it's fixing unusual and perhaps undocumented behaviour.\r\n\r\nMight be worth adding a brief note in the release notes? We could also wait for the Pillow 13.0.0 release in October, but that's probably unnecessary?"
+  },
+  {
+   "author": "radarhere",
+   "created_at": "2026-03-28T07:32:24Z",
+   "body": "#9395 changed the C `setimage()` so extents needed to be passed in. However, I've realised that both before and after that, the C `setimage()` never accepted `None`.\r\n\r\nFor background, #1938 added the Python `setimage()`, which accepted `None` for the extents, and tested for it accordingly. #8285 added `None` as a possible value to the `extents` type hint in a tile.\r\n\r\nI think we should aim for the same behaviour with the C and Python `setimage()`. It is fair enough to say that removing `None` as a possible `extents` value for Python `setimage()` is a breaking change, so I'm now going in the opposite direction with this PR - allowing `None` as an `extents` value in the C `setimage()`."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6dfc2be807aaaf4b01b3e4fb130f52ae459fbe06",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  }
+ ]
+}

@@ -1,0 +1,52 @@
+{
+ "repo": "python/cpython",
+ "number": 132296,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132296",
+ "title": "Concurrent deallocation of threads while calling `PyEval_SetTrace`",
+ "state": "closed",
+ "state_reason": "duplicate",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-C-API",
+  "topic-free-threading"
+ ],
+ "created_at": "2025-04-09T00:23:50Z",
+ "closed_at": "2025-08-01T14:05:57Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe following code will cause the interpreter to abort in a no-gil build:\n```python\nimport threading\n\nfor x in range(1000):\n    threading._start_joinable_thread(lambda: None)\n    try:\n        threading.settrace_all_threads(())\n    except Exception:\n        pass\n```\n\nAbort backtrace:\n```gdb\npython: Python/legacy_tracing.c:435: is_tstate_valid: Assertion `!_PyMem_IsPtrFreed(tstate)' failed.\nThread 1 \"python\" received signal SIGABRT, Aborted.\n\n__pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:44\n44      ./nptl/pthread_kill.c: No such file or directory.\n\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140737350580032, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7ce0476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc67f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7cc671b in __assert_fail_base (fmt=0x7ffff7e7b130 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\n    assertion=0x555555b53aa9 \"!_PyMem_IsPtrFreed(tstate)\", file=0x555555b53a91 \"Python/legacy_tracing.c\", line=435,\n    function=<optimized out>) at ./assert/assert.c:94\n#6  0x00007ffff7cd7e96 in __GI___assert_fail (assertion=assertion@entry=0x555555b53aa9 \"!_PyMem_IsPtrFreed(tstate)\",\n    file=file@entry=0x555555b53a91 \"Python/legacy_tracing.c\", line=line@entry=435,\n    function=function@entry=0x555555b53ed0 <__PRETTY_FUNCTION__.18> \"is_tstate_valid\") at ./assert/assert.c:103\n#7  0x000055555594a667 in is_tstate_valid (tstate=tstate@entry=0xdddddddddddddddd) at Python/legacy_tracing.c:435\n#8  0x000055555594c0c2 in _PyEval_SetTrace (tstate=tstate@entry=0xdddddddddddddddd,\n    func=func@entry=0x5555559984b0 <trace_trampoline>, arg=arg@entry=()) at Python/legacy_tracing.c:596\n#9  0x000055555584cd32 in PyEval_SetTraceAllThreads (func=0x5555559984b0 <trace_trampoline>, arg=()) at Python/ceval.c:2473\n#10 0x000055555599698e in sys__settraceallthreads (module=<optimized out>, arg=<optimized out>) at ./Python/sysmodule.c:1187\n#11 0x0000555555859272 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d8a858 <_PyRuntime+361432>, frame=0x7ffff7fb0098,\n    frame@entry=0x7ffff7fb0020, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:2271\n#12 0x0000555555888b6d in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020, tstate=0x555555d8a858 <_PyRuntime+361432>)\n    at ./Include/internal/pycore_ceval.h:119\n```\n\nIt's also possible to sometimes segfault the interpreter with similar code, like:\n```python\nimport threading\n\nthreading._start_joinable_thread(lambda: None)\nthreading._start_joinable_thread(lambda: None)\nthreading._start_joinable_thread(lambda: None)\nthreading._start_joinable_thread(lambda: None)\nfor x in range(100):\n    try:\n        threading.settrace_all_threads(())\n    except Exception:\n        pass\n```\n\nSegfault backtrace:\n```gdb\nThread 1 \"python\" received signal SIGSEGV, Segmentation fault.\n0x000055555594b3fb in setup_tracing (tstate=tstate@entry=0x555555e29760, func=func@entry=0x5555559984b0 <trace_trampoline>, arg=arg@entry=(), old_traceobj=old_traceobj@entry=0x7fffffffd380) at Python/legacy_tracing.c:588\n588         tstate->interp->sys_tracing_threads += delta;\n(gdb) bt\n#0  0x000055555594b3fb in setup_tracing (tstate=tstate@entry=0x555555e29760, func=func@entry=0x5555559984b0 <trace_trampoline>,\n    arg=arg@entry=(), old_traceobj=old_traceobj@entry=0x7fffffffd380) at Python/legacy_tracing.c:588\n#1  0x000055555594c141 in _PyEval_SetTrace (tstate=tstate@entry=0x555555e29760, func=func@entry=0x5555559984b0 <trace_trampoline>,\n    arg=arg@entry=()) at Python/legacy_tracing.c:610\n#2  0x000055555584cd32 in PyEval_SetTraceAllThreads (func=0x5555559984b0 <trace_trampoline>, arg=()) at Python/ceval.c:2473\n#3  0x000055555599698e in sys__settraceallthreads (module=<optimized out>, arg=<optimized out>) at ./Python/sysmodule.c:1187\n#4  0x00005555557110b6 in cfunction_vectorcall_O (\n    func=<built-in method _settraceallthreads of module object at remote 0x20000259930>, args=<optimized out>,\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:537\n#5  0x00005555556817dd in _PyObject_VectorcallTstate (tstate=0x555555d8a858 <_PyRuntime+361432>,\n    callable=<built-in method _settraceallthreads of module object at remote 0x20000259930>, args=0x7fffffffd708,\n    nargsf=9223372036854775809, kwnames=0x0) at ./Include/internal/pycore_call.h:169\n#6  0x00005555556818fc in PyObject_Vectorcall (\n    callable=callable@entry=<built-in method _settraceallthreads of module object at remote 0x20000259930>,\n    args=args@entry=0x7fffffffd708, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#7  0x000055555585575c in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d8a858 <_PyRuntime+361432>, frame=0x7ffff7fb0098,\n    frame@entry=0x7ffff7fb0020, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:1434\n#8  0x0000555555888b6d in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020, tstate=0x555555d8a858 <_PyRuntime+361432>)\n    at ./Include/internal/pycore_ceval.h:119\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a6+ experimental free-threading build (heads/main:0f04f2456a2, Apr  8 2025, 11:49:24) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132298\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-09T02:10:58Z",
+   "body": "The issue is that `PyEval_SetTraceAllThreads` uses another thread's state without holding the runtime lock, so it's free to get deallocated in the middle of execution. Normally, we'd either stop-the-world or grab the runtime lock, but unfortunately, `PyEval_SetTrace` is re-entrant, so neither of those work."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-08-01T14:05:55Z",
+   "body": "This has the same underlying issue as https://github.com/python/cpython/issues/132817"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132298",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132817",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2840,
+ "type": "issue",
+ "url": "https://github.com/h5py/h5py/issues/2840",
+ "title": "Static `_error_handler` data race under free-threading",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "threading"
+ ],
+ "created_at": "2026-03-25T10:12:29Z",
+ "closed_at": null,
+ "body": "- `_errors.pyx:163-169`",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T11:02:30Z",
+   "body": "`_error.templ.pyx:166-172`"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T11:05:54Z",
+   "body": "`set_default_error_handler` is explicitly marked as `nogil`. I guess the correct fix would be to add an object-level lock to `_error_handler` ?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-25T13:39:10Z",
+   "body": "The problem is that both `silence_errors()` and `unsilence_errors()` write to `_error_handler`, so there's a data race on the `.func` and `.data` fields.\n\nSo you may add a lock around the \"modify `_error_handler` and call `set_default_error_handler`\" sequences for each of those functions.\n\nOr, since `set_default_error_handler` just calls `H5Eset_auto`, you could eliminate that function and pass the values directly:\n\n```cython\ndef silence_errors():\n    H5Eset_auto(...)\n\ndef unsilence_errors():\n    H5Eset_auto(...)\n```\n"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T15:46:52Z",
+   "body": "`set_default_error_handler` has other uses which I don't think we can eliminate, so locking might be the only option here"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2825",
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

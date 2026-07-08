@@ -1,0 +1,104 @@
+{
+ "repo": "python/cpython",
+ "number": 126654,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126654",
+ "title": "`_interpreters.exec` with invalid parameters segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-subinterpreters"
+ ],
+ "created_at": "2024-11-10T21:23:13Z",
+ "closed_at": "2024-11-11T11:36:08Z",
+ "body": "# Crash report\r\n\r\n### What happened?\r\n\r\nThe code below segfaults on non-debug builds and aborts on debug builds.\r\n\r\n```python\r\nimport _interpreters\r\n\r\n_interpreters.exec(False, \"aaaa\", 1)\r\n```\r\n\r\nThe abort looks like:\r\n```\r\npython: ./Modules/_interpretersmodule.c:462: _run_in_interpreter: Assertion `!PyErr_Occurred()' failed.\r\nAborted\r\n```\r\n\r\nThe backtrace of the segfault is:\r\n```\r\nProgram received signal SIGSEGV, Segmentation fault.\r\n0x00005555557c4e1c in _PyXI_ApplyError (error=0x0) at Python/crossinterp.c:1057\r\n1057        if (error->code == _PyXI_ERR_UNCAUGHT_EXCEPTION) {\r\n(gdb) bt\r\n#0  0x00005555557c4e1c in _PyXI_ApplyError (error=0x0) at Python/crossinterp.c:1057\r\n#1  0x00007ffff79db912 in _run_in_interpreter (p_excinfo=0x7fffffffd0a0, flags=1, shareables=0x555555abe9d0 <_PyRuntime+14032>,\r\n    codestrlen=<optimized out>, codestr=0x7ffff7a53358 \"aaaa\", interp=0x555555ad0e48 <_PyRuntime+88904>)\r\n    at ./Modules/_interpretersmodule.c:463\r\n#2  _interp_exec (interp=interp@entry=0x555555ad0e48 <_PyRuntime+88904>, code_arg=<optimized out>,\r\n    shared_arg=0x555555abe9d0 <_PyRuntime+14032>, p_excinfo=p_excinfo@entry=0x7fffffffd0a0, self=<optimized out>)\r\n    at ./Modules/_interpretersmodule.c:950\r\n#3  0x00007ffff79dbaa0 in interp_exec (self=<optimized out>, args=<optimized out>, kwds=<optimized out>)\r\n    at ./Modules/_interpretersmodule.c:995\r\n#4  0x00005555556ac233 in cfunction_call (func=0x7ffff7a6d4e0, args=<optimized out>, kwargs=<optimized out>)\r\n    at Objects/methodobject.c:551\r\n#5  0x00005555556433f0 in _PyObject_MakeTpCall (tstate=0x555555b07b20 <_PyRuntime+313376>, callable=callable@entry=0x7ffff7a6d4e0,\r\n    args=args@entry=0x7ffff7fb0080, nargs=<optimized out>, keywords=keywords@entry=0x0) at Objects/call.c:242\r\n#6  0x0000555555643d16 in _PyObject_VectorcallTstate (kwnames=0x0, nargsf=<optimized out>, args=0x7ffff7fb0080,\r\n    callable=0x7ffff7a6d4e0, tstate=<optimized out>) at ./Include/internal/pycore_call.h:165\r\n#7  0x00005555555d8e85 in _PyEval_EvalFrameDefault (tstate=0x555555b07b20 <_PyRuntime+313376>, frame=0x7ffff7fb0020,\r\n    throwflag=<optimized out>) at Python/generated_cases.c.h:955\r\n#8  0x00005555557a5abc in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020, tstate=0x555555b07b20 <_PyRuntime+313376>)\r\n    at ./Include/internal/pycore_ceval.h:116\r\n#9  _PyEval_Vector (args=0x0, argcount=0, kwnames=0x0, locals=0x7ffff7a187c0, func=0x7ffff7a033d0,\r\n    tstate=0x555555b07b20 <_PyRuntime+313376>) at Python/ceval.c:1901\r\n#10 PyEval_EvalCode (co=co@entry=0x7ffff7a3a120, globals=globals@entry=0x7ffff7a187c0, locals=locals@entry=0x7ffff7a187c0)\r\n    at Python/ceval.c:662\r\n#11 0x0000555555811018 in run_eval_code_obj (locals=0x7ffff7a187c0, globals=0x7ffff7a187c0, co=0x7ffff7a3a120,\r\n    tstate=0x555555b07b20 <_PyRuntime+313376>) at Python/pythonrun.c:1338\r\n```\r\n\r\nFound using fusil by @vstinner.\r\n\r\n### CPython versions tested on:\r\n\r\n3.13, CPython main branch\r\n\r\n### Operating systems tested on:\r\n\r\nLinux\r\n\r\n### Output from running 'python -VV' on the command line:\r\n\r\nPython 3.14.0a1+ (heads/main:54c63a32d06, Nov  8 2024, 19:53:10) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126678\n* gh-126681\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-11T08:47:48Z",
+   "body": "I am on it! Thanks for the report."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-23T12:21:42Z",
+   "body": "I think the fix missed this case:\r\n```python\r\nimport _interpreters\r\n_interpreters.exec(0, \"1\", {\"\\uFD7C\\u5124\\u7B91\\u92E9\\u1850\\u39AA\\u0DF2\\uD82A\\u2D68\\uACAD\\u92DE\\u47C5\\uFFD0\\uDE0B\\uAA9C\\u2C17\\\\u6577\\u4C92\\uD37C\": 0})\r\n```\r\nShould I open a new issue or can it be fixed here?"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-23T13:34:20Z",
+   "body": "Please, open a new one."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0d54444fe9f501372e5a626c177b488efc6f4b46",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126678",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9fc2808eaf4e74a9f52f44d20a7d1110bd949d41",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cfe023cb25c36f9243cafd4953c9c217fa3ca6b3",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126681",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e194b217536416341dd54852c6773773c373f57e",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127196",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "db85d7ca95f44cb813d11e5b1fa0e1d8b7fdb176",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "35e9ec3375fd2b29c7645bc23e794d9e112d2ae8",
+   "actor": "ebonnal"
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/kiwi",
+ "number": 229,
+ "type": "issue",
+ "url": "https://github.com/nucleic/kiwi/issues/229",
+ "title": "Global state cleanup: leaked refs on re-exec, borrowed type pointers, partial failure leaks",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T09:02:09Z",
+ "closed_at": null,
+ "body": "Several related module init / global state hygiene issues. None cause crashes in normal single-interpreter use, but they affect correctness under reimport, subinterpreters, and error paths.\n\n### 1. Exception globals leaked on module re-exec\n\n`init_exceptions()` in `solver.cpp:330-375` stores new references from `mod.getattr()` into bare `PyObject*` globals. These are never decref'd. If `Py_mod_exec` runs again (subinterpreters), the old references leak. The module has no `m_clear`/`m_free` that would release them.\n\n### 2. Type object globals become borrowed after PyModule_AddObject steals\n\nIn `add_objects()` (`kiwisolver.cpp:94-130`), `PyModule_AddObject` steals the reference from `PyType_FromSpec`. After success, the static `TypeObject` pointers hold borrowed references from the module dict. If the module is ever unloaded, these become dangling. Using `PyModule_AddObjectRef` (available since 3.10) would let the globals retain their own strong reference.\n\n### 3. init_exceptions() leaks on partial failure\n\nIf the 4th `getattr()` fails in `init_exceptions()`, the first 3 globals hold leaked new references. The function returns `false` without cleaning up previously-assigned globals. Fix: use `cppy::ptr` for all 6, commit to globals only after all succeed.\n\n### 4. ready_types() leaks on partial failure\n\nIf the 3rd `Ready()` call fails, the first 2 type objects (from `PyType_FromSpec`) leak. Same pattern \u2014 no cleanup of previously-created types on error.\n\n### 5. global_lock defined unconditionally\n\n`kiwisolver.cpp:17` defines `std::recursive_mutex global_lock` outside any `#ifdef Py_GIL_DISABLED` guard, even though the macros that use it are no-ops without `Py_GIL_DISABLED`. The `extern` declaration in `util.h` IS correctly guarded. The definition should match:\n\n```cpp\n#ifdef Py_GIL_DISABLED\nstd::recursive_mutex global_lock;\n#endif\n```\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

@@ -1,0 +1,32 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 79,
+ "type": "issue",
+ "url": "https://github.com/dpdani/cereggii/issues/79",
+ "title": "Abort from re-initializing and repopulating an `AtomicDict`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "AtomicDict"
+ ],
+ "created_at": "2025-10-18T04:00:33Z",
+ "closed_at": "2025-10-19T13:04:49Z",
+ "body": "Running the code below will cause an abort:\n\n```python\nimport cereggii\na = cereggii.AtomicDict()\n\n# Prime the AtomicDict to len=100\nfor x in range(100):\n    a[x] = x\n\n# Re-init to len=1\na.__init__({1:2})\nprint(f\"{len(a)=}\")\nprint(f\"{list(a.fast_iter())=}\")\n\n# Delete the lone key and get len=100\ndel a[1]\nprint(f\"Should be empty, but {len(a)=}\")\n\n# Try to repopulate and get an abort\nfor x in range(100):\n    a[x] = x\n```\n\nMessage:\n```\nFatal Python error: _Py_CheckSlotResult: Slot __setitem__ of type cereggii.AtomicDict failed without setting an exception\nPython runtime state: initialized\n\nStack (most recent call first):\n  File \"/home/danzin/scratch.py\", line 18 in <module>\n\nProgram received signal SIGABRT, Aborted.\n```",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dpdani/cereggii/pull/80",
+   "commit": null,
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ]
+}

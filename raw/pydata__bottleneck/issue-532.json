@@ -1,0 +1,24 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 532,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/532",
+ "title": "Py_MOD_GIL_NOT_USED declared but global state unprotected for free-threading",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:36:51Z",
+ "closed_at": null,
+ "body": "All four modules declare `Py_MOD_GIL_NOT_USED` via `PyUnstable_Module_SetGIL`, claiming free-threading safety. However, the global `slow_module` pointer in `bottleneck.h:143` has a lazy-init race condition (two threads could both see NULL and both import), and the 15 global interned `pystr_*` variables across all modules lack atomic access patterns.\n\nAdditionally, the modules use single-phase init (`m_size = -1`) with global state, which prevents subinterpreter isolation.\n\n**File(s):** `bottleneck.h:143-183` (slow_module race), all 4 template files (pystr_* globals, single-phase init)\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

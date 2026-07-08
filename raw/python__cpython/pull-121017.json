@@ -1,0 +1,123 @@
+{
+ "repo": "python/cpython",
+ "number": 121017,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/121017",
+ "title": "gh-121016: Add test for `PYTHON_BASIC_REPL` envioronment variable",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news",
+  "topic-repl"
+ ],
+ "created_at": "2024-06-26T01:12:41Z",
+ "closed_at": "2024-06-26T10:39:07Z",
+ "body": "This PR adds a test for `PYTHON_BASIC_REPL` setting the interpreter to use the basic REPL, using a technique suggested by @AlexWaygood on Discord.\n\n<!-- gh-issue-number: gh-121016 -->\n* Issue: gh-121016\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-06-26T09:58:16Z",
+   "body": "Thank you Lysandros and Alex!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-06-26T10:39:10Z",
+   "body": "Thanks @devdanzin for the PR, and @AlexWaygood for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-06-26T10:39:31Z",
+   "body": "Sorry, @devdanzin and @AlexWaygood, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 9e45fd9858a059950f7387b4fda2b00df0e8e537 3.13\n```\n"
+  },
+  {
+   "author": "AlexWaygood",
+   "created_at": "2024-06-26T10:46:57Z",
+   "body": "@devdanzin, would you possibly be able to take care of the backport PR? If you're not familiar with the process, I can do it later"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-06-26T12:02:50Z",
+   "body": "Thanks for merging!\r\n\r\n> @devdanzin, would you possibly be able to take care of the backport PR?\r\n\r\nI'm not sure I can, I get \"Permission denied\" at the end of the process:\r\n\r\n```\r\n\ud83d\udc0d \ud83c\udf52 \u26cf\r\nFailed to push to origin \u2639\r\nbranch backport-9e45fd9-3.13 has been deleted.\r\n\r\nBackport PR:\r\n\r\n[3.13] gh-121016: Add test for `PYTHON_BASIC_REPL` envioronment variable (GH-121017)\r\n(cherry picked from commit 9e45fd9858a059950f7387b4fda2b00df0e8e537)\r\n\r\nCo-authored-by: devdanzin <74280297+devdanzin@users.noreply.github.com>\r\nremote: Permission to python/cpython.git denied to devdanzin.\r\nfatal: unable to access 'https://github.com/python/cpython.git/': The requested URL returned error: 403\r\n```\r\n\r\nIf the right way to do it is to push to my fork first, I can try it tonight. Otherwise, feel free to handle it."
+  },
+  {
+   "author": "lysnikolaou",
+   "created_at": "2024-06-26T12:05:17Z",
+   "body": "> If the right way to do it is to push to my fork first, I can try it tonight. Otherwise, feel free to handle it.\r\n\r\nThat's the right way, yes. You can try it tonight, sure."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-06-26T20:49:34Z",
+   "body": "[GH-121064](https://github.com/python/cpython/pull/121064) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/121016",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9e45fd9858a059950f7387b4fda2b00df0e8e537",
+   "actor": "AlexWaygood"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "AlexWaygood"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "547f13db20e65a7fe3169d27ae6481d235e76303",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1ac30d54c1d42e0cbf38fecb6f0eb51470f23703",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4ecdb52d463a6ca3839d45ba8c550ef0e4adb91d",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "65f456b9d9269259c767aa255c88617840f78fa5",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bc515b332bef0eaa3064d3b912ad660932ad8c90",
+   "actor": "AlexWaygood"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bcd420442c79a22da4fe21f0e19b35365f1e7e65",
+   "actor": "mrahtz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0bbf153d69eca6559145da2f6c869bce19adf171",
+   "actor": "noahbkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "73474bbf33bcbbd1d9b65108da305f7970952a8a",
+   "actor": "estyxx"
+  }
+ ]
+}

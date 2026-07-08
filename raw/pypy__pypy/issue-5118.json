@@ -1,0 +1,48 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5118,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5118",
+ "title": "`SystemError` with `gc.dump_rpy_heap`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-14T12:26:45Z",
+ "closed_at": "2026-04-30T20:54:20Z",
+ "body": "Calling `gc.dump_rpy_heap` with invalid arguments results in a `SystemError`.\r\n\r\nSomething else also seems to be happening regarding handling of the `file` parameter: when passed a large negative value, some sort of dump into stdout happens, but it looks different from a normal dump to me (and seems to vary between PyPy runs).\r\n\r\n```python\r\nPython 3.10.14 (39dc8d3c85a7, Aug 27 2024, 14:32:27)\r\n[PyPy 7.3.17 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>>> import gc\r\n>>>> gc.dump_rpy_heap(-1)\r\nRPython traceback:\r\n  File \"pypy_interpreter.c\", line 51609, in BuiltinCode1_fastcall_1\r\n  File \"rpython_memory_gc.c\", line 23123, in dump_rpy_heap\r\n  File \"rpython_memory_gc.c\", line 23622, in BaseWalker_add_roots\r\n  File \"rpython_memory_gc.c\", line 23722, in BaseWalker_walk\r\n  File \"rpython_memory_gc.c\", line 24344, in HeapDumper_writeobj\r\n  File \"rpython_memory_gc.c\", line 25720, in trace__gc_callback__writeref\r\n  File \"rpython_memory_gc.c\", line 23867, in HeapDumper_flush\r\nTraceback (most recent call last):\r\n  File \"<python-input-1>\", line 1, in <module>\r\n    gc.dump_rpy_heap(-1)\r\nSystemError: unexpected internal exception (please report a bug): <OSError object at 0x7f523c9796c0>; internal traceback was dumped to stderr\r\n>>>> gc.dump_rpy_heap(-2**35)\r\n# Some memory dump, not sure why it's visible nor where this memory is coming from.\r\n```\r\n\r\nFound using fusil by @vstinner.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-11-15T12:51:53Z",
+   "body": "Weird. gc.dump_rpy_heap goes to `app_referencts.dumpy_rpy_heap` which calls interplevel `gc._dump_rpy_heap` which is in [referents.py](https://github.com/pypy/pypy/blob/6360faa8804905f3715b87ec08b27683ed29ff8c/pypy/module/gc/referents.py#L158) and has a `try: except OSError`. So how is the llevel [`rgc.dump_rpy_heap`](https://github.com/pypy/pypy/blob/6360faa8804905f3715b87ec08b27683ed29ff8c/rpython/rlib/rgc.py#L857) not raising properly? It is annotated as [having a `hop.exception_is_here()`]()https://github.com/pypy/pypy/blob/6360faa8804905f3715b87ec08b27683ed29ff8c/rpython/rlib/rgc.py#L1106-L1113."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/5455",
+   "commit": null,
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6fcdeb9cfdd5724eb447bffcdf14438be47230da",
+   "actor": "mattip"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6f466610f29e01d497aa868e85756f56c7f85a43",
+   "actor": "mattip"
+  }
+ ]
+}

@@ -38,11 +38,26 @@ Completed:
       simplejson→review-toolkit (both corrected from "manual"). 75 upstream
       issues cite a devdanzin gist (Phase-2 vector). §1/§2/§5/§6/§7 updated.
 
-## Phase 2 — Raw harvest / import  ← NEXT
-Worklist in SCOPING_REPORT §7. Highlights: import 139 cext JSON + refresh
-labels/state; per-repo harvest (beat the 1000-cap); OOM 15 issues + umbrella +
-gists; maintainer-filed + gist-id sub-pass; verify **#146443 vs #146124**;
-reconcile the ~30 no-ref crash dirs vs GitHub live.
+## Phase 2 — Raw harvest / import  🟡 IN PROGRESS (core harvest DONE 2026-07-08)
+`tools/harvest.py` (idempotent, resumable). **403 artifacts in `raw/`** — full
+core + labels + comments + issue↔PR timeline refs. 300 issues / 103 PRs; 296
+closed / 107 open; **343 self + 60 maintainer-authored**; 0 fetch errors (2
+cpython timeline hiccups retried clean after making sub-fetches non-fatal).
+Coverage in `sources/harvest_coverage.json`. Enumeration matched refined counts
+(cpython 175, pypy 31, …); cext-JSON ingest added the maintainer-authored ones
+(Pillow 0→24, zope 0→9, h5py 16→25, bottleneck 15→24). Labels: type-crash 133,
+fusil-fuzzer 8, topic-JIT 34.
+
+**Still to do in Phase 2 (long-tail + enrichment):**
+- [ ] **Gist-cite sub-pass:** the 75 upstream issues citing a `gist.github.com/
+      devdanzin` gist → harvest any not already in `raw/` (maintainer-filed +
+      untagged finds). Enumerate the 285 gists → per-id issue search.
+- [ ] **cext communicated-only extensions** (astropy, cffi, cvxopt, isal,
+      ml-dtypes, msgspec, mypyc, nanobind, pybind, pyerfa, pymongo, wrapt,
+      awkward-cpp): confirm 0 filed (enum returned 0) or catch late filings.
+- [ ] **Reconcile the ~30 no-ref crash dirs** + drafts staging.
+- [ ] **Verify #146443 vs #146124** (cpython-review PR) during classify.
+- [ ] Old bpo / ajaksu2 long-tail (Phase-3-adjacent).
 
 ## Open decisions (block Phase 3, not Phase 2) — SCOPING_REPORT §5 + §10
 - Own-repo (1471) EXCLUDE? OTHER_OSS (120) EXCLUDE? pypy/simplejson → `manual`?

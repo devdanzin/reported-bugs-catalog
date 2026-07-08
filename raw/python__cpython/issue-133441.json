@@ -1,0 +1,52 @@
+{
+ "repo": "python/cpython",
+ "number": 133441,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/133441",
+ "title": "3.13: Abort from failed assertion in `_PyEval_EvalFrameDefault`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.13"
+ ],
+ "created_at": "2025-05-05T14:21:07Z",
+ "closed_at": "2025-05-11T21:10:41Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort a 3.13 debug build running the following code:\n\n```python\nimport copy\n\nclass Node:\n    def __init__(self):\n        self._parents = {}\n\n    def __getstate__(self):\n        return {'_parents': {}}\n\n    def __setstate__(self, data_dict):\n        self.__dict__ = data_dict\n        self._parents = {}\n\n    def call_copy(self):\n        copy.copy(super())\n\nclass D(dict): pass\n\nobj = Node()\nobj.call_copy()\nobj.call_copy()\nobj.__setstate__(D())\n```\n\nBacktrace:\n```shell\npython: Python/generated_cases.c.h:5594: _PyEval_EvalFrameDefault: Assertion `PyDict_CheckExact((PyObject *)dict)' failed.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0)\n    at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6)\n    at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7c4519e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28902 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7c2881e in __assert_fail_base (\n    fmt=0x7ffff7dde2a0 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\n    assertion=assertion@entry=0x55555590a6c0 \"PyDict_CheckExact((PyObject *)dict)\",\n    file=file@entry=0x5555558cbb1f \"Python/generated_cases.c.h\", line=line@entry=5594,\n    function=function@entry=0x555555964500 <__PRETTY_FUNCTION__.72> \"_PyEval_EvalFrameDefault\")\n    at ./assert/assert.c:96\n#6  0x00007ffff7c3b7c7 in __assert_fail (\n    assertion=assertion@entry=0x55555590a6c0 \"PyDict_CheckExact((PyObject *)dict)\",\n    file=file@entry=0x5555558cbb1f \"Python/generated_cases.c.h\", line=line@entry=5594,\n    function=function@entry=0x555555964500 <__PRETTY_FUNCTION__.72> \"_PyEval_EvalFrameDefault\")\n    at ./assert/assert.c:105\n#7  0x00005555557b1e76 in _PyEval_EvalFrameDefault (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    frame=0x7ffff7fb0090, throwflag=0) at Python/generated_cases.c.h:5594\n#8  0x00005555557b4b05 in _PyEval_EvalFrame (\n    tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>, frame=<optimized out>,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:119\n#9  0x00005555557b4c34 in _PyEval_Vector (tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>,\n    func=func@entry=0x7ffff74674d0, locals=locals@entry=0x7ffff7463d70, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1816\n#10 0x00005555557b4cf7 in PyEval_EvalCode (co=co@entry=0x7ffff7566d40,\n    globals=globals@entry=0x7ffff7463d70, locals=locals@entry=0x7ffff7463d70)\n    at Python/ceval.c:604\n#11 0x00005555558225c5 in run_eval_code_obj (\n    tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>, co=co@entry=0x7ffff7566d40,\n    globals=globals@entry=0x7ffff7463d70, locals=locals@entry=0x7ffff7463d70)\n    at Python/pythonrun.c:1381\n``` \n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.13\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.13.3+ (heads/3.13:fdcaaad1cc7, May  4 2025, 08:43:24) [GCC 14.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-133446\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-05T15:04:21Z",
+   "body": "I wrote a fix: https://github.com/python/cpython/pull/133446"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/133446",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "756774e1320e13e395446091ef67c52a0ee5c887",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5cd56b249f239deab8d6d566fe4a62e74da3d60a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ]
+}

@@ -1,0 +1,114 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9520,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9520",
+ "title": "Avoid overflow by not adding extents together",
+ "state": "closed",
+ "state_reason": null,
+ "author": "hugovk",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-31T18:43:06Z",
+ "closed_at": "2026-04-01T02:45:31Z",
+ "body": null,
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "58f9a1d166dcb0c274807d4423522d205b0c35ea",
+   "actor": "radarhere"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "radarhere"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/rsoreq-mend/AutoGPT/issues/104",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/supabase/issues/39",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/Vonage/audio-connector-server-samples/issues/8",
+   "commit": null,
+   "actor": "mend-for-github-com[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/stable-diffusion-webui/issues/28",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/stable-diffusion-webui/issues/37",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/stable-diffusion-webui/issues/39",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/stable-diffusion-webui/issues/46",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/NixOS/nixpkgs/issues/518763",
+   "commit": null,
+   "actor": "nixpkgs-security-tracker[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/inab/treecript/pull/28",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/inab/treecript/pull/29",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/inab/treecript/pull/30",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/generalbots/generalbots/issues/544",
+   "commit": null,
+   "actor": "rodrigorodriguez"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/fema-ffrd/stormlit/pull/128",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  }
+ ]
+}

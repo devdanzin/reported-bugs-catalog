@@ -1,0 +1,30 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 528,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/528",
+ "title": "PyArray_Ravel unchecked in iterators.h init_iter_all \u2014 NULL dereference and ref leak",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:35:57Z",
+ "closed_at": null,
+ "body": "Four calls to `PyArray_Ravel` in `init_iter_all` / the ravel-based init paths (`iterators.h:133-146`) store the result without checking for NULL. If `PyArray_Ravel` fails, `PyArray_DIM(NULL, 0)` dereferences NULL. The old `a` reference is also leaked (same pattern as the `nonreducer_axis` Ravel leak in #521).\n\nThese functions return `void`, so the fix requires either refactoring to return an error indicator or having callers check after `init_iter_all`.\n\n**File(s):** `iterators.h:133-135, 144-146`\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/545",
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

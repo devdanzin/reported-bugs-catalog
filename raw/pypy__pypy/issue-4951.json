@@ -1,0 +1,71 @@
+{
+ "repo": "pypy/pypy",
+ "number": 4951,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/4951",
+ "title": "Repeated `__import__` is much slower than on CPython",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-05-16T14:43:58Z",
+ "closed_at": "2024-05-26T22:15:05Z",
+ "body": "On PyPy, repeatedly calling `__import__` (that is, for a module that is already in `sys.modules`) is much slower than on CPython:\r\n\r\n```\r\npypy win32 3.10.14 (75b3de9d9035, Apr 21 2024, 13:13:38)\r\n[PyPy 7.3.16 with MSC v.1929 64 bit (AMD64)]\r\nTime taken: 38.180 seconds\r\n```\r\n\r\n```\r\ncpython win32 3.12.3 (tags/v3.12.3:f6650f9, Apr  9 2024, 14:05:25) [MSC v.1938 64 bit (AMD64)]\r\nTime taken: 0.072 seconds\r\n```\r\n\r\nWith the following test script:\r\n```python\r\nimport sys\r\nfrom time import time\r\n\r\ndef test():\r\n    n_loops = 200000\r\n    for _ in range(n_loops):\r\n        __import__('email')\r\n\r\nprint(f\"{sys.implementation.name} {sys.platform} {sys.version}\")\r\nstart = time()\r\ntest()\r\nprint(f\"Time taken: {time() - start:.3f} seconds\")\r\n```\r\n\r\nThis seems to be the root cause of #1423.",
+ "comments": [
+  {
+   "author": "cfbolz",
+   "created_at": "2024-05-17T08:03:32Z",
+   "body": "there is a fast path for importing written in rpython, in `pypy/module/imp/importing.py`, function `import_name_fast_path`. We use that in the bytecode `IMPORT_NAME` but not in `__import__`."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-05-17T10:11:52Z",
+   "body": "Testing on Linux (WSL), PyPy is only 5x-10x slower than CPython. On Windows, it's 500x slower, even with antivirus disabled. Trying to figure out why."
+  },
+  {
+   "author": "cfbolz",
+   "created_at": "2024-05-17T10:19:44Z",
+   "body": "@devdanzin but even on linux `__import__(\"email\")` is massively slower than `import email`, which is what I want to fix."
+  },
+  {
+   "author": "cfbolz",
+   "created_at": "2024-05-17T10:25:51Z",
+   "body": "I have now written a quick prototype on the `py3.9-__import__-fast-path` branch, probably won't get to that in the next couple of days though."
+  },
+  {
+   "author": "cfbolz",
+   "created_at": "2024-05-21T15:47:58Z",
+   "body": "I've merged the fast path, let's check tomorrow's nightly whether the situation improved."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-05-22T09:06:08Z",
+   "body": "The Linux nightly at [pypy-c-jit-183898-9064d3c9091e-linux64.tar.bz2](https://buildbot.pypy.org/nightly/py3.9/pypy-c-jit-183898-9064d3c9091e-linux64.tar.bz2) is fixed:\r\n\r\n```\r\npypy linux 3.9.19 (9064d3c9091e, May 22 2024, 01:30:20)\r\n[PyPy 7.3.17-alpha0 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)]\r\nTime taken: 0.005 seconds\r\n```\r\n\r\nCompared to:\r\n```\r\npypy linux 3.9.19 (a2113ea87262, Apr 21 2024, 05:40:24)\r\n[PyPy 7.3.16 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)]\r\nTime taken: 0.543 seconds\r\n```\r\n\r\nThe time taken for repeated `__import__` when the module isn't in `sys.modules` is slightly longer than when it is. Repeated `import` is a bit faster still."
+  },
+  {
+   "author": "cfbolz",
+   "created_at": "2024-05-22T09:08:49Z",
+   "body": "wonderful, thanks for checking @devdanzin! if the module is not in `sys.modules` we use the full `importlib` machinery, so it's to be expected that that case is slower."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-05-26T22:15:05Z",
+   "body": "As predicted, performance improvement on Windows is impressive:\r\n\r\n```\r\npypy win32 3.10.14 (75b3de9d9035, Apr 21 2024, 13:13:38)\r\n[PyPy 7.3.16 with MSC v.1929 64 bit (AMD64)]\r\nTime taken: 38.357 seconds\r\n```\r\n\r\n```\r\npypy win32 3.9.19 (b93b48d4429e, May 24 2024, 01:35:22)\r\n[PyPy 7.3.17-alpha0 with MSC v.1929 64 bit (AMD64)]\r\nTime taken: 0.033 seconds\r\n```"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4960",
+   "commit": null,
+   "actor": "cfbolz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

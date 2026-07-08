@@ -1,0 +1,79 @@
+{
+ "repo": "python/cpython",
+ "number": 126221,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126221",
+ "title": "`sre_constants._makecodes` segfaults in JIT builds",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2024-10-31T03:16:37Z",
+ "closed_at": "2024-10-31T13:13:26Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to crash a JIT build of Python (or abort, if it's a debug build) by passing an invalid parameter to `sre_constants._makecodes`:\n\n```python\nimport sre_constants\nsre_constants._makecodes(\"\", {}, 10)\n```\n\nBacktrace on non-debug JIT build looks like:\n```gdb\nProgram received signal SIGSEGV, Segmentation fault.\n_PyEval_EvalFrameDefault (tstate=0x555555b3f440 <_PyRuntime+313216>, frame=0x7ffff7fb0098, throwflag=<optimized out>) at Python/generated_cases.c.h:6753\n6753                PyStackRef_CLOSE(value);\n(gdb) bt\n#0  _PyEval_EvalFrameDefault (tstate=0x555555b3f440 <_PyRuntime+313216>, frame=0x7ffff7fb0098,\n    throwflag=<optimized out>) at Python/generated_cases.c.h:6753\n#1  0x00005555557a9bac in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020,\n    tstate=0x555555b3f440 <_PyRuntime+313216>) at ./Include/internal/pycore_ceval.h:116\n#2  _PyEval_Vector (args=0x0, argcount=0, kwnames=0x0, locals=0x7ffff7a18c00, func=0x7ffff7a035e0,\n    tstate=0x555555b3f440 <_PyRuntime+313216>) at Python/ceval.c:1886\n#3  PyEval_EvalCode (co=co@entry=0x7ffff7a3a010, globals=globals@entry=0x7ffff7a18c00,\n    locals=locals@entry=0x7ffff7a18c00) at Python/ceval.c:662\n#4  0x000055555583aca8 in run_eval_code_obj (locals=0x7ffff7a18c00, globals=0x7ffff7a18c00,\n    co=0x7ffff7a3a010, tstate=0x555555b3f440 <_PyRuntime+313216>) at Python/pythonrun.c:1338\n#5  run_eval_code_obj (tstate=0x555555b3f440 <_PyRuntime+313216>, co=0x7ffff7a3a010,\n    globals=0x7ffff7a18c00, locals=0x7ffff7a18c00) at Python/pythonrun.c:1305\n#6  0x000055555583af28 in run_mod (mod=mod@entry=0x555555c61fb0, filename=filename@entry=0x7ffff7a72130,\n    globals=globals@entry=0x7ffff7a18c00, locals=locals@entry=0x7ffff7a18c00,\n    flags=flags@entry=0x7fffffffdf28, arena=arena@entry=0x7ffff7b5e250, interactive_src=0x7ffff7b8dbc0,\n    generate_new_source=0) at Python/pythonrun.c:1423\n#7  0x000055555583d5a4 in _PyRun_StringFlagsWithName (generate_new_source=0, flags=0x7fffffffdf28,\n    locals=0x7ffff7a18c00, globals=0x7ffff7a18c00, start=257, name=0x7ffff7a72130,\n    str=0x7ffff7a49c10 \"import sre_constants; sre_constants._makecodes('', {}, 10)\\n\")\n    at Python/pythonrun.c:1222\n#8  _PyRun_SimpleStringFlagsWithName (\n    command=0x7ffff7a49c10 \"import sre_constants; sre_constants._makecodes('', {}, 10)\\n\",\n    name=name@entry=0x5555558e3520 \"<string>\", flags=flags@entry=0x7fffffffdf28) at Python/pythonrun.c:548\n```\n\nBacktrace on debug JIT build looks like:\n```gdb\npython: Python/ceval.c:966: _PyEval_EvalFrameDefault: Assertion `STACK_LEVEL() >= level' failed.\n\nProgram received signal SIGABRT, Aborted.\n__pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:44\n44      ./nptl/pthread_kill.c: No such file or directory.\n(gdb) bt\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140737350580032, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7ce0476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc67f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7cc671b in __assert_fail_base (\n    fmt=0x7ffff7e7b130 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\n    assertion=0x555555a7203f \"STACK_LEVEL() >= level\", file=0x555555a71710 \"Python/ceval.c\", line=966,\n    function=<optimized out>) at ./assert/assert.c:92\n#6  0x00007ffff7cd7e96 in __GI___assert_fail (\n    assertion=assertion@entry=0x555555a7203f \"STACK_LEVEL() >= level\",\n    file=file@entry=0x555555a71710 \"Python/ceval.c\", line=line@entry=966,\n    function=function@entry=0x555555a74920 <__PRETTY_FUNCTION__.74> \"_PyEval_EvalFrameDefault\")\n    at ./assert/assert.c:101\n#7  0x00005555558529a0 in _PyEval_EvalFrameDefault (\n    tstate=tstate@entry=0x555555cbbc70 <_PyRuntime+329232>, frame=0x7ffff7fb0098,\n    throwflag=throwflag@entry=0) at Python/ceval.c:966\n#8  0x0000555555852fb7 in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>,\n    tstate=0x555555cbbc70 <_PyRuntime+329232>) at ./Include/internal/pycore_ceval.h:116\n#9  _PyEval_Vector (tstate=tstate@entry=0x555555cbbc70 <_PyRuntime+329232>,\n    func=func@entry=0x7ffff7a46450, locals=locals@entry=0x7ffff7a55df0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1886\n#10 0x0000555555853096 in PyEval_EvalCode (co=co@entry=0x7ffff7a42e60,\n    globals=globals@entry=0x7ffff7a55df0, locals=locals@entry=0x7ffff7a55df0) at Python/ceval.c:662\n#11 0x00005555559251f4 in run_eval_code_obj (tstate=tstate@entry=0x555555cbbc70 <_PyRuntime+329232>,\n    co=co@entry=0x7ffff7a42e60, globals=globals@entry=0x7ffff7a55df0, locals=locals@entry=0x7ffff7a55df0)\n    at Python/pythonrun.c:1338\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ (heads/main:d467d9246cb, Oct 30 2024, 23:30:10) [GCC 11.4.0]",
+ "comments": [
+  {
+   "author": "Zheaoli",
+   "created_at": "2024-10-31T13:10:27Z",
+   "body": "@ZeroIntensity plz add interperter or core lib here. This crash is raised the exception unwind process. I'm trying to find the root cause"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-10-31T13:12:55Z",
+   "body": "I'm pretty sure Brandt already found the root cause and is addressing it via #126222"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-10-31T13:13:26Z",
+   "body": "> I'm pretty sure Brandt already found the root cause and is addressing it via #126222\r\n\r\nAgreed."
+  },
+  {
+   "author": "Zheaoli",
+   "created_at": "2024-10-31T13:14:05Z",
+   "body": "> I'm pretty sure Brandt already found the root cause and is addressing it via #126222\r\n\r\nYep"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/facebookincubator/cinder/issues/148",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148798",
+   "commit": null,
+   "actor": "rajkripal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f54773fa78268e636d0add21650c1ae41f80362b",
+   "actor": "rajkripal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148799",
+   "commit": null,
+   "actor": "rajkripal"
+  }
+ ]
+}

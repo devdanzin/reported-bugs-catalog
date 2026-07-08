@@ -1,0 +1,42 @@
+{
+ "repo": "zopefoundation/zope.interface",
+ "number": 358,
+ "type": "issue",
+ "url": "https://github.com/zopefoundation/zope.interface/issues/358",
+ "title": "copt: unguarded PyErr_Clear swallows KeyboardInterrupt/MemoryError at 4 sites",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "jensens",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-30T00:40:47Z",
+ "closed_at": "2026-04-10T06:11:33Z",
+ "body": "A detailed analysis of `_zope_interface_coptimizations.c` was published at\nhttps://gist.github.com/devdanzin/5afbad864934b165a2cc080f110aa720 by @devdanzin.\nWe reviewed the report with agent support and verified the findings against the\ncurrent source (zope.interface 8.2). This issue is one of several extracted from\nthat review.\n\n### Problem\n\nFour `PyErr_Clear()` calls clear exceptions unconditionally after\n`PyObject_GetAttr`/`PyObject_GetItem` failures:\n\n- Line 2436 (`implementedBy`): after `PyObject_GetAttr(cls, \"__dict__\")` failure\n- Line 2452 (`implementedBy`): after `PyObject_GetItem(dict, \"__implemented__\")` failure\n- Line 2595 (`providedBy`): after `PyObject_GetAttr(ob, \"__provides__\")` failure\n- Line 2604 (`providedBy`): after `PyObject_GetAttr(cls, \"__provides__\")` failure\n\nThe same file has 7 other sites that correctly guard with\n`PyErr_ExceptionMatches(PyExc_AttributeError)` before clearing. These 4 were\nmissed.\n\n`KeyboardInterrupt`, `MemoryError`, and `SystemExit` are silently swallowed.\n\n### Reproducer\n\n```python\nfrom zope.interface import implementedBy\n\nclass EvilDict(dict):\n    def __getitem__(self, key):\n        if key == \"__implemented__\":\n            raise KeyboardInterrupt(\"getitem bomb\")\n        return super().__getitem__(key)\n\nclass EvilMeta(type):\n    @property\n    def __dict__(cls):\n        return EvilDict()\n\nclass EvilClass(metaclass=EvilMeta):\n    pass\n\nresult = implementedBy(EvilClass)\n# Returns Implements() (BUG) \u2014 KeyboardInterrupt silently swallowed\n```\n\n### Fix\n\nApply the same guard pattern already used at 7 other sites in this file:\n\n```c\n// Before (e.g., line 2436):\nif (dict == NULL) {\n    PyErr_Clear();\n    return implementedByFallback(module, cls);\n}\n\n// After:\nif (dict == NULL) {\n    if (!PyErr_ExceptionMatches(PyExc_AttributeError))\n        return NULL;\n    PyErr_Clear();\n    return implementedByFallback(module, cls);\n}\n```\n\nLine 2452 should guard with `PyExc_KeyError` (since it uses `PyObject_GetItem`).\n\n### Scope\n\n4 sites. Consistent pattern already established in the same file.\n\n### Tests\n\nThe project already uses `MissingSomeAttrs` (in `tests/__init__.py`) to verify\nthat non-`AttributeError` exceptions propagate correctly. The same pattern can\ntest all 4 sites. For the `implementedBy` `KeyboardInterrupt` case, a direct\ntest based on the reproducer above works:\n\n```python\ndef test_implementedBy_propagates_KeyboardInterrupt(self):\n    class EvilDict(dict):\n        def __getitem__(self, key):\n            if key == \"__implemented__\":\n                raise KeyboardInterrupt(\"bomb\")\n            return super().__getitem__(key)\n\n    class EvilMeta(type):\n        @property\n        def __dict__(cls):\n            return EvilDict()\n\n    class EvilClass(metaclass=EvilMeta):\n        pass\n\n    with self.assertRaises(KeyboardInterrupt):\n        self._callFUT(EvilClass)\n```\n\nFor the `providedBy` sites (lines 2595, 2604), the `MissingSomeAttrs.test_raises`\npattern already exists for other `__provides__` lookups in the same test file\nand should be extended to cover these paths.\n\n### Performance impact\n\nZero on the happy path. `PyErr_ExceptionMatches` only executes when an error has\nalready occurred (the `if (dict == NULL)` / `if (result == NULL)` branch). Normal\noperation never enters these blocks.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "37912d54e5b38d956b1347fa248fb8e5c38f72b6",
+   "actor": "jensens"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/zopefoundation/zope.interface/pull/365",
+   "commit": null,
+   "actor": "jensens"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "89665f67abef163d3f69a5f6cba3bb76e96cae09",
+   "actor": "icemac"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "89665f67abef163d3f69a5f6cba3bb76e96cae09",
+   "actor": "pull[bot]"
+  }
+ ]
+}

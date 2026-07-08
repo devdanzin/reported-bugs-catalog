@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/enaml",
+ "number": 602,
+ "type": "issue",
+ "url": "https://github.com/nucleic/enaml/issues/602",
+ "title": "declarative_function: super_disallowed ref leak per call + _Invoke cascading NULL + DFunc_new leaks self on bad args",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:34:51Z",
+ "closed_at": null,
+ "body": "Three bugs in `declarative_function.cpp`:\n\n### 1. `super_disallowed` reference leak on every `_Invoke` call (line 113)\n\n`cppy::incref(super_disallowed)` is called before `PyMapping_SetItemString`, which does NOT steal references. The extra incref is never released. Leaks one reference per declarative function/method invocation.\n\n**Fix**: pass `super_disallowed` directly without the incref:\n```cpp\nif( PyMapping_SetItemString( scope.get(), \"super\", super_disallowed ) == -1 )\n    return cppy::system_error( \"Failed to set key super in dynamic scope\" );\n```\n\n### 2. Cascading NULL dereferences in `_Invoke` (lines 106-119)\n\nThree consecutive API calls have their return values used without NULL checks:\n- `PyDict_New()` (line 106) \u2014 OOM \u2192 NULL\n- `PyObject_CallMethod(...)` (line 107) \u2014 called with NULL `empty.get()` argument\n- `PyObject_CallFunctionObjArgs(...)` (lines 108-112) \u2014 called with NULL `f_locals.get()`\n\n`cppy::ptr` wraps NULL without crashing, but passes NULL to the next API call. Eventually `PyMapping_SetItemString(scope.get(), ...)` dereferences the NULL scope.\n\n**Fix**: add NULL checks after each failable call:\n```cpp\ncppy::ptr empty( PyDict_New() );\nif( !empty ) return 0;\ncppy::ptr f_locals( PyObject_CallMethod( d_storage.get(), \"get\", \"OO\", key, empty.get() ) );\nif( !f_locals ) return 0;\ncppy::ptr scope( PyObject_CallFunctionObjArgs( DynamicScope, self,\n    f_locals.get(), f_globals.get(), f_builtins.get(), 0 ) );\nif( !scope ) return 0;\n```\n\n### 3. `DFunc_new` leaks self on argument parse failure (lines 126-139)\n\n`PyType_GenericNew` allocates `self`, then `PyArg_ParseTupleAndKeywords` is called. If parsing fails or `!PyFunction_Check(im_func)`, the function returns without `Py_DECREF(self)`.\n\n**Reproducer**:\n```python\nimport gc; gc.disable()\nimport os, tracemalloc\ntracemalloc.start()\nfrom enaml.core.declarative_function import DeclarativeFunction\ngc.collect()\nbefore = tracemalloc.get_traced_memory()[0]\nfor _ in range(500):\n    try:\n        DeclarativeFunction(\"not_a_function\", \"key\")\n    except TypeError:\n        pass\ngc.collect()\nafter = tracemalloc.get_traced_memory()[0]\nprint(f\"Leaked {after - before} bytes over 500 bad calls (~{(after - before) // 500} bytes/call)\")\nos._exit(0)\n# Leaked 24272 bytes over 500 bad calls (~48 bytes/call)\n```\n\n**Fix**: parse arguments before allocating, or wrap `self` in `cppy::ptr`.\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

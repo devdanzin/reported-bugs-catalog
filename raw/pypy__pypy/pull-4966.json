@@ -1,0 +1,40 @@
+{
+ "repo": "pypy/pypy",
+ "number": 4966,
+ "type": "pull",
+ "url": "https://github.com/pypy/pypy/pull/4966",
+ "title": "Add some missing sqlite3 symbols",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-05-24T01:15:32Z",
+ "closed_at": "2024-05-24T08:20:44Z",
+ "body": "This PR adds:\r\n\r\n- sqlite3.SQLITE_CREATE_VTABLE\r\n- sqlite3.SQLITE_DROP_VTABLE\r\n- sqlite3.SQLITE_FUNCTION\r\n- sqlite3.SQLITE_RECURSIVE\r\n- sqlite3.SQLITE_SAVEPOINT\r\n\r\nAddresses part of #4962.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-05-24T05:25:41Z",
+   "body": "Looks good. This should target py3.9"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-05-24T08:20:44Z",
+   "body": "While I'm sure there's a way to re-target a PR to a new branch and rebase things, I'm failing at it. Will create a new one instead."
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-05-24T08:25:38Z",
+   "body": "I do this kind of thing with `git cherry-pick <commit>` accross branches. You need to know which commits you did, then you can\r\n```\r\ngit checkout py3.9\r\ngit pull\r\ngit checkout -b sqlite_symbols2\r\ngit cherry-pick <commit1>\r\ngit cherry-pick <commit2>\r\n...\r\ngit push devdanzin\r\n```\r\n\r\nThen when you create the new PR you will only have the commits you want"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2837,
+ "type": "issue",
+ "url": "https://github.com/h5py/h5py/issues/2837",
+ "title": "`ObjectID._dealloc` doesn't zero `self.id` after `H5Idec_ref`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-25T10:11:20Z",
+ "closed_at": "2026-03-27T18:03:29Z",
+ "body": "`_objects.pyx:209-218`",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/pull/2844",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2825",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

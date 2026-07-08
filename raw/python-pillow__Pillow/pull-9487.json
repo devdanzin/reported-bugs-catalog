@@ -1,0 +1,39 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9487,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9487",
+ "title": "Fix `_getxy` refcount leaks",
+ "state": "closed",
+ "state_reason": null,
+ "author": "hugovk",
+ "author_association": "MEMBER",
+ "labels": [
+  "Bug",
+  "Memory"
+ ],
+ "created_at": "2026-03-24T14:46:43Z",
+ "closed_at": "2026-03-25T12:00:18Z",
+ "body": "Thanks to @devdanzin for the report!",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9a89944e735283ce4bbdf2dde1ea7c44798d9683",
+   "actor": "radarhere"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "radarhere"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  }
+ ]
+}

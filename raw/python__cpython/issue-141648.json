@@ -1,0 +1,110 @@
+{
+ "repo": "python/cpython",
+ "number": 141648,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/141648",
+ "title": "JIT segfault or aborts from shape confusion code",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-11-17T03:30:55Z",
+ "closed_at": "2025-12-19T01:05:40Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault or cause different aborts on a patched debug JIT build by running the code below. Please let me know whether you can reproduce this issue.\n\nThe patch is (it might be possible to reduce this diff and keep the repro):\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex 71066f1bd9f..e4a31f76ff2 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -112,8 +112,8 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n-#define JUMP_BACKWARD_INITIAL_BACKOFF 12\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n+#define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n {\n@@ -125,8 +125,8 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n-#define SIDE_EXIT_INITIAL_BACKOFF 12\n+#define SIDE_EXIT_INITIAL_VALUE 63\n+#define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n initial_temperature_backoff_counter(void)\ndiff --git a/Include/internal/pycore_optimizer.h b/Include/internal/pycore_optimizer.h\nindex 0307a174e77..13f163584c1 100644\n--- a/Include/internal/pycore_optimizer.h\n+++ b/Include/internal/pycore_optimizer.h\n@@ -86,7 +86,7 @@ PyAPI_FUNC(void) _Py_Executors_InvalidateCold(PyInterpreterState *interp);\n // Used as the threshold to trigger executor invalidation when\n // executor_creation_counter is greater than this value.\n // This value is arbitrary and was not optimized.\n-#define JIT_CLEANUP_THRESHOLD 1000\n+#define JIT_CLEANUP_THRESHOLD 10000\n\n int _Py_uop_analyze_and_optimize(\n     PyFunctionObject *func,\n@@ -118,7 +118,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n }\n\n // Holds locals, stack, locals, stack ... co_consts (in that order)\n-#define MAX_ABSTRACT_INTERP_SIZE 4096\n+#define MAX_ABSTRACT_INTERP_SIZE 8192\n\n #define TY_ARENA_SIZE (UOP_MAX_TRACE_LENGTH * 5)\n\n@@ -129,7 +129,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n // progress (and inserting a new ENTER_EXECUTOR instruction). In practice, this\n // is the \"maximum amount of polymorphism\" that an isolated trace tree can\n // handle before rejoining the rest of the program.\n-#define MAX_CHAIN_DEPTH 4\n+#define MAX_CHAIN_DEPTH 16\n\n /* Symbols */\n /* See explanation in optimizer_symbols.c */\ndiff --git a/Python/optimizer.c b/Python/optimizer.c\nindex 9db894f0bf0..14cbf670dec 100644\n--- a/Python/optimizer.c\n+++ b/Python/optimizer.c\n@@ -509,7 +509,7 @@ guard_ip_uop[MAX_UOP_ID + 1] = {\n\n\n #define CONFIDENCE_RANGE 1000\n-#define CONFIDENCE_CUTOFF 333\n+#define CONFIDENCE_CUTOFF 100\n\n #ifdef Py_DEBUG\n #define DPRINTF(level, ...) \\\n```\n\nThis is the code that causes the segfault, please comment out the indicated blocks to cause assertion failures instead.\n\n```python\ndef uop_harness_f1():\n\n    def f1():\n        return 0.0\n\n    def f2():\n        return 0.1111\n    funcs = [f1, f2]\n\n    # 1- Comment this block to get an abort instead\n    for i in range(200):\n        func_to_call = funcs[i % 2]\n        try:\n            func_to_call()\n        except Exception:\n            pass\n    \n    # 2- Also comment this block to get a different abort\n    for i in range(200):\n        func_to_call = funcs[i % 2]\n        if callable(func_to_call):\n            for x in range(10):\n                try:        \n                    func_to_call()\n                except Exception:\n                    pass\n\n\n    class ShapeA:\n        payload = -1.11\n\n    class ShapeB:\n        @property\n        def payload(self):\n            return 'property_payload'\n\n    class ShapeC:\n        def payload(self):\n            return id(self)\n\n    class ShapeD:\n        __slots__ = ['payload']\n        def __init__(self):\n            self.payload = 'slot_payload'\n\n    shapes = [ShapeA(), ShapeB(), ShapeC(), ShapeD()]\n    for i in range(500):\n        obj = shapes[i % len(shapes)]\n        try:\n            payload_val = obj.payload\n            if callable(payload_val):\n                for _ in range(15):\n                    payload_val()\n        except Exception:\n            pass\n\nfor i_f1 in range(300):\n    uop_harness_f1()\n```\n\nBacktrace for segfault:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555555c6126d in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x7e8ff65e5290, throwflag=<optimized out>) at Python/generated_cases.c.h:5480\n5480                assert(executor->vm_data.index == INSTR_OFFSET() - 1);\n\n#0  0x0000555555c6126d in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x7e8ff65e5290, throwflag=<optimized out>) at Python/generated_cases.c.h:5480\n#1  0x0000555555c8ef88 in _PyEval_EvalFrame (tstate=tstate@entry=0x55555669e760 <_PyRuntime+358304>, frame=frame@entry=0x7e8ff65e5220, throwflag=throwflag@entry=0)\n    at ./Include/internal/pycore_ceval.h:121\n#2  0x0000555555c8f27c in _PyEval_Vector (tstate=tstate@entry=0x55555669e760 <_PyRuntime+358304>, func=func@entry=0x7cfff661ec60, locals=locals@entry=0x7c7ff6687240, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2104\n#3  0x0000555555c8f52c in PyEval_EvalCode (co=co@entry=0x7d1ff661bed0, globals=globals@entry=0x7c7ff6687240, locals=locals@entry=0x7c7ff6687240) at Python/ceval.c:944\n#4  0x0000555555e575b0 in run_eval_code_obj (tstate=tstate@entry=0x55555669e760 <_PyRuntime+358304>, co=co@entry=0x7d1ff661bed0, globals=globals@entry=0x7c7ff6687240,\n    locals=locals@entry=0x7c7ff6687240) at Python/pythonrun.c:1372\n#5  0x0000555555e578f6 in run_mod (mod=mod@entry=0x7e4ff6615738, filename=filename@entry=0x7cbff65fc010, globals=globals@entry=0x7c7ff6687240, locals=locals@entry=0x7c7ff6687240,\n    flags=flags@entry=0x7bfff541ba30, arena=arena@entry=0x7c7ff66adeb0, interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1475\n#6  0x0000555555e58830 in pyrun_file (fp=fp@entry=0x7d4ff65efd00, filename=filename@entry=0x7cbff65fc010, start=start@entry=257, globals=globals@entry=0x7c7ff6687240,\n    locals=locals@entry=0x7c7ff6687240, closeit=closeit@entry=1, flags=0x7bfff541ba30) at Python/pythonrun.c:1300\n```\n\nBacktrace for abort from commenting block 1 out:\n```\npython: Python/ceval_macros.h:226: GETITEM: Assertion `i < PyTuple_GET_SIZE(v)' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7445e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7428888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff74287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff743c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555c3172c in GETITEM (v=0x7caff6626470, i=i@entry=5) at Python/ceval_macros.h:226\n#8  0x0000555555c700d2 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x7e8ff65e5290, throwflag=<optimized out>) at Python/generated_cases.c.h:7829\n#9  0x0000555555c8ef88 in _PyEval_EvalFrame (tstate=tstate@entry=0x55555669e760 <_PyRuntime+358304>, frame=frame@entry=0x7e8ff65e5220, throwflag=throwflag@entry=0)\n    at ./Include/internal/pycore_ceval.h:121\n#10 0x0000555555c8f27c in _PyEval_Vector (tstate=tstate@entry=0x55555669e760 <_PyRuntime+358304>, func=func@entry=0x7cfff661ec60, locals=locals@entry=0x7c7ff6687240, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2104\n#11 0x0000555555c8f52c in PyEval_EvalCode (co=co@entry=0x7d1ff661b750, globals=globals@entry=0x7c7ff6687240, locals=locals@entry=0x7c7ff6687240) at Python/ceval.c:944\n```\n\nBacktrace for abort from also commenting block 2 out:\n```\npython: Python/optimizer.c:1646: _Py_ExecutorDetach: Assertion `instruction->op.code == ENTER_EXECUTOR' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7445e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7428888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff74287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff743c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555e14dfc in _Py_ExecutorDetach (executor=<optimized out>) at Python/optimizer.c:1646\n#8  0x00005555559c74e4 in clear_executors (co=0x7d5ff6603790) at Objects/codeobject.c:2191\n#9  0x00005555559cec89 in _PyCode_Clear_Executors (code=<optimized out>) at Objects/codeobject.c:2202\n#10 0x0000555555e15c19 in _Py_Executors_InvalidateAll (interp=interp@entry=0x555556667900 <_PyRuntime+133440>, is_invalidation=is_invalidation@entry=0) at Python/optimizer.c:1755\n#11 0x0000555555e4070e in finalize_modules (tstate=tstate@entry=0x55555669e760 <_PyRuntime+358304>) at Python/pylifecycle.c:1724\n#12 0x0000555555e4c100 in _Py_Finalize (runtime=runtime@entry=0x555556646fc0 <_PyRuntime>) at Python/pylifecycle.c:2265\n#13 0x0000555555e4c1da in Py_FinalizeEx () at Python/pylifecycle.c:2388\n#14 0x0000555555eb0c6a in Py_RunMain () at Modules/main.c:774\n```\n\nOutput from running with `PYTHON_LLTRACE=4` (segfault):\n[236_segfault_lltrace.txt](https://github.com/user-attachments/files/23573655/236_segfault_lltrace.txt)\n\nOutput from running with `PYTHON_DEBUG=4` (segfault):\n[236_segfault_opt_debug.txt](https://github.com/user-attachments/files/23573656/236_segfault_opt_debug.txt)\n\n\nI'm not sure this is all a single issue, but it was found based on a single fuzzer attack (shape confusion). We can open more issues if warranted.\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a1+ (heads/main-dirty:ed73c909f27, Nov 17 2025, 00:19:17) [GCC 15.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-141649\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-17T05:29:04Z",
+   "body": "I can reproduce this on main. Thank you."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-17T05:42:16Z",
+   "body": "FYI, I can reproduce with a much smaller diff:\n\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex 71066f1bd9f..e4a31f76ff2 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -112,8 +112,8 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n-#define JUMP_BACKWARD_INITIAL_BACKOFF 12\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n+#define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n {\n@@ -125,8 +125,8 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n-#define SIDE_EXIT_INITIAL_BACKOFF 12\n+#define SIDE_EXIT_INITIAL_VALUE 63\n+#define SIDE_EXIT_INITIAL_BACKOFF 6\n \n static inline _Py_BackoffCounter\n initial_temperature_backoff_counter(void)\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-17T06:05:06Z",
+   "body": "Fix up at https://github.com/python/cpython/pull/141649\n\nCan you also test this PR please? https://github.com/python/cpython/pull/141595\n\nI think it shouldn't have the bug, as I changed the way executors are invalidated."
+  },
+  {
+   "author": "Hritikk999",
+   "created_at": "2025-11-17T08:28:26Z",
+   "body": "Logged error"
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-17T10:57:28Z",
+   "body": "> Fix up at [#141649](https://github.com/python/cpython/pull/141649)\n\nOn my machine this PR fixes all three those crashes."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-17T11:32:22Z",
+   "body": "> On my machine this PR fixes all three those crashes.\n\nSame. Won't have time to test the other PR until later today. \n"
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-17T11:39:53Z",
+   "body": "Only needed change is this:\n\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex 71066f1bd9..b18088b0ff 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -112,7 +112,7 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n #define JUMP_BACKWARD_INITIAL_BACKOFF 12\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n@@ -125,7 +125,7 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n+#define SIDE_EXIT_INITIAL_VALUE 63+15\n #define SIDE_EXIT_INITIAL_BACKOFF 12\n```\n\nAnd we can use any value from 0 to 15 in `SIDE_EXIT_INITIAL_VALUE` sum."
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-17T11:57:56Z",
+   "body": "> Can you also test this PR please? [#141595](https://github.com/python/cpython/pull/141595)\n> \n> I think it shouldn't have the bug, as I changed the way executors are invalidated.\n\nYes, I can't reproduce a crash on this PR."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-18T09:17:44Z",
+   "body": "> > Can you also test this PR please? [#141595](https://github.com/python/cpython/pull/141595)\n> > I think it shouldn't have the bug, as I changed the way executors are invalidated.\n> \n> Yes, I can't reproduce a crash on this PR.\n\nThe segfault still happens for me with this PR, using the full diff from the first post and these compile commands (even after `make distclean`):\n```\nCC=clang-21 ./configure --enable-experimental-jit --with-pydebug --with-address-sanitizer --without-pymalloc --without-system-libmpdec  && make -j12\n```\n\nSince it shouldn't be happening, it might be some error from my part, but I've double checked everything and it still segfaults (and hits assertion failures with the commented blocks)."
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-18T10:28:59Z",
+   "body": "Maybe we both have tested correctly but our results are different because this PR had been changed much yesterday."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-18T10:31:52Z",
+   "body": "Yes, the FT x JIT PR has changed. So let's ignore that for now. The current fix put up for this issue fixes it for me. Really sorry but can you please double check to see if it fixes it for you?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-18T10:51:06Z",
+   "body": "Confirmed that t does fix the issue on clang. But GCC errors out with:\n```\nmake: *** [Makefile:3302: jit_stencils-x86_64-unknown-linux-gnu.h] Error 1\nmake: *** Waiting for unfinished jobs....\nPython/optimizer.c: In function \u2018_PyJit_translate_single_bytecode_to_trace\u2019:\nPython/optimizer.c:600:11: warning: operand of \u2018?:\u2019 changes signedness from \u2018int\u2019 to \u2018unsigned int\u2019 due to unsignedness of other operand [-Wsign-compare]\n  600 |         ? (int)(target_instr - _Py_INTERPRETER_TRAMPOLINE_INSTRUCTIONS_PTR)\n      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n```"
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-18T11:01:18Z",
+   "body": "It's a known warning of last few days, we want to fix it soon."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-18T11:05:22Z",
+   "body": "Yeah I think it's a warning on old GCC and an outright non-compile on recent ones"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-19T01:05:40Z",
+   "body": "I can no longer reproduce this after https://github.com/python/cpython/commit/e4058d7cb115286c3c53e0a0be2a7b60af46e073\n\nThanks for the bug report!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/141649",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5110,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5110",
+ "title": "`_pypyjson.raw_encode_basestring_ascii` segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-11T11:35:50Z",
+ "closed_at": "2024-11-11T15:55:49Z",
+ "body": "It's possible to segfault PyPy by calling `_pypyjson.raw_encode_basestring_ascii` with an invalid value:\r\n\r\n```python\r\nimport _pypyjson\r\n_pypyjson.raw_encode_basestring_ascii(b'\\xa2\\xf1')\r\nSegmentation fault (core dumped)\r\n```\r\n\r\n```\r\nPython 3.10.14 (39dc8d3c85a7, Aug 27 2024, 14:32:27)\r\n[PyPy 7.3.17 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\n```\r\n\r\nFound using fusil by @vstinner.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-11-11T15:55:49Z",
+   "body": "Fixed in a608a540070, now raises TypeError as it should. Thanks for the report"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

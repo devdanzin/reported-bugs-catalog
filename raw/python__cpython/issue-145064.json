@@ -1,0 +1,90 @@
+{
+ "repo": "python/cpython",
+ "number": 145064,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/145064",
+ "title": "JIT: `co != NULL` assertion failure in `*_Py_uop_frame_new`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2026-02-21T01:10:06Z",
+ "closed_at": "2026-02-22T18:46:11Z",
+ "body": "# Crash report\n\n### What happened?\n\nRunning mypy with the `--strict` flag will sometimes abort a JIT build:\n\n```bash\nmypy --no-incremental --strict -c \"pass\"\npython: Python/optimizer_symbols.c:1318: _Py_UOpsAbstractFrame *_Py_uop_frame_new(JitOptContext *, PyCodeObject *, int, JitOptRef *, int): Assertion `co != NULL' failed.\nAborted\n```\n\nBacktrace:\n```\npython: Python/optimizer_symbols.c:1318: _Py_UOpsAbstractFrame *_Py_uop_frame_new(JitOptContext *, PyCodeObject *, int, JitOptRef *, int): Assertion `co != NULL' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x000055555647cc75 in _Py_uop_frame_new (ctx=ctx@entry=0x7bfff47c28a0, co=<optimized out>, curr_stackentries=curr_stackentries@entry=2, args=args@entry=0x0, arg_len=arg_len@entry=0)\n    at Python/optimizer_symbols.c:1318\n#8  0x000055555645fbbc in optimize_uops (tstate=<optimized out>, trace=<optimized out>, trace_len=<optimized out>, curr_stacklen=<optimized out>, output=<optimized out>,\n    dependencies=<optimized out>) at Python/optimizer_analysis.c:477\n#9  0x000055555645f177 in _Py_uop_analyze_and_optimize (tstate=0x227c2a, buffer=buffer@entry=0x7bfff47e6518, length=6, curr_stacklen=2, output=0x16, output@entry=0x7bfff47ec2d8,\n    dependencies=0x7bfff47c2870) at Python/optimizer_analysis.c:720\n#10 0x000055555644feac in uop_optimize (frame=0x7e8ff6de6278, tstate=0x555556f4a4a0 <_PyRuntime+360512>, progress_needed=false, exec_ptr=<optimized out>) at Python/optimizer.c:1515\n#11 _PyOptimizer_Optimize (frame=frame@entry=0x7e8ff6de6278, tstate=tstate@entry=0x555556f4a4a0 <_PyRuntime+360512>) at Python/optimizer.c:169\n#12 0x0000555555ef57eb in stop_tracing_and_jit (tstate=0x555556f4a4a0 <_PyRuntime+360512>, frame=frame@entry=0x7e8ff6de6278) at Python/ceval.c:1145\n#13 0x0000555555eb07a7 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:11959\n#14 0x0000555555e8d1b8 in _PyEval_EvalFrame (tstate=0x555556f4a4a0 <_PyRuntime+360512>, frame=0x7e8ff6de53c8, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#15 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2132\n#16 0x0000555555e8cbd5 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff6e87340) at Python/ceval.c:680\n#17 0x0000555555e7fe47 in builtin_exec_impl (module=0x7ccff6de6380, source=0x7d2ff6e36a50, globals=0x7c7ff6e87340, locals=0x7c7ff6e87340, closure=0x0) at Python/bltinmodule.c:1249\n#18 builtin_exec (module=<optimized out>, args=0x7bfff5bfe428, nargs=<optimized out>, kwnames=0x0) at Python/clinic/bltinmodule.c.h:674\n#19 0x0000555555c15b5c in cfunction_vectorcall_FASTCALL_KEYWORDS (func=func@entry=0x7c7ff6e35d40, args=args@entry=0x7bfff5bfe428, nargsf=nargsf@entry=9223372036854775810,\n    kwnames=kwnames@entry=0x0) at Objects/methodobject.c:465\n#20 0x0000555555af4b40 in _PyObject_VectorcallTstate (tstate=0x555556f4a4a0 <_PyRuntime+360512>, callable=0x7c7ff6e35d40, args=0x7bfff5bfe428, nargsf=9223372036854775810, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:136\n#21 0x0000555555e8e31d in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=<optimized out>, total_args=2, kwnames=..., call_instrumentation=<optimized out>,\n    frame=<optimized out>, this_instr=<optimized out>, tstate=<optimized out>) at Python/ceval.c:769\n#22 0x0000555555eca2fc in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1817\n#23 0x0000555555e8d1b8 in _PyEval_EvalFrame (tstate=0x555556f4a4a0 <_PyRuntime+360512>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#24 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2132\n#25 0x0000555555af724a in _PyVectorcall_Call (tstate=<optimized out>, func=<optimized out>, callable=<optimized out>, tuple=0x7c7ff6f45d40, kwargs=<optimized out>) at Objects/call.c:273\n#26 0x00005555565608fd in pymain_run_module (modname=0x7c3ff6de1f20 L\"mypy\", set_argv0=<optimized out>) at Modules/main.c:353\n#27 0x000055555655f430 in pymain_run_python (exitcode=0x7bfff5c3ef00) at Modules/main.c:685\n#28 Py_RunMain () at Modules/main.c:772\n```\n\nTruncated output from running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`, the full file is over 150MB:\n\n[mypy_abort_lltrace_opt_debug_truncated.txt](https://github.com/user-attachments/files/25454638/mypy_abort_lltrace_opt_debug_truncated.txt)\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a6+ (heads/main-dirty:645f5c4a737, Feb 14 2026, 17:12:48) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-145078\n* gh-145100\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "aviralgarg05",
+   "created_at": "2026-02-21T11:40:11Z",
+   "body": "I would like to solve this issue, please assign me"
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2026-02-21T11:50:33Z",
+   "body": "We generally do not assign issues here."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-02-21T13:02:17Z",
+   "body": "@cocolato sorry again to bother you, but can you take a look into this please? I think the fix should be not too hard hopefully."
+  },
+  {
+   "author": "cocolato",
+   "created_at": "2026-02-21T14:30:27Z",
+   "body": "> [@cocolato](https://github.com/cocolato) sorry again to bother you, but can you take a look into this please? I think the fix should be not too hard hopefully.\n\nIt\u2018s ok, I'll work on this issue after i reimplement the bloom filters."
+  },
+  {
+   "author": "cocolato",
+   "created_at": "2026-02-21T15:02:19Z",
+   "body": "I found use `PYTHON_JIT=1 PYTHON_JIT_STRESS=1 PYTHON_JIT_SIDE_EXIT_INITIAL_VALUE=1 ./python -m mypy --no-incremental --strict -c \"pass\"` can reproduce this issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "29faba9f945832b6955cff2ae079e1354658f800",
+   "actor": "aviralgarg05"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145078",
+   "commit": null,
+   "actor": "aviralgarg05"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145100",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fd01372d4e509b2cbec708adcf7cdf6f7c1c1298",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c06cdc28f755436db2244089a5cd38cfe76016e1",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7631d20afa9206c513f90574ddf2dd25f9c0350a",
+   "actor": "ljfp"
+  }
+ ]
+}

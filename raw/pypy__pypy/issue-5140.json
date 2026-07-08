@@ -1,0 +1,30 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5140,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5140",
+ "title": "Segfault in `StringIO` after invalid attempt at reinitialization",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-29T13:48:19Z",
+ "closed_at": "2024-11-30T22:26:30Z",
+ "body": "It's possible to segfault PyPy by calling `__init__` with an invalid argument on an existing `StringIO` instance and ignoring the exception raised, then calling `__next__`:\r\n\r\n```python\r\nfrom io import StringIO\r\n\r\nobj = StringIO(\"1\")\r\ntry:\r\n    obj.__init__(\"\", ())\r\nexcept:\r\n    pass\r\nobj.__next__()\r\n```\r\n\r\n`pypy -VV`\r\n```\r\nPython 3.10.14 (a05a1649d335, Nov 29 2024, 04:33:11)\r\n[PyPy 7.3.18-alpha0 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)]\r\n```\r\n\r\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-11-30T22:26:30Z",
+   "body": "This is a bit of a stretch. Why would someone expect things to work correctly when ignoring an error?\r\nThe fix was simple, so I did it in 53634b2341."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

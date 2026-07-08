@@ -1,0 +1,45 @@
+{
+ "repo": "cython/cython",
+ "number": 7594,
+ "type": "pull",
+ "url": "https://github.com/cython/cython/pull/7594",
+ "title": "Fix a couple of cyfunction ref-counting errors",
+ "state": "closed",
+ "state_reason": null,
+ "author": "da-woods",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "defect",
+  "Code Generation"
+ ],
+ "created_at": "2026-03-27T21:07:45Z",
+ "closed_at": "2026-03-28T06:09:28Z",
+ "body": "1. The annotations dict wasn't visited. Normally it's just strings, so this shouldn't matter. However, it is modifiable so it can participate in reference cycles if people try hard.\r\n2. Classobj wasn't freed in the Limited API.\r\n3. Classobj wasn't visited in the Limited API.\r\n\r\n@devdanzin sent me an automated analysis (I think parsing the C code to find potentially suspicious bits and then putting them into AI to try to identify problems, but I could be misrepresenting it) that pointed these out. More fixes to follow based on that...",
+ "comments": [
+  {
+   "author": "scoder",
+   "created_at": "2026-03-28T06:43:02Z",
+   "body": "3.2.x commit is https://github.com/cython/cython/commit/9c9501dcd62f30d58c5a35da6ecaee393030c00d"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "09b1ad783c1bca78257446a5335e0e6abda61f7e",
+   "actor": "scoder"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "scoder"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9c9501dcd62f30d58c5a35da6ecaee393030c00d",
+   "actor": "scoder"
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/enaml",
+ "number": 601,
+ "type": "issue",
+ "url": "https://github.com/nucleic/enaml/issues/601",
+ "title": "set_dynamic_attr: missing return -1 after read-only error + return -1 without exception + DICT_SUBCLASS flag",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:34:30Z",
+ "closed_at": null,
+ "body": "Three `DynamicScope`/`set_dynamic_attr` issues:\n\n### 1. Missing `return -1` after read-only descriptor error (`dynamicscope.cpp:296-306`)\n\nWhen a read-only descriptor is found (has `__get__` but no `__set__`), `PyErr_Format(PyExc_AttributeError, ...)` is called, but the code falls through to the \"step up to parent\" logic instead of returning -1. The error is set but never delivered \u2014 **setting a read-only attribute silently succeeds**.\n\n**Reproducer**:\n```python\nimport gc; gc.disable()\nimport os\nfrom enaml.core._dynamicscope import _DynamicScope\n\nclass ReadOnlyDescr:\n    def __get__(self, obj, objtype=None):\n        return 42\n\nclass Owner:\n    readonly = ReadOnlyDescr()\n\nds = _DynamicScope(Owner(), {}, {}, {})\nds[\"readonly\"] = 99  # Should raise AttributeError, but silently succeeds!\nos._exit(0)\n```\n\n**Fix**: add `return -1;` after the `PyErr_Format` call.\n\n### 2. `return -1` without exception at bottom of `set_dynamic_attr` (`dynamicscope.cpp:308`)\n\nWhen the while loop exits (reached `Py_None` at top of scope chain), the function returns -1 without setting an exception. The callers (`Nonlocals_setattro`, `Nonlocals_setitem`) check `if(res < 0 && !PyErr_Occurred())` and set their own exception, so this doesn't crash \u2014 but it violates the Python/C API contract.\n\n### 3. `Py_TPFLAGS_DICT_SUBCLASS` on `DynamicScope` (`dynamicscope.cpp:869`)\n\n`DynamicScope` sets `Py_TPFLAGS_DICT_SUBCLASS` but is NOT a dict subclass \u2014 it just implements the mapping protocol. Testing shows `PyType_FromSpec` currently strips this flag (so `isinstance(ds, dict)` returns `False`), but the flag should still be removed to avoid confusion and future breakage if `PyType_FromSpec` behavior changes.\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

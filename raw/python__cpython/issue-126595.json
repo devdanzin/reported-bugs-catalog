@@ -1,0 +1,132 @@
+{
+ "repo": "python/cpython",
+ "number": 126595,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126595",
+ "title": "Failed assertion in `itertoolsmodule.c: itertools_count_impl` for `count(sys.maxsize)`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-08T17:25:03Z",
+ "closed_at": "2024-11-12T14:19:09Z",
+ "body": "# Crash report\n\n### What happened?\n\nCalling `itertools.count(sys.maxsize)` aborts with the following message:\n\n```\npython -c \"from sys import maxsize; from itertools import count; count(maxsize)\"\npython: ./Modules/itertoolsmodule.c:3325: itertools_count_impl: Assertion `(cnt != PY_SSIZE_T_MAX && long_cnt == NULL && fast_mode) || (cnt == PY_SSIZE_T_MAX && long_cnt != NULL && !fast_mode)' failed.\nAborted (core dumped)\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ (heads/main:4ea214ea982, Nov  6 2024, 00:52:15) [MSC v.1941 64 bit (AMD64)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126617\n* gh-126739\n* gh-126740\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-08T17:56:29Z",
+   "body": "cc @rhettinger \r\n\r"
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2024-11-09T10:19:23Z",
+   "body": "Note, that on non-debug builds there is no crash:\r\n```pycon\r\nPython 3.13.0rc1+ (heads/3.13:bd29ce8509, Aug 29 2024, 15:30:15) [GCC 12.2.0] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>> from sys import maxsize\r\n>>> from itertools import count\r\n>>> c = count(maxsize)\r\n>>> next(c)\r\n9223372036854775807\r\n>>> next(c)\r\n9223372036854775808\r\n>>> next(c)\r\n9223372036854775809\r\n```\r\nSo, I don't think this should be backported.\r\n\r\nOn another hand, we have an issue with repl.  Continuing the above example:\r\n```pycon\r\n>>> count(maxsize)\r\ncount(<NULL>)\r\n```\r\nThis seems to be fixed by pr."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-09T10:37:57Z",
+   "body": "> Note, that on non-debug builds there is no crash:\r\n\r\nI think we should still backport fixes for non-debug builds because people might want to use debug builds for themselves."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-09T11:42:23Z",
+   "body": "> ```\r\n> >>> count(maxsize)\r\n> count(<NULL>)\r\n> ```\r\n\r\nNice find! If we take it further, another assertion fails:\r\n```python\r\nPython 3.14.0a1+ experimental free-threading build (heads/main:6293d00, Nov  9 2024, 07:56:06) [GCC 13.2.0] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>> from sys import maxsize; from itertools import count\r\n>>> c = count(maxsize - 2)\r\n>>> for x in c:\r\n...     print(c, x)\r\n... \r\ncount(9223372036854775806) 9223372036854775805\r\npython: Objects/unicodeobject.c:3046: unicode_fromformat_arg: Assertion `obj' failed.\r\nAborted (core dumped)\r\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-09T12:29:23Z",
+   "body": "Ah the PR does not fix this second assertion on unicode objects. I'll work a bit more. Thanks for finding it."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-09T13:08:36Z",
+   "body": "Update: I found the issue. When the counter reaches `PY_SSIZE_T_MAX`, it does *not* set its `long_cnt` field. In particular, if you call `repr()` just after, the field will still be NULL (it's set by `next` only). I'm preparing the fix."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-12T14:19:09Z",
+   "body": "Closing since completed and backported. Thank you all."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126617",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126618",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6e3bb8a91380ba98d704f2dca8e98923c0abc8a8",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8e596cb9d3bac341e7268ae5e73ed37a624e1fab",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126739",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126740",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "46710ca5f263936a2e36fa5d0f140cf9f50b2618",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "865f096f51bb7290eb10b33b330f387d245c2472",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c0b89e2320feab985eb563cb866b16eb416203a8",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8418d6639170a5d5d3ab6575d97342f180a9f77b",
+   "actor": "ebonnal"
+  }
+ ]
+}

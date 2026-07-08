@@ -1,0 +1,56 @@
+{
+ "repo": "aio-libs/multidict",
+ "number": 1306,
+ "type": "issue",
+ "url": "https://github.com/aio-libs/multidict/issues/1306",
+ "title": "multidict C Extension Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "bug",
+  "reproducer: present"
+ ],
+ "created_at": "2026-03-24T09:40:44Z",
+ "closed_at": null,
+ "body": "I ran a [code analysis tool](https://github.com/devdanzin/cext-review-toolkit) I'm developing on multidict and it generated an interesting report: https://gist.github.com/devdanzin/a36588ae7e2b73f0d85f8a925fb13b3d. It contains issue descriptions, suggested fixes, and reproducers for some of the issues.\n\nFrom the summary:\n\n> The most critical finding is a **double-free/use-after-free in `md_contains`** and a **crash from swapped format string arguments** in `_err_cannot_fetch`. The iterator and view types are also missing the heap type lifecycle management (`Py_VISIT(Py_TYPE(self))`) that the main dict types correctly implement.\n\nI hope it helps.",
+ "comments": [
+  {
+   "author": "Vizonex",
+   "created_at": "2026-03-24T15:13:02Z",
+   "body": "Interesting report I've labeled this issue as something that can be worked with because there is a reproducer that is in fact present."
+  },
+  {
+   "author": "Vizonex",
+   "created_at": "2026-03-28T17:55:51Z",
+   "body": "I figured out that `_err_cannot_fetch` is in fact crashable so I will be looking into a fix soon. "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/aio-libs/multidict/pull/1310",
+   "commit": null,
+   "actor": "Vizonex"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/aio-libs/multidict/pull/1311",
+   "commit": null,
+   "actor": "Vizonex"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/aio-libs/multidict/pull/1317",
+   "commit": null,
+   "actor": "Vizonex"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "edb61e87d3b6068fe082dc53773e7adad893540f",
+   "actor": "bdraco"
+  }
+ ]
+}

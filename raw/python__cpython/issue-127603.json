@@ -1,0 +1,51 @@
+{
+ "repo": "python/cpython",
+ "number": 127603,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127603",
+ "title": "Abort from `GenericAlias.__sizeof__`: `ob->ob_type != &PyLong_Type`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.12"
+ ],
+ "created_at": "2024-12-04T14:24:46Z",
+ "closed_at": "2024-12-11T11:23:51Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort the interpreter in 3.12 by calling `__sizeof__` of a `GenericAlias` instance:\n\n```python\nfrom types import GenericAlias\n\ng = GenericAlias(BaseException, Exception)\ng.__sizeof__(1)\n```\nAbort message:\n```\npython: ./Include/object.h:231: Py_SIZE: Assertion `ob->ob_type != &PyLong_Type' failed.\nAborted\n```\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.12\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.12.8+ (heads/3.12:8e3c2d2, Dec  4 2024, 10:58:33) [GCC 11.4.0]",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-04T14:55:09Z",
+   "body": "I created https://github.com/python/cpython/pull/127605 backport to fix the issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-11T11:23:51Z",
+   "body": "Fixed by commit https://github.com/python/cpython/commit/0964f9f1847bcbe90345eeafd65813d06db4ba3b. Thanks for your bug report."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/117220",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127605",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ]
+}

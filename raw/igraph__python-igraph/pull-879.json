@@ -1,0 +1,30 @@
+{
+ "repo": "igraph/python-igraph",
+ "number": 879,
+ "type": "pull",
+ "url": "https://github.com/igraph/python-igraph/pull/879",
+ "title": "fix: correct error handling in some OOM cases",
+ "state": "closed",
+ "state_reason": null,
+ "author": "szhorvat",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-31T22:57:52Z",
+ "closed_at": "2026-04-01T18:29:11Z",
+ "body": null,
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "89303ec9df0ed83d056b4087f11b5e14c39e2385",
+   "actor": "ntamas"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ntamas"
+  }
+ ]
+}

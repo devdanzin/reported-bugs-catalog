@@ -1,0 +1,105 @@
+{
+ "repo": "python/cpython",
+ "number": 127165,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127165",
+ "title": "Segfault in invalid `concurrent.futures.interpreter.WorkerContext`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-subinterpreters",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-22T16:43:05Z",
+ "closed_at": "2024-12-01T06:33:46Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter by calling `initialize()` on a `concurrent.futures.interpreter.WorkerContext` instance that was created with the `shared` argument being a dict containing the null byte as a key:\n\n```python\npython -c \"import concurrent.futures.interpreter; w = concurrent.futures.interpreter.WorkerContext(0, {'\\x00': ''}).initialize()\"\n```\n\nThis doesn't require threads or free-threading. It can be traced to the `_interpreters` module:\n```python\nimport _interpreters\n_interpreters.create()\n_interpreters.set___main___attrs(1, {\"\\x00\": 1}, restrict=True)\nSegmentation fault (core dumped)\n```\n\nThe backtrace is:\n```gdb\n#0  Py_INCREF (op=op@entry=0x0) at ./Include/refcount.h:241\n#1  0x00005555557e6aa7 in _Py_NewRef (obj=0x0) at ./Include/refcount.h:492\n#2  _sharednsitem_apply (item=0x555555cd55e0, ns=ns@entry=0x200028329b0, dflt=dflt@entry=0x0) at Python/crossinterp.c:1224\n#3  0x00005555557e7d14 in _PyXI_ApplyNamespace (ns=ns@entry=0x555555cd55b0, nsobj=nsobj@entry=0x200028329b0, dflt=dflt@entry=0x0) at Python/crossinterp.c:1523\n#4  0x00005555557e7ec8 in _PyXI_Enter (session=session@entry=0x7fffffffe040, interp=interp@entry=0x7ffff7bb8020, nsupdates=<optimized out>)\n    at Python/crossinterp.c:1754\n#5  0x00007ffff7e1fafd in interp_set___main___attrs (self=self@entry=0x20000966980, args=args@entry=0x20000943850, kwargs=kwargs@entry=0x20000736eb0)\n    at ./Modules/_interpretersmodule.c:836\n#6  0x00005555556c1565 in cfunction_call (func=func@entry=0x20000966830, args=args@entry=0x20000943850, kwargs=kwargs@entry=0x20000736eb0)\n    at Objects/methodobject.c:551\n#7  0x000055555566987f in _PyObject_MakeTpCall (tstate=tstate@entry=0x555555c39510 <_PyRuntime+360208>, callable=callable@entry=0x20000966830, \n    args=args@entry=0x7fffffffe3c8, nargs=<optimized out>, keywords=keywords@entry=0x2000057e700) at Objects/call.c:242\n#8  0x0000555555669ada in _PyObject_VectorcallTstate (tstate=0x555555c39510 <_PyRuntime+360208>, callable=callable@entry=0x20000966830, \n    args=args@entry=0x7fffffffe3c8, nargsf=<optimized out>, kwnames=kwnames@entry=0x2000057e700) at ./Include/internal/pycore_call.h:165\n#9  0x0000555555669b30 in PyObject_Vectorcall (callable=callable@entry=0x20000966830, args=args@entry=0x7fffffffe3c8, nargsf=<optimized out>, \n    kwnames=kwnames@entry=0x2000057e700) at Objects/call.c:327\n#10 0x00005555557adebb in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x7ffff7e6a0a0, throwflag=<optimized out>) at Python/generated_cases.c.h:1982\n#11 0x00005555557c755c in _PyEval_EvalFrame (tstate=tstate@entry=0x555555c39510 <_PyRuntime+360208>, frame=<optimized out>, throwflag=throwflag@entry=0)\n    at ./Include/internal/pycore_ceval.h:116\n#12 0x00005555557c766a in _PyEval_Vector (tstate=tstate@entry=0x555555c39510 <_PyRuntime+360208>, func=func@entry=0x200007b3490, locals=locals@entry=0x20000737870, \n    args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1898\n#13 0x00005555557c7739 in PyEval_EvalCode (co=co@entry=0x200003a3f10, globals=globals@entry=0x20000737870, locals=locals@entry=0x20000737870) at Python/ceval.c:659\n#14 0x000055555588bac3 in run_eval_code_obj (tstate=tstate@entry=0x555555c39510 <_PyRuntime+360208>, co=co@entry=0x200003a3f10, globals=globals@entry=0x20000737870, \n    locals=locals@entry=0x20000737870) at Python/pythonrun.c:1338\n#15 0x000055555588bca3 in run_mod (mod=mod@entry=0x200007e42b0, filename=filename@entry=0x20000a462f0, globals=globals@entry=0x20000737870, \n    locals=locals@entry=0x20000737870, flags=flags@entry=0x7fffffffe720, arena=arena@entry=0x200000508b0, interactive_src=0x200002338f0, generate_new_source=0)\n    at Python/pythonrun.c:1423\n#16 0x000055555588c6ad in _PyRun_StringFlagsWithName (\n    str=str@entry=0x200002341e0 \"import concurrent.futures.interpreter; w = concurrent.futures.interpreter.WorkerContext(0, {'\\\\x00': ''}).initialize()\\n\", \n    name=name@entry=0x20000a462f0, start=start@entry=257, globals=globals@entry=0x20000737870, locals=locals@entry=0x20000737870, flags=flags@entry=0x7fffffffe720, \n    generate_new_source=0) at Python/pythonrun.c:1222\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n\n### CPython versions tested on:\n\n3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a2+ (heads/main:0af4ec3, Nov 20 2024, 21:45:19) [GCC 13.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-127199\n* gh-127463\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-22T16:53:53Z",
+   "body": "I'm assuming this is because of a missing `NULL` check on `PyUnicode_AsUTF8` again. Should be a pretty easy fix, I'll deal with it if nobody else submits a PR."
+  },
+  {
+   "author": "rruuaanng",
+   "created_at": "2024-11-23T13:10:06Z",
+   "body": "> I'm assuming this is because of a missing `NULL` check on `PyUnicode_AsUTF8` again. Should be a pretty easy fix, I'll deal with it if nobody else submits a PR.\r\n\r\nIf you can, give it to me :)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-23T15:22:25Z",
+   "body": "Apparently, this is because `PyUnicode_AsUTF8` doesn't do anything about embedded null characters, so some things in the dictionary lookups break down when converting from C to Python strings."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-28T17:00:37Z",
+   "body": "> Apparently, this is because PyUnicode_AsUTF8 doesn't do anything about embedded null characters\r\n\r\nThere is a private _PyUnicode_AsUTF8NoNUL() function which rejects null characters."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127199",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "46bfd26fb294a8769ef6d0c056ee6c9df022a037",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5718d544537b6c8cef4a8171d143a51cee21907c",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127463",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2813a6167560a8d649465249f27ff1c134151387",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7321eff182309b3742e8f30a98838fb97bfc6455",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1aa1f2f6205286102b53dcc342793221d0a80550",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "80a773517acf05502527e2304dac78c9ec14bcea",
+   "actor": "ebonnal"
+  }
+ ]
+}

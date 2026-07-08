@@ -1,0 +1,79 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2843,
+ "type": "pull",
+ "url": "https://github.com/h5py/h5py/pull/2843",
+ "title": "BUG: add missing nullptr checks following malloc calls",
+ "state": "closed",
+ "state_reason": null,
+ "author": "neutrinoceros",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "bug"
+ ],
+ "created_at": "2026-03-25T15:06:53Z",
+ "closed_at": "2026-03-28T11:22:25Z",
+ "body": "close #2833\r\nclose #2832\r\npartially address #2831",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T15:12:56Z",
+   "body": "ping @devdanzin for review"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-25T15:19:33Z",
+   "body": "LGTM"
+  },
+  {
+   "author": "codecov[bot]",
+   "created_at": "2026-03-25T15:34:22Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/h5py/h5py/pull/2843?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py) Report\n:white_check_mark: All modified and coverable lines are covered by tests.\n:white_check_mark: Project coverage is 90.39%. Comparing base ([`1a695ea`](https://app.codecov.io/gh/h5py/h5py/commit/1a695ea2dec904c332e708b81081f32bd0098c80?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)) to head ([`cf3108d`](https://app.codecov.io/gh/h5py/h5py/commit/cf3108d86477967e00dfd3c142c53279a5425c6c?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)).\n:warning: Report is 73 commits behind head on master.\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@           Coverage Diff           @@\n##           master    #2843   +/-   ##\n=======================================\n  Coverage   90.39%   90.39%           \n=======================================\n  Files          16       16           \n  Lines        2509     2509           \n=======================================\n  Hits         2268     2268           \n  Misses        241      241           \n```\n</details>\n\n[:umbrella: View full report in Codecov by Harness](https://app.codecov.io/gh/h5py/h5py/pull/2843?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-27T16:42:19Z",
+   "body": "Can we use our `emalloc` wrapper function for these?"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-27T16:45:49Z",
+   "body": "I tried, but hit compilation errors. Since the pattern of checking explicitly for `NULL` was already used elsewhere I figured I would take the path of least resistance."
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-27T17:15:41Z",
+   "body": "I'd be curious about what exactly those errors were. I'd guess there are other places where it's not used just because they predate the utility function & were never cleaned up, or were added by people unaware of it."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-28T08:58:30Z",
+   "body": "Thanks for asking. Trying to document my answer lead me to untangle my own confusion. I think the mistake I made in my previous attempt was to use a Python `import` instead of `cimport` for the wrapper, for which my compiler produced less than helpful error messages, but trying again it looks like it actually works."
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-28T11:22:17Z",
+   "body": "Looks good, thanks. Yup, we'll need `cimport` to use `cdef` Cython functions - these are compiled to C functions without a Python wrapper."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2831",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e9abe034a209b4c57b76d6eb780cde9542776e8e",
+   "actor": "takluyver"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "takluyver"
+  }
+ ]
+}

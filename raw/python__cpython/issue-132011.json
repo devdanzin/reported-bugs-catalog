@@ -1,0 +1,69 @@
+{
+ "repo": "python/cpython",
+ "number": 132011,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132011",
+ "title": "Failed assertion in `_PyEval_EvalFrameDefault`: `self_o != NULL`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2025-04-02T12:43:40Z",
+ "closed_at": "2025-04-06T18:53:12Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to make the interpreter exit with a failed assertion by running the following code:\n\n```python\nimport difflib\n\nobj = difflib.HtmlDiff(None, None, None, None,)\n\ntry:\n    for x in range(3):\n        obj._split_line([], None, None)\nexcept:\n    pass\n\nobj._split_line(list, None, None)\n```\n\nBacktrace:\n```gdb\npython: Python/generated_cases.c.h:3345: _PyEval_EvalFrameDefault: Assertion `self_o != NULL' failed.\n\nProgram received signal SIGABRT, Aborted.\n__pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:44\n44      ./nptl/pthread_kill.c: No such file or directory.\n(gdb) bt\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140737350580032, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7ce0476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc67f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7cc671b in __assert_fail_base (fmt=0x7ffff7e7b130 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\n    assertion=0x555555a43bc6 \"self_o != NULL\", file=0x555555a43993 \"Python/generated_cases.c.h\", line=3345,\n    function=<optimized out>) at ./assert/assert.c:94\n#6  0x00007ffff7cd7e96 in __GI___assert_fail (assertion=assertion@entry=0x555555a43bc6 \"self_o != NULL\",\n    file=file@entry=0x555555a43993 \"Python/generated_cases.c.h\", line=line@entry=3345,\n    function=function@entry=0x555555a44980 <__PRETTY_FUNCTION__.81> \"_PyEval_EvalFrameDefault\") at ./assert/assert.c:103\n#7  0x0000555555837189 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555c6b558 <_PyRuntime+330424>, frame=0x7ffff7fb00a0,\n    frame@entry=0x7ffff7fb0020, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:3345\n#8  0x000055555585db58 in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020, tstate=0x555555c6b558 <_PyRuntime+330424>)\n    at ./Include/internal/pycore_ceval.h:119\n#9  _PyEval_Vector (tstate=tstate@entry=0x555555c6b558 <_PyRuntime+330424>, func=func@entry=0x7ffff7a8db50,\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/difflib-abort-assertion/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/difflib-abort-assertion/source2.py', '__cached__': None, 'difflib': <module at remote 0x7ffff7acc110>, 'obj': <HtmlDiff(_charjunk=None, _linejunk=None, _tabsize=None, _wrapcolumn=None) at remote 0x7ffff7a7be40>, 'x': 2}, args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1908\n#10 0x000055555585dc57 in PyEval_EvalCode (co=co@entry=<code at remote 0x7ffff7bce400>,\n    globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/difflib-abort-assertion/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/difflib-abort-assertion/source2.py', '__cached__': None, 'difflib': <module at remote 0x7ffff7acc110>, 'obj': <HtmlDiff(_charjunk=None, _linejunk=None, _tabsize=None, _wrapcolumn=None) at remote 0x7ffff7a7be40>, 'x': 2},\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/difflib-abort-assertion/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/difflib-abort-assertion/source2.py', '__cached__': None, 'difflib': <module at remote 0x7ffff7acc110>, 'obj': <HtmlDiff(_charjunk=None, _linejunk=None, _tabsize=None, _wrapcolumn=None) at remote 0x7ffff7a7be40>, 'x': 2}) at Python/ceval.c:836\n#11 0x00005555558eb82e in run_eval_code_obj (tstate=tstate@entry=0x555555c6b558 <_PyRuntime+330424>, co=co@entry=0x7ffff7bce400,\n    globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/difflib-abort-assertion/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/difflib-abort-assertion/source2.py', '__cached__': None, 'difflib': <module at remote 0x7ffff7acc110>, 'obj': <HtmlDiff(_charjunk=None, _linejunk=None, _tabsize=None, _wrapcolumn=None) at remote 0x7ffff7a7be40>, 'x': 2},\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <SourceFileLoader(name='__main__', path='/home/fusil/runs/python-12/difflib-abort-assertion/source2.py') at remote 0x7ffff7a95b90>, '__spec__': None, '__builtins__': <module at remote 0x7ffff7befef0>, '__file__': '/home/fusil/runs/python-12/difflib-abort-assertion/source2.py', '__cached__': None, 'difflib': <module at remote 0x7ffff7acc110>, 'obj': <HtmlDiff(_charjunk=None, _linejunk=None, _tabsize=None, _wrapcolumn=None) at remote 0x7ffff7a7be40>, 'x': 2}) at Python/pythonrun.c:1365\n```\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a6+ (heads/main:3a8cefba0b6, Apr  1 2025, 21:31:55) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132018\n* gh-132161\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-02T12:58:22Z",
+   "body": "Here's a simplified test case that can be used in a PR:\n```python\nl = []\n\ndef lappend(l, x, y):\n    l.append((x, y))\n\ntry:\n    for x in range(3):\n        lappend(l, None, None)\nexcept:\n    pass\n\nlappend(list, None, None)\n```"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3f4db453c2f65807f51da33d65702a7d4290cd44",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132018",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c0661df42ad20e488dbfa3e0fec22462833fc3d6",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f8134e4191d2ef43e12279f168d0aa0f54ff09bf",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132161",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5fb9fe0e3e3f71b9a5197b19e8f6068c059d341c",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ]
+}

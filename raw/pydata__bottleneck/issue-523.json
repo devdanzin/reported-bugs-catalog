@@ -1,0 +1,42 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 523,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/523",
+ "title": "rankdata/nanrankdata: unchecked PyArray_ArgSort and PyArray_EMPTY \u2014 NULL dereference",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:34:46Z",
+ "closed_at": "2026-03-31T07:43:47Z",
+ "body": "Both `rankdata` and `nanrankdata` call `PyArray_ArgSort` and `PyArray_EMPTY` in sequence without checking either for NULL. If either allocation fails, the result is passed to `init_iter3` which immediately dereferences it via `PyArray_STRIDES()` \u2014 segfault. If `PyArray_ArgSort` succeeds but `PyArray_EMPTY` fails, `z` also leaks.\n\n**File(s):** `nonreduce_axis_template.c:204-209` (rankdata), `nonreduce_axis_template.c:266-271` (nanrankdata)\n\n**Suggested fix:**\n\n```c\n// Before:\nPyObject *z = PyArray_ArgSort(a, axis, NPY_QUICKSORT);\nPyObject *y = PyArray_EMPTY(PyArray_NDIM(a), PyArray_SHAPE(a), NPY_DTYPE1, 0);\niter3 it;\ninit_iter3(&it, a, y, z, axis);\n\n// After:\nPyObject *z = PyArray_ArgSort(a, axis, NPY_QUICKSORT);\nif (z == NULL) return NULL;\nPyObject *y = PyArray_EMPTY(PyArray_NDIM(a), PyArray_SHAPE(a), NPY_DTYPE1, 0);\nif (y == NULL) {\n    Py_DECREF(z);\n    return NULL;\n}\niter3 it;\ninit_iter3(&it, a, y, z, axis);\n```\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-30T16:23:02Z",
+   "body": "I confirm that both `PyArray_ArgSort` and `PyArray_EMPTY` can return nullptr, with confirms the defect.\nFurthermore, this seems like the correct fix to me."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/536",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

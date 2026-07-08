@@ -1,0 +1,30 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5122,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5122",
+ "title": "`_curses._mk_acs` with invalid `ichar` segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-15T14:36:23Z",
+ "closed_at": "2024-11-16T19:55:20Z",
+ "body": "It's possible to make PyPy segfault by calling `_curses._mk_acs(\"\", \"\\U0010ffff\")`:\r\n\r\n```python\r\nPython 3.10.14 (6b367d9e6715, Nov 14 2024, 04:48:15)\r\n[PyPy 7.3.18-alpha0 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\nAnd now for something completely different: ``All problems in computer science\r\ncan be solved by another level of indirection. --Butler Lampson''\r\n>>>> import _curses\r\n>>>> _curses._mk_acs(\"\", \"\\U0010ffff\")\r\nSegmentation fault (core dumped)\r\n```\r\n\r\nFound using fusil by @vstinner.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-11-16T19:55:15Z",
+   "body": "fixed in 5cccf8d934d by hiding the helper function better. It is not meant to be exposed to end users."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

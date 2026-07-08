@@ -1,0 +1,108 @@
+{
+ "repo": "python/cpython",
+ "number": 126461,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126461",
+ "title": "Calling `_pickle.load` with a `MagicMock` results in `SystemError`/aborts",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-05T23:56:36Z",
+ "closed_at": "2024-11-06T13:25:46Z",
+ "body": "# Crash report\n\n### What happened?\n\nCalling `_pickle.load(MagicMock())` with a results in an abort in debug builds and a `SystemError` in non-debug.\n\nIn debug builds:\n```python\npython -c \"from unittest.mock import MagicMock as MM; from _pickle import load;\n load(MM())\"\npython: Objects/typeobject.c:5583: _PyType_LookupRef: Assertion `!PyErr_Occurred()' failed.\nAborted\n```\n\n\nIn non-debug builds:\n```python\npython -c \"from unittest.mock import MagicMock as MM; from _pickle import load; load(MM())\"\nTypeError: a bytes-like object is required, not 'MagicMock'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    from unittest.mock import MagicMock as MM; from _pickle import load; load(MM())\n                                                                         ~~~~^^^^^^\n  File \"/home/danzin/projects/cpython/Lib/unittest/mock.py\", line 1168, in __call__\n    self._mock_check_sig(*args, **kwargs)\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\nSystemError: <function CallableMixin._mock_check_sig at 0x7feb149cf8a0> returned a result with an exception set\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main-dirty:bfc1d2504c, Nov  4 2024, 07:55:58) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126485\n* gh-126495\n* gh-126496\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T13:25:46Z",
+   "body": "Fixed. Thanks for your bug report."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "88d25750ede5983f6244ff9d2eba25105f43186a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126485",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a1c57bcfd2bcbc55ff858407e09c1d8d8cee44e6",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "01fa8b936ce679a0a855080e1f0a9aa9915741ae",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "01571bfa74f2d60ddfc0308f506efaec7dae3eda",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126495",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126496",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "97ab3cf3749085f6f42f38180c40aa88ca1b6355",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "83827ad81972e8e6438a29274dbdcb923d7b1cc4",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "92bb0899bbbc793ace5ca91b238a947ee7950788",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "74dc089b29a4057d02ec3359c935db0c7b31a8ec",
+   "actor": "ebonnal"
+  }
+ ]
+}

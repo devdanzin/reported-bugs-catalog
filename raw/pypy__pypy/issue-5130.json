@@ -1,0 +1,30 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5130,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5130",
+ "title": "`_pickle_support.builtin_code` segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-21T16:54:46Z",
+ "closed_at": "2024-11-21T21:36:55Z",
+ "body": "It's possible to segfault PyPy by calling `_pickle_support.builtin_code`:\r\n\r\n```python\r\nPython 3.10.14 (6b367d9e6715, Nov 14 2024, 04:48:15)\r\n[PyPy 7.3.18-alpha0 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\n>>>> import _pickle_support\r\n>>>> _pickle_support.builtin_code(\"\")\r\nSegmentation fault (core dumped)\r\n```\r\nFound using [fusil ](https://github.com/devdanzin/fusil) by @vstinner.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-11-21T21:36:53Z",
+   "body": "Thanks. Fixed in b928ea00cb5"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

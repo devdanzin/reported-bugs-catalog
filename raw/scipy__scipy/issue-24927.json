@@ -1,0 +1,50 @@
+{
+ "repo": "scipy/scipy",
+ "number": 24927,
+ "type": "issue",
+ "url": "https://github.com/scipy/scipy/issues/24927",
+ "title": "BUG: umbrella issue for SciPy C Extension Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "defect"
+ ],
+ "created_at": "2026-03-28T19:11:29Z",
+ "closed_at": null,
+ "body": "### Describe your issue.\n\nRunning [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit) on SciPy resulted in a report with some crashers, leaks, and incorrectness issues:\n\n\n> 1. **Unchecked allocations causing crashes** \u2014 15+ distinct NULL dereference paths from unchecked `PyTuple_New`, `PyDict_New`, `malloc`, and `PyArray_SimpleNew` across DVODE, DIRECT, SuperLU, ODR, and _uarray. These are reachable on any OOM condition.\n> \n> 2. **Reference counting bugs** \u2014 Leaked `py_SpecialFunctionWarning` on every call to `sf_error_v` (high-frequency ufunc path), leaked temporaries in `_fitpackmodule.c`, and a key/value swap in `SuperLUGlobal_dealloc` that prevents memory cleanup.\n> \n> 3. **Complex number construction bug (`real + imag * I`)** \u2014 The same bug fixed in `_complexstuff.h` persists in 4 other locations (ARNAUD/ARPACK, PROPACK, ZVODE, linalg headers), corrupting real parts when imaginary components are NaN.\n> \n> Additionally, one critical GIL violation was found: `Py_XDECREF` after `PyGILState_Release` in `unuran_callback.h`, and a completely uninitialized exception object in `_arpackmodule.c` that makes all ARPACK error paths produce `SystemError`.\n\nThe full report is at https://gist.github.com/devdanzin/7ec1e87568d3ad9036ec9b24e32d5875#scipy-c-extension-analysis-report\n\n### Reproducing Code Example\n\n\nReproducers for 7 of the found bugs are at https://gist.github.com/devdanzin/7ec1e87568d3ad9036ec9b24e32d5875#scipy-analysis-report--reproducer-appendix\n\n\n### Error message\n\n```shell\n# Too many to list\n```\n\n### SciPy/NumPy/Python version and system information\n\n```shell\n1.17.1 2.4.3 sys.version_info(major=3, minor=14, micro=3, releaselevel='final', serial=0)\n/home/danzin/.local/lib/python3.14/site-packages/scipy/__config__.py:166: UserWarning: Install `pyyaml` for better output\n  warnings.warn(\"Install `pyyaml` for better output\", stacklevel=1)\n{\n  \"Compilers\": {\n    \"c\": {\n      \"name\": \"gcc\",\n      \"linker\": \"ld.bfd\",\n      \"version\": \"14.2.1\",\n      \"commands\": \"cc\"\n    },\n    \"cython\": {\n      \"name\": \"cython\",\n      \"linker\": \"cython\",\n      \"version\": \"3.2.4\",\n      \"commands\": \"cython\"\n    },\n    \"c++\": {\n      \"name\": \"gcc\",\n      \"linker\": \"ld.bfd\",\n      \"version\": \"14.2.1\",\n      \"commands\": \"c++\"\n    },\n    \"fortran\": {\n      \"name\": \"gcc\",\n      \"linker\": \"ld.bfd\",\n      \"version\": \"14.2.1\",\n      \"commands\": \"gfortran\"\n    },\n    \"pythran\": {\n      \"version\": \"0.18.1\",\n      \"include directory\": \"../../tmp/build-env-9ogizriy/lib/python3.14/site-packages/pythran\"\n    }\n  },\n  \"Machine Information\": {\n    \"host\": {\n      \"cpu\": \"x86_64\",\n      \"family\": \"x86_64\",\n      \"endian\": \"little\",\n      \"system\": \"linux\"\n    },\n    \"build\": {\n      \"cpu\": \"x86_64\",\n      \"family\": \"x86_64\",\n      \"endian\": \"little\",\n      \"system\": \"linux\"\n    },\n    \"cross-compiled\": false\n  },\n  \"Build Dependencies\": {\n    \"blas\": {\n      \"name\": \"scipy-openblas\",\n      \"found\": true,\n      \"version\": \"0.3.30\",\n      \"detection method\": \"pkgconfig\",\n      \"include directory\": \"/opt/_internal/cpython-3.14.0rc1/lib/python3.14/site-packages/scipy_openblas32/include\",\n      \"lib directory\": \"/opt/_internal/cpython-3.14.0rc1/lib/python3.14/site-packages/scipy_openblas32/lib\",\n      \"openblas configuration\": \"OpenBLAS 0.3.30 DYNAMIC_ARCH NO_AFFINITY Haswell MAX_THREADS=64\",\n      \"pc file directory\": \"/project/\",\n      \"has ilp64\": false\n    },\n    \"lapack\": {\n      \"name\": \"scipy-openblas\",\n      \"found\": true,\n      \"version\": \"0.3.30\",\n      \"detection method\": \"pkgconfig\",\n      \"include directory\": \"/opt/_internal/cpython-3.14.0rc1/lib/python3.14/site-packages/scipy_openblas32/include\",\n      \"lib directory\": \"/opt/_internal/cpython-3.14.0rc1/lib/python3.14/site-packages/scipy_openblas32/lib\",\n      \"openblas configuration\": \"OpenBLAS 0.3.30 DYNAMIC_ARCH NO_AFFINITY Haswell MAX_THREADS=64\",\n      \"pc file directory\": \"/project/\",\n      \"has ilp64\": false\n    },\n    \"pybind11\": {\n      \"name\": \"pybind11\",\n      \"version\": \"3.0.2\",\n      \"detection method\": \"config-tool\",\n      \"include directory\": \"unknown\"\n    }\n  },\n  \"Python Information\": {\n    \"path\": \"/tmp/build-env-9ogizriy/bin/python\",\n    \"version\": \"3.14\"\n  }\n}\n```",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24929",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24928",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24931",
+   "commit": null,
+   "actor": "ssam18"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24935",
+   "commit": null,
+   "actor": "ssam18"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24752",
+   "commit": null,
+   "actor": "nickodell"
+  }
+ ]
+}

@@ -1,0 +1,225 @@
+{
+ "repo": "python/cpython",
+ "number": 146090,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146090",
+ "title": "Assertion failure in `free_callback_context` via `create_collation` and missing `PyErr_NoMemory` in `create_callback_context`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-sqlite3",
+  "3.13",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2026-03-17T21:29:17Z",
+ "closed_at": "2026-03-29T12:21:39Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe interpreter will abort when running the following MRE.\n\n### Automated diagnosis:\n\nBug 1: When `sqlite3_create_collation_v2()` fails with `SQLITE_BUSY`, error cleanup at line 2201 calls `free_callback_context(ctx)` directly. But `ctx` has `refcount=1` (set at creation, line 1064). `free_callback_context` asserts `ctx->refcount == 0` (line 1076) -> crash in debug builds.\n\nFix: Use `decref_callback_context(ctx)` instead of `free_callback_context(ctx)`.\nFile: `Modules/_sqlite/connection.c`, line 2201\n\nBug 2:  `create_callback_context` returns `NULL` without exception when `PyMem_Malloc` fails. All 7 callers propagate `NULL` \u2192 `SystemError`.\n\nFix: Add if (ctx == NULL) { return (callback_context *)PyErr_NoMemory(); }.\nFile: `Modules/_sqlite/connection.c`, line 1061\n\n[Full report](https://gist.github.com/devdanzin/69aff7ff2d64ce8c7c21622f7f36e84c) (contains both bugs)\n\nMRE 1:\n```python\nimport sqlite3\n\nconn = sqlite3.connect(\":memory:\")\nconn.create_collation(\"mycoll\", lambda a, b: (a > b) - (a < b))\nconn.execute(\"CREATE TABLE t(x TEXT)\")\nfor i in range(100):\n    conn.execute(\"INSERT INTO t VALUES (?)\", (f\"item_{i:03d}\",))\nconn.commit()\n\ncursor = conn.execute(\"SELECT x FROM t ORDER BY x COLLATE mycoll\")\nnext(cursor)\n\n# Replace the collation while the statement is active -> SQLITE_BUSY\n# -> free_callback_context(ctx) with refcount=1 -> assertion failure\ntry:\n    conn.create_collation(\"mycoll\", lambda a, b: 0)\nexcept sqlite3.OperationalError:\n    pass  # We never get here in debug builds \u2014 assertion fires first\n```\n\nMRE 2:\n```python\nimport sqlite3, _testcapi\n\nconn = sqlite3.connect(\":memory:\")\n_testcapi.set_nomemory(1, 0)\ntry:\n    conn.set_trace_callback(lambda s: None)\nexcept (MemoryError, SystemError):\n    pass\nfinally:\n    _testcapi.remove_mem_hooks()\n```\n\n\nBacktrace 1:\n```\npython: ./Modules/_sqlite/connection.c:1076: void free_callback_context(callback_context *): Assertion `ctx->refcount == 0' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x00007ffff72e678f in free_callback_context (ctx=ctx@entry=0x7ffff74af940) at ./Modules/_sqlite/connection.c:1076\n#8  0x00007ffff72e765b in pysqlite_connection_create_collation_impl (self=0x7ffff75b6450, cls=0x555555f5ec50, name=0x7ffff74e6688 \"mycoll\", callable=0x7ffff74f0a10)\n    at ./Modules/_sqlite/connection.c:2201\n#9  pysqlite_connection_create_collation (self=0x7ffff75b6450, cls=0x555555f5ec50, args=0x7fffffffb5e0, nargs=nargs@entry=2, kwnames=0x0) at ./Modules/_sqlite/clinic/connection.c.h:1289\n#10 0x00005555556b6e0b in method_vectorcall_FASTCALL_KEYWORDS_METHOD (func=func@entry=0x7ffff7343350, args=args@entry=0x7fffffffb5d8, nargsf=nargsf@entry=9223372036854775811,\n    kwnames=kwnames@entry=0x0) at Objects/descrobject.c:381\n#11 0x00005555556a2ebe in _PyObject_VectorcallTstate (tstate=0x555555d99c08 <_PyRuntime+360664>, callable=0x7ffff7343350, args=0x7fffffffb5d8, nargsf=9223372036854775811, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:144\n#12 0x000055555583f859 in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=0x7ffff7fa7078, total_args=total_args@entry=3, kwnames=kwnames@entry=...,\n    call_instrumentation=false, frame=frame@entry=0x7ffff7fa7020, this_instr=0x555555f392f8, tstate=0x555555d99c08 <_PyRuntime+360664>) at Python/ceval.c:775\n#13 0x000055555584a8e4 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:1838\n#14 0x000055555583f08b in _PyEval_EvalFrame (tstate=0x555555d99c08 <_PyRuntime+360664>, frame=0x7ffff7fa7020, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#15 _PyEval_Vector (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, func=func@entry=0x7ffff7466690, locals=locals@entry=0x7ffff746a4b0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2130\n#16 0x000055555583ee1e in PyEval_EvalCode (co=co@entry=0x555555f390f0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0) at Python/ceval.c:686\n#17 0x00005555559c8f8e in run_eval_code_obj (tstate=0x555555d99c08 <_PyRuntime+360664>, co=co@entry=0x555555f390f0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0)\n    at Python/pythonrun.c:1368\n#18 0x00005555559c8adb in run_mod (mod=mod@entry=0x555555f45cc8, filename=filename@entry=0x7ffff74f8040, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0,\n    flags=0x7fffffffc910, arena=arena@entry=0x7ffff74dac20, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1471\n```\n\nBacktrace 2:\n```\nFatal Python error: _Py_CheckFunctionResult: a function returned NULL without setting an exception\nPython runtime state: initialized\nobject address  : 0x7ffff75ac520\nobject refcount : 1\nobject type     : 0x555555d05978\nobject type name: MemoryError\nobject repr     :\nlost sys.stderr\n\nCurrent thread 0x00007ffff7e8b780 [python] (most recent call first):\n  File \"/home/danzin/crashers/sqlite_oom1.py\", line 6 in <module>\n\nExtension modules: _testcapi (total: 1)\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x0000555555993a4d in fatal_error_exit (status=3064086, status@entry=-1) at Python/pylifecycle.c:3341\n#6  0x0000555555993737 in fatal_error (fd=2, header=header@entry=1, prefix=prefix@entry=0x555555ac7235 \"_Py_CheckFunctionResult\",\n    msg=msg@entry=0x555555ac724d \"a function returned NULL without setting an exception\", status=status@entry=-1) at Python/pylifecycle.c:3571\n#7  0x0000555555991ca4 in _Py_FatalErrorFunc (func=0x555555ac7235 \"_Py_CheckFunctionResult\", msg=0x555555ac724d \"a function returned NULL without setting an exception\")\n    at Python/pylifecycle.c:3587\n#8  0x00005555556a2d05 in _Py_CheckFunctionResult (tstate=<optimized out>, callable=<optimized out>, result=<optimized out>, where=<optimized out>) at Objects/call.c:43\n#9  0x000055555583f859 in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=0x7ffff7fa7078, total_args=total_args@entry=2, kwnames=kwnames@entry=...,\n    call_instrumentation=false, frame=frame@entry=0x7ffff7fa7020, this_instr=0x7ffff756d9ea, tstate=0x555555d99c08 <_PyRuntime+360664>) at Python/ceval.c:775\n#10 0x000055555584a8e4 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:1838\n#11 0x000055555583f08b in _PyEval_EvalFrame (tstate=0x555555d99c08 <_PyRuntime+360664>, frame=0x7ffff7fa7020, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#12 _PyEval_Vector (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, func=func@entry=0x7ffff7466690, locals=locals@entry=0x7ffff746a4b0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2130\n#13 0x000055555583ee1e in PyEval_EvalCode (co=co@entry=0x7ffff756d8a0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0) at Python/ceval.c:686\n#14 0x00005555559c8f8e in run_eval_code_obj (tstate=0x555555d99c08 <_PyRuntime+360664>, co=co@entry=0x7ffff756d8a0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0)\n    at Python/pythonrun.c:1368\n#15 0x00005555559c8adb in run_mod (mod=mod@entry=0x555555f3f5b0, filename=filename@entry=0x7ffff74e8580, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0,\n    flags=0x7fffffffc950, arena=arena@entry=0x7ffff74dad40, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1471\n```\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/_sqlite/ all deep` command.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:e0f7c1097e1, Mar 17 2026, 18:10:52) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146569\n* gh-146595\n* gh-146596\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-17T22:12:23Z",
+   "body": "I think this one is on me. I added the refcount logic here and in the tests I said that coverage was missing so this likely caused this issue to slip."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-17T22:14:22Z",
+   "body": "I will try to address this in the next two weeks. I am away this week but I may address it while travelling. "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-18T10:07:26Z",
+   "body": "The [full report](https://gist.github.com/devdanzin/69aff7ff2d64ce8c7c21622f7f36e84c)  presents another crash, please let me know if I should open another issue for it."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T14:18:20Z",
+   "body": "@picnixz plans to write a PR to fix this issue.\n\nI confirm that the proposed fix works as expected:\n\n```diff\ndiff --git a/Modules/_sqlite/connection.c b/Modules/_sqlite/connection.c\nindex af63271b9fd..76df1089ebb 100644\n--- a/Modules/_sqlite/connection.c\n+++ b/Modules/_sqlite/connection.c\n@@ -2198,7 +2198,7 @@ pysqlite_connection_create_collation_impl(pysqlite_Connection *self,\n          * the context before returning.\n          */\n         if (callable != Py_None) {\n-            free_callback_context(ctx);\n+            decref_callback_context(ctx);\n         }\n         set_error_from_db(self->state, self->db);\n         return NULL;\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T16:34:24Z",
+   "body": "> please let me know if I should open another issue for it\n\nNo, it's fine. Just rename the issue and add the two bugs in that issue (that is, bugs concerning custom refcounting in sqlite3)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "67703c7f7fae9e0ae723ea7bc4392d0c2b549bdb",
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146569",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "connected",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "aa6680775d6d9ca571a675c3b2d655f4ade78c0c",
+   "actor": "picnixz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a0192adaed5e746593c127ed8511e37a1caf81f4",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146595",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1b5bd8e1c53421019afb2d239508691d06e7e694",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146596",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6fdf0846449064c2f5bec18296163e19ee09121e",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1458ea00658ba8284b71b93eec499cc922c510c0",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a0ea81b65c2e41d22addc23ddd64da0782855db",
+   "actor": "maurycy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/deep-learnings/pull/11",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/botpress-accuracy-reporters/pull/83",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/coding-tests/pull/43",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-cleaners/pull/32",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-extension-converters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/github-wiki-organisers/pull/30",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/itunes-file-delimiter-replacers/pull/28",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/json-data-sorters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/natural-language-processing/pull/10",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/pr-title-printers/pull/17",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/template-creators/pull/16",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/tutorials/pull/219",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/web-scrapers/pull/14",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "77666ccb87b1c3de1a9da2616c50026e48d1bca5",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5448ac0ad9706b7e9ba987633d0720e49c18b517",
+   "actor": "ljfp"
+  }
+ ]
+}

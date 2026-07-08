@@ -1,0 +1,222 @@
+{
+ "repo": "python/cpython",
+ "number": 132713,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132713",
+ "title": "Segfault in `union_repr` from `list_repr_impl` in free-threaded build",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-typing",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2025-04-19T00:34:02Z",
+ "closed_at": "2025-04-23T13:46:09Z",
+ "body": "# Crash report\n\n### What happened?\n\nCalling `repr` in many threads on a list containing a large `typing.Union` segfaults in a free-threaded build:\n\n```python\nimport abc\nimport builtins\nimport collections.abc\nimport itertools\nimport types\nimport typing\nfrom functools import reduce\nfrom operator import or_\n\nabc_types = [cls for cls in abc.__dict__.values() if isinstance(cls, type)]\nbuiltins_types = [cls for cls in builtins.__dict__.values() if isinstance(cls, type)]\ncollections_abc_types = [cls for cls in collections.abc.__dict__.values() if isinstance(cls, type)]\ncollections_types = [cls for cls in collections.__dict__.values() if isinstance(cls, type)]\nitertools_types = [cls for cls in itertools.__dict__.values() if isinstance(cls, type)]\ntypes_types = [cls for cls in types.__dict__.values() if isinstance(cls, type)]\ntyping_types = [cls for cls in typing.__dict__.values() if isinstance(cls, type)]\n\nall_types = (abc_types + builtins_types + collections_abc_types + collections_types + itertools_types\n             + types_types + typing_types)\nall_types = [t for t in all_types if not issubclass(t, BaseException)]\nBIG_UNION = reduce(or_, all_types, int)\n\nfrom threading import Thread\nfrom time import sleep\n\nfor x in range(100):\n    union_list = [int | BIG_UNION] * 17  \n\n    def stress_list():\n        for x in range(3):\n            try:\n                union_list.pop()\n            except Exception:\n                pass\n            repr(union_list)\n            sleep(0.006)\n        union_list.__getitem__(None, None)\n\n    alive = []\n    for x in range(25):\n        alive.append(Thread(target=stress_list, args=()))\n\n    for t in alive:\n        t.start()\n```\n\nExample segfault backtrace:\n```\nThread 60 \"Thread-59 (stre\" received signal SIGSEGV, Segmentation fault.\n\n0x0000555555d21751 in _Py_TYPE (ob=<unknown at remote 0xdddddddddddddddd>) at ./Include/object.h:270\n270             return ob->ob_type;\n\n#0  0x0000555555d21751 in _Py_TYPE (ob=<unknown at remote 0xdddddddddddddddd>) at ./Include/object.h:270\n#1  union_repr (self=<optimized out>) at Objects/unionobject.c:296\n#2  0x0000555555b8949a in PyObject_Repr (v=<unknown at remote 0x7fffb48464b0>) at Objects/object.c:776\n#3  0x0000555555cc06a1 in PyUnicodeWriter_WriteRepr (writer=writer@entry=0x7fff660907f0,\n    obj=<unknown at remote 0x207c>) at Objects/unicodeobject.c:13951\n#4  0x0000555555aeba03 in list_repr_impl (v=0x7fffb4a8dc90) at Objects/listobject.c:606\n#5  list_repr (self=[]) at Objects/listobject.c:633\n#6  0x0000555555b8949a in PyObject_Repr (v=[]) at Objects/object.c:776\n#7  0x0000555555e07abf in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>,\n    throwflag=<optimized out>) at Python/generated_cases.c.h:2306\n#8  0x0000555555ddcf53 in _PyEval_EvalFrame (tstate=0x529000325210, frame=0x529000384328, throwflag=0)\n    at ./Include/internal/pycore_ceval.h:119\n#9  _PyEval_Vector (tstate=0x529000325210, func=0x7fffb4828dd0, locals=0x0, args=<optimized out>,\n    argcount=1, kwnames=0x0) at Python/ceval.c:1917\n#10 0x0000555555a4f42b in _PyObject_VectorcallTstate (tstate=0x529000325210,\n    callable=<function at remote 0x7fffb4828dd0>, args=0x207c, nargsf=3, nargsf@entry=1,\n    kwnames=<unknown at remote 0x7fff66090450>, kwnames@entry=0x0) at ./Include/internal/pycore_call.h:169\n#11 0x0000555555a4ccbf in method_vectorcall (method=<optimized out>, args=<optimized out>,\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/classobject.c:72\n#12 0x0000555555e8005b in _PyObject_VectorcallTstate (tstate=0x529000325210,\n    callable=<method at remote 0x7fff660c0eb0>, args=0x7fff93df06d8, nargsf=0, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:169\n#13 context_run (self=<_contextvars.Context at remote 0x7fffb4a8ebf0>, args=<optimized out>,\n    nargs=<optimized out>, kwnames=0x0) at Python/context.c:728\n#14 0x0000555555e0a3e7 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>,\n    throwflag=<optimized out>) at Python/generated_cases.c.h:3551\n```\n\nOnce it aborted with message:\n```\npython: Objects/unionobject.c:296: PyObject *union_repr(PyObject *): Assertion `PyTuple_Check(alias->args)' failed.\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a7+ experimental free-threading build (heads/main:741c6386b86, Apr 18 2025, 15:04:45) [Clang 19.1.7 (++20250114103320+cd708029e0b2-1~exp1~20250114103432.75)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132801\n* gh-132802\n* gh-132809\n* gh-132811\n* gh-132839\n* gh-132899\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-20T16:54:57Z",
+   "body": "Here's a reduced repro in case it helps:\n\n```python\nimport abc\nfrom threading import Thread\nfrom typing import Union\n\nclass NonUniqueMeta(abc.ABCMeta):\n    i = 0\n    def __hash__(self):\n        self.i += 1\n        return self.i\nclass NonUnique(metaclass=NonUniqueMeta): pass\n\nnonun = (NonUnique,) * 350\nbig_union = Union[*nonun]\n\nfor x in range(100):\n    alive = []\n    obj = []\n    alive.append(Thread(target=obj.__str__, args=()))\n    alive.append(Thread(target=obj.__str__, args=()))\n    alive.append(Thread(target=obj.clear, args=()))\n    obj.append([big_union] * 100)\n\n    for obj in alive:\n        obj.start()\n```"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-21T07:43:35Z",
+   "body": "Looks like the whole `Union` object is not thread-safe :("
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-21T07:43:48Z",
+   "body": "cc @colesbury and @JelleZijlstra "
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-21T12:47:59Z",
+   "body": "> Looks like the whole Union object is not thread-safe :(\n\nHmm. I don't see how the issue could be with `Union`, because it's an immutable type. I guess it could be something related to a borrowed reference?"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-04-21T18:58:35Z",
+   "body": "Two different issues:\n\nList can be modified concurrently or reentrantly during `PyUnicodeWriter_WriteRepr`/`PyObject_Repr` invocation, making the `v->ob_item[i]` pointer invalid.\n\nhttps://github.com/python/cpython/blob/ea8ec95cfadbf58a11ef8e41341254d982a1a479/Objects/listobject.c#L606-L608\n\nLazy initialization of `alias->parameters` isn't thread-safe (and may leak memory; probably won't crash):\n\nhttps://github.com/python/cpython/blob/ea8ec95cfadbf58a11ef8e41341254d982a1a479/Objects/unionobject.c#L329-L335"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-22T14:42:51Z",
+   "body": "> List can be modified concurrently or reentrantly during PyUnicodeWriter_WriteRepr/PyObject_Repr invocation, making the v->ob_item[i] pointer invalid.\n\nI wrote https://github.com/python/cpython/pull/132801 to fix this issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-22T14:55:14Z",
+   "body": "> Lazy initialization of alias->parameters isn't thread-safe (and may leak memory; probably won't crash)\n\nOh, right, I wrote https://github.com/python/cpython/pull/132802 to fix this other (minor) issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-23T13:46:30Z",
+   "body": "Fixed. Thanks for the bug report @devdanzin."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-24T17:41:54Z",
+   "body": "Fusil has hit a very similar crash while running an outdated commit of main, also pointing to union repr, but this time from a classmethod repr. It makes be wonder whether the same issue we had in list repr is present for classmethod.\n\nHere's the traceback. Should a new issue be created for this, or are the current fixes enough? I can try to get a MRE if it's interesting. \n\n```\nThread 399 \"Thread-398 (__r\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7ffecc0886c0 (LWP 2395450)]\n0x0000555555b3970f in _Py_TYPE (ob=<unknown at remote 0xdddddddddddddddd>)\n    at ./Include/object.h:270\n270             return ob->ob_type;\n(gdb) bt\n#0  0x0000555555b3970f in _Py_TYPE (ob=<unknown at remote 0xdddddddddddddddd>)\n    at ./Include/object.h:270\n#1  union_repr (self=<unknown at remote 0x7fffb94dd750>)\n    at Objects/unionobject.c:296\n#2  0x0000555555a1f01a in PyObject_Repr (v=<unknown at remote 0x7fffb94dd750>)\n    at Objects/object.c:776\n#3  0x0000555555afbbc4 in unicode_fromformat_arg (\n    writer=writer@entry=0x7ffec9b84220, f=0x555555f1b26e \"R)>\",\n    f@entry=0x555555f1b26d \"%R)>\", vargs=vargs@entry=0x7ffec9b842a0)\n    at Objects/unicodeobject.c:3097\n#4  0x0000555555afc23d in unicode_from_format (\n    writer=writer@entry=0x7ffec9b84220,\n    format=format@entry=0x555555f1b260 \"<classmethod(%R)>\",\n    vargs=vargs@entry=0x7ffec9b841a0) at Objects/unicodeobject.c:3216\n#5  0x0000555555afc5ef in PyUnicode_FromFormatV (\n    format=format@entry=0x555555f1b260 \"<classmethod(%R)>\",\n    vargs=vargs@entry=0x7ffec9b841a0) at Objects/unicodeobject.c:3250\n#6  0x0000555555afc78f in PyUnicode_FromFormat (\n    format=format@entry=0x555555f1b260 \"<classmethod(%R)>\")\n    at Objects/unicodeobject.c:3264\n#7  0x00005555559b1a7b in cm_repr (\n    self=self@entry=<classmethod at remote 0x7fffb94bd1c0>)\n    at Objects/funcobject.c:1491\n#8  0x0000555555a7437c in wrap_unaryfunc (\n    self=<classmethod at remote 0x7fffb94bd1c0>, args=<optimized out>,\n    wrapped=0x5555559b1a32 <cm_repr>) at Objects/typeobject.c:9220\n#9  0x00005555559752ab in wrapperdescr_raw_call (descr=0x7fffb40a63d0,\n    self=<classmethod at remote 0x7fffb94bd1c0>, args=args@entry=(),\n    kwds=kwds@entry={}) at Objects/descrobject.c:532\n```"
+  },
+  {
+   "author": "JelleZijlstra",
+   "created_at": "2025-04-24T17:46:28Z",
+   "body": "Is it still reproducible on latest main? If classmethods are mutable they may need a similar fix to list."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-24T18:40:47Z",
+   "body": "It's reproducible in latest main, just checked (will double check when I get on a computer).\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-24T19:38:35Z",
+   "body": "Would you mind to open a new issue?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-24T20:09:49Z",
+   "body": "I reduced the test case and it depends on calling `__init__` concurrently on `classmethod` (or `staticmethod`) objects, [which is not supported](https://github.com/python/cpython/issues/127192#issuecomment-2495552818). So I guess no new issue needed?\n\nSorry for the noise.\n\n```python\nimport abc\nimport builtins\nimport collections.abc\nimport itertools\nimport types\nimport typing\nfrom functools import reduce\nfrom operator import or_\n\nabc_types = [cls for cls in abc.__dict__.values() if isinstance(cls, type)]\nbuiltins_types = [cls for cls in builtins.__dict__.values() if isinstance(cls, type)]\ncollections_abc_types = [cls for cls in collections.abc.__dict__.values() if isinstance(cls, type)]\ncollections_types = [cls for cls in collections.__dict__.values() if isinstance(cls, type)]\nitertools_types = [cls for cls in itertools.__dict__.values() if isinstance(cls, type)]\ntypes_types = [cls for cls in types.__dict__.values() if isinstance(cls, type)]\ntyping_types = [cls for cls in typing.__dict__.values() if isinstance(cls, type)]\nall_types = (abc_types + builtins_types + collections_abc_types + collections_types + itertools_types\n             + types_types + typing_types)\nall_types = [t for t in all_types if not issubclass(t, BaseException)]\nBIG_UNION = reduce(or_, all_types, int)\n\nfrom threading import Thread\nunion_cm = classmethod(int | BIG_UNION)\n\ndef stress_cm():\n    for x in range(3):\n        repr(union_cm)\n        union_cm.__init__(str|BIG_UNION)\n        repr(union_cm)\n        \nalive = []\nfor x in range(10):\n    alive.append(Thread(target=stress_cm, args=()))\nfor t in alive:\n    t.start()\nfor t in alive:\n    t.join()\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-25T07:18:03Z",
+   "body": "> I reduced the test case and it depends on calling __init__ concurrently on classmethod (or staticmethod) objects, https://github.com/python/cpython/issues/127192#issuecomment-2495552818. So I guess no new issue needed?\n\nI wrote a basic fix for repr(classmethod): https://github.com/python/cpython/pull/132899. But this fix was not enough, the reproducer still crashed randomly. A full fix would require to harden classmethod constructor (`cm_init()`). It may slow down the code whereas we don't want to support calling `__init__()` concurrently. So I prefer to give up and ignore this crash found by fuzzing."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8037bbeb2aa820c48dfe0908b150bd3a2993680f",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dafaf7ab47ba73eacce3dd5ab8f9573c918a7382",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "53f83a265ebcc41437da568ab3b30d2b4e352052",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132801",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "208f247bdc57e1e2282538a59427edf66e26042e",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132802",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a4ea80d52394bafffb2257abbe815c7ffdb003a3",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2edc8652fefd20cc038fb0204a85fe5e60a6fd4a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132809",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0070bf1c0a05e875ca3ae04f4d1b49736b42cad6",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132811",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "de9deb7ca7120fbb5cbbb53044ce91087065e723",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3de0f55f3410ae835923d10ae098558900a9a121",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dc3e9638c22fc1fa807a88c32316ac2558a4b879",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4c52ddff6afd1596e8fe8c623252c85a3bbf2c00",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132839",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "341b86e095e59f849c80312ccdb5b70e00fa5216",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f6cd6f857a0286814f766c18074a62766e4f8d09",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132899",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/135878",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

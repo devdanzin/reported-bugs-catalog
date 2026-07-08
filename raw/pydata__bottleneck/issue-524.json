@@ -1,0 +1,36 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 524,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/524",
+ "title": "push: unchecked PyArray_Copy \u2014 NULL dereference on OOM",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:34:56Z",
+ "closed_at": "2026-03-31T07:43:32Z",
+ "body": "`push` (float path) calls `PyArray_Copy(a)` and immediately passes the result to `init_iter_one` without a NULL check. If the copy fails (OOM), `init_iter_one` dereferences NULL.\n\n**File(s):** `nonreduce_axis_template.c:347-349`\n\n**Suggested fix:**\n\n```c\n// Before:\nPyObject *y = PyArray_Copy(a);\niter it;\ninit_iter_one(&it, (PyArrayObject *)y, axis);\n\n// After:\nPyObject *y = PyArray_Copy(a);\nif (y == NULL) return NULL;\niter it;\ninit_iter_one(&it, (PyArrayObject *)y, axis);\n```\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/537",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

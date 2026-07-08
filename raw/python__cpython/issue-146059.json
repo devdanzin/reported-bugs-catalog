@@ -1,0 +1,182 @@
+{
+ "repo": "python/cpython",
+ "number": 146059,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146059",
+ "title": "`Fatal Python error` when using `_pickle` with many `frozenset` objects",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2026-03-17T13:42:31Z",
+ "closed_at": "2026-03-26T16:37:02Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to make the interpreter abort when using `_pickle` with `frozenset` objects. Please let me know if the automated diagnosis is incorrect and whether you prefer me not to post it in new issues.\n\n### Automated diagnosis:\n\nMissing `fast_save_leave` bug in `save_frozenset` (_pickle.c:3674): `save_frozense`t calls `fast_save_enter` (line 3681) but never `calls fast_save_leave` on any return path. This causes:\n1. `fast_nesting` to drift upward (never decremented for frozensets)\n2. After `FAST_NESTING_LIMIT` (50) frozensets, `fast_memo` dict activates\n3. Frozenset addresses get inserted into `fast_memo` but never removed\n4. When an outer container (list/dict) calls `fast_save_leave`, it tries to remove itself from `fast_memo` via PyDict_DelItem \u2014 but it was never added. A frozenset was added at that nesting level instead.\n5. `KeyError` propagates \u2192 `SystemError` \u2192 `Fatal Python error` \u2192 abort\n\nCompare `with save_list` (line 3289) and `save_dict` (line 3588), which properly call fast_save_leave.\n\n\nMRE:\n```python\nimport _pickle\nimport io\n\nbuf = io.BytesIO()\np = _pickle.Pickler(buf, protocol=4)\np.fast = 1  # Enable fast mode (disables memo, enables cycle detection)\n\ndata = {\"key\": [frozenset([i]) for i in range(55)]}\np.dump(data)  # Fatal Python error: abort\n```\n\nBacktrace:\n```\nFatal Python error: _Py_CheckFunctionResult: a function returned a result with an exception set\nPython runtime state: initialized\nKeyError: 136820327477664\nwhen serializing dict item 'key'\n\nThe above exception was the direct cause of the following exception:\n\nSystemError: <class 'KeyError'> returned a result with an exception set\n\nCurrent thread 0x00007ffff7e4c3c0 [python] (most recent call first):\n  File \"/home/danzin/crashers/_pickle_frozenset_abort.py\", line 33 in <module>\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x0000555556007ad4 in fatal_error_exit (status=status@entry=-1) at Python/pylifecycle.c:3341\n#6  0x0000555556007716 in fatal_error (fd=<optimized out>, header=<optimized out>, prefix=<optimized out>, msg=<optimized out>, status=<optimized out>) at Python/pylifecycle.c:3564\n#7  0x0000555556003940 in _Py_FatalErrorFunc (func=0x555556325b20 <__func__._Py_CheckFunctionResult> \"_Py_CheckFunctionResult\",\n    msg=0x555556325c80 <str> \"a function returned a result with an exception set\") at Python/pylifecycle.c:3587\n#8  0x0000555555ab98d3 in _Py_CheckFunctionResult (tstate=0x5555568f7b18 <_PyRuntime+360664>, callable=0x5555566ad3a0 <_PyExc_KeyError>, result=<optimized out>, where=0x0)\n    at Objects/call.c:65\n#9  0x0000555555abcda5 in PyObject_CallOneArg (func=<optimized out>, arg=0x7c5ff7052990) at Objects/call.c:395\n#10 0x0000555555f2eaf3 in _PyErr_SetKeyError (arg=arg@entry=0x7c5ff7052990) at Python/errors.c:256\n#11 0x0000555555b99ef9 in _PyDict_DelItem_KnownHash_LockHeld (op=0x7c7ff70b4540, key=<optimized out>, hash=<optimized out>) at Objects/dictobject.c:2942\n#12 0x00007bfff5abe01c in fast_save_leave (self=0x7cfff703f860, obj=obj@entry=0x7c7ff7088740) at ./Modules/_pickle.c:2212\n#13 0x00007bfff5ab2b86 in save_dict (state=<optimized out>, self=<optimized out>, obj=0x7c7ff7088740) at ./Modules/_pickle.c:3588\n#14 0x00007bfff5aaffc6 in save (st=<optimized out>, self=0x7cfff703f860, obj=<optimized out>, pers_save=<optimized out>) at ./Modules/_pickle.c:4568\n#15 0x00007bfff5aadf00 in dump (state=<optimized out>, self=0x7cfff703f860, obj=<optimized out>) at ./Modules/_pickle.c:4768\n#16 0x00007bfff5ad7c6c in _pickle_Pickler_dump_impl (self=0x7cfff703f860, cls=0x7d8ff7016ba0, obj=0x7c7ff7088740) at ./Modules/_pickle.c:4843\n#17 _pickle_Pickler_dump (self=<optimized out>, cls=<optimized out>, args=0x7bfff5d47a28, nargs=<optimized out>, kwnames=<optimized out>) at ./Modules/clinic/_pickle.c.h:73\n#18 0x0000555555bdf145 in cfunction_vectorcall_FASTCALL_KEYWORDS_METHOD (func=func@entry=0x7caff6fff900, args=args@entry=0x7bfff5d47a28, nargsf=nargsf@entry=9223372036854775809,\n    kwnames=kwnames@entry=0x0) at Objects/methodobject.c:481\n#19 0x0000555555ab9e00 in _PyObject_VectorcallTstate (tstate=0x5555568f7b18 <_PyRuntime+360664>, callable=0x7caff6fff900, args=0x7bfff5d47a28, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:136\n#20 0x0000555555e588dd in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=<optimized out>, total_args=1, kwnames=..., call_instrumentation=<optimized out>,\n    frame=<optimized out>, this_instr=<optimized out>, tstate=<optimized out>) at Python/ceval.c:770\n#21 0x0000555555e94263 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1838\n#22 0x0000555555e57778 in _PyEval_EvalFrame (tstate=0x5555568f7b18 <_PyRuntime+360664>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#23 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2134\n#24 0x0000555555e57195 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff70884c0) at Python/ceval.c:681\n#25 0x0000555556061fb0 in run_eval_code_obj (tstate=tstate@entry=0x5555568f7b18 <_PyRuntime+360664>, co=co@entry=0x7d4ff6ff0210, globals=globals@entry=0x7c7ff70884c0,\n    locals=locals@entry=0x7c7ff70884c0) at Python/pythonrun.c:1368\n```\n\n### Claude explanation for the MRE and crash\n\nThe dict contains 55 frozensets. After the 50th frozenset, the cycle detection dict activates. When the outer dict's fast_save_leave runs, it tries to remove itself from fast_memo but finds a frozenset address there instead \u2192 KeyError \u2192 SystemError \u2192 Fatal Python error.\n\n----\n\nFound with [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/_pickle.c all deep` command.\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:99e2c5eccd2, Mar 17 2026, 08:26:50) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146173\n* gh-146473\n* gh-146474\n* gh-146481\n* gh-146509\n* gh-146510\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-19T15:18:31Z",
+   "body": "I wrote https://github.com/python/cpython/pull/146173 to fix pickle `save_frozenset()`."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-26T16:37:02Z",
+   "body": "It's now fixed in the main branch by https://github.com/python/cpython/commit/5c0dcb3e0d817bd8c28e8efcdb97103cd9210989, backports to 3.13 and 3.14 will follow. Thanks for the bug report @devdanzin!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2fda9f6c24fcc378cd7934adc51c8dc8efe71c0e",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c86e3d03086f3e15a5973fde65be959b58c096b2",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146173",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5c0dcb3e0d817bd8c28e8efcdb97103cd9210989",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3ba60463d438e5980a628e3df8355981314f00c1",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "16abed639868ac87cf67eed8375d1d6ff8c72e4f",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146473",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146474",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e8c3d31b2c3fd630859f453566c19cf6baa25501",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d11419b80b063788a1af2a9aa5ba4b30606a3028",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146481",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0c7a75aeef4dae87f02536ed4c42a57c13ef20e2",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bc67778099e7b10f18e62438f2b97c4f993d792a",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146509",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cba54979dfe33a579394e02fdaa55326663bd274",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "de1644cd40be90201f0300ddaef5f4e6e58720a8",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "08842d183ab859b8b0beef39591c4f7e72d04842",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146510",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9ee6b67ee9839dd46fc7c27aab24deae403b1bbc",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a03671c8af24ddb6c70026891a02d4eba91c61b7",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fd1d48169a37591be7fb70b2c9be1d9122154316",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "42b743e3219168751031f2ba32ab1f013a171b5e",
+   "actor": "ljfp"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3df6d452a1bbd6117b341e5a987a8b7dead31ed",
+   "actor": "ljfp"
+  }
+ ]
+}

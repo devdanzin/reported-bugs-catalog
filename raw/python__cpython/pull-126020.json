@@ -1,0 +1,96 @@
+{
+ "repo": "python/cpython",
+ "number": 126020,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/126020",
+ "title": "gh-126018: Avoid aborting due to unnecessary assert in `sys.audit`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-10-26T23:43:27Z",
+ "closed_at": "2024-10-27T14:41:42Z",
+ "body": "This PR removes an assert in `sysmodule.c` that caused the interpreter to abort when `sys.audit` received a non-string as first argument.\r\n\r\nWithout this assert, the code that runs the hooks will raise an exception instead.\n\n<!-- gh-issue-number: gh-126018 -->\n* Issue: gh-126018\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-10-26T23:46:15Z",
+   "body": "This likely requires some NEWS entry, for instance: \r\n\r\n```rst\r\nFix a crash in :func:`sys.audit` when passing a non-string argument.\r\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-10-26T23:53:16Z",
+   "body": "FTR: 3.12 is not affected because the assertion does not exist:\r\n\r\nhttps://github.com/python/cpython/blob/67b270142d58b8f9a64f8ae2b84a195e7e49adda/Python/sysmodule.c#L499-L514"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-10-27T00:02:29Z",
+   "body": "Thank you very much for the review and suggestions @picnixz  and @Eclips4!"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-10-27T09:51:59Z",
+   "body": "> This works, but I would be more comfortable just converting this to clinic.\r\n\r\nI'm not too attached to this PR, but converting to AC is beyond my skills. If you or someone else wants to propose another PR with that approach, I'll gladly close this one."
+  },
+  {
+   "author": "JelleZijlstra",
+   "created_at": "2024-10-27T14:41:28Z",
+   "body": "Converting to AC can wait for a later PR, and probably should be done only in main."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-10-27T14:41:45Z",
+   "body": "Thanks @devdanzin for the PR, and @JelleZijlstra for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-10-27T14:41:58Z",
+   "body": "[GH-126042](https://github.com/python/cpython/pull/126042) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126018",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "80eec52fc813bc7d20478da3114ec6ffd73e7c31",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e0eeb7070132b331733870bd236ced0b55b1ac58",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e4157f0fd71676c5dcee687ad17871dc226a5560",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "353994ff99bdb46544e5b311ab5b1d3c3a930592",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3a9bc3f68206a3e93295afb93963ba09a0a0c2ea",
+   "actor": "ebonnal"
+  }
+ ]
+}

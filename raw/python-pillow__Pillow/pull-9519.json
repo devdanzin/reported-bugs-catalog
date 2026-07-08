@@ -1,0 +1,150 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9519,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9519",
+ "title": "Raise an error if the trailer chain loops back on itself",
+ "state": "closed",
+ "state_reason": null,
+ "author": "hugovk",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-31T18:40:59Z",
+ "closed_at": "2026-03-31T21:03:16Z",
+ "body": "> The test file from the issue has a trailer that references itself. I've instead created a test file where trailer A references trailer B which references trailer A again.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3bf614e4b8615d0ce1d5039efaf6db447fe7c468",
+   "actor": "radarhere"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "radarhere"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python-pillow/Pillow/pull/9539",
+   "commit": null,
+   "actor": "radarhere"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/supabase/issues/39",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/supabase/issues/40",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/Vonage/audio-connector-server-samples/issues/8",
+   "commit": null,
+   "actor": "mend-for-github-com[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/Emmanuel-Evenzur/syetem_prompt/issues/24",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/blemaire-wavetel/AutoPrompt/issues/34",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/stable-diffusion-webui/issues/28",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/stable-diffusion-webui/issues/39",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/amaybaum-prod/stable-diffusion-webui/issues/46",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/Emmanuel-Evenzur/AutoPromptAI/issues/67",
+   "commit": null,
+   "actor": "renovate[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/NixOS/nixpkgs/issues/518766",
+   "commit": null,
+   "actor": "nixpkgs-security-tracker[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/inab/treecript/pull/28",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python-pillow/Pillow/pull/9629",
+   "commit": null,
+   "actor": "danigm"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/inab/treecript/pull/29",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/inab/treecript/pull/30",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/CUAutoDrone/cuad-docker-ros/pull/29",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/generalbots/generalbots/issues/544",
+   "commit": null,
+   "actor": "rodrigorodriguez"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c4141341f0c45dda53dd136039912c222d54be44",
+   "actor": "martinPavesio"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/CUAutoDrone/cuad-docker-ros/pull/30",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  }
+ ]
+}

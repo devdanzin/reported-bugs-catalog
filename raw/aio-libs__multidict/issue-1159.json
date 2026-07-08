@@ -1,0 +1,55 @@
+{
+ "repo": "aio-libs/multidict",
+ "number": 1159,
+ "type": "issue",
+ "url": "https://github.com/aio-libs/multidict/issues/1159",
+ "title": "Segfault calling `MultiDict().setdefault()`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "bug",
+  "reproducer: present"
+ ],
+ "created_at": "2025-05-04T11:42:35Z",
+ "closed_at": "2025-05-16T20:09:23Z",
+ "body": "Using latest git version of 3.13, calling `MultiDict().setdefault(\"a\")` segfaults:\n\n```python\nimport multidict\nm = multidict.MultiDict()\nm.setdefault(\"a\")\n```\n\nThe backtrace references `cpython-3.13.2`, so I tested the repro code against that version  and still got a segfault.\n\nBacktrace:\n```console\nProgram received signal SIGSEGV, Segmentation fault.\n0x00007ffff6d38402 in Py_INCREF (op=0x0)\n    at /opt/_internal/cpython-3.13.2/include/python3.13/object.h:826\nwarning: 826    /opt/_internal/cpython-3.13.2/include/python3.13/object.h: No such file or directory\n\n#0  0x00007ffff6d38402 in Py_INCREF (op=0x0)\n    at /opt/_internal/cpython-3.13.2/include/python3.13/object.h:826\n#1  _pair_list_add_with_hash (hash=-8311172392442909167, value=0x0,\n    key=0x555555b2e628 <_PyRuntime+94600>, identity=0x555555b2e628 <_PyRuntime+94600>,\n    list=0x555555e8b610) at multidict/_multilib/pair_list.h:360\n#2  pair_list_set_default (value=<optimized out>, key=<optimized out>, list=0x555555e8b610)\n    at multidict/_multilib/pair_list.h:802\n#3  multidict_setdefault (self=0x555555e8b600, args=<optimized out>, nargs=<optimized out>,\n    kwnames=<optimized out>) at multidict/_multidict.c:576\n#4  0x00005555556815b3 in method_vectorcall_FASTCALL_KEYWORDS (func=0x7ffff6da1850,\n    args=0x7ffff7fb0640, nargsf=<optimized out>, kwnames=0x0) at Objects/descrobject.c:420\n#5  0x00005555556746fa in _PyObject_VectorcallTstate (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    callable=callable@entry=0x7ffff6da1850, args=args@entry=0x7ffff7fb0640,\n    nargsf=9223372036854775810, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:168\n#6  0x00005555556747d6 in PyObject_Vectorcall (callable=callable@entry=0x7ffff6da1850,\n    args=args@entry=0x7ffff7fb0640, nargsf=<optimized out>, kwnames=kwnames@entry=0x0)\n    at Objects/call.c:327\n#7  0x00005555557a310b in _PyEval_EvalFrameDefault (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    frame=0x7ffff7fb05f0, throwflag=0) at Python/generated_cases.c.h:813\n#8  0x00005555557b4b05 in _PyEval_EvalFrame (\n    tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>, frame=<optimized out>,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:119\n#9  0x00005555557b4c34 in _PyEval_Vector (tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>,\n    func=func@entry=0x7ffff6f996d0, locals=locals@entry=0x7ffff7463d70, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1816\n#10 0x00005555557b4cf7 in PyEval_EvalCode (co=co@entry=0x7ffff6f25ad0,\n    globals=globals@entry=0x7ffff7463d70, locals=locals@entry=0x7ffff7463d70)\n    at Python/ceval.c:604\n#11 0x00005555557988e1 in builtin_exec_impl (module=module@entry=0x7ffff75a6930,\n    source=0x7ffff6f25ad0, globals=0x7ffff7463d70, locals=0x7ffff7463d70, closure=0x0)\n    at Python/bltinmodule.c:1143\n#12 0x0000555555798a44 in builtin_exec (module=0x7ffff75a6930, args=<optimized out>,\n    args@entry=0x7ffff7fb05e0, nargs=nargs@entry=2, kwnames=kwnames@entry=0x0)\n    at Python/clinic/bltinmodule.c.h:556\n#13 0x00005555557a46de in _PyEval_EvalFrameDefault (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    frame=0x7ffff7fb0578, throwflag=0) at Python/generated_cases.c.h:1217\n#14 0x00005555557b4b05 in _PyEval_EvalFrame (\n    tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>, frame=<optimized out>,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:119\n#15 0x00005555557b4c34 in _PyEval_Vector (tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>,\n    func=func@entry=0x7ffff74d7dd0, locals=locals@entry=0x7ffff7463d70, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1816\n#16 0x00005555557b4cf7 in PyEval_EvalCode (co=co@entry=0x7ffff73da200,\n    globals=globals@entry=0x7ffff7463d70, locals=locals@entry=0x7ffff7463d70)\n    at Python/ceval.c:604\n#17 0x00005555557988e1 in builtin_exec_impl (module=module@entry=0x7ffff75a6930,\n    source=0x7ffff73da200, globals=0x7ffff7463d70, locals=0x7ffff7463d70, closure=0x0)\n    at Python/bltinmodule.c:1143\n#18 0x0000555555798a44 in builtin_exec (module=0x7ffff75a6930, args=<optimized out>,\n    args@entry=0x7ffff7fb0180, nargs=nargs@entry=2, kwnames=kwnames@entry=0x0)\n    at Python/clinic/bltinmodule.c.h:556\n#19 0x00005555556c6249 in cfunction_vectorcall_FASTCALL_KEYWORDS (func=0x7ffff75a6f90,\n    args=0x7ffff7fb0180, nargsf=<optimized out>, kwnames=0x0) at Objects/methodobject.c:441\n#20 0x00005555556746fa in _PyObject_VectorcallTstate (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    callable=callable@entry=0x7ffff75a6f90, args=args@entry=0x7ffff7fb0180,\n    nargsf=9223372036854775810, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:168\n#21 0x00005555556747d6 in PyObject_Vectorcall (callable=callable@entry=0x7ffff75a6f90,\n    args=args@entry=0x7ffff7fb0180, nargsf=<optimized out>, kwnames=kwnames@entry=0x0)\n    at Objects/call.c:327\n#22 0x00005555557a310b in _PyEval_EvalFrameDefault (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    frame=0x7ffff7fb00d8, throwflag=0) at Python/generated_cases.c.h:813\n#23 0x00005555557b4b05 in _PyEval_EvalFrame (\n    tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>, frame=<optimized out>,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:119\n#24 0x00005555557b4c34 in _PyEval_Vector (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    func=0x7ffff6f99010, locals=locals@entry=0x0, args=0x7ffff6f71968, argcount=2, kwnames=0x0)\n    at Python/ceval.c:1816\n#25 0x0000555555674391 in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>,\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/call.c:413\n#26 0x0000555555676029 in _PyVectorcall_Call (\n    tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>,\n    func=0x555555674339 <_PyFunction_Vectorcall>, callable=callable@entry=0x7ffff6f99010,\n    tuple=tuple@entry=0x7ffff6f71950, kwargs=kwargs@entry=0x0) at Objects/call.c:273\n#27 0x0000555555676349 in _PyObject_Call (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    callable=callable@entry=0x7ffff6f99010, args=args@entry=0x7ffff6f71950,\n    kwargs=kwargs@entry=0x0) at Objects/call.c:348\n#28 0x0000555555676385 in PyObject_Call (callable=callable@entry=0x7ffff6f99010,\n    args=args@entry=0x7ffff6f71950, kwargs=kwargs@entry=0x0) at Objects/call.c:373\n#29 0x000055555584aa3f in pymain_run_module (modname=modname@entry=0x55555592e4a8 L\"_pyrepl\",\n    set_argv0=set_argv0@entry=0) at Modules/main.c:349\n```\n\n\n\n\n`multidict.__version__`\n```\n'6.4.3'\n```\n\nPython versions:\n```\nPython 3.13.3+ (heads/3.13:fdcaaad1cc7, Apr 27 2025, 10:17:23) [GCC 14.2.0] on linux\nPython 3.13.2 (tags/v3.13.2:4f8bb3947cf, May  4 2025, 08:34:35) [GCC 14.2.0]\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.",
+ "comments": [
+  {
+   "author": "webknjaz",
+   "created_at": "2025-05-04T16:18:05Z",
+   "body": "I confirmed that this reproduces on pyenv's 3.13.2. It crashes with a single arg passed but works with two args:\n```pycon\nPython 3.13.2 (main, Feb 28 2025, 20:34:46) [GCC 14.2.1 20241221] on linux\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n>>> import multidict\n>>> multidict.__version__\n'6.4.4.dev0'\n>>> multidict.MultiDict().setdefault('a', 'b')\n'b'\n>>> multidict.MultiDict().setdefault('a')\n[1]    614028 segmentation fault (core dumped)  python\n```\n"
+  },
+  {
+   "author": "bdraco",
+   "created_at": "2025-05-04T16:35:28Z",
+   "body": "Signature of the arg parser should likely only allow two args.  Is there a valid use case for one?"
+  },
+  {
+   "author": "webknjaz",
+   "created_at": "2025-05-04T16:42:22Z",
+   "body": "This is because we mimic `dict` which has the optional default argument with a fallback to `None`: https://docs.python.org/3.4/library/stdtypes.html?highlight=dict.setdefault#dict.setdefault\n\n> [..] *default*. *default* defaults to `None`."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "61847ef442bf45e18271dbbb389d448df9e8dc7d",
+   "actor": "bdraco"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/aio-libs/multidict/pull/1160",
+   "commit": null,
+   "actor": "bdraco"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "bdraco"
+  }
+ ]
+}

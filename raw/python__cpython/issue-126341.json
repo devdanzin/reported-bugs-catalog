@@ -1,0 +1,173 @@
+{
+ "repo": "python/cpython",
+ "number": 126341,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126341",
+ "title": "`SystemError` from calling `__iter__` on a released `memoryview`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "easy",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-03T00:57:17Z",
+ "closed_at": "2024-11-13T19:50:59Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe code below causes a `SystemError` on all tested Python versions in Windows and Linux. In a no-gil debug build of main, besides the expected abort, sometimes a segfault occurs.\n\n```python\nfrom threading import Thread\n\nav = memoryview(b\"something\")\nav.release()\n\nalive = [\n    Thread(target=av.release, args=('/bin/sh')),\n    Thread(target=av.__iter__, args=())\n]\n\nfor obj in alive:\n    try:\n        print('START', obj)\n        obj.start()\n    except Exception:\n        pass\n```\n\nCommon abort:\n```\nFatal Python error: _Py_CheckFunctionResult: a function returned a result with an exception set\nPython runtime state: initialized\nValueError: operation forbidden on released memoryview object\n\nThe above exception was the direct cause of the following exception:\n\nSystemError: <method-wrapper '__iter__' of memoryview object at 0x200006a6050> returned a result with an exception set\nAborted\n```\n\nRare segfault:\n```\nException in thread Thread-1 (release):\nFatal Python error: _Py_CheckFunctionResult: a function returned a result with an exception set\nPython runtime state: initialized\nValueError: operation forbidden on released memoryview object\n\nThe above exception was the direct cause of the following exception:\n\nSystemError: <method-wrapper '__iter__' of memoryview object at 0x200006a6050> returned a result with an exception set\n\nCurrent thread 0x00007f750b5d0640 (most recent call first):\n  File \"/home/danzin/projects/mycpython/Lib/threading.py\", line 992 in run\n  File \"/home/danzin/projects/mycpython/Lib/threading.py\", line 1041 in _bootstrap_inner\n  File \"/home/danzin/projects/mycpython/Lib/threading.py\", line 1012 in _bootstrap\n\nThread 0x00007f750bdd5640 (most recent call first):\n  File \"<frozen importlib._bootstrap_external>\", line 142 in _path_split\nPython/traceback.c:979:18: runtime error: member access within misaligned address 0x000000000001 for type 'struct _PyInterpreterFrame', which requires 8 byte alignment\n0x000000000001: note: pointer points here\n<memory cannot be printed>\nSegmentation fault\n```\n\nThe backtrace for the segfault is:\n```gdb\n0x00005555564d6e71 in _PyFrame_GetCode (f=0x7ffff6bbcca8)\n    at ./Include/internal/pycore_frame.h:83\n#1  PyUnstable_InterpreterFrame_GetLine (\n    frame=frame@entry=0x7ffff6bbcca8) at Python/frame.c:146\n#2  0x00005555565ffb1e in dump_frame (fd=fd@entry=2,\n    frame=frame@entry=0x7ffff6bbcca8) at Python/traceback.c:905\n#3  0x00005555565fffcc in dump_traceback (fd=fd@entry=2,\n    tstate=tstate@entry=0x555557130d20,\n    write_header=write_header@entry=0)\n    at Python/traceback.c:974\n#4  0x00005555566001e0 in _Py_DumpTracebackThreads (\n    fd=fd@entry=2, interp=<optimized out>,\n    interp@entry=0x555557052280 <_PyRuntime+129152>,\n    current_tstate=current_tstate@entry=0x5555571351d0)\n    at Python/traceback.c:1090\n#5  0x00005555565888f1 in _Py_FatalError_DumpTracebacks (\n    fd=fd@entry=2,\n    interp=interp@entry=0x555557052280 <_PyRuntime+129152>,\n    tstate=tstate@entry=0x5555571351d0)\n    at Python/pylifecycle.c:2937\n#6  0x000055555659b12b in fatal_error (fd=2,\n    header=header@entry=1,\n    prefix=prefix@entry=0x555556811220 <__func__.23> \"_Py_CheckFunctionResult\",\n    msg=msg@entry=0x555556810c80 \"a function returned a result with an exception set\", status=status@entry=-1)\n    at Python/pylifecycle.c:3245\n#7  0x000055555659b2ca in _Py_FatalErrorFunc (\n    func=func@entry=0x555556811220 <__func__.23> \"_Py_CheckFunctionResult\",\n    msg=msg@entry=0x555556810c80 \"a function returned a result with an exception set\") at Python/pylifecycle.c:3286\n#8  0x0000555555ee822c in _Py_CheckFunctionResult (\n    tstate=tstate@entry=0x5555571351d0,result=result@entry=0x20004040130, where=where@entry=0x0)\n    at Objects/call.c:65\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.11, 3.12, 3.13, CPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows\n\n### Output from running 'python -VV' on the command line:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126759\n* gh-126778\n* gh-126779\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-03T01:35:43Z",
+   "body": "IIUC, it's undecided right now about what to do with method thread safety--most methods on objects aren't thread-safe, so you should be using a lock. "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-03T02:02:20Z",
+   "body": "It seems to be independent of threads, my bad for not reducing further. The code below reliably causes the `SystemError` for me, but I couldn't get a segfault with it so far.\r\n\r\n```python\r\nav = memoryview(b\"something\")\r\nav.release()\r\nav.__iter__()\r\n```"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-03T02:03:54Z",
+   "body": "I'm assuming the segfault is a result of missing thread safety on `memoryview` objects, but the `SystemError` is definitely a bug. Thank you for the report!"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-03T02:04:51Z",
+   "body": "@picnixz Considering your recent ventures with `memoryview` objects, would you like to take this one? If not, I can submit a PR."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-11-03T06:58:04Z",
+   "body": "I would expect to see something like:\r\n\r\n```c\r\n    CHECK_RELEASED(obj);\r\n```\r\n\r\nas the fix."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-03T09:05:36Z",
+   "body": "> @picnixz Considering your recent ventures with `memoryview` objects, would you like to take this one? If not, I can submit a PR.\r\n\r\nPlease do so! I'm working on HACL* HMAC now and won't be available for the next few days. (I'll also fix a simple curses issue in a few hours (DONE))."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-03T12:40:07Z",
+   "body": "Yeah, @sobolevn is right. I'll let someone newer have a chance to contribute since it's a super easy fix :)\r\n\r\n```diff\r\nindex d4672e8198..25634f997a 100644\r\n--- a/Objects/memoryobject.c\r\n+++ b/Objects/memoryobject.c\r\n@@ -3356,6 +3356,7 @@ memory_iter(PyObject *seq)\r\n         PyErr_BadInternalCall();\r\n         return NULL;\r\n     }\r\n+    CHECK_RELEASED(seq);\r\n     PyMemoryViewObject *obj = (PyMemoryViewObject *)seq;\r\n     int ndims = obj->view.ndim;\r\n     if (ndims == 0) {\r\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-03T12:44:52Z",
+   "body": "Is the segfault something to worry about in other `SystemError` situations, even if it requires threading shenanigans? Should there also be a protection for that?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-03T12:48:12Z",
+   "body": "Let's deal with the segfault separately. I'm assuming that it's a data race, so we just need to add `@critical_section` to AC."
+  },
+  {
+   "author": "ritvikpasham",
+   "created_at": "2024-11-03T22:43:05Z",
+   "body": "Can I be assigned to this issue? I'm an undergraduate student looking to contribute to my first open source project."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-03T22:44:59Z",
+   "body": "@ritvikpasham Go for it :)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-09T18:02:11Z",
+   "body": "@ritvikpasham Are you still working on this?"
+  },
+  {
+   "author": "ritvikpasham",
+   "created_at": "2024-11-09T18:12:14Z",
+   "body": "Yeah I am!"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-12T18:21:21Z",
+   "body": "@ritvikpasham:\r\n> Yeah I am!\r\n\r\nDo you need help to write the fix? The fix was provided as a patch in https://github.com/python/cpython/issues/126341#issuecomment-2453414047."
+  },
+  {
+   "author": "ritvikpasham",
+   "created_at": "2024-11-12T18:59:02Z",
+   "body": "Sorry for the delay. I'll finish it in the next hour."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126759",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a12690ef49e8fc8a3af4c5f1757eb3caffb35e03",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a7414313c59e404995e0e33e7a8e85e753000956",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1af10dec6ea991725c506fe39e5baf39c996ade5",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126778",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126779",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0bdcc84ae99ff695b10b2f13c5a00497ce0840e5",
+   "actor": "Eclips4"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3fe062c98d5b25766740effa866bbf9e38c0a585",
+   "actor": "Eclips4"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Eclips4"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0c6ec4ac6bdf79545d243588d90e97088112b5ce",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6adefa16e3e5eff3735d2903832f0bef18ee7247",
+   "actor": "ebonnal"
+  }
+ ]
+}

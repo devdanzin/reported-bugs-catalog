@@ -1,0 +1,70 @@
+{
+ "repo": "python/cpython",
+ "number": 132472,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132472",
+ "title": "Speed up `Fraction.__round__` for large negative `ndigits`",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-feature",
+  "performance",
+  "stdlib"
+ ],
+ "created_at": "2025-04-13T11:23:18Z",
+ "closed_at": "2025-04-19T06:02:54Z",
+ "body": "# Feature or enhancement\n\n### Proposal:\n\nRounding a `Fraction` to a large negative `ndigits` takes a long time, only to return `Fraction(0, 1)`:\n\n```python\n>>> from fractions import Fraction\n>>> large_negative_number = -2**31\n>>> d = Fraction(17, 33)\n>>> d.__round__(large_negative_number)  # Takes forever, calculating `10**abs(ndigits)`\n```\n\nUsing the check below, the code above returns almost instantly:\n```python\nif ndigits < 0 and int(math.log10(self)) < abs(ndigits):\n    return Fraction(0, 1)\n```\n\nI realize there may not be a real use case for this enhancement. OTOH, it's such a simple code change that it might make sense. If it's considered worthy of implementing, I can submit a PR (which also speeds up `_round_to_exponent` in a similar way).\n\ncc @JelleZijlstra\n\n### Has this already been discussed elsewhere?\n\nThis is a minor feature, which does not need previous discussion elsewhere\n\n### Links to previous discussion of this feature:\n\nIt was very briefly discussed on Discord.",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-13T11:30:49Z",
+   "body": "Please, provide a benchmark for before and after. You can use `pyperf`, for example."
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2025-04-13T12:17:47Z",
+   "body": "Same remark as for integer case (and same example \"works\"), but here we also have implicit `self->float` conversion."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-13T13:32:27Z",
+   "body": "> Please, provide a benchmark for before and after.\n\nHere's one showing the improvements as `ndigits` grows. Unfortunately, the code has the issues @skirpichev pointed, so numbers might look worse with corrected code.\n```\n+----------------------------+-----------------------+----------------------------+\n| Benchmark                  | fraction_round_before | fraction_round_after       |\n+============================+=======================+============================+\n| Fraction.__round__(-2**1)  | 7.17 us               | 2.93 us: 2.45x faster      |\n+----------------------------+-----------------------+----------------------------+\n| Fraction.__round__(-2**7)  | 9.36 us               | 2.94 us: 3.18x faster      |\n+----------------------------+-----------------------+----------------------------+\n| Fraction.__round__(-2**14) | 809 us                | 2.99 us: 270.81x faster    |\n+----------------------------+-----------------------+----------------------------+\n| Fraction.__round__(-2**21) | 1.45 sec              | 2.96 us: 490332.01x faster |\n+----------------------------+-----------------------+----------------------------+\n| Geometric mean             | (ref)                 | 179.26x faster             |\n+----------------------------+-----------------------+----------------------------+\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-13T13:36:24Z",
+   "body": "> Same remark as for integer case (and same example \"works\"), but here we also have implicit `self->float` conversion.\n\nBummer. Unfortunately I don't have the maths or programming chops to correct the code, so I'm withdrawing my offer of a PR. \n\nFor reference, here's the incorrect diff to show the attempted improvement to `_round_to_exponent `:\n\n```diff\ndiff --git a/Lib/fractions.py b/Lib/fractions.py\nindex f0cbc8c2e6c..32b63e59899 100644\n--- a/Lib/fractions.py\n+++ b/Lib/fractions.py\n@@ -84,6 +84,15 @@ def _round_to_exponent(n, d, exponent, no_neg_zero=False):\n\n     d must be positive, but n and d need not be relatively prime.\n     \"\"\"\n+    if n == 0 or exponent > math.log10(abs(n)):\n+        sign = False\n+        if not no_neg_zero:\n+            if n == 0:\n+                sign = math.copysign(1.0, n) > 0\n+            elif (n < 0 and d < 0) or (n > 0 and d > 0) :\n+                sign = True\n+        return sign,  0\n+\n     if exponent >= 0:\n         d *= 10**exponent\n     else:\n@@ -971,6 +980,8 @@ def __round__(self, ndigits=None):\n                 return floor\n             else:\n                 return floor + 1\n+        if ndigits < 0 and int(math.log10(self)) < abs(ndigits):\n+            return Fraction(0, 1)\n         shift = 10**abs(ndigits)\n         # See _operator_fallbacks.forward to check that the results of\n         # these operations will always be Fraction and therefore have\n```"
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2025-04-13T13:54:54Z",
+   "body": "> numbers might look worse with corrected code\n\nNo, I don't expect that.\n\nYet your benchmark results seems cryptic for me.  I guess @sobolevn asked you to measure performance in case you hit *negative* test (i.e. `int(math.log10(self)) < abs(ndigits)` is `False`).  In your results you show big improvements, so I suspect you did measurements only for some fixed `self` and increasing `abs(ndigits)`.\n\n> Unfortunately I don't have the maths or programming chops to correct the code, so I'm withdrawing my offer of a PR.\n\nI think it's not too hard, especially for integers.  But if you aren't interested, I'll take over it.\n\nCC @mdickinson \n\nPS: Unfortunately, gmpy2's version (quoted in the [#132474](https://github.com/python/cpython/issues/132474)) seems buggy:\n```pycon\n>>> import gmpy2\n>>> round(gmpy2.mpz(501), gmpy2.mpz(-3))\nmpz(0)\n>>> round(int(gmpy2.mpz(501)), int(gmpy2.mpz(-3)))\n1000\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-13T14:20:00Z",
+   "body": "> I suspect you did measurements only for some fixed `self` and increasing `abs(ndigits)`.\n\nCorrect, I didn't think of negative cases.\n\n> I think it's not too hard, especially for integers. But if you aren't interested, I'll take over it.\n\nOh, I don't know C either. Please take it over, glad to have found something interesting :)"
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2025-04-19T06:02:54Z",
+   "body": "I think this can be postponed, until we decide with more basic case: #132474\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132474",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "skirpichev"
+  }
+ ]
+}

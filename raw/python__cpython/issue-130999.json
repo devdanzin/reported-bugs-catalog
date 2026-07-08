@@ -1,0 +1,192 @@
+{
+ "repo": "python/cpython",
+ "number": 130999,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/130999",
+ "title": "New REPL exits when there are non-string candidates for suggestions",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "stdlib",
+  "3.13",
+  "3.14",
+  "topic-repl"
+ ],
+ "created_at": "2025-03-09T03:04:25Z",
+ "closed_at": "2025-06-04T12:27:06Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe new REPL in main will exit if a suggestion would be offered, but there are non-string candidates like below:\n\n```python\n>>> import runpy\n... runpy._run_module_code(\"blech\", {0: \"\", \"bluch\": \"\"}, \"\")\n...\nException ignored in the internal traceback machinery:\nTraceback (most recent call last):\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 139, in _print_exception_bltin\n    return print_exception(exc, limit=BUILTIN_EXCEPTION_LIMIT, file=file, colorize=colorize)\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 129, in print_exception\n    te = TracebackException(type(value), value, tb, limit=limit, compact=True)\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1138, in __init__\n    context = TracebackException(\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1094, in __init__\n    suggestion = _compute_suggestion_error(exc_value, exc_traceback, wrong_name)\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1535, in _compute_suggestion_error\n    return _suggestions._generate_suggestions(d, wrong_name)\nTypeError: all elements in 'candidates' must be strings\nTraceback (most recent call last):\n  File \"<python-input-0>\", line 2, in <module>\n  File \"/home/danzin/projects/cpython/Lib/runpy.py\", line 98, in _run_module_code\n    _run_code(code, mod_globals, init_globals,\n  File \"/home/danzin/projects/cpython/Lib/runpy.py\", line 88, in _run_code\n    exec(code, run_globals)\n  File \"<string>\", line 1, in <module>\nNameError: name 'blech' is not defined\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/console.py\", line 173, in _excepthook\n    lines = traceback.format_exception(\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 154, in format_exception\n    te = TracebackException(type(value), value, tb, limit=limit, compact=True)\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1094, in __init__\n    suggestion = _compute_suggestion_error(exc_value, exc_traceback, wrong_name)\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1535, in _compute_suggestion_error\n    return _suggestions._generate_suggestions(d, wrong_name)\nTypeError: all elements in 'candidates' must be strings\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/home/danzin/projects/cpython/Lib/runpy.py\", line 198, in _run_module_as_main\n    return _run_code(code, main_globals, None,\n  File \"/home/danzin/projects/cpython/Lib/runpy.py\", line 88, in _run_code\n    exec(code, run_globals)\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/__main__.py\", line 6, in <module>\n    __pyrepl_interactive_console()\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/main.py\", line 59, in interactive_console\n    run_multiline_interactive_console(console)\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/simple_interact.py\", line 152, in run_multiline_interactive_console\n    more = console.push(_strip_final_indent(statement), filename=input_name, _symbol=\"single\")  # type: ignore[call-arg]\n  File \"/home/danzin/projects/cpython/Lib/code.py\", line 324, in push\n    more = self.runsource(source, filename, symbol=_symbol)\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/console.py\", line 231, in runsource\n    result = self.runcode(code)\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/console.py\", line 191, in runcode\n    self.showtraceback()\n  File \"/home/danzin/projects/cpython/Lib/code.py\", line 128, in showtraceback\n    self._showtraceback(typ, value, tb.tb_next, \"\")\n  File \"/home/danzin/projects/cpython/Lib/code.py\", line 144, in _showtraceback\n    self._excepthook(typ, value, tb)\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/console.py\", line 179, in _excepthook\n    lines = traceback.format_exception(\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 154, in format_exception\n    te = TracebackException(type(value), value, tb, limit=limit, compact=True)\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1138, in __init__\n    context = TracebackException(\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1094, in __init__\n    suggestion = _compute_suggestion_error(exc_value, exc_traceback, wrong_name)\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1535, in _compute_suggestion_error\n    return _suggestions._generate_suggestions(d, wrong_name)\nTypeError: all elements in 'candidates' must be strings\n```\n\nThis is an offshoot of #129573, where code like above would abort in 3.12.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a5+ (heads/main:a3990df6121, Mar  9 2025, 00:02:58) [GCC 13.3.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-131001\n* gh-135019\n* gh-135020\n* gh-135030\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2025-03-09T08:21:28Z",
+   "body": "Ok, I'll say it's a bug for 3.13/3.14 and a crash for 3.12 but the crash issue is tracked elsewhere "
+  },
+  {
+   "author": "terryjreedy",
+   "created_at": "2025-05-09T20:09:09Z",
+   "body": "In dup #133748, the code was  `globals().update({123: 'test'}); not_defined`.  However, `globals()[123] = 'a'; xxx` also works.  Both of these (on Windows) have just  one \"During handling ...\" section.  If REPL is started from an icon, it 'crashes' in that the window closes when the REPL quits due to its internal error (instead of printing the traceback and then a new '>>>' prompt).\n\nOn the other issue, @StanFromIreland proposed, as I understand it, that globals be made a string-only dict.  Since, AFAIK, it is not documented as such, I suspect that this would break something.  As I remember, @gvanrossum once rejected the idea of making class `.__dict__` string only, so that setting non-string attributes (with setattr, for instance), would raise.  I think the same may be true for globals dict.\n\nWith a non-string in globals, `dir()` exits with \"TypeError: '<' not supported between instances of 'int' and 'str'\".  This says a) non-strings in globals are not ordinarily a good idea, but b) the possibility has be anticipated and gracefully handled.  The simplest solution here is for the hinter to ignore non-strings as possible name corrections, as they definitely are not, instead of crashing the REPL."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-05-11T17:40:26Z",
+   "body": "Does it exit after this PR https://github.com/python/cpython/pull/131910 was merged?"
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2025-05-11T18:24:55Z",
+   "body": "> Does it exit after this PR https://github.com/python/cpython/pull/131910 was merged?\n\nIt still does. A reproducer was linked in the issue."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-05-13T09:47:40Z",
+   "body": "The fix is very simple, but I'd like some feedback on the best way to do it: https://github.com/python/cpython/pull/131001#issuecomment-2763338764. "
+  },
+  {
+   "author": "encukou",
+   "created_at": "2025-06-02T13:06:24Z",
+   "body": "I think the fix here is what's causing the buildbot failure seen at: https://buildbot.python.org/#/builders/1368/builds/3297:\n\n```\ntest test_traceback crashed -- Traceback (most recent call last):\n  File \"/Users/ec2-user/buildbot/buildarea/3.x.itamaro-macos-arm64-aws.macos-with-brew.refleak.nogil/build/Lib/test/libregrtest/single.py\", line 210, in _runtest_env_changed_exc\n    _load_run_test(result, runtests)\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"/Users/ec2-user/buildbot/buildarea/3.x.itamaro-macos-arm64-aws.macos-with-brew.refleak.nogil/build/Lib/test/libregrtest/single.py\", line 165, in _load_run_test\n    regrtest_runner(result, test_func, runtests)\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/ec2-user/buildbot/buildarea/3.x.itamaro-macos-arm64-aws.macos-with-brew.refleak.nogil/build/Lib/test/libregrtest/single.py\", line 114, in regrtest_runner\n    refleak, test_result = runtest_refleak(result.test_name, test_func,\n                           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                                           runtests.hunt_refleak,\n                                           ^^^^^^^^^^^^^^^^^^^^^^\n                                           runtests.quiet)\n                                           ^^^^^^^^^^^^^^^\n  File \"/Users/ec2-user/buildbot/buildarea/3.x.itamaro-macos-arm64-aws.macos-with-brew.refleak.nogil/build/Lib/test/libregrtest/refleak.py\", line 138, in runtest_refleak\n    result = test_func()\n  File \"/Users/ec2-user/buildbot/buildarea/3.x.itamaro-macos-arm64-aws.macos-with-brew.refleak.nogil/build/Lib/test/libregrtest/single.py\", line 162, in test_func\n    return run_unittest(test_mod, runtests)\n  File \"/Users/ec2-user/buildbot/buildarea/3.x.itamaro-macos-arm64-aws.macos-with-brew.refleak.nogil/build/Lib/test/libregrtest/single.py\", line 33, in run_unittest\n    tests = loader.loadTestsFromModule(test_mod)\n  File \"/Users/ec2-user/buildbot/buildarea/3.x.itamaro-macos-arm64-aws.macos-with-brew.refleak.nogil/build/Lib/unittest/loader.py\", line 100, in loadTestsFromModule\n    for name in dir(module):\n                ~~~^^^^^^^^\nTypeError: '<' not supported between instances of 'int' and 'str'\n1 test failed again:\n    test_traceback\n\n```"
+  },
+  {
+   "author": "ambv",
+   "created_at": "2025-06-02T13:54:58Z",
+   "body": "I'm on it.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131001",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/133748",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "baccfdb3d4d004cfb5308674e5e6ea6e598abcd7",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9e90086ad12943dae5fa015da11b06841acbdae8",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3d4ea1894f706a3c5444f553bdf7f013160d9f20",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135019",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135020",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "944169fae59a47b006f3fc087f7cc1c1aee3c509",
+   "actor": "ambv"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135030",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a7b9dfd3089a8de7b1d38db15ee2b780bda793d",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "702f89f039805834043d6ad32612969c077e911a",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "055827528fa50c9a7707792f5fe264c4e20c07e9",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7775d93e2d142ab66c7d8fa7cff068b2522a37b0",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7ca17edd13c77a38d1a7b7f3c0becff63f7e2506",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/129573",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7a9e5026b5088d2ce48ea1cb1d92a908b1b966e4",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3e18a3c08736f96f35c4abe6539d4850be66c88b",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2c7bac955edd3fc60d95e7834ddf205542f6e035",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "31f0d6e454e959b09e68cc4400a6e9399fb1bf88",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a16ddb624853ef851dd82850383ac8f17b43523",
+   "actor": "Agent-Hellboy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3fa92652f8af90dd788a5a6100fffe8b41f6b665",
+   "actor": "Agent-Hellboy"
+  }
+ ]
+}

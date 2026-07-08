@@ -1,0 +1,42 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 520,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/520",
+ "title": "partition/argpartition leak ~80 KB per invalid-kth error",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:34:05Z",
+ "closed_at": "2026-03-31T07:44:22Z",
+ "body": "`partition` calls `PyArray_NewCopy` to create a working copy, and `argpartition` calls `PyArray_EMPTY` to create an output array. When the `kth` bounds check fails, both return NULL without `Py_DECREF`ing the allocated array \u2014 leaking one full array copy per error.\n\n**File(s):** `nonreduce_axis_template.c:56-64` (partition), `nonreduce_axis_template.c:164-175` (argpartition)\n\n**Reproducer:**\n\n```python\nimport bottleneck as bn\nimport numpy as np\nimport tracemalloc, gc\n\narr = np.random.rand(10000)\n\ntracemalloc.start()\nfor _ in range(100):\n    try: bn.partition(arr, kth=-1)\n    except ValueError: pass\ngc.collect()\nbefore = tracemalloc.get_traced_memory()[0]\n\nfor _ in range(5000):\n    try: bn.partition(arr, kth=-1)\n    except ValueError: pass\n\ngc.collect()\nafter = tracemalloc.get_traced_memory()[0]\ndelta = after - before\nprint(f\"partition(kth=-1) x5000: {delta} bytes ({delta/5000:.0f} bytes/call)\")\n# Output: 400561560 bytes (80112 bytes/call)\n```\n\n80,112 bytes = 10,000 \u00d7 8 bytes (float64) + overhead. `argpartition` shows the same leak rate. Any application that validates input by catching `ValueError` will leak the entire array copy on each failed call.\n\n**Suggested fix:** Add `Py_DECREF` on the error paths:\n\n```c\n// partition \u2014 before:\nif (n < 0 || n > LENGTH - 1) {\n    PyErr_Format(PyExc_ValueError, ...);\n    return NULL;\n}\n\n// partition \u2014 after:\nif (n < 0 || n > LENGTH - 1) {\n    PyErr_Format(PyExc_ValueError, ...);\n    Py_DECREF(a);  // a is the copy from PyArray_NewCopy\n    return NULL;\n}\n```\n\nSame pattern for `argpartition` with `Py_DECREF(y)`.\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-30T14:17:42Z",
+   "body": "bug and fix confirmed."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/533",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 527,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/527",
+ "title": "Missing pystr_kth in intern_strings return check",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:35:43Z",
+ "closed_at": "2026-04-02T20:42:40Z",
+ "body": "In `nonreduce_axis_template.c`, the `intern_strings()` function interns four strings but the return check only validates three:\n\n```c\npystr_a = PyUnicode_InternFromString(\"a\");\npystr_n = PyUnicode_InternFromString(\"n\");\npystr_kth = PyUnicode_InternFromString(\"kth\");\npystr_axis = PyUnicode_InternFromString(\"axis\");\nreturn pystr_a && pystr_n && pystr_axis;  // Missing: pystr_kth\n```\n\nIf `PyUnicode_InternFromString(\"kth\")` fails while the others succeed, the module init reports success but `pystr_kth` is NULL. Later, `PyDict_GetItem(kwds, pystr_kth)` passes NULL as a key.\n\nIn practice this is not triggerable on CPython (short ASCII strings like \"kth\" are pre-interned and `PyUnicode_InternFromString` cannot fail for them), but the missing check is a real code defect.\n\n**File(s):** `nonreduce_axis_template.c:399`\n\n**Suggested fix:**\n\n```c\n// Before:\nreturn pystr_a && pystr_n && pystr_axis;\n\n// After:\nreturn pystr_a && pystr_n && pystr_kth && pystr_axis;\n```\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/544",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

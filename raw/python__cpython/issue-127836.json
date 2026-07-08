@@ -1,0 +1,85 @@
+{
+ "repo": "python/cpython",
+ "number": 127836,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127836",
+ "title": "Assertion failure on finalization with `_lsprof` and `asyncio` in 3.12",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-asyncio",
+  "type-crash",
+  "3.12"
+ ],
+ "created_at": "2024-12-11T17:27:12Z",
+ "closed_at": "2025-02-23T02:58:41Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort the interpreter in 3.12 during finalization by having a mix of enabled `_lsprof` and `asyncio` with very specific details:\n\n```python\nimport asyncio\nimport _lsprof\n\nobj = _lsprof.Profiler()\nobj.enable()\nobj._pystart_callback(lambda: 0, 0)\nobj = None  # Required\n\nloop = asyncio.get_event_loop()\n```\nNot having `loop` stored in a variable or not reassigning `obj` breaks the testcase.\nAbort message:\n```\npython: Python/instrumentation.c:958: call_instrumentation_vector: Assertion `instrumentation_cross_checks(tstate->interp, code)' failed.\nAborted\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.12\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.12.8+ (heads/3.12:b0615a8a9aa, Dec 11 2024, 13:46:42) [GCC 11.4.0]",
+ "comments": [
+  {
+   "author": "graingert",
+   "created_at": "2024-12-11T19:27:40Z",
+   "body": "Can you repeat this with `asyncio.new_event_loop()`?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-12-11T21:07:35Z",
+   "body": "It fails with the same message. "
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-12-11T22:14:46Z",
+   "body": "The reproducer seems to pass just fine on release builds. I suspect that the assertion just needs to get removed."
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-12-11T23:10:16Z",
+   "body": "No please do not just remove random assertions. That assertion indicates that on that specific code object, the monitoring events are not consistent. We should figure out why."
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2025-02-18T16:22:13Z",
+   "body": "Hmm, it seems to be fine with main branch as well. @devdanzin does it only repro on 3.12?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-18T19:13:30Z",
+   "body": "Yes, I was only able to hit the assertion failure in 3.12."
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2025-02-18T19:48:51Z",
+   "body": "Hmm, if it's fixed somehow in 3.13, and it's a very rare issue (only the assertion failure, no observable problem with released branch), it's probably not worth it to investigate it. (It's pretty close to the last bug-fix release for 3.12 too)."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-02-20T14:06:15Z",
+   "body": "Should we just close this, then?"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2025-02-20T16:31:29Z",
+   "body": "I'm inclined to close this, unless others disagree."
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2025-02-23T02:58:41Z",
+   "body": "Let's close this for now. If anyone would like to keep it open feel free to reopen it. Just remember that that last bug-fix version 3.12.10 is scheduled to be released on 4/8/2025. If we can't make that deadline, the fix won't be merged."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127842",
+   "commit": null,
+   "actor": "c144-tht"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "gaogaotiantian"
+  }
+ ]
+}

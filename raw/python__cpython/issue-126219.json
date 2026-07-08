@@ -1,0 +1,122 @@
+{
+ "repo": "python/cpython",
+ "number": 126219,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126219",
+ "title": "`tkinter.Tk` segfault with invalid `className`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "topic-tkinter",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-10-31T02:55:21Z",
+ "closed_at": "2026-06-24T06:31:41Z",
+ "body": "# Crash report\r\n\r\n### What happened?\r\n\r\nIt's possible to crash Python by passing an invalid `className` to `_tkinter.create`, for example:\r\n```python\r\nimport  _tkinter \r\n_tkinter.create(None, '', '\\U0010FFFF', None)\r\n```\r\n\r\nOr, using `tkinter.Tk` (repro thanks to @graingert and @JelleZijlstra):\r\n```python\r\n% ./python.exe \r\nPython 3.14.0a0 experimental free-threading build (heads/gh-125331:c315120a535, Oct 30 2024, 11:22:31) [Clang 15.0.0 (clang-1500.3.9.4)] on darwin\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>> import tkinter\r\n... tkinter.Tk(screenName=None, baseName='', className='\\U0010FFFF')\r\n... \r\nzsh: segmentation fault  ./python.exe\r\n```\r\n\r\nBacktrace looks like:\r\n\r\n```gdb\r\n#0  0x00007ffff77bab5b in Tcl_UtfToUniChar () from /lib/x86_64-linux-gnu/libtcl8.6.so\r\n#1  0x00007ffff77bc993 in ?? () from /lib/x86_64-linux-gnu/libtcl8.6.so\r\n#2  0x00007ffff77bb795 in Tcl_UtfToTitle () from /lib/x86_64-linux-gnu/libtcl8.6.so\r\n#3  0x00007ffff78b5083 in ?? () from /lib/x86_64-linux-gnu/libtk8.6.so\r\n#4  0x00007ffff79dcf9d in Tcl_AppInit (interp=0x555555e14860) at ./Modules/tkappinit.c:40\r\n#5  0x00007ffff79d92b4 in Tkapp_New (screenName=screenName@entry=0x0,\r\n    className=className@entry=0x7ffff7c2c1c0 \"\\364\\217\\277\\277\", interactive=interactive@entry=0,\r\n    wantobjects=wantobjects@entry=0, wantTk=wantTk@entry=1, sync=sync@entry=0, use=0x0)\r\n    at ./Modules/_tkinter.c:730\r\n#6  0x00007ffff79d953f in _tkinter_create_impl (module=module@entry=<module at remote 0x7ffff7ab9eb0>,\r\n    screenName=screenName@entry=0x0, baseName=baseName@entry=0x555555c77ef0 <_PyRuntime+51344> \"\",\r\n    className=className@entry=0x7ffff7c2c1c0 \"\\364\\217\\277\\277\", interactive=interactive@entry=0,\r\n    wantobjects=wantobjects@entry=0, wantTk=1, sync=0, use=0x0) at ./Modules/_tkinter.c:3176\r\n#7  0x00007ffff79d99c6 in _tkinter_create (module=<module at remote 0x7ffff7ab9eb0>, args=0x7ffff7fb0080,\r\n    nargs=<optimized out>) at ./Modules/clinic/_tkinter.c.h:820\r\n#8  0x00005555556f18b0 in cfunction_vectorcall_FASTCALL (\r\n    func=<built-in method create of module object at remote 0x7ffff7ab9eb0>, args=0x7ffff7fb0080,\r\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:436\r\n#9  0x000055555567ba55 in _PyObject_VectorcallTstate (tstate=0x555555cbbc70 <_PyRuntime+329232>,\r\n    callable=<built-in method create of module object at remote 0x7ffff7ab9eb0>, args=0x7ffff7fb0080,\r\n    nargsf=9223372036854775812, kwnames=0x0) at ./Include/internal/pycore_call.h:167\r\n```\r\n\r\n\r\nFound using fusil by @vstinner. \r\n\r\n### CPython versions tested on:\r\n\r\n3.12, 3.14, CPython main branch\r\n\r\n### Operating systems tested on:\r\n\r\nLinux, macOS, Windows\r\n\r\n### Output from running 'python -VV' on the command line:\r\n\r\nPython 3.14.0a1+ (heads/main:d467d9246c, Oct 30 2024, 22:52:43) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151980\n* gh-152045\n* gh-152046\n* gh-152047\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "JelleZijlstra",
+   "created_at": "2024-10-31T03:04:10Z",
+   "body": "(I think @graingert came up with the `tkinter.Tk` repro, I just ran it :) )"
+  },
+  {
+   "author": "terryjreedy",
+   "created_at": "2024-10-31T05:46:26Z",
+   "body": "U+10FFFF is a valid code point but (edit) in a sense not a valid character.  A nice choice for fuzzing.  \"There are also 66 non-characters. These are defined in part in Corrigendum #9: 34 values of the form U+nFFFE and U+nFFFF (where n is a value 0x00000, 0x10000, \u2026 0xF0000, 0x100000), and 32 values U+FDD0 - U+FDEF.\"\r\n\r\n[tk doc](https://www.tcl.tk/man/tcl8.6/TkCmd/toplevel.htm#M7l) says nothing directly about what is a class name but hints that is should be displayable.  \"Specifies a class for the window. ... Some window managers display the class name for windows in their dock ... .\" "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T09:05:51Z",
+   "body": "cc @serhiy-storchaka "
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2024-11-16T10:37:40Z",
+   "body": "I suspect that this is a Tk or Tcl bug. I do not see anything wrong on our side. Tcl before 9.0 does not support non-BMP characters well, `Tcl_UtfToUniChar()` does not work, and somewhere they forget to check for error. This may be improved with Tcl 9."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2024-11-16T11:11:06Z",
+   "body": "On other hand, it is not so easy to reproduce this with a pure Tcl -- `subprocess.call(['\\U0010FFFF'], executable='tclsh')` does not crash. There should be something else to trigger a crash."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-06-24T06:32:20Z",
+   "body": "It is now a TclError."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151980",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bf0f06af0692a792b9fa8463ae6e1cce618eb0f0",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8088525b7f49d0b8213554d7818239ef1b90da74",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "124c7cd91be8cff76d1eec0adef65991c23c4419",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152045",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152046",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152047",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ba13d34fb8f730f8f087f3756a4a7adfe3f04eb",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "32546b728eea7c2757210ee89bb43d360a29a5fa",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dbc9b686e02abb9af57f16184666ba9a344f8004",
+   "actor": "serhiy-storchaka"
+  }
+ ]
+}

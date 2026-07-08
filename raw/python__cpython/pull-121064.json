@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 121064,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/121064",
+ "title": "[3.13] gh-121016: Add test for PYTHON_BASIC_REPL envioronment variable (GH-121017)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news",
+  "topic-repl"
+ ],
+ "created_at": "2024-06-26T20:49:28Z",
+ "closed_at": "2024-06-26T21:17:14Z",
+ "body": "This PR adds a test for `PYTHON_BASIC_REPL` setting the interpreter to use the basic REPL, using a technique suggested by @AlexWaygood on Discord.\r\n\r\n(cherry picked from commit https://github.com/python/cpython/commit/9e45fd9858a059950f7387b4fda2b00df0e8e537)\r\n\r\nCo-authored-by: devdanzin <74280297+devdanzin@users.noreply.github.com>\r\n\r\n<!-- gh-issue-number: gh-121016 -->\r\n* Issue: gh-121016\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/121016",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/121017",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "bc515b332bef0eaa3064d3b912ad660932ad8c90",
+   "actor": "AlexWaygood"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "AlexWaygood"
+  }
+ ]
+}

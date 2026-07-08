@@ -1,0 +1,36 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 534,
+ "type": "pull",
+ "url": "https://github.com/pydata/bottleneck/pull/534",
+ "title": "BUG: fix memory leaks in `rankdata` when called on non C-contiguous arrays",
+ "state": "closed",
+ "state_reason": null,
+ "author": "neutrinoceros",
+ "author_association": "COLLABORATOR",
+ "labels": [],
+ "created_at": "2026-03-30T14:43:31Z",
+ "closed_at": "2026-03-31T09:04:27Z",
+ "body": "close #521 as suggested",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b288f20e969da2cf7904650b65f40378c88ba50e",
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/545",
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

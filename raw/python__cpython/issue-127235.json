@@ -1,0 +1,84 @@
+{
+ "repo": "python/cpython",
+ "number": 127235,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127235",
+ "title": "Failed assertion in `Python/legacy_tracing.c:431` on a free-threading build",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2024-11-24T18:51:30Z",
+ "closed_at": "2025-11-17T15:55:05Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to cause an abort on `!_PyMem_IsPtrFreed(tstate)` while running with `PYTHON_GIL=0` by calling the following code:\n```python\nimport threading\n\ndef errback(*args, **kw):\n    raise ValueError('error')\n\nfor x in range(200):\n    threading._start_joinable_thread(errback)\n    try:\n        threading.setprofile_all_threads(\"\")\n    except:\n        pass\n```\nAbort message:\n```\npython: Python/legacy_tracing.c:431: is_tstate_valid: Assertion `!_PyMem_IsPtrFreed(tstate)' failed.\nAborted\n```\nNot sure this isn't an expected failure mode.\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a2+ experimental free-threading build (heads/main-dirty:a13e94d84bf, Nov 23 2024, 07:16:19) [GCC 11.4.0]",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-25T15:50:16Z",
+   "body": "Does this occur without use of the private `_start_joinable_thread`?"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-25T16:26:28Z",
+   "body": "I'm pretty sure that this is not limited to free threading. It's not safe to access other `PyThreadState`s without holding the runtime lock because those threads may exit. I think that we release the lock here because of reentrancy/deadlock concerns, but it's still not safe.\r\n\r\nThe reproducers involving the GIL are slightly more complicated because `PyThreadState_DeleteCurrent` is called with the GIL, which prevents most of these crashes. However, `PyThreadState_Delete` is called *without* the GIL and can lead to the crash.\r\n\r\nhttps://github.com/python/cpython/blob/3e7ce6e9aed8616c8ce53eaef4279402d3ee38ec/Python/ceval.c#L2402-L2421\r\n\r\nI think we have various reports of the same underlying issue. This issue is a nice reproducer for free threading, though.\r\n\r\nFor example:\r\n* https://github.com/python/cpython/issues/40857"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-27T17:57:09Z",
+   "body": "Ok, I've pondered this issue for a day or so and I think that the simplest solution for this specific case is to just wait for the per-interpreter thread state lock (GH-127115) to get merged. `HEAD_LOCK` tends to be annoyingly reentrant, so by just switching to that, we should be able to fix any unsafe usage because it shouldn't be nearly as reentrancy prone. (FWIW, I'm somewhat in favor of making the runtime lock recursive with how much of a PITA it is to use, but whatever.)\r\n\r\nThe much bigger issue at hand here is that `PyThreadState_Next` and friends are public APIs, so they aren't able to `HEAD_LOCK`. Somehow, we need to lock inside of those functions rather than relying on the caller to lock the runtime. I don't think there's anything we can do about `PyThreadState_Next`, because even if we somehow got thread states in a thread-safe way internally, and then magically made it safe to use the thread state without worrying about concurrent modifications (which would be impossible, unless we did something silly like copying the thread state and returning that), there's nothing stopping the list of thread states from being changed in between calls, so it could possibly skip over entries or return duplicates. Our best shot is probably to just deprecate `PyThreadState_Next` and invent something new and safer for users.\r\n\r\nSome other functions we need to worry about in terms of thread safety:\r\n\r\n- `PyInterpreterState_ThreadHead`: Same issue as `PyThreadState_Next`, pretty much.\r\n- `PyGILState_GetThisThreadState`: I'm not sure how this will work with subinterpreters, because apparently `PyGILState` doesn't play nicely with them. I could imagine some interesting edge cases coming up related to locking there because apparently GILState checks are disabled if subinterpreters are active.\r\n- `PyThreadState_GetDict`: Returns an evil borrowed reference. If the thread state gets switched out, the user can still hold a reference to that dictionary. Even worse, on a GILful build, trying to use that dictionary without having the thread state attached is just not thread safe at all if you try to access it from a different GIL.\r\n- `PyThreadState_GetFrame`: Not borrowed, but still has the object thread safety issue with the cross-GIL that I mentioned above. I think for both of these functions it's probably fine to just mention in the docs that you can only use the references while the thread state is attached.\r\n- `PyThreadState_Swap`: Not inherently dangerous, but could lead to misue that we should document. This returns a not-attached thread state, which is ripe for abuse by any of the other `PyThreadState` APIs. (Also, what happens if e.g. the interpreter starts to exit while its detached?)\r\n\r\nFor the future, I think we should probably steer clear of *any* support for using a detached thread state. Perhaps we could invent some new API (`PyThreadStateView`?) that has more clear thread safety requirements and push that for users.\r\n\r\nTL;DR we probably need to document and deprecate some non-thread-safe thread state APIs."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-11-17T10:13:58Z",
+   "body": "I can't reproduce this on current main, @devdanzin are you able to reproduce?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-17T10:51:06Z",
+   "body": "Can't test it right now, but will try later. But on a quick search, maybe it was fixed by https://github.com/python/cpython/pull/137518?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-11-17T15:38:28Z",
+   "body": "The reproducer fails with this error on the main branch:\n\n```\nException ignored in thread started by <function errback at 0x7f130084abd0>:\n(...)\nException ignored in thread started by <function errback at 0x7f130084abd0>:\nException ignored in thread started by <function errback at 0x7f130084abd0>:\nException ignored in thread started by <function errback at 0x7f130084abd0>:\nFatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedWriter name='<stderr>'> at interpreter shutdown, possibly due to daemon threads\nPython runtime state: finalizing (tstate=0x0000000000a0c640)\n\nCurrent thread 0x00007f130e8cc780 [python] (most recent call first):\n  <no Python frame>\nAbandon                    (core dumped)./python x.py\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-11-17T15:53:41Z",
+   "body": "Oh sorry, ignore my previous comment. I missed the fact that the issue is specific to Free Threading.\n\n> Can't test it right now, but will try later. But on a quick search, maybe it was fixed by https://github.com/python/cpython/pull/137518?\n\nBefore this change, I randomly got crashes like:\n\n```\nThread 1 \"python\" received signal SIGSEGV, Segmentation fault.\n0x0000000000649df8 in setup_profile (tstate=tstate@entry=0xac5db0, \n    func=func@entry=0x6754b0 <profile_trampoline>, arg=arg@entry='', \n    old_profileobj=old_profileobj@entry=0x7fffffffd288)\n    at Python/legacy_tracing.c:485\n485\t    tstate->interp->sys_profiling_threads += delta;\nMissing rpms, try: dnf --enablerepo='*debug*' install glibc-debuginfo-2.42-4.fc43.x86_64\n(gdb) p tstate->interp\n$1 = (PyInterpreterState *) 0xdddddddddddddddd\n```\n\nOn the main branch, I **can no longer reproduce the `setup_profile()` bug**, but I get randomly the following error:\n\n```\nFatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedWriter name='<stderr>'> at interpreter shutdown, possibly due to daemon threads\nPython runtime state: finalizing (tstate=0x0000000000a44a90)\n\nStack (most recent call first):\n  <no Python frame>\n\nThread 1 \"python\" received signal SIGABRT, Aborted.\n```\n\nMoreover, sometimes the program hangs, likely a deadlock related to `stderr`."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-11-17T15:54:02Z",
+   "body": "> I can't reproduce this on current main, @devdanzin are you able to reproduce?\n\nMe neither. I suggest closing this issue as FIXED."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-18T09:22:33Z",
+   "body": "Cannot reproduce after extensive testing with tweaked test cases."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-11-18T13:33:23Z",
+   "body": "> Cannot reproduce after extensive testing with tweaked test cases.\n\nThanks for double checking!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ]
+}

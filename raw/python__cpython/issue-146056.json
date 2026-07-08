@@ -1,0 +1,310 @@
+{
+ "repo": "python/cpython",
+ "number": 146056,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146056",
+ "title": "Crash in repr() for lists containing NULLs",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "topic-XML",
+  "type-crash"
+ ],
+ "created_at": "2026-03-17T12:19:15Z",
+ "closed_at": "2026-03-23T11:20:19Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter from a double-free in `xml.etree.ElementTree.TreeBuilder`. Please let me know if the automated diagnosis is incorrect and whether you prefer me not to post it in new issues.\n\n### Automated diagnosis:\n\n**Missing Py_NewRef causes double-free in treebuilder_handle_end (line 2851)**: `Py_XSETREF(self->last_for_tail, self->last)` stores into `last_for_tail` without taking a new reference. Both fields point to the same object with only one reference. `treebuilder_gc_clear` decrements twice \u2014 a double-free triggered on every XML end tag. Lines 2882 and 2922 demonstrate the correct pattern with `Py_NewRef`.\nFix: `Py_XSETREF(self->last_for_tail, Py_NewRef(self->last));`\n\nMRE:\n```python\nimport xml.etree.ElementTree\nimport gc\n\nbuilder = xml.etree.ElementTree.TreeBuilder()\nfor x in range(10):\n    builder.start(\"a\", {})\nfor x in range(10):\n    builder.end(\"a\")\nroot = builder.close()\nprint(gc.get_referrers(root[0]))\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555555b5ca97 in Py_INCREF (op=0x0) at ./Include/refcount.h:281\n281         PY_UINT32_T cur_refcnt = op->ob_refcnt;\n(gdb) bt\n#0  0x0000555555b5ca97 in Py_INCREF (op=0x0) at ./Include/refcount.h:281\n#1  _Py_NewRef (obj=0x0) at ./Include/refcount.h:529\n#2  list_repr_impl (v=0x7c6ff70471a0) at Objects/listobject.c:604\n#3  list_repr (self=0x7c6ff70471a0) at Objects/listobject.c:644\n#4  0x0000555555bf05dc in PyObject_Repr (v=v@entry=0x7c6ff70471a0) at Objects/object.c:781\n#5  0x0000555555cdc514 in PyUnicodeWriter_WriteRepr (writer=writer@entry=0x7c6ff71b2390, obj=obj@entry=0x7c6ff70471a0) at Objects/unicode_writer.c:390\n#6  0x0000555555b5cb0b in list_repr_impl (v=0x7c6ff70749a0) at Objects/listobject.c:615\n#7  list_repr (self=0x7c6ff70749a0) at Objects/listobject.c:644\n#8  0x0000555555bf028b in PyObject_Str (v=0x7c6ff70749a0) at Objects/object.c:823\n#9  0x0000555555b26f23 in PyFile_WriteObject (v=0x7c6ff70749a0, f=0x7d0ff70126a0, flags=flags@entry=1) at Objects/fileobject.c:119\n#10 0x0000555555e4de11 in builtin_print_impl (module=0x7ccff6fe6450, objects=0x7bfff5db6b28, objects_length=1, sep=0x0, end=0x0, file=0x7d0ff70126a0, flush=0) at Python/bltinmodule.c:2356\n#11 builtin_print (module=<optimized out>, args=<optimized out>, nargs=<optimized out>, kwnames=0x0) at Python/clinic/bltinmodule.c.h:1122\n#12 0x0000555555bde65c in cfunction_vectorcall_FASTCALL_KEYWORDS (func=func@entry=0x7c7ff70374c0, args=args@entry=0x7bfff5db6b28, nargsf=nargsf@entry=9223372036854775809,\n    kwnames=kwnames@entry=0x0) at Objects/methodobject.c:465\n#13 0x0000555555ab9e00 in _PyObject_VectorcallTstate (tstate=0x5555568f7b18 <_PyRuntime+360664>, callable=0x7c7ff70374c0, args=0x7bfff5db6b28, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:136\n#14 0x0000555555e588dd in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=<optimized out>, total_args=1, kwnames=..., call_instrumentation=<optimized out>,\n    frame=<optimized out>, this_instr=<optimized out>, tstate=<optimized out>) at Python/ceval.c:770\n#15 0x0000555555e94263 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1838\n#16 0x0000555555e57778 in _PyEval_EvalFrame (tstate=0x5555568f7b18 <_PyRuntime+360664>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#17 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2134\n#18 0x0000555555e57195 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff70884c0) at Python/ceval.c:681\n#19 0x0000555556061fb0 in run_eval_code_obj (tstate=tstate@entry=0x5555568f7b18 <_PyRuntime+360664>, co=co@entry=0x7d5ff6ffe990, globals=globals@entry=0x7c7ff70884c0,\n    locals=locals@entry=0x7c7ff70884c0) at Python/pythonrun.c:1368\n```\n\n### Claude explanation of the MRE and crash:\n\n1. The loop calls `builder.end(\"a\")` 10 times, each time executing line 2851: `Py_XSETREF(self->last_for_tail, self->last)` \u2014 missing `Py_NewRef`. Each end tag over-decrements the element it touches.\n2. After `builder.close()`, `root[0]` (the innermost `<a>`) has had its refcount corrupted \u2014 it's lower than it should be.\n3. `gc.get_referrers(root[0])` returns a list containing objects that reference that element. One of those referrers is the `TreeBuilder`'s internal stack list, which itself contains elements with corrupted refcounts.\n4. `print()` calls `list_repr` on that referrers list, which calls `Py_NewRef` on each item. When it hits an element whose refcount was decremented to 0 (already freed), `op` is `NULL` or points to freed memory \u2192 segfault at `Py_INCREF(op=0x0)`.\n\nThe backtrace confirms it: `list_repr_impl` at `listobject.c:604` tries to `Py_NewRef` a `NULL` pointer \u2014 an object that was prematurely freed due to the cumulative over-decrements from the 10 `end()` calls.\n\n----\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:99e2c5eccd2, Mar 17 2026, 08:26:50) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146062\n* gh-146129\n* gh-146155\n* gh-146167\n* gh-146204\n* gh-146213\n* gh-146271\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-17T14:27:46Z",
+   "body": "> Missing Py_NewRef causes double-free in treebuilder_handle_end\n\nIt's not a double free, but the TreeBuilder stack list which contains NULL items. `repr(stack)` crashes since `list_repr()` makes the assumptions that all list items are not `NULL`.\n\nAlso, `treebuilder_handle_end()` has a surprising code to handle references, but the current \"works\" (by luck):\n\n```c\n    item = self->last;\n    self->last = Py_NewRef(self->this);\n    Py_XSETREF(self->last_for_tail, self->last);\n    self->index--;\n    self->this = Py_NewRef(PyList_GET_ITEM(self->stack, self->index));\n    Py_DECREF(item);\n```\n\n`last_for_tail` assignment consumes one reference to `this`, but then `this` is set without decrementing its reference count (no Py_SETREF, no Py_DECREF): so `last_for_tail` ref count is correct at the end.\n\nWhile the code works (by luck), I prefer to change it to make reference counting more explicit.\n\nI wrote PR gh-146062 to fix TreeBuilder stack and fix `treebuilder_handle_end()` reference counting."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-03-18T16:24:53Z",
+   "body": "Other way to fix this is to make the list's repr safe for NULLs. This is not the only place were we preallocate a non-empty list, and in the GIL-less build we can expect more random crashes when inspecting `gc.get_referrers()`, `gc.get_referents()` or `gc.get_objects()` or playing with debugger."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T16:30:08Z",
+   "body": "I would prefer to leave `repr(tuple)` and `repr(list)` unchanged if possible.\n\n> This is not the only place were we preallocate a non-empty list, and in the GIL-less build we can expect more random crashes when inspecting gc.get_referrers(), gc.get_referents() or gc.get_objects() or playing with debugger.\n\nWe should fix these issues on a case by case basis."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-03-18T16:55:26Z",
+   "body": "This was a regression in `list.__repr__()` introduced in 3.13."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T17:51:01Z",
+   "body": "Oh, `PyObject_Repr(NULL)` already returns the string `\"<NULL>\"`, I didn't know that.\n\n> This was a regression in list.__repr__() introduced in 3.13.\n\nOh, I added this regression in commit 3de0f55f3410ae835923d10ae098558900a9a121 (fix for another bug). Well, there was no test for `repr(list)` with `NULL` :-)"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-03-19T08:16:22Z",
+   "body": "There were two breaking changes -- adding incref and using the PyUnicodeWriter C API. The latter broke also the repr of uninitialized tuples and perhaps other objects. So the simplest way is to fix `PyUnicodeWriter_WriteRepr()`, otherwise we would need to add a workaround for each use of `PyUnicodeWriter_WriteRepr()` (and leave unexploded bombs in the user code)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-23T11:20:19Z",
+   "body": "The reproducer does no longer crash:\n\n```\n[[None, <Element 'a' at 0x7fb7d75f9310>, <Element 'a' at 0x7fb7d73cf5f0>, <Element 'a' at 0x7fb7d73cf6b0>, <Element 'a' at 0x7fb7d73cf770>, <Element 'a' at 0x7fb7d73cf830>, <Element 'a' at 0x7fb7d73cf8f0>, <Element 'a' at 0x7fb7d73cf9b0>, <Element 'a' at 0x7fb7d73cfa70>, <Element 'a' at 0x7fb7d73cfb30>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>], <Element 'a' at 0x7fb7d75f9310>]\n```\n\nInstead, it displays the stack list which contains `<NULL>` items.\n\nThanks @devdanzin for your bug report and thanks @serhiy-storchaka for the generic fix (backported to 3.13 and 3.14 branches)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8d2d68f5c3a5dbee7be395f38412f2632edb3946",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146062",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3824c229e80fd0fd3879838b7c5e03a71d7c8953",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5a1e0ad8c1b0d734b231d6c34d7e51c682b76654",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146129",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0f2246b1553f401da5ade47e0fd1c80ad7a8dfa5",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3af9bbbd4ca678fa812d14453bd3be3d89f63689",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146155",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e00b6122a53fff4b6cca2e05be67c134cd49fdfb",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146167",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fec7f555945e345c68d6bd36ce35524283980c23",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146204",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "033f34d91a98abfc4a67807670f9b2b9fec60378",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146213",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "796513306fdc1184452ea644b485f83511f39528",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3776aba20482a24096e8760e8a32d13b95d51492",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "94d687d37e7d4cdf5119ecb7451d4041bcb34cb4",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bb5d229ad89ecbe4130a7c548d505d828a878f68",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146271",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fab82679d3e129b804e496ebf1e5ad24948c5f50",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "90f9991abb2ef6422ec0ea8330533966a84d8c8f",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3e05fa35e0562de54252dab4d09da002fc358393",
+   "actor": "CuriousLearner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/zhuyifei1999/guppy3/issues/52",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148181",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/deep-learnings/pull/11",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/botpress-accuracy-reporters/pull/83",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/coding-tests/pull/43",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-cleaners/pull/32",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-extension-converters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/github-wiki-organisers/pull/30",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/itunes-file-delimiter-replacers/pull/28",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/json-data-sorters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/natural-language-processing/pull/10",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/pr-title-printers/pull/17",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/template-creators/pull/16",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/tutorials/pull/219",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/web-scrapers/pull/14",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e573679cb7fa32f052ae15c528ad192d1800ab05",
+   "actor": "ljfp"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fcfe3f1169e0e3310f656e926144bac304bf3765",
+   "actor": "ljfp"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7e159c755bda17727a91b3c581e8a491905911ee",
+   "actor": "ljfp"
+  }
+ ]
+}

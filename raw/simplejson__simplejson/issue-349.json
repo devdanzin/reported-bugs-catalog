@@ -1,0 +1,48 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 349,
+ "type": "issue",
+ "url": "https://github.com/simplejson/simplejson/issues/349",
+ "title": "Crash: use-after-free and leak in encoder ident handling",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:21:33Z",
+ "closed_at": "2026-04-06T17:07:20Z",
+ "body": "Part of #348 (C extension analysis). [Full report](https://gist.github.com/devdanzin/e8a25ea988dc0461c2fd378efd84a8a3).\n\n## Finding 14: Double `Py_XDECREF` on `ident` \u2014 segfault\n\n**Lines 2955-2961.** When `PyDict_DelItem(s->markers, ident)` fails, `ident` is XDECREF'd at L2957 inside the `if`, then XDECREF'd again at L2960 unconditionally. Use-after-free / refcount underflow \u2192 segfault.\n\n**Reproducer (100% reproducible):**\n```python\nimport simplejson._speedups as sp\nimport decimal\n\nmarkers = {}\n\nclass Evil:\n    pass\n\ncall_count = [0]\n\ndef bad_default(obj):\n    call_count[0] += 1\n    if call_count[0] <= 1:\n        markers.clear()  # Remove ident from markers mid-encoding!\n        return \"safe\"\n    return str(obj)\n\nc_enc = sp.make_encoder(\n    markers, bad_default, sp.encode_basestring_ascii, None, \", \", \": \",\n    False, False, True, None, False, False, False, None,\n    None, \"utf-8\", False, False, decimal.Decimal, False,\n)\n\nc_enc(Evil(), 0)\n# Segmentation fault \u2014 double Py_XDECREF on ident\n```\n\n**Suggested fix:** Set `ident = NULL` after the first XDECREF, or restructure to use a single cleanup point (like the correct `goto bail` pattern in `encoder_listencode_dict` L3083-3086).\n\n---\n\n## Finding 15: `ident` leak on `Py_EnterRecursiveCall` failure\n\n**Lines 2940-2941.** `ident` acquired at L2925 via `PyLong_FromVoidPtr(obj)` is never released when `Py_EnterRecursiveCall` fails. `return rv` exits without cleanup. Leaks on every `RecursionError` with circular reference tracking enabled.\n\n**Reproducer (100% reproducible, 158.5 bytes per error):**\n```python\nimport simplejson, sys, tracemalloc, gc\n\nsys.setrecursionlimit(50)\ntracemalloc.start()\ngc.collect()\nsnap1 = tracemalloc.take_snapshot()\nfor i in range(200):\n    obj = {}\n    current = obj\n    for j in range(60):\n        child = {}\n        current[\"nested\"] = child\n        current = child\n    try:\n        simplejson.dumps(obj)\n    except (RecursionError, ValueError):\n        pass\ngc.collect()\nsnap2 = tracemalloc.take_snapshot()\ndiff = sum(s.size_diff for s in snap2.compare_to(snap1, \"lineno\") if s.size_diff > 0)\nprint(f\"Growth: {diff} bytes ({diff/200:.1f} per error)\")\n# ~158.5 per RecursionError\nsys.setrecursionlimit(1000)\n```\n\n**Suggested fix:** Add `Py_XDECREF(ident)` before `return rv` in the `Py_EnterRecursiveCall` failure path.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/348",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3da557eeb58aed051860a69665d428952b9eb46f",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/355",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "aa9182d79e36fd306c5d9970658c2ab03494d9c8",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "aa9182d79e36fd306c5d9970658c2ab03494d9c8",
+   "actor": "etrepum"
+  }
+ ]
+}

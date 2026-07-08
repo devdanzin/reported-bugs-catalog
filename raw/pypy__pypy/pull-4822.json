@@ -1,0 +1,46 @@
+{
+ "repo": "pypy/pypy",
+ "number": 4822,
+ "type": "pull",
+ "url": "https://github.com/pypy/pypy/pull/4822",
+ "title": "Replace Heptapod and Mercurial mentions with GitHub and git",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-01-02T11:40:06Z",
+ "closed_at": "2024-01-05T07:44:45Z",
+ "body": "This PR aims to help the migration effort to GitHub by replacing mentions of Heptapod and Mercurial with GitHub and git.\r\n\r\nSo far, it's missing some hg command translations.",
+ "comments": [
+  {
+   "author": "cfbolz",
+   "created_at": "2024-01-02T14:45:21Z",
+   "body": "thanks a lot for doing this! I'm working on getting readthedocs integrated into github, so we can look at previews, will look at your pr when that is done."
+  },
+  {
+   "author": "cfbolz",
+   "created_at": "2024-01-02T18:45:05Z",
+   "body": "the readthedocs integration is now there, could you push a dummy commit to see whether it triggers? or recreate the PR?"
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-01-05T07:44:52Z",
+   "body": "Thanks @devdanzin "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9859eca2cefb314b6968e17563709427fd26597e",
+   "actor": "mattip"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 87,
+ "type": "issue",
+ "url": "https://github.com/dpdani/cereggii/issues/87",
+ "title": "Inplace mod of an `AtomicInt64` by zero causes arithmetic exception",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "fusil-fuzzer"
+ ],
+ "created_at": "2025-10-25T12:49:59Z",
+ "closed_at": "2025-10-29T20:48:35Z",
+ "body": "Running the code below raises `SIGFPE`:\n\n```python\nimport cereggii\n\ntarget_atomic_int = cereggii.AtomicInt64(1)\ntarget_atomic_int.__imod__(0)\n```\n\nBacktrace:\n```\nProgram received signal SIGFPE, Arithmetic exception.\n0x00007ffff42d2d04 in AtomicInt64_InplaceRemainder_internal (self=0x7fffb29c4750, other=0x555556772790 <_PyRuntime+30288>, do_refcount=1) at /home/danzin/projects/cereggii/src/cereggii/atomic_int.c:851\n851             desired = current % amount;\n\n#0  0x00007ffff42d2d04 in AtomicInt64_InplaceRemainder_internal (self=0x7fffb29c4750, other=0x555556772790 <_PyRuntime+30288>, do_refcount=1)\n    at /home/danzin/projects/cereggii/src/cereggii/atomic_int.c:851\n#1  0x000055555594fe11 in binary_iop1 (v=v@entry=0x7fffb29c4750, w=w@entry=0x555556772790 <_PyRuntime+30288>, iop_slot=iop_slot@entry=176,\n    op_slot=op_slot@entry=24, op_name=op_name@entry=0x5555561e7a60 \"%=\") at Objects/abstract.c:1228\n#2  0x000055555594ffa0 in binary_iop (v=v@entry=0x7fffb29c4750, w=w@entry=0x555556772790 <_PyRuntime+30288>, iop_slot=iop_slot@entry=176,\n    op_slot=op_slot@entry=24, op_name=op_name@entry=0x5555561e7a60 \"%=\") at Objects/abstract.c:1253\n#3  0x00005555559545b5 in PyNumber_InPlaceRemainder (v=v@entry=0x7fffb29c4750, w=w@entry=0x555556772790 <_PyRuntime+30288>)\n    at Objects/abstract.c:1294\n#4  0x0000555555d94fa5 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x5555567c3a40 <_PyRuntime+362752>, frame=0x529000005280,\n    frame@entry=0x529000005220, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:62\n#5  0x0000555555e09002 in _PyEval_EvalFrame (throwflag=0, frame=0x529000005220, tstate=0x5555567c3a40 <_PyRuntime+362752>)\n    at ./Include/internal/pycore_ceval.h:121\n#6  _PyEval_Vector (tstate=tstate@entry=0x5555567c3a40 <_PyRuntime+362752>, func=func@entry=0x7fffb29bf350, locals=locals@entry=0x7fffb270cbb0,\n    args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1965\n#7  0x0000555555e095ec in PyEval_EvalCode (co=co@entry=0x7fffb28d1050, globals=globals@entry=0x7fffb270cbb0, locals=<optimized out>,\n    locals@entry=0x7fffb270cbb0) at Python/ceval.c:857\n```",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dpdani/cereggii/pull/91",
+   "commit": null,
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ]
+}

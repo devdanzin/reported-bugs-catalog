@@ -1,0 +1,48 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 355,
+ "type": "pull",
+ "url": "https://github.com/simplejson/simplejson/pull/355",
+ "title": "Fix use-after-free and leak in encoder ident handling",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:36:43Z",
+ "closed_at": "2026-04-06T17:07:18Z",
+ "body": "Fixes #349 (part of #348).\n\n## Changes\n\n1. **Fix double `Py_XDECREF` on `ident`** (Finding 14): When `PyDict_DelItem(s->markers, ident)` fails in `encoder_listencode_obj`, `ident` was XDECREF'd inside the `if` block, then XDECREF'd again unconditionally. Now uses a single `Py_DECREF` after the error check, matching the correct pattern in `encoder_listencode_dict` (line 3086).\n\n2. **Fix `ident` leak on `Py_EnterRecursiveCall` failure** (Finding 15): `ident` acquired via `PyLong_FromVoidPtr` was never released when `Py_EnterRecursiveCall` fails. Added `Py_XDECREF(ident)` before `return rv`.\n\n## Reproducers\n\nFinding 14 segfault (from issue):\n```python\nimport simplejson._speedups as sp\nimport decimal\n\nmarkers = {}\nclass Evil: pass\ncall_count = [0]\ndef bad_default(obj):\n    call_count[0] += 1\n    if call_count[0] <= 1:\n        markers.clear()\n        return \"safe\"\n    return str(obj)\n\nc_enc = sp.make_encoder(\n    markers, bad_default, sp.encode_basestring_ascii, None, \", \", \": \",\n    False, False, True, None, False, False, False, None,\n    None, \"utf-8\", False, False, decimal.Decimal, False,\n)\nc_enc(Evil(), 0)  # Segfault before fix\n```\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b328c4d40252a5a00c3a1ca65c5a6af5852ff0bd",
+   "actor": "etrepum"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dbf6f64fcea1b8b95ab5b9ad9502899a006990b9",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1621e6cc818b2a097e316a3f193b1458a8cb7c27",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae7cd18c2df9ba696fad92a31e2755ef468a1b25",
+   "actor": "netbsd-srcmastr"
+  }
+ ]
+}

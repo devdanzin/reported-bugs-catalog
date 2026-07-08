@@ -1,0 +1,190 @@
+{
+ "repo": "python/cpython",
+ "number": 122170,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/122170",
+ "title": "Interpreter exits on Windows due to ValueError raised in linecache.py",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "OS-windows"
+ ],
+ "created_at": "2024-07-23T13:02:25Z",
+ "closed_at": "2024-07-27T10:58:37Z",
+ "body": "# Bug report\n\n### Bug description:\n\nIt's possible to make the interpreter exit on Windows in 3.13.0b4 and main due to `ValueError: stat: path too long for Windows` being raised by `os.stat()` in `updatecache` in linecache.py when trying to print a traceback:\n\n```python\n>>> exec(compile(\"print(2**100000)\", \"s\"*99999, \"exec\"))\nException ignored in the internal traceback machinery:\nTraceback (most recent call last):\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 139, in _print_exception_bltin\n    return print_exception(exc, limit=BUILTIN_EXCEPTION_LIMIT, file=file, colorize=colorize)\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 129, in print_exception\n    te = TracebackException(type(value), value, tb, limit=limit, compact=True)\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 1133, in __init__\n    context = TracebackException(\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 1043, in __init__\n    self.stack = StackSummary._extract_from_extended_frame_gen(\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 492, in _extract_from_extended_frame_gen\n    f.line\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 369, in line\n    self._set_lines()\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 350, in _set_lines\n    lines.append(linecache.getline(self.filename, lineno).rstrip())\n  File \"~\\PycharmProjects\\cpython\\Lib\\linecache.py\", line 25, in getline\n    lines = getlines(filename, module_globals)\n  File \"~\\PycharmProjects\\cpython\\Lib\\linecache.py\", line 41, in getlines\n    return updatecache(filename, module_globals)\n  File \"~\\PycharmProjects\\cpython\\Lib\\linecache.py\", line 100, in updatecache\n    stat = os.stat(fullname)\nValueError: stat: path too long for Windows\nTraceback (most recent call last):\n  File \"~\\PycharmProjects\\cpython\\Lib\\code.py\", line 91, in runcode\n    exec(code, self.locals)\n  File \"<python-input-2>\", line 1, in <module>\n  File \"sss[...]sssssss\", line 1, in <module>\nValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"~\\PycharmProjects\\cpython\\Lib\\runpy.py\", line 198, in _run_module_as_main\n    return _run_code(code, main_globals, None,\n  File \"~\\PycharmProjects\\cpython\\Lib\\runpy.py\", line 88, in _run_code\n    exec(code, run_globals)\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\__main__.py\", line 6, in <module>\n    __pyrepl_interactive_console()\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\main.py\", line 59, in interactive_console\n    run_multiline_interactive_console(console)\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\simple_interact.py\", line 156, in run_multiline_interactive_console\n    more = console.push(_strip_final_indent(statement), filename=input_name, _symbol=\"single\")  # type: ignore[call-arg]\n  File \"~\\PycharmProjects\\cpython\\Lib\\code.py\", line 303, in push\n    more = self.runsource(source, filename, symbol=_symbol)\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\console.py\", line 200, in runsource\n    self.runcode(code)\n  File \"~\\PycharmProjects\\cpython\\Lib\\code.py\", line 95, in runcode\n    self.showtraceback()\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\console.py\", line 168, in showtraceback\n    super().showtraceback(colorize=self.can_colorize)\n  File \"~\\PycharmProjects\\cpython\\Lib\\code.py\", line 147, in showtraceback\n    lines = traceback.format_exception(ei[0], ei[1], last_tb.tb_next, colorize=colorize)\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 154, in format_exception\n    te = TracebackException(type(value), value, tb, limit=limit, compact=True)\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 1043, in __init__\n    self.stack = StackSummary._extract_from_extended_frame_gen(\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 492, in _extract_from_extended_frame_gen\n    f.line\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 369, in line\n    self._set_lines()\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 350, in _set_lines\n    lines.append(linecache.getline(self.filename, lineno).rstrip())\n  File \"~\\PycharmProjects\\cpython\\Lib\\linecache.py\", line 25, in getline\n    lines = getlines(filename, module_globals)\n  File \"~\\PycharmProjects\\cpython\\Lib\\linecache.py\", line 41, in getlines\n    return updatecache(filename, module_globals)\n  File \"~\\PycharmProjects\\cpython\\Lib\\linecache.py\", line 100, in updatecache\n    stat = os.stat(fullname)\nValueError: stat: path too long for Windows\n[Thread 30100.0x6108 exited with code 1]\n[Thread 30100.0x5da4 exited with code 1]\n[Thread 30100.0x90a0 exited with code 1]\n[Inferior 1 (process 30100) exited with code 01]\n```\n\n\n### CPython versions tested on:\n\n3.13, CPython main branch\n\n### Operating systems tested on:\n\nWindows\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-122175\n* gh-122176\n* gh-122348\n* gh-122349\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-23T13:12:36Z",
+   "body": "I'm surprised that `os.stat` raises a ValueError in this case actually and not an OSError. I'll make a PR for handling this case in linecache."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-23T13:24:25Z",
+   "body": "> I'll make a PR for handling this case in linecache.\r\n\r\nI have one ready.\r\n\r\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-23T13:29:00Z",
+   "body": "Oh I was just going to push it now xD Go for yours then, I'll review it."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-23T13:35:26Z",
+   "body": "Yours is much more complete and polished, is it OK if I close mine?"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-23T13:36:25Z",
+   "body": "Err... it's up to you."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-23T13:39:05Z",
+   "body": "I'll close it, I'd rather have code of higher quality in the standard library than code I wrote :)"
+  },
+  {
+   "author": "eryksun",
+   "created_at": "2024-07-23T14:09:46Z",
+   "body": "> I'm surprised that `os.stat` raises a ValueError in this case actually and not an OSError. I'll make a PR for handling this case in linecache.\r\n\r\nFor some reason, code was added to the `path_t` converter to raise `ValueError` if the path length exceeds 32767 characters. The length limit is actually 32766 characters, because the terminating null must be included in the buffer size. Properly, the expression `UNICODE_STRING_MAX_CHARS - 1` should be used instead of 32766. But really, a `path_t` using function should just let the system API fail and raise an `OSError`, either for the system error code `ERROR_FILENAME_EXCED_RANGE` or `ERROR_PATH_NOT_FOUND`, depending on the system API function that's called.\r\n\r\nhttps://github.com/python/cpython/blob/2c1b1e7a07eba0138b9858c6f2bea3cae9af0808/Modules/posixmodule.c#L1331-L1336\r\nhttps://github.com/python/cpython/blob/2c1b1e7a07eba0138b9858c6f2bea3cae9af0808/Modules/posixmodule.c#L1398-L1403"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-07-23T14:36:33Z",
+   "body": "I get a different error when using the reproducer on Linux:\r\n```\r\nValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/runpy.py\", line 198, in _run_module_as_main\r\n    return _run_code(code, main_globals, None,\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/runpy.py\", line 88, in _run_code\r\n    exec(code, run_globals)\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/_pyrepl/__main__.py\", line 6, in <module>\r\n    __pyrepl_interactive_console()\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/_pyrepl/main.py\", line 57, in interactive_console\r\n    run_multiline_interactive_console(console)\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/_pyrepl/simple_interact.py\", line 156, in run_multiline_interactive_console\r\n    more = console.push(_strip_final_indent(statement), filename=input_name, _symbol=\"single\")  # type: ignore[call-arg]\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/code.py\", line 303, in push\r\n    more = self.runsource(source, filename, symbol=_symbol)\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/_pyrepl/console.py\", line 200, in runsource\r\n    self.runcode(code)\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/code.py\", line 95, in runcode\r\n    self.showtraceback()\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/_pyrepl/console.py\", line 168, in showtraceback\r\n    super().showtraceback(colorize=self.can_colorize)\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/code.py\", line 147, in showtraceback\r\n    lines = traceback.format_exception(ei[0], ei[1], last_tb.tb_next, colorize=colorize)\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/traceback.py\", line 155, in format_exception\r\n    return list(te.format(chain=chain, colorize=colorize))\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/traceback.py\", line 1384, in format\r\n    yield from _ctx.emit(exc.stack.format(colorize=colorize))\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/traceback.py\", line 747, in format\r\n    formatted_frame = self.format_frame_summary(frame_summary, colorize=colorize)\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/traceback.py\", line 583, in format_frame_summary\r\n    show_carets = self._should_show_carets(start_offset, end_offset, all_lines, anchors)\r\n  File \"/home/zero/Desktop/Projects/Python/cpython/Lib/traceback.py\", line 701, in _should_show_carets\r\n    statement = tree.body[0]\r\nIndexError: list index out of range\r\n```\r\n\r\nCC @picnixz, this might be a separate issue. This still occurs on both PRs."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-23T14:40:54Z",
+   "body": "> I get a different error when using the reproducer on Linux:\r\n> ```\r\n> [...]\r\n>   File \"/home/zero/Desktop/Projects/Python/cpython/Lib/traceback.py\", line 701, in _should_show_carets\r\n>     statement = tree.body[0]\r\n> IndexError: list index out of range\r\n> ```\r\n\r\nThat's #122145."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-23T14:45:51Z",
+   "body": "Which is fixed by #122161"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-23T15:33:46Z",
+   "body": "@eryksun I see the ValueError was implemented in https://github.com/python/cpython/pull/118355, which is recent enough. However, I think that `os.stat` raising an OSError would be more correct because on Linux, this is what happens: `OSError: [Errno 36] File name too long: '` but on Windows, IIRC, it should be a \"FileNotFound\" (but I have no way to check this now). Do you think I should open another issue for `os.stat` ? (and maybe more functions?) "
+  },
+  {
+   "author": "eryksun",
+   "created_at": "2024-07-23T18:04:25Z",
+   "body": "> @eryksun I see the ValueError was implemented in #118355, which is recent enough. However, I think that `os.stat` raising an OSError would be more correct because on Linux, this is what happens: `OSError: [Errno 36] File name too long: '` but on Windows, IIRC, it should be a \"FileNotFound\" (but I have no way to check this now). Do you think I should open another issue for `os.stat` ? (and maybe more functions?)\r\n\r\nThe issue is with the `path_t` converter, not specifically with `os.stat()`. I'd be in favor of letting the system API call fail and raising whichever `OSError` exception corresponds to the error code. C `ENAMETOOLONG` isn't used on Windows. It's going to be either `ENOENT` or `EINVAL`, and only the former gets specialized as `FileNotFoundError`.\r\n\r\nIf long paths are enabled at the system level (via the \"LongPathsEnabled\" registry value in Windows 10+), then the legacy DOS `MAX_PATH` (260) limit is removed, and only native NT limits are enforced. In this case, WinAPI `CreateFileW()` fails with `ERROR_FILENAME_EXCED_RANGE` (206) if the pathname length exceeds the system's pathname length limit `UNICODE_STRING_MAX_CHARS` (32767, including the terminating null), or fails with `ERROR_INVALID_NAME` (123) if the filename length exceeds the filesystem's filename length limit, which is typically the system's filename length limit `MAXIMUM_FILENAME_LENGTH` (256, including the terminating null). The C runtime library maps `ERROR_FILENAME_EXCED_RANGE` to C `ENOENT` (2), and it maps `ERROR_INVALID_NAME` to C `EINVAL` (22). For the sake of consistency, Python follows suit in \"PC/errmap.h\". \r\n\r\nIf long paths are disabled or not supported (i.e. prior to Windows 10), then pathnames that aren't prefixed by \"\\\\\\\\?\\\\\" are limited to `MAX_PATH` (260), and filenames are typically limited to `MAXIMUM_FILENAME_LENGTH`. In this case, WinAPI `CreateFileW()` fails with `ERROR_PATH_NOT_FOUND` (3) if the pathname length exceeds `MAX_PATH` or with `ERROR_FILENAME_EXCED_RANGE` if the pathname length exceeds `UNICODE_STRING_MAX_CHARS`. Usually in this case the filename length limit doesn't affect the error, assuming the filesystem's limit is `MAXIMUM_FILENAME_LENGTH`. In the rare case where the pathname of the working directory is only 4 characters (e.g. \"C:\\\\\" plus the terminating null), then a filename length of exactly 256 characters causes the error to be `ERROR_INVALID_NAME` instead of `ERROR_PATH_NOT_FOUND`. The C runtime library maps `ERROR_PATH_NOT_FOUND` to C `ENOENT`, and Python follows suit."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-24T07:12:19Z",
+   "body": "I'll file an issue to summarize what you told me (and to make the discussion distinct from this issue). If we were to patch the `path_t` converter, then we would not need the patch for linecache and it could be better IMO (I don't really like to intercept this ValueError that is raised by `os.stat` because of a conversion function and not because of the underlying C call)."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-24T10:10:16Z",
+   "body": "> If we were to patch the `path_t` converter, then we would not need the patch for linecache and it could be better IMO (I don't really like to intercept this ValueError that is raised by `os.stat` because of a conversion function and not because of the underlying C call).\r\n\r\nI believe that would also fix two minor related issues I've found (posting here so I don't forget about them):\r\n\r\n```python\r\n> $Env:PYTHONPATH=\"a\" * 33000\r\n> py -3.13\r\nException ignored in running getpath:\r\nTraceback (most recent call last):\r\n  File \"<frozen getpath>\", line 668, in <module>\r\nOSError: failed to make path absolute\r\nFatal Python error: error evaluating path\r\nPython runtime state: core initialized\r\n\r\nCurrent thread 0x00005a8c (most recent call first):\r\n  <no Python frame>\r\n```\r\n\r\n```python\r\n>>> import sys\r\n>>> sys.path.insert(0, \"a\" * 33000)\r\n>>> import email\r\nTraceback (most recent call last):\r\n  File \"<frozen importlib._bootstrap_external>\", line 1512, in _path_importer_cache\r\nKeyError: 'aaaaaaaaaaaaaaaaaaaaaaaa[...]aaaaaaaaaa'\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"<python-input-6>\", line 1, in <module>\r\n    import email\r\n  File \"<frozen importlib._bootstrap>\", line 1360, in _find_and_load\r\n  File \"<frozen importlib._bootstrap>\", line 1322, in _find_and_load_unlocked\r\n  File \"<frozen importlib._bootstrap>\", line 1262, in _find_spec\r\n  File \"<frozen importlib._bootstrap_external>\", line 1555, in find_spec\r\n  File \"<frozen importlib._bootstrap_external>\", line 1527, in _get_spec\r\n  File \"<frozen importlib._bootstrap_external>\", line 1514, in _path_importer_cache\r\n  File \"<frozen importlib._bootstrap_external>\", line 1490, in _path_hooks\r\n  File \"<frozen importlib._bootstrap_external>\", line 1714, in path_hook_for_FileFinder\r\n  File \"<frozen importlib._bootstrap_external>\", line 173, in _path_isdir\r\n  File \"<frozen importlib._bootstrap_external>\", line 158, in _path_is_mode_type\r\n  File \"<frozen importlib._bootstrap_external>\", line 152, in _path_stat\r\nValueError: stat: path too long for Windows\r\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-24T10:29:22Z",
+   "body": "Actually, I probably found another bug in linecache where requesting a filename with null bytes makes it fail:\r\n\r\n```shell\r\n$ ./python -c 'import linecache;linecache.getlines(\"a\\x00bc\")'\r\nTraceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\n    import linecache;linecache.getlines(\"a\\x00bc\")\r\n                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^\r\n  File \"/lib/python/cpython/Lib/linecache.py\", line 41, in getlines\r\n    return updatecache(filename, module_globals)\r\n  File \"/lib/python/cpython/Lib/linecache.py\", line 100, in updatecache\r\n    stat = os.stat(fullname)\r\nValueError: stat: embedded null character in path\r\n```\r\n\r\nbut linecache is not supposed to fail =/.\r\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-24T10:37:48Z",
+   "body": "(So the PR is still correct, would not be fixed even if we change the `path_t` converter since raising ValueError for NUL bytes seems to be something that was done for ages)"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-27T10:58:37Z",
+   "body": "Now that the PRs have been merged, I think this specific issue can be closed. It remains to fix the other issue at the level of imports and `sys.path.insert`, but I'm not sure it's something related to linecache. For now, I'm closing this issue (though, it remains to merge https://github.com/python/cpython/pull/122161 so if anyone can do it, I'd be happy) and we should open a new one for the imports related issue (could you do it @devdanzin please?)"
+  },
+  {
+   "author": "zooba",
+   "created_at": "2024-08-06T22:31:40Z",
+   "body": "For the record, while I think it's okay for `linecache` to silently ignore this issue, I don't think that applies generally. Any code that's attempting to use the bad value ought to raise `ValueError`, and most likely it ought to propagate out to whoever provided the bad value.\r\n\r\nSo I'm not going to insist on reverting anything here, but I do intend to hold up further changes until they've been properly considered."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122175",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122176",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122228",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7a6d4ccf0ec16e09f0d8b21c5a0c591e5e3e45f7",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "84f35b9f194090f9833563cc148718179d1ffa60",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122348",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e99304bd1a8b8b3881380ee062a32cc74593478a",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122349",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2e37d67db2a9a0ebd2f3a2cfd3d02e0f06d64522",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3648a945e447cb9c6f5f7b6b803e503e1f38f982",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122353",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122454",
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ]
+}

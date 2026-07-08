@@ -1,0 +1,103 @@
+{
+ "repo": "python/cpython",
+ "number": 127316,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127316",
+ "title": "[FreeThreading] object_set_class() fails with an assertion error in _PyCriticalSection_AssertHeld()",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2024-11-27T03:27:21Z",
+ "closed_at": "2024-11-29T16:15:37Z",
+ "body": "# Crash report\n\n### What happened?\n\nOn a free-threaded debug build, even with `PYTHON_GIL=1`, it's possible to abort the interpreter by calling `_DummyThread._after_fork` after a `__reduce__` call:\n\n```python\nimport threading\n\nobj = threading._DummyThread()\nres = obj.__reduce__()\nres = obj._after_fork(1)\n```\nAbort message:\n```\npython: ./Include/internal/pycore_critical_section.h:222: _PyCriticalSection_AssertHeld: Assertion `cs != NULL && cs->_cs_mutex == mutex' failed.\nAborted (core dumped)\n```\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a2+ experimental free-threading build (heads/main:0af4ec3, Nov 20 2024, 21:48:16) [GCC 13.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-127399\n* gh-127422\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-27T06:02:30Z",
+   "body": "`_after_fork` resets mutexes because it's supposed to be used... after a `fork()`. I think this one is definitely a wontfix, but I'll let others weigh in on it."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-27T09:57:31Z",
+   "body": "@Fidget-Spinner: You worked on `obj.__class__ = new_class` in Free Threading, you might be interested by this bug.\r\n\r\nI wrote a reproducer which doesn't depend on threading:\r\n\r\n```py\r\nclass Base:\r\n    def __init__(self):\r\n        self.attr = 123\r\nclass ClassA(Base):\r\n    pass\r\nclass ClassB(Base):\r\n    pass\r\n\r\nobj = ClassA()\r\n# it's important to store __getstate__() result in a variable!\r\nobj_dict = object.__getstate__(obj)\r\nobj.__class__ = ClassB\r\n```\r\n\r\nOutput:\r\n\r\n```\r\npython: ./Include/internal/pycore_critical_section.h:222: _PyCriticalSection_AssertHeld: Assertion `cs != NULL && cs->_cs_mutex == mutex' failed.\r\n```\r\n\r\ngdb traceback:\r\n\r\n```\r\n(...)\r\n#4  0x00007ffff7cd8e47 in __assert_fail () from /lib64/libc.so.6\r\n#5  0x000000000051a62a in _PyCriticalSection_AssertHeld (mutex=0x20000737d5a) at ./Include/internal/pycore_critical_section.h:222\r\n#6  0x0000000000529db2 in _PyDict_DetachFromObject (mp=0x20000737d50, obj=<ClassA(attr=123) at remote 0x20000542a20>)\r\n    at Objects/dictobject.c:7303\r\n#7  0x0000000000585d83 in object_set_class_world_stopped (self=<ClassA(attr=123) at remote 0x20000542a20>, newto=0x20000a5aa10)\r\n    at Objects/typeobject.c:6799\r\n#8  0x0000000000585ec1 in object_set_class (self=<ClassA(attr=123) at remote 0x20000542a20>, value=<type at remote 0x20000a5aa10>, closure=0x0)\r\n    at Objects/typeobject.c:6844\r\n#9  0x00000000004d5024 in getset_set (self=<getset_descriptor at remote 0x20000010250>, obj=<ClassA(attr=123) at remote 0x20000542a20>, \r\n    value=<type at remote 0x20000a5aa10>) at Objects/descrobject.c:249\r\n#10 0x00000000005406f6 in _PyObject_GenericSetAttrWithDict (obj=<ClassA(attr=123) at remote 0x20000542a20>, name='__class__', \r\n    value=<type at remote 0x20000a5aa10>, dict=0x0) at Objects/object.c:1772\r\n#11 0x0000000000540968 in PyObject_GenericSetAttr (obj=<ClassA(attr=123) at remote 0x20000542a20>, name='__class__', \r\n    value=<type at remote 0x20000a5aa10>) at Objects/object.c:1843\r\n#12 0x000000000053fa6b in PyObject_SetAttr (v=<ClassA(attr=123) at remote 0x20000542a20>, name='__class__', \r\n    value=<type at remote 0x20000a5aa10>) at Objects/object.c:1409\r\n```\r\n\r\ncc @colesbury "
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-27T16:36:08Z",
+   "body": "I'm doing my best to try and understand this bug. I get that some lock isn't held when it's supposed to, and that it's related to descriptors, but the original report is a result of `_after_fork` abuse. What's going on with the `__getstate__` problem? Is it a result of the same bug, or just the same assertion that happens to be failing?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-27T16:43:40Z",
+   "body": "> but the original report is a result of _after_fork abuse\r\n\r\nMy reproducer is unrelated to _after_fork().\r\n\r\n> What's going on with the __getstate__ problem?\r\n\r\nApparently, getting a reference to the object `__dict__` is needed to trigger the bug. I'm not sure why.\r\n\r\n> Is it a result of the same bug, or just the same assertion that happens to be failing?\r\n\r\nI believe that it's the same bug in my reproducer and the \"after fork\" reproducer."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127399",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "45c5cba318a19dda3ee6f9fc84781cc7a2fbde80",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5388279cee69197ebdefccba6c0353035517cfc0",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127422",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2f56c68dec97002fdd8563a0e4977b75eb191ab9",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dda892021f15750e92fb43333a65f7e56a7544b8",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "76b6bc4d70a960428a9d2338d23d152500d6356d",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "154b201773a399ada017cb555d569063a0d122c6",
+   "actor": "ebonnal"
+  }
+ ]
+}

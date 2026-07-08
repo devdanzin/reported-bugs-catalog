@@ -1,0 +1,55 @@
+{
+ "repo": "python/cpython",
+ "number": 132386,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132386",
+ "title": "Segfault or failed assertion (`obj != NULL`) in `PyStackRef_FromPyObjectSteal`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2025-04-11T09:24:55Z",
+ "closed_at": "2025-04-11T21:08:37Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault or abort the interpreter with the following code:\n\n```python\nclass WeirdDict(dict): pass\n\nns = {}\nexec(\"def __create_fn__():\\n return a\", WeirdDict({None: None}), ns)\nns['__create_fn__']()\n```\n\nSegfault backtrace:\n```gdb\nProgram received signal SIGSEGV, Segmentation fault.\n_PyEval_LoadGlobalStackRef (globals=<optimized out>, builtins=<optimized out>, name=0x555555aeace0 <_PyRuntime+80128>, writeto=0x7ffff7fb00f8) at Python/ceval.c:3317\n3317            *writeto = PyStackRef_FromPyObjectSteal(res);\n(gdb) bt\n#0  _PyEval_LoadGlobalStackRef (globals=<optimized out>, builtins=<optimized out>,\n    name=0x555555aeace0 <_PyRuntime+80128>, writeto=0x7ffff7fb00f8) at Python/ceval.c:3317\n#1  0x00005555555e22f2 in _PyEval_EvalFrameDefault (tstate=0x555555b24178 <_PyRuntime+314776>,\n    frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:9073\n#2  0x00005555557ab807 in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020,\n    tstate=0x555555b24178 <_PyRuntime+314776>) at ./Include/internal/pycore_ceval.h:119\n#3  _PyEval_Vector (args=0x0, argcount=0, kwnames=0x0, locals=0x7ffff7a4d240, func=0x7ffff7a50f60,\n    tstate=0x555555b24178 <_PyRuntime+314776>) at Python/ceval.c:1913\n#4  PyEval_EvalCode (co=co@entry=0x7ffff7bf5920, globals=globals@entry=0x7ffff7a4d240,\n    locals=locals@entry=0x7ffff7a4d240) at Python/ceval.c:829\n#5  0x000055555581f3bc in run_eval_code_obj (locals=0x7ffff7a4d240, globals=0x7ffff7a4d240,\n    co=0x7ffff7bf5920, tstate=0x555555b24178 <_PyRuntime+314776>) at Python/pythonrun.c:1365\n#6  run_mod (mod=<optimized out>, filename=filename@entry=0x7ffff7a066b0,\n    globals=globals@entry=0x7ffff7a4d240, locals=locals@entry=0x7ffff7a4d240,\n    flags=flags@entry=0x7fffffffdc18, arena=arena@entry=0x7ffff7b5e210, interactive_src=0x0,\n    generate_new_source=0) at Python/pythonrun.c:1436\n#7  0x0000555555821456 in pyrun_file (flags=0x7fffffffdc18, closeit=1, locals=0x7ffff7a4d240,\n    globals=0x7ffff7a4d240, start=257, filename=0x7ffff7a066b0, fp=0x555555b97510)\n    at Python/pythonrun.c:1293\n```\n\nAbort backtrace:\n```gdb\npython: ./Include/internal/pycore_stackref.h:447: PyStackRef_FromPyObjectSteal: Assertion `obj != NULL' failed.\n\nProgram received signal SIGABRT, Aborted.\n__pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:44\n44      ./nptl/pthread_kill.c: No such file or directory.\n(gdb) bt\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140737350580032) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140737350580032, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7ce0476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc67f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7cc671b in __assert_fail_base (\n    fmt=0x7ffff7e7b130 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\n    assertion=0x555555a5971d \"obj != NULL\", file=0x5555559dc630 \"./Include/internal/pycore_stackref.h\",\n    line=447, function=<optimized out>) at ./assert/assert.c:94\n#6  0x00007ffff7cd7e96 in __GI___assert_fail (assertion=assertion@entry=0x555555a5971d \"obj != NULL\",\n    file=file@entry=0x5555559dc630 \"./Include/internal/pycore_stackref.h\", line=line@entry=447,\n    function=function@entry=0x555555a42180 <__PRETTY_FUNCTION__.23> \"PyStackRef_FromPyObjectSteal\")\n    at ./assert/assert.c:103\n#7  0x0000555555829da7 in PyStackRef_FromPyObjectSteal (obj=<optimized out>)\n    at ./Include/internal/pycore_stackref.h:447\n#8  _PyEval_LoadGlobalStackRef (globals=<optimized out>, builtins=<optimized out>, name='a',\n    writeto=writeto@entry=0x7ffff7fb00f8) at Python/ceval.c:3312\n#9  0x000055555584e4ba in _PyEval_EvalFrameDefault (\n    tstate=tstate@entry=0x555555c69558 <_PyRuntime+330424>, frame=0x7ffff7fb00a8,\n    frame@entry=0x7ffff7fb0020, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:9086\n#10 0x000055555585cd69 in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020,\n    tstate=0x555555c69558 <_PyRuntime+330424>) at ./Include/internal/pycore_ceval.h:119\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a7+ (heads/main:d87e7f35297, Apr 11 2025, 06:20:25) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132412\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "tomasr8",
+   "created_at": "2025-04-11T10:04:18Z",
+   "body": "This seems to do the trick. I can send a PR later if no one beats me to it.\n```diff\ndiff --git a/Python/ceval.c b/Python/ceval.c\nindex a59b2b7a16..43798e9f8a 100644\n--- a/Python/ceval.c\n+++ b/Python/ceval.c\n@@ -3301,6 +3301,8 @@ _PyEval_LoadGlobalStackRef(PyObject *globals, PyObject *builtins, PyObject *name\n                 _PyEval_FormatExcCheckArg(\n                             PyThreadState_GET(), PyExc_NameError,\n                             NAME_ERROR_MSG, name);\n+                *writeto = PyStackRef_NULL;\n+                return;\n             }\n         }\n         *writeto = PyStackRef_FromPyObjectSteal(res);\n\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-04-11T12:08:29Z",
+   "body": "> _PyEval_LoadGlobalStackRef\n\nOh yeah I think I missed that. Sorry and thanks!"
+  },
+  {
+   "author": "tomasr8",
+   "created_at": "2025-04-11T21:09:57Z",
+   "body": "Thanks @devdanzin for reporting this!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132412",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e6ef47ac229b5c4a62b9c907e4232e350db77ce3",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "tomasr8"
+  }
+ ]
+}

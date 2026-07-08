@@ -1,0 +1,124 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 348,
+ "type": "issue",
+ "url": "https://github.com/simplejson/simplejson/issues/348",
+ "title": "C extension (_speedups.c) analysis: 15 bugs found",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:20:52Z",
+ "closed_at": "2026-04-18T23:58:28Z",
+ "body": "## Summary\n\nWe ran an automated C extension analysis on `simplejson/_speedups.c` (v3.20.2, 3,414 lines) using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit) (13 specialized agents covering refcount safety, error paths, NULL safety, GC, type slots, and more).\n\n**Full report with details and reproducers:** https://gist.github.com/devdanzin/e8a25ea988dc0461c2fd378efd84a8a3\n\n### Results: 15 FIX-level bugs, 8 reproduced\n\n| # | Finding | Severity | Reproduced? |\n|---|---------|----------|-------------|\n| 14 | Double `Py_XDECREF` on `ident` \u2192 use-after-free segfault | Critical | **YES** (segfault) |\n| 15 | `ident` leak on `Py_EnterRecursiveCall` failure | High | **YES** (158.5 bytes/error) |\n| 1 | `maybe_quote_bigint` error-as-truthy \u2192 abort on debug | High | **YES** (abort) |\n| 11 | `is_raw_json` error-as-truthy | High | Code-confirmed |\n| 3 | `iterable_as_array` swallows MemoryError/KeyboardInterrupt | High | **YES** |\n| 7 | Variable shadowing leaks `encoded` in dict encoder | Medium | Code-confirmed |\n| 13 | skipkeys `item` leak (14.5 bytes per skipped key) | Medium | **YES** (tracemalloc) |\n| 4 | `moduleinit` NULL deref on OOM | Medium | Code-confirmed |\n| 8 | `_encoded_const` `Py_INCREF(NULL)` on lazy init failure | Medium | Code-confirmed |\n| 9 | Partial static init leaves NULL statics | Medium | Code-confirmed |\n| 2 | `raise_errmsg` loses exception on OOM | Medium | Code-confirmed |\n| 5 | `encoder_traverse` missing `Py_VISIT(skipkeys_bool)` | Low | Code-confirmed |\n| 6 | `encoder_members` maps `\"encoding\"` to wrong field (copy-paste) | Low | **YES** |\n| 12 | `PyLong_AsLong` exception clobbering (OverflowError \u2192 TypeError) | Low | **YES** |\n| 10 | `int_as_string_bitcount` parity gap (C vs Python encoder) | Low | Code-confirmed |\n\n### Individual issues\n\nWe've filed separate issues grouped by bug class, each with reproducers and suggested fixes:\n\n- #349 \u2014 Crash: use-after-free and leak in `ident` handling (Findings 14, 15)\n- #350 \u2014 Error-as-truthy bugs in `maybe_quote_bigint` and `is_raw_json` (Findings 1, 11)\n- #351 \u2014 Exception swallowing in `iterable_as_array` (Finding 3)\n- #352 \u2014 Reference leaks in dict encoder (Findings 7, 13)\n- #353 \u2014 NULL dereferences on OOM (Findings 4, 8, 9)\n- #354 \u2014 Minor: member table copy-paste, exception clobbering, traverse (Findings 5, 6, 12)\n\n### Additional CONSIDER items (not filed as issues)\n\n- `raise_errmsg` (Finding 2) loses exception on OOM \u2014 low-priority since it requires OOM during exception construction\n- `int_as_string_bitcount` parity gap (Finding 10) \u2014 C encoder rejects values >= 64 but Python encoder accepts any positive integer\n- 3 `PyDict_GetItem` calls that silently swallow lookup errors \u2014 should migrate to `PyDict_GetItemWithError`\n- `PyModule_AddObject` \u2192 `PyModule_AddObjectRef` migration\n- `structmember.h` deprecated since 3.12\n\n### Strengths noted\n\nThe codebase has excellent fundamentals: zero scanner-flagged refcount bugs (all 31 candidates were false positives), consistent `goto bail` cleanup, proper GC support, and subclassing correctly blocked. The bugs hide in error paths and callback interactions.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [
+  {
+   "author": "etrepum",
+   "created_at": "2026-04-05T20:25:24Z",
+   "body": "Do you intend to submit PRs for these issues as well?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-05T20:35:00Z",
+   "body": "Yes, in the process of creating them now."
+  },
+  {
+   "author": "etrepum",
+   "created_at": "2026-04-18T23:58:28Z",
+   "body": "I think all of these should be addressed"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/349",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/350",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/351",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/352",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/353",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/354",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/355",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/356",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/357",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/358",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/359",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/360",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/362",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/364",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  }
+ ]
+}

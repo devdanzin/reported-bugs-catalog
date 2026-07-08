@@ -1,0 +1,116 @@
+{
+ "repo": "python/cpython",
+ "number": 131712,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/131712",
+ "title": "`_suggestions` module missing on Windows, untested",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "OS-windows",
+  "extension-modules"
+ ],
+ "created_at": "2025-03-25T11:41:50Z",
+ "closed_at": "2025-03-27T08:54:58Z",
+ "body": "# Bug report\n\n### Bug description:\n\nThe `_suggestions` module isn't available in Windows builds because it's missing from `PC/config.c`. Since it's not tested and only imported in `traceback.py` in a `try:` block guarding against `ImportError`, it's easy to not detect that it's missing.\n\nIf there is no objection, I'll create a PR adding the `_suggestions` module to `PC/config.c` (and perhaps `config_minimal.c`) plus basic tests to detect whether it's available and working as intended.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nWindows\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-131759\n* gh-131790\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-25T13:14:02Z",
+   "body": "Oh right, it should be available on Windows as well. Don't we have functional tests for this feature in test_traceback?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-03-25T13:35:48Z",
+   "body": ">Don't we have functional tests for this feature in test_traceback?\n\nWe do, but `traceback.py` has a Python implementation that is automatically used if `_suggestions` fails to import:\n\nhttps://github.com/python/cpython/blob/f1967e72498209e42f7cf5eeff0cd84d1ec10d18/Lib/traceback.py#L1538-L1550\n\n"
+  },
+  {
+   "author": "zooba",
+   "created_at": "2025-03-25T15:34:45Z",
+   "body": "How significant is this module's size/load time/impact?\n\nSince it's only ever going to be used for interactive mode, I think I'd prefer it to be its own extension module, so that we don't pay any cost for it in normal use."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-03-25T17:07:20Z",
+   "body": "> Since it's only ever going to be used for interactive mode\n\nI think suggestions are provided for non-interactive use too, aren't they?\n\n\n> I think I'd prefer it to be its own extension module\n\nThat'd probably be above my skill level, so if anyone wants to tackle this feel free to. "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-25T17:14:07Z",
+   "body": "Yes, suggestions are also used when running a script.\n\n`demo.py`:\n\n```\ndemo = 1\nprint(dmo)\n```\n\nPython suggests `Did you mean: 'demo'?`:\n\n```\n$ ./python demo.py \nTraceback (most recent call last):\n  File \"/home/vstinner/python/main/demo.py\", line 2, in <module>\n    print(dmo)\n          ^^^\nNameError: name 'dmo' is not defined. Did you mean: 'demo'?\n```"
+  },
+  {
+   "author": "zooba",
+   "created_at": "2025-03-25T17:33:57Z",
+   "body": "It's still not a requirement for production code, so not having it loaded until it's needed would be better.\n\nThat said, I just looked at the size of the module and it's tiny. So no concerns about packing it into the main DLL."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-26T07:18:12Z",
+   "body": "> That said, I just looked at the size of the module and it's tiny. So no concerns about packing it into the main DLL.\n\n@devdanzin: Do you feel able to make this change? Or do you want me to have a look?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-03-26T08:21:07Z",
+   "body": "If you tackle this one, I'll use the time to try to fix up my in-flight PRs that I've been too slow to update, thanks!"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-26T11:01:38Z",
+   "body": "I wrote https://github.com/python/cpython/pull/131759 to build the `_suggestions` extension on Windows."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "87ce870d128192a49b6d0f54044bf658036d0f40",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131759",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9ef9d687ff7cfc4bbf422ba61db04207b7f343d2",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2a7bb708a625feb5d0d5b19c2fe2169b4d4ee424",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131790",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5c0be8ced6fcdb4372eb946ce816c4f689f2917b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0d4b3768bd5da234ed699eb236f1ac0545bce5e8",
+   "actor": "diegorusso"
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+{
+ "repo": "python-greenlet/greenlet",
+ "number": 502,
+ "type": "pull",
+ "url": "https://github.com/python-greenlet/greenlet/pull/502",
+ "title": "Address automated code audit results",
+ "state": "closed",
+ "state_reason": null,
+ "author": "jamadden",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-04T14:19:37Z",
+ "closed_at": "2026-04-04T20:15:31Z",
+ "body": "User @devdanzin provided the results of running various coding agents over the code base in https://gist.github.com/devdanzin/5e6e52e425558ae68a5caa7a1e78697f. This PR addresses the results of that audit. I independently verified each finding and either made changes or left comments as to why the behaviour was correct. See the individual commits for details.\r\n\r\nA few of these are potential crashers, though I'm not aware of any reports of crashes that are directly linked to these.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "f52615ae64f73b19e53e71cd1e12cbb1841246ff",
+   "actor": "jamadden"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "jamadden"
+  }
+ ]
+}

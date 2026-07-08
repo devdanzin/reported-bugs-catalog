@@ -1,0 +1,38 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9539,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9539",
+ "title": "Close PdfParser if error occurs during init",
+ "state": "closed",
+ "state_reason": null,
+ "author": "radarhere",
+ "author_association": "MEMBER",
+ "labels": [
+  "automerge"
+ ],
+ "created_at": "2026-04-04T09:08:27Z",
+ "closed_at": "2026-04-04T19:30:11Z",
+ "body": "After #9519 added a new PdfParser test, there is an unclosed file warning in the test suite - https://github.com/python-pillow/Pillow/actions/runs/23934036444/job/69806741534#step:13:5392\r\n```\r\nTests/test_pdfparser.py::test_trailer_loop\r\n  /home/runner/work/Pillow/Pillow/Tests/test_pdfparser.py:131: ResourceWarning: unclosed file <_io.BufferedReader name='Tests/images/trailer_loop.pdf'>\r\n    with pytest.raises(PdfFormatError, match=\"trailer loop found\"):\r\n```\r\n\r\nThis fixes it.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "64f6d4ebd878d00b581812faab3f9863576470e6",
+   "actor": "radarhere"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "radarhere"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "130540e1f1d412c2c88844349d8e8c3f2cf310c2",
+   "actor": "luketainton"
+  }
+ ]
+}

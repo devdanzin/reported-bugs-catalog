@@ -1,0 +1,48 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 352,
+ "type": "issue",
+ "url": "https://github.com/simplejson/simplejson/issues/352",
+ "title": "Reference leaks in dict encoder: variable shadowing and skipkeys",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:22:23Z",
+ "closed_at": "2026-04-06T19:41:59Z",
+ "body": "Part of #348 (C extension analysis). [Full report](https://gist.github.com/devdanzin/e8a25ea988dc0461c2fd378efd84a8a3).\n\n## Finding 13: skipkeys `item` leak \u2014 14.5 bytes per skipped non-string key\n\n**Lines 729-732.** When `kstr == Py_None` (skipkeys mode), `Py_DECREF(kstr)` then `continue` \u2014 but `item` from `PyIter_Next` is never decref'd. Leaks one tuple reference per skipped non-string key.\n\nCompare the correct pattern at L3042-3046 which does `Py_DECREF(item); continue`.\n\n**Reproducer (100% reproducible, measurable with tracemalloc):**\n```python\nimport simplejson, tracemalloc, gc\n\nd = {1: \"a\", 2: \"b\", 3: \"c\", \"x\": \"y\"}\ntracemalloc.start()\ngc.collect()\nsnap1 = tracemalloc.take_snapshot()\nfor i in range(2000):\n    simplejson.dumps(d, skipkeys=True, sort_keys=True)\ngc.collect()\nsnap2 = tracemalloc.take_snapshot()\ndiff = sum(s.size_diff for s in snap2.compare_to(snap1, \"lineno\") if s.size_diff > 0)\nprint(f\"Growth: {diff} bytes ({diff/2000:.1f} per call)\")\n# ~15.3 per call (vs 0.8 with all-string keys)\n```\n\n**Suggested fix:** Add `Py_DECREF(item)` before `continue` at L731.\n\n---\n\n## Finding 7: Variable shadowing leaks `encoded` in `encoder_listencode_dict`\n\n**Lines 3027, 3100.** Inner `PyObject *encoded` at line 3027 shadows the outer declaration at line 2979. On `goto bail`, the bail handler XDECREF's the outer (always NULL at that point), leaking the inner's owned reference.\n\n**Status:** Code-confirmed. Requires `PyDict_SetItem` failure (OOM) to trigger.\n\n**Suggested fix:** Remove the inner `PyObject *encoded` declaration at line 3027; use the outer variable so the bail handler can clean up.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/348",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3bdf0701032776d68a1988d7fab6b22384c85af9",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/358",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "17814cbe7e3b6b5100b4778b1e1648510825ab8d",
+   "actor": "github-merge-queue[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  }
+ ]
+}

@@ -1,0 +1,160 @@
+{
+ "repo": "python/cpython",
+ "number": 141976,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/141976",
+ "title": "JIT: Assertion failure for `WITHIN_STACK_BOUNDS()` in `optimize_uops`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-11-26T12:50:23Z",
+ "closed_at": "2025-12-10T19:39:27Z",
+ "body": "# Crash report\n\n### What happened?\n\n\nIt's possible to cause an abort in a patched JIT build with the code below. Removing some more code still aborts, but usually starts causing ignored exceptions or making the reproduction take longer (to the point of becoming probabilistic).\n\nHere's the patch used, it might be possible to reduce it:\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex 7f60eb49508..fd80dedb27e 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -124,7 +124,7 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n #define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n@@ -137,7 +137,7 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n+#define SIDE_EXIT_INITIAL_VALUE 63\n #define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\ndiff --git a/Include/internal/pycore_optimizer.h b/Include/internal/pycore_optimizer.h\nindex e7177552cf6..0d76a5a3df0 100644\n--- a/Include/internal/pycore_optimizer.h\n+++ b/Include/internal/pycore_optimizer.h\n@@ -86,7 +86,7 @@ PyAPI_FUNC(void) _Py_Executors_InvalidateCold(PyInterpreterState *interp);\n // Used as the threshold to trigger executor invalidation when\n // executor_creation_counter is greater than this value.\n // This value is arbitrary and was not optimized.\n-#define JIT_CLEANUP_THRESHOLD 1000\n+#define JIT_CLEANUP_THRESHOLD 10000\n\n int _Py_uop_analyze_and_optimize(\n     PyFunctionObject *func,\n@@ -118,7 +118,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n }\n\n // Holds locals, stack, locals, stack ... co_consts (in that order)\n-#define MAX_ABSTRACT_INTERP_SIZE 4096\n+#define MAX_ABSTRACT_INTERP_SIZE 8192\n\n #define TY_ARENA_SIZE (UOP_MAX_TRACE_LENGTH * 5)\n\n@@ -129,7 +129,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n // progress (and inserting a new ENTER_EXECUTOR instruction). In practice, this\n // is the \"maximum amount of polymorphism\" that an isolated trace tree can\n // handle before rejoining the rest of the program.\n-#define MAX_CHAIN_DEPTH 4\n+#define MAX_CHAIN_DEPTH 16\n\n /* Symbols */\n /* See explanation in optimizer_symbols.c */\ndiff --git a/Python/optimizer.c b/Python/optimizer.c\nindex 9db894f0bf0..14cbf670dec 100644\n--- a/Python/optimizer.c\n+++ b/Python/optimizer.c\n@@ -509,7 +509,7 @@ guard_ip_uop[MAX_UOP_ID + 1] = {\n\n\n #define CONFIDENCE_RANGE 1000\n-#define CONFIDENCE_CUTOFF 333\n+#define CONFIDENCE_CUTOFF 100\n\n #ifdef Py_DEBUG\n #define DPRINTF(level, ...) \\\n```\n\nHere's the MRE for quick, reliable reproduction:\n```python\nclass WithGetItem:\n    def __getitem__(self, item): return 5\nwith_getitem = WithGetItem()\n\nclass StatefulIndex:\n    def __index__(self): return 0\nstateful_index = StatefulIndex()\n\ndef f1():\n    import sys\n    import asyncio\n    class MetaException1(type): pass\n    class EvilException1(Exception, metaclass=MetaException1): pass\n    class Meta: pass\n    class EvilException2(Exception, metaclass=MetaException1): pass\n\n    for i in range(1):\n        x = i\n        try:\n            raise EvilException1()\n        except EvilException1:\n            pass\n\n    def sync_corruptor(value):\n        caller_frame = sys._getframe(1)\n        caller_frame.f_locals['x'] = value\n\n    async def evil_coro():\n        x = 0\n        sync_corruptor('corrupted_string')\n\n    def recursive():\n        for i in range(70):\n            x = i\n            try:\n                raise EvilException1()\n            except EvilException1:\n                pass\n        asyncio.run(evil_coro())\n        res = with_getitem[stateful_index]\n        recursive()\n\n    try:\n        recursive()\n    except RecursionError:\n        pass\n    print(\"NOT REACHED\")\n\nfor i in range(3):\n    print(i)\n    f1()\n```\n\nHere's the output and backtrace, it shows that the issue happens on the first `f1` call, with the last print not being called:\n```\n0\npython: Python/optimizer_cases.c.h:1117: int optimize_uops(PyFunctionObject *, _PyUOpInstruction *, int, int, _PyBloomFilter *): Assertion `WITHIN_STACK_BOUNDS()' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555934494 in optimize_uops (func=0x7ffff5aa2750, trace=0x7ffff6940000, trace_len=trace_len@entry=901, curr_stacklen=2, dependencies=0x555555d98cc0 <_PyRuntime+359664>)\n    at Python/optimizer_cases.c.h:1117\n#8  0x000055555592b0e2 in _Py_uop_analyze_and_optimize (func=0xcef3, buffer=0xcef3, length=6, length@entry=901, curr_stacklen=-137732115, dependencies=0x16)\n    at Python/optimizer_analysis.c:534\n#9  0x000055555592619a in uop_optimize (frame=0x7ffff6248e90, tstate=0x555555d988a8 <_PyRuntime+358616>, progress_needed=true, exec_ptr=<optimized out>) at Python/optimizer.c:1371\n#10 _PyOptimizer_Optimize (frame=frame@entry=0x7ffff6248e90, tstate=tstate@entry=0x555555d988a8 <_PyRuntime+358616>) at Python/optimizer.c:164\n#11 0x000055555586e4d5 in stop_tracing_and_jit (tstate=tstate@entry=0x555555d988a8 <_PyRuntime+358616>, frame=frame@entry=0x7ffff6248e90) at Python/ceval.c:1108\n#12 0x0000555555865724 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d988a8 <_PyRuntime+358616>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:11712\n#13 0x000055555582d56b in _PyEval_EvalFrame (tstate=0x555555d988a8 <_PyRuntime+358616>, frame=0x7ffff7fa7020, throwflag=0) at ./Include/internal/pycore_ceval.h:121\n#14 _PyEval_Vector (tstate=tstate@entry=0x555555d988a8 <_PyRuntime+358616>, func=func@entry=0x7ffff6bf6bd0, locals=locals@entry=0x7ffff6c05190, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2159\n```\n\nOutput from running with PYTHON_LLTRACE=4:\n[1989_abort_lltrace.txt](https://github.com/user-attachments/files/23771624/1989_abort_lltrace.txt)\n\nOutput from running with PYTHON_DEBUG=4:\n[1989_abort_opt_debug.txt](https://github.com/user-attachments/files/23771625/1989_abort_opt_debug.txt)\n\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a2+ (heads/main-dirty:dc9d2eea587, Nov 24 2025, 06:26:38) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-141989\n* gh-142201\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-26T14:38:10Z",
+   "body": "In the future, could you please run `PYTHON_LLTRACE` together with `PYTHON_OPT_DEBUG`? It's hard to make sense of PYTHON_OPT_DEBUG if the execution of PYTHON_LLTRACE is not interleaved. Thank you!"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-26T14:42:37Z",
+   "body": "Sorry, will do. "
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-26T15:08:57Z",
+   "body": "No need to apologise :). Thank you for all the great fuzzing work you do."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-26T16:06:12Z",
+   "body": "So this is a very interesting bug. It's in the trace recorder but manifests in the optimizer. What I think is happening is the following:\n\nCALL\nspecializes immediately to \nCALL_ALLOC_AND_ENTER_INIT\nwhich immediately deopts due to `DEOPT_IF(!_PyThreadState_HasStackSpace(tstate, code->co_framesize + _Py_InitCleanup.co_framesize));` or some other deopt.\n\nSo it's very possible for CALL_ALLOC_AND_ENTER_INIT to make no progress due to stack space checks which are dynamic!\n\n@markshannon this is an example of a specialization that makes no progress but isn't buggy. In this case, the easiest fix instead of counters it to just inspect the adaptive counter i think. If it's non-zero, that indicates that a deopt happened."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-26T20:06:28Z",
+   "body": "Fix up at https://github.com/python/cpython/pull/141989"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-01T15:54:19Z",
+   "body": "I don't see how the behavior of the specializer matters. The generated trace should be correct regardless of what the specializer does."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-01T16:02:06Z",
+   "body": "> I don't see how the behavior of the specializer matters. The generated trace should be correct regardless of what the specializer does.\n\nNo the problem is not the specializer. The problem is that the previous instruction is not actually what was actually executed. Please see the PR."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-01T16:11:52Z",
+   "body": "IIUC, the instruction recorded was `CALL_ALLOC_AND_ENTER_INIT`, but the executed path was to deopt to `CALL`. This should be fine as the guard immediately after the call will fail at runtime, or be converted to an exit by the optimizer, which would be expecting execution in the `__init__` function, not immediately after the call.\n\nAre we missing a guard?"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-01T16:18:27Z",
+   "body": "> IIUC, the instruction recorded was CALL_ALLOC_AND_ENTER_INIT, but the executed path was to deopt to CALL.\n\nYes.\n\n>  This should be fine as the guard immediately after the call will fail at runtime, or be converted to an exit by the optimizer\n\nNo the optimizer does not recognise that the sequence as invalid and tries to optimize across it, manifesting in the assertion failure.\nWe shouldn't fix this in the optimizer as there's nothing it's doing that is wrong there. The sequence of uops produced is just invalid due to the trace recorder.\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-01T16:19:40Z",
+   "body": "Note that the assertion failure is in the optimizer, not in the interpreter. So it's the optimizer complaining about the trace."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-01T17:57:49Z",
+   "body": "The previous instruction is what was executed, just not the fast path through it. Which isn't invalid, just unusual.\n\nIt looks to me like we are missing a guard after the `CALL_ALLOC_AND_ENTER_INIT`\n\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-01T18:02:08Z",
+   "body": "> It looks to me like we are missing a guard after the `CALL_ALLOC_AND_ENTER_INIT`\n\nA guard for what? \n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-02T09:25:22Z",
+   "body": "A guard for the control flow that we didn't expect.\n\nThe bug is that `CALL_ALLOC_AND_ENTER_INIT` becomes `CALL` and that confuses the tracer.\nWe need a general solution for instruction `X_SPECIALIZED` becoming instruction `X` (or vice versa) during tracing.\nThis is probably only a problem when `X` and `X_SPECIALIZED` involve different control flow.\n\nI don't know what the solution is. Your PR may do that, but I'm worried that it mostly handles the problem, leaving an even harder to find bug behind."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-02T09:31:24Z",
+   "body": "What happens if we turn the optimizer off?\nI assume it crashes when we try to run the trace."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-02T09:38:11Z",
+   "body": "There are two cases:\n\n1. X becomes X_SPECIALIZED\n2. X_SPECIALIZED deopts to X but stays as X_SPECIALIZED in the bytecode\n\nThe first case is already safe, because X_SPECIALIZED is the actual instruction executed.\n\nThe second case is currently not safe, because X is the actual instruction executed not X_SPECIALIZED.\n\nThe fix is to reflect the actual executed instruction properly in the trace stream. This is why I had the deopt counters in the past, to handle such cases. We ended up removing that but now we still have to deal with the specializer not reflecting the actual instruction executed."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-02T11:13:58Z",
+   "body": "For case 2, we execute `X_SPECIALIZED` even though that execution ends up in `X` so we should record `X_SPECIALIZED`.\nSince the the state of VM will be different than if we had executed `X_SPECIALIZED` normally, we need a guard to check we are executing in the correct place after the instruction has completed.\nDon't we already emit that guard after `CALL` and its specializations?\n\nAs long as we insert guards after jumps, we can record *any* specialization of an instruction and the trace will be correct, just not very efficient.\n\nSo this does look like a bug in the optimizer after all. We should abandon the trace if we get stack out of bounds, not crash.\n\nHaving said that, we do want to get the right specialization. I've created https://github.com/python/cpython/issues/142183 for the specific deopt we are seeing here."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-02T13:57:40Z",
+   "body": "Can we do both? Ie fix the optimizer and fix the trace recorder. The problem is that if we continue recording these types of traces where a deopt actually happened, the chances of contradiction in the optimizer go up. Which in turn means the optimizer is less likely to do its job properly."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-02T14:30:00Z",
+   "body": "Yes let's do both. But we should fix the optimizer first, otherwise we won't know if it is fixed."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-10T19:39:27Z",
+   "body": "Thanks again for the bug report!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/141989",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142201",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3bf2128989e550a7a02acbaa47389023b2c6bc9",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2883a637ad173330c18976946120603506a54877",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142365",
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ebf3427615b3a3d1e6048f84a4adc47331c3803d",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ]
+}

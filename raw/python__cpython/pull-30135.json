@@ -1,0 +1,136 @@
+{
+ "repo": "python/cpython",
+ "number": 30135,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/30135",
+ "title": "gh-90117: handle dict and mapping views in pprint",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-feature",
+  "stdlib",
+  "3.15"
+ ],
+ "created_at": "2021-12-16T09:54:41Z",
+ "closed_at": "2025-05-20T19:30:01Z",
+ "body": "This PR adds two methods to PrettyPrinter: one to handle `dict_keys` and `dict_values` (sorted with `_safe_key`), another to handle  `dict_items` (sorted using  `_safe_tuple`).\r\n\r\nDesign and implementation open for discussion, thanks in advance.\n\n<!-- issue-number: [bpo-45959](https://bugs.python.org/issue45959) -->\nhttps://bugs.python.org/issue45959\n<!-- /issue-number -->\n\n\n<!-- gh-issue-number: gh-90117 -->\n* Issue: gh-90117\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "the-knights-who-say-ni",
+   "created_at": "2021-12-16T09:54:44Z",
+   "body": "Hello, and thanks for your contribution!\n\nI'm a bot set up to make sure that the project can legally accept this contribution by verifying everyone involved has signed the [PSF contributor agreement](https://www.python.org/psf/contrib/contrib-form/) (CLA).\n\n\n\n## CLA Missing\n\nOur records indicate the following people have not signed the CLA:\n\n@devdanzin\n\nFor legal reasons we need all the people listed to sign the CLA before we can look at your contribution. Please follow [the steps outlined in the CPython devguide](https://devguide.python.org/pullrequest/#licensing) to rectify this issue.\n\nIf you have recently signed the CLA, please wait at least one business day\nbefore our records are updated.\n\n\nYou can [check yourself](https://check-python-cla.herokuapp.com/) to see if the CLA has been received.\n\nThanks again for the contribution, we look forward to reviewing it!\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2021-12-17T00:07:46Z",
+   "body": "Thank you for the review, Alex!"
+  },
+  {
+   "author": "AlexWaygood",
+   "created_at": "2021-12-17T00:09:37Z",
+   "body": "> Thank you for the review, Alex!\r\n\r\nPleasure :) You can add a News entry to your PR using https://blurb-it.herokuapp.com"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2021-12-18T12:46:04Z",
+   "body": "Thank you for reviewing, \u00c9ric!"
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2022-01-18T00:06:49Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  },
+  {
+   "author": "merwok",
+   "created_at": "2022-01-26T15:43:31Z",
+   "body": "The sake of consistency is not a sufficient reason to do things.  The question should be: what is the feature added by handling dict views ABCs in pprint?  Do people pretty-print these ABCs?  Would registering them automatically handle instance of concrete subclasses of the ABCs?  In that case, should that replace the code added in this PR?"
+  },
+  {
+   "author": "BvB93",
+   "created_at": "2022-01-26T16:18:40Z",
+   "body": "> The question should be: what is the feature added by handling dict views ABCs in pprint? Do people pretty-print these ABCs?\r\n\r\nData point of 1, but I've personally run into this exact issue before, both with normal dict views as well as custom mapping views derived from the `collections.abc` ABCs.\r\n\r\n> Would registering them automatically handle instance of concrete subclasses of the ABCs? In that case, should that replace the code added in this PR?\r\n\r\nRegistering the `collections.abc.MappingView` baseclass (which is the one that actually implements [`__repr__`](https://github.com/python/cpython/blob/ac0c6e128cb6553585af096c851c488b53a6c952/Lib/_collections_abc.py#L860-L861) for the mapping views) should do most of the work. \r\n\r\nThe only caveat is that because the mapping views share identical `__repr__` methods by default it's not possible to distinguish between, *e.g.*, `ItemsView` and `KeysView` simply by using the `__repr__` method as a dictionary key. Nevertheless, some minor changes in the logic of `_pprint_dict_view` should be able to deal with this.\r\n\r\n``` diff\r\n@@ -233,8 +233,11 @@ def _pprint_ordered_dict(self, object, stream, indent, allowance, context, level\r\n-    def _pprint_dict_view(self, object, stream, indent, allowance, context, level, items=False):\r\n-        key = _safe_tuple if items else _safe_key\r\n+    def _pprint_dict_view(self, object, stream, indent, allowance, context, level):\r\n+        if isinstance(object, (self._dict_items_view, _collections.abc.ItemsView)):\r\n+            key = _safe_tuple\r\n+        else:\r\n+            key = _safe_key\r\n@@ -255,11 +258,10 @@ def _pprint_dict_view(self, object, stream, indent, allowance, context, level, i\r\n-    def _pprint_dict_items_view(self, object, stream, indent, allowance, context, level):\r\n-        self._pprint_dict_view(object, stream, indent, allowance, context, level, items=True)\r\n-\r\n     _dict_items_view = type({}.items())\r\n-    _dispatch[_dict_items_view.__repr__] = _pprint_dict_items_view\r\n+    _dispatch[_dict_items_view.__repr__] = _pprint_dict_view\r\n+\r\n+    _dispatch[_collections.abc.MappingView.__repr__] = _pprint_dict_view\r\n```"
+  },
+  {
+   "author": "arhadthedev",
+   "created_at": "2023-03-04T14:30:27Z",
+   "body": "@freddrake (as a pprint expert)"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-04-07T15:21:12Z",
+   "body": "Sorry for dropping the ball on this one, folks. I'm back to try and finish it.\r\n\r\nBack when I working on this, I was stumped on how to handle recursive views. Now I've mostly copied the code for recursive dicts for that, it adds quite a bit more code but works correctly. I've added more tests too.\r\n\r\n[merwok](https://github.com/python/cpython/pull/30135#issuecomment-1022325104):\r\n\r\n> The question should be: what is the feature added by handling dict views ABCs in pprint?\r\n\r\nIt adds support for pretty printing `UserDict` and `ChainMap` views, besides custom mapping views derived from the ABCs. I can't say whether that's enough to justify adding the code, but I've added it so we can discuss that based on a concrete implementation. Should be fairly straightforward to yank ABC view support if that's the decision.\r\n\r\n> Would registering them automatically handle instance of concrete subclasses of the ABCs?\r\n\r\nNot that I can see, because their `__repr__` includes the whole mapping they hold, while `dict` and `odict` views only include the keys/values/items they hold.\r\n\r\n> In that case, should that replace the code added in this PR?\r\n\r\nIf possible, it would make for cleaner code. I just can't see how.\r\n\r\n[BvB93](https://github.com/python/cpython/pull/30135#issuecomment-1022359703):\r\n> Registering the collections.abc.MappingView baseclass (which is the one that actually implements [__repr__](https://github.com/python/cpython/blob/ac0c6e128cb6553585af096c851c488b53a6c952/Lib/_collections_abc.py#L860-L861) for the mapping views) should do most of the work.\r\n\r\nUnfortunately, as mentioned above, the `__repr__` of ABC views is different enough to complicate the code with special casings. So I've added a different method to handle them.\r\n\r\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-04-09T09:08:35Z",
+   "body": "Here's an argument against supporting the pretty-printing of mapping ABC views: we need to special-case mapping classes with custom or unimplemented `__repr__`.\r\n\r\nConsider the following class:\r\n```python\r\n        from collections.abc import Mapping\r\n\r\n        class MyMapping(Mapping):\r\n            def __init__(self, keys=None):\r\n                self._keys = set() if keys is None else set(keys)\r\n\r\n            def __getitem__(self, item):\r\n                if item in self._keys:\r\n                    return item\r\n                else:\r\n                    raise KeyError\r\n\r\n            def __len__(self):\r\n                return len(self._keys)\r\n\r\n            def __iter__(self):\r\n                return iter(self._keys)\r\n\r\n            def __setitem__(self, key, value):\r\n                self._keys.add(key)\r\n\r\n            def __repr__(self):\r\n                return f\"{self.__class__.__name__}([{', '.join(map(repr, self._keys))}])\"\r\n```\r\n\r\nWhen we `pprint` keys from this class, the current code doesn't detect that a custom `__repr__` exists:\r\n```python\r\n       m = MyMapping([1])\r\n        m[\"test\"] = 10\r\n        print(m)  # MyMapping(['test', 1])\r\n        print(m.keys())  # KeysView(MyMapping(['test', 1])) -> Uses the custom __repr__\r\n        pprint.pprint(m.keys())  # KeysView({'test': 'test', 1: 1}) -> Uses __class__.__name__\r\n                                 # and .items() to construct a repr that doesn't necessarily\r\n                                 # match the custom repr.\r\n```\r\n\r\nI've figured that what these mapping ABCs need is pretty-printing their `._mapping`. This might involve a recursive call in `._safe_repr`. Converting to a draft until I have this code working."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-04-26T11:58:56Z",
+   "body": "I believe this PR is now ready for review. Any feedback is most welcome!\r\n\r\nIt tries to keep the changes self-contained and use the same code style as the rest of the module, matching the code for pretty printing of dicts as closely as possible. It also adds and adapts many tests, to ensure full coverage of the changes. \r\n\r\nI now believe supporting ABC mapping views is worth it: it adds little code and broadens the kinds of mapping for which we can pretty print views.\r\n\r\nSome choices, like calling `repr()` only to raise an `AttributeError` instead of raising it ourselves, I'm not so sure about.\r\n\r\n<details><summary>Code and output for pretty printing many kinds of views</summary>\r\n<p>\r\n\r\n```python\r\nimport pprint\r\nfrom collections import OrderedDict, defaultdict, Counter, ChainMap\r\nfrom collections.abc import Mapping, MappingView, ItemsView, KeysView, ValuesView\r\n\r\nABC_MAPPING_VIEWS = MappingView, ItemsView, KeysView, ValuesView\r\nDICT_CLASSES = OrderedDict, Counter, ChainMap\r\n\r\ndef main():\r\n    # Simple dictionary with string keys and values\r\n    simple_dict = {\"apple\": \"fruit\", \"carrot\": \"vegetable\", \"pear\": \"fruit\"}\r\n\r\n    # Dictionary with various types of keys and values\r\n    mixed_dict = {42: \"answer\", (2, 3): [1, 2, 3], 'key': {'nested': 'dict'}}\r\n\r\n    # Long dictionary with integer keys and string values\r\n    long_dict = {i: f\"number_{i}\" for i in range(20)}\r\n\r\n    # Long recursive dictionary\r\n    recursive_dict = long_dict.copy()\r\n    recursive_dict[20] = recursive_dict\r\n\r\n    # Dictionary containing views\r\n    views_dict = {i: cls({i: i}) for i, cls in enumerate(ABC_MAPPING_VIEWS)}\r\n    start = len(ABC_MAPPING_VIEWS)\r\n    views_dict.update({i + start: cls({i: i}).items() for i, cls in enumerate(DICT_CLASSES)})\r\n    int_default_dict = defaultdict(int)\r\n    int_default_dict[0] = 0\r\n    views_dict.update({7: int_default_dict.items()})\r\n\r\n    # Ordered dictionary to maintain insertion order\r\n    ordered_dict = OrderedDict([(f\"key_{i}\", i) for i in range(20)])\r\n\r\n    # Default dictionary with a default factory of list\r\n    default_dict = defaultdict(list)\r\n    default_dict['fruits'].append('apple')\r\n    default_dict['fruits'].append('banana')\r\n    default_dict['vegetables'].append('carrot')\r\n\r\n    # Counter dictionary to count occurrences\r\n    counter_dict = Counter('abracadabra')\r\n\r\n    # ChainMap to search multiple dictionaries\r\n    chain_map = ChainMap(simple_dict, mixed_dict, long_dict)\r\n\r\n    # Nested dictionary views\r\n    nested_dict = {'level1': simple_dict, 'level2': {'level2_dict': mixed_dict}}\r\n\r\n    # Printing different dictionaries with pprint\r\n    print(\"Simple Dict Keys:\")\r\n    pprint.pprint(simple_dict.keys())\r\n    print(\"\\nMixed Dict Items:\")\r\n    pprint.pprint(mixed_dict.items())\r\n\r\n    print(\"\\nLong Dict Values:\")\r\n    pprint.pprint(long_dict.values(), width=50)\r\n\r\n    print(\"\\nOrdered Dict Items:\")\r\n    pprint.pprint(ordered_dict.items())\r\n\r\n    print(\"\\nDefault Dict Items:\")\r\n    pprint.pprint(default_dict.items())\r\n\r\n    print(\"\\nCounter Dict Items:\")\r\n    pprint.pprint(counter_dict.items())\r\n\r\n    print(\"\\nChainMap Items:\")\r\n    pprint.pprint(chain_map.items())\r\n\r\n    print(\"\\nNested Dict Views:\")\r\n    pprint.pprint(nested_dict.keys())\r\n    pprint.pprint(nested_dict.items())\r\n    pprint.pprint(nested_dict.items(), depth=2)\r\n\r\n    print(\"\\nRecursive Dict Views:\")\r\n    pprint.pprint(recursive_dict.items())\r\n\r\n    print(\"\\nABC Mapping Views (should pretty print a repr of the mapping):\")\r\n    pprint.pprint(MappingView(recursive_dict))\r\n    pprint.pprint(ItemsView(nested_dict))\r\n    pprint.pprint(KeysView(chain_map))\r\n    pprint.pprint(ValuesView(ordered_dict))\r\n\r\n    print(\"\\nDict With Views:\")\r\n    pprint.pprint(views_dict.items())\r\n\r\n    classes()\r\n\r\n\r\ndef classes():\r\n\r\n    class Mappingview_Custom_Repr(MappingView):\r\n        def __repr__(self):\r\n            return '*' * len(MappingView.__repr__(self))\r\n\r\n    print(\"\\nCustom __repr__ in Subclass:\")\r\n    pprint.pprint(Mappingview_Custom_Repr({1: 1}))\r\n\r\n    class MyMapping(Mapping):\r\n        def __init__(self, keys=None):\r\n            self._keys = {} if keys is None else dict.fromkeys(keys)\r\n\r\n        def __getitem__(self, item):\r\n            return self._keys[item]\r\n\r\n        def __len__(self):\r\n            return len(self._keys)\r\n\r\n        def __iter__(self):\r\n            return iter(self._keys)\r\n\r\n        def __repr__(self):\r\n            return f\"{self.__class__.__name__}([{', '.join(map(repr, self._keys.keys()))}])\"\r\n\r\n    print(\"\\nCustom __repr__ in _mapping:\")\r\n    my_mapping = MyMapping([\"test\", 1])\r\n    pprint.pprint(MappingView(my_mapping))\r\n    pprint.pprint(my_mapping.items())\r\n\r\nif __name__ == \"__main__\":\r\n    main()\r\n``` \r\n\r\nOutput:\r\n```\r\nSimple Dict Keys:\r\ndict_keys(['apple', 'carrot', 'pear'])\r\n\r\nMixed Dict Items:\r\ndict_items([(42, 'answer'), ('key', {'nested': 'dict'}), ((2, 3), [1, 2, 3])])\r\n\r\nLong Dict Values:\r\ndict_values(['number_0',\r\n 'number_1',\r\n 'number_10',\r\n 'number_11',\r\n 'number_12',\r\n 'number_13',\r\n 'number_14',\r\n 'number_15',\r\n 'number_16',\r\n 'number_17',\r\n 'number_18',\r\n 'number_19',\r\n 'number_2',\r\n 'number_3',\r\n 'number_4',\r\n 'number_5',\r\n 'number_6',\r\n 'number_7',\r\n 'number_8',\r\n 'number_9'])\r\n\r\nOrdered Dict Items:\r\nodict_items([('key_0', 0),\r\n ('key_1', 1),\r\n ('key_10', 10),\r\n ('key_11', 11),\r\n ('key_12', 12),\r\n ('key_13', 13),\r\n ('key_14', 14),\r\n ('key_15', 15),\r\n ('key_16', 16),\r\n ('key_17', 17),\r\n ('key_18', 18),\r\n ('key_19', 19),\r\n ('key_2', 2),\r\n ('key_3', 3),\r\n ('key_4', 4),\r\n ('key_5', 5),\r\n ('key_6', 6),\r\n ('key_7', 7),\r\n ('key_8', 8),\r\n ('key_9', 9)])\r\n\r\nDefault Dict Items:\r\ndict_items([('fruits', ['apple', 'banana']), ('vegetables', ['carrot'])])\r\n\r\nCounter Dict Items:\r\ndict_items([('a', 5), ('b', 2), ('c', 1), ('d', 1), ('r', 2)])\r\n\r\nChainMap Items:\r\nItemsView(ChainMap({'apple': 'fruit', 'carrot': 'vegetable', 'pear': 'fruit'},\r\n         {42: 'answer', 'key': {'nested': 'dict'}, (2, 3): [1, 2, 3]},\r\n         {0: 'number_0',\r\n          1: 'number_1',\r\n          2: 'number_2',\r\n          3: 'number_3',\r\n          4: 'number_4',\r\n          5: 'number_5',\r\n          6: 'number_6',\r\n          7: 'number_7',\r\n          8: 'number_8',\r\n          9: 'number_9',\r\n          10: 'number_10',\r\n          11: 'number_11',\r\n          12: 'number_12',\r\n          13: 'number_13',\r\n          14: 'number_14',\r\n          15: 'number_15',\r\n          16: 'number_16',\r\n          17: 'number_17',\r\n          18: 'number_18',\r\n          19: 'number_19'}))\r\n\r\nNested Dict Views:\r\ndict_keys(['level1', 'level2'])\r\ndict_items([('level1', {'apple': 'fruit', 'carrot': 'vegetable', 'pear': 'fruit'}),\r\n ('level2',\r\n  {'level2_dict': {42: 'answer',\r\n                   'key': {'nested': 'dict'},\r\n                   (2, 3): [1, 2, 3]}})])\r\ndict_items([('level1', {...}), ('level2', {...})])\r\n\r\nRecursive Dict Views:\r\ndict_items([(0, 'number_0'),\r\n (1, 'number_1'),\r\n (2, 'number_2'),\r\n (3, 'number_3'),\r\n (4, 'number_4'),\r\n (5, 'number_5'),\r\n (6, 'number_6'),\r\n (7, 'number_7'),\r\n (8, 'number_8'),\r\n (9, 'number_9'),\r\n (10, 'number_10'),\r\n (11, 'number_11'),\r\n (12, 'number_12'),\r\n (13, 'number_13'),\r\n (14, 'number_14'),\r\n (15, 'number_15'),\r\n (16, 'number_16'),\r\n (17, 'number_17'),\r\n (18, 'number_18'),\r\n (19, 'number_19'),\r\n (20,\r\n  {0: 'number_0',\r\n   1: 'number_1',\r\n   2: 'number_2',\r\n   3: 'number_3',\r\n   4: 'number_4',\r\n   5: 'number_5',\r\n   6: 'number_6',\r\n   7: 'number_7',\r\n   8: 'number_8',\r\n   9: 'number_9',\r\n   10: 'number_10',\r\n   11: 'number_11',\r\n   12: 'number_12',\r\n   13: 'number_13',\r\n   14: 'number_14',\r\n   15: 'number_15',\r\n   16: 'number_16',\r\n   17: 'number_17',\r\n   18: 'number_18',\r\n   19: 'number_19',\r\n   20: <Recursion on dict with id=2200369163696>})])\r\n\r\nABC Mapping Views (should pretty print a repr of the mapping):\r\nMappingView({0: 'number_0',\r\n 1: 'number_1',\r\n 2: 'number_2',\r\n 3: 'number_3',\r\n 4: 'number_4',\r\n 5: 'number_5',\r\n 6: 'number_6',\r\n 7: 'number_7',\r\n 8: 'number_8',\r\n 9: 'number_9',\r\n 10: 'number_10',\r\n 11: 'number_11',\r\n 12: 'number_12',\r\n 13: 'number_13',\r\n 14: 'number_14',\r\n 15: 'number_15',\r\n 16: 'number_16',\r\n 17: 'number_17',\r\n 18: 'number_18',\r\n 19: 'number_19',\r\n 20: <Recursion on dict with id=2200369163696>})\r\nItemsView({'level1': {'apple': 'fruit', 'carrot': 'vegetable', 'pear': 'fruit'},\r\n 'level2': {'level2_dict': {42: 'answer',\r\n                            'key': {'nested': 'dict'},\r\n                            (2, 3): [1, 2, 3]}}})\r\nKeysView(ChainMap({'apple': 'fruit', 'carrot': 'vegetable', 'pear': 'fruit'},\r\n         {42: 'answer', 'key': {'nested': 'dict'}, (2, 3): [1, 2, 3]},\r\n         {0: 'number_0',\r\n          1: 'number_1',\r\n          2: 'number_2',\r\n          3: 'number_3',\r\n          4: 'number_4',\r\n          5: 'number_5',\r\n          6: 'number_6',\r\n          7: 'number_7',\r\n          8: 'number_8',\r\n          9: 'number_9',\r\n          10: 'number_10',\r\n          11: 'number_11',\r\n          12: 'number_12',\r\n          13: 'number_13',\r\n          14: 'number_14',\r\n          15: 'number_15',\r\n          16: 'number_16',\r\n          17: 'number_17',\r\n          18: 'number_18',\r\n          19: 'number_19'}))\r\nValuesView(OrderedDict([('key_0', 0),\r\n             ('key_1', 1),\r\n             ('key_2', 2),\r\n             ('key_3', 3),\r\n             ('key_4', 4),\r\n             ('key_5', 5),\r\n             ('key_6', 6),\r\n             ('key_7', 7),\r\n             ('key_8', 8),\r\n             ('key_9', 9),\r\n             ('key_10', 10),\r\n             ('key_11', 11),\r\n             ('key_12', 12),\r\n             ('key_13', 13),\r\n             ('key_14', 14),\r\n             ('key_15', 15),\r\n             ('key_16', 16),\r\n             ('key_17', 17),\r\n             ('key_18', 18),\r\n             ('key_19', 19)]))\r\n\r\nDict With Views:\r\ndict_items([(0, MappingView({0: 0})),\r\n (1, ItemsView({1: 1})),\r\n (2, KeysView({2: 2})),\r\n (3, ValuesView({3: 3})),\r\n (4, odict_items([(0, 0)])),\r\n (5, dict_items([(1, 1)])),\r\n (6, ItemsView(ChainMap({2: 2}))),\r\n (7, dict_items([(0, 0)]))])\r\n\r\nCustom __repr__ in Subclass:\r\n*******************************\r\n\r\nCustom __repr__ in _mapping:\r\nMappingView(MyMapping(['test', 1]))\r\nItemsView(MyMapping(['test', 1]))\r\n\r\n``` \r\n\r\n</p>\r\n</details> \r\n\r\n"
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-18T09:47:07Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "merwok",
+   "created_at": "2025-05-20T22:44:59Z",
+   "body": "A small thing: github unhelpfully defaults merge commit message to the concatenation of all commits in the branch. One needs to delete it before merging. The browser extension Refined Github helps with this."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/90117",
+   "commit": null,
+   "actor": "AbhigyanBose"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c7f8e706e116d7986da40805cc4a85333acde1c9",
+   "actor": "gpshead"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "gpshead"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "853730b424b8c68176b690f012123813bf286749",
+   "actor": "lkollar"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135779",
+   "commit": null,
+   "actor": "brandtbucher"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "08aee8642b10062959724101930b7b429f14907c",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "462a0983a3263630b468af281e1474f9b9101e68",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "33047808145f120d9765a2b08305e5a2bec0c64d",
+   "actor": "gostak-dd"
+  }
+ ]
+}

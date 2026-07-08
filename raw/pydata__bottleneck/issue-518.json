@@ -1,0 +1,143 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 518,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/518",
+ "title": "Umbrella issue: bottleneck C Extension Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:33:34Z",
+ "closed_at": null,
+ "body": "Below is part of an analysis report created by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit). It contains segfaults under OOM, memory leaks on error paths (~80 KB per invalid `partition`/`argpartition` call), a per-call reference leak in `rankdata` on non-C-contiguous arrays, systemic missing NULL checks in INIT/INIT_ONE macros affecting ~46 generated functions, and unchecked malloc in `mm_new`/`mm_new_nan`. The full report is available at https://gist.github.com/devdanzin/b9ce99c1971afa418b6a24ca575c67c5.\n\nThis is meant as an umbrella issue from which specific sub issues can be created.\n\n# bottleneck C Extension Analysis Report\n## Findings by Priority\n### FIX\n\n- #519\n- #520\n- #521\n- #522\n- #523\n- #524\n- #525\n- #526\n- #527\n\n### CONSIDER\n\n- #528\n- #529\n- #530\n- #531\n- #532\n\n----\n\n## Summary Table\n\n| # | Finding | Classification | Confidence |\n|---|---------|---------------|------------|\n| 1-2 | #519 `move_median` MEMORY_ERR segfault | **FIX** | HIGH |\n| 3-4 | #520 `partition`/`argpartition` ~80 KB leak on error | **FIX** | HIGH |\n| 5 | #521 `nonreducer_axis` Ravel reference leak + NULL | **FIX** | HIGH |\n| 6 | #522 `nonreducer_axis` RUNTIME_ERR without return | **FIX** | HIGH |\n| 7-8 | #523 `rankdata`/`nanrankdata` unchecked ArgSort+EMPTY | **FIX** | HIGH |\n| 9 | #524 `push` unchecked PyArray_Copy | **FIX** | HIGH |\n| 10-11 | #525 INIT/INIT_ONE macro unchecked EMPTY (~46 functions) | **FIX** | HIGH |\n| 12-14 | #526 `mm_new`/`mm_new_nan` unchecked malloc + mm_free on NULL | **FIX** | HIGH |\n| 15 | #527 Missing `pystr_kth` check | **FIX** | HIGH |\n| 16 | #528 `iterators.h` Ravel unchecked | CONSIDER | HIGH |\n| 17 | #529 BUFFER_NEW unchecked malloc | CONSIDER | HIGH |\n| 18 | #530 Module leak on init failure | CONSIDER | MEDIUM |\n| 19 | #531 Exception clobbering (~15 sites) | CONSIDER | MEDIUM |\n| 20 | #532 Free-threading global state | CONSIDER | HIGH |",
+ "comments": [
+  {
+   "author": "rgommers",
+   "created_at": "2026-03-29T14:06:25Z",
+   "body": "Hi @devdanzin, I've seen your work on `cext-review-toolkit` before and think it's quite useful, so I appreciate this issue and the linked bug reports. That said, I recommend on other projects to not open many issues at once, it might get you banned given that many OSS projects struggle with \"AI slop\" spam.\n\nI assume you validated all the linked bug reports, and they're real and need fixing?\n\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-29T14:40:29Z",
+   "body": "Thank you, and point taken. I've been contacting maintainers and asking them how I should proceed, in this case @neutrinoceros said it'd be OK to open the issues (as we did similarly for h5py before).\n\nI've read and analyzed all the bug reports, but validating is a strong word for the cursory confirmations I did. E.g. I haven't tried applying the suggested fixes. I think it's likely there will be false positives, hopefully few (both I and the agents expend some time weeding those out) . \n\nI can't say they all need fixing, there's probably some issues that are intended behavior or not important enough. But I did my best to add context, explain why it was considered a bug, and offer fix suggestions."
+  },
+  {
+   "author": "rgommers",
+   "created_at": "2026-03-29T14:45:01Z",
+   "body": "Ah great, thanks for the context."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-29T15:08:48Z",
+   "body": "In h5py we've seen no false positives, so I green lighted @devdanzin to do more of the same here (thank you !). I'll mark all other tickets as sub-issues to this one."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-29T15:13:41Z",
+   "body": "also note for @rgommers on my methodology addressing these; I'll triage them manually over the next few days, marking the ones I'm confident I can confirm as bugs, and fixing anything I can as I go. If all goes well, I expect the easy, more numerous ones, will get a patch early, and then whatever remains can get more in depth analysis and discussion."
+  },
+  {
+   "author": "rgommers",
+   "created_at": "2026-03-29T15:18:12Z",
+   "body": "Sounds great, thanks for working on this!"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-30T16:46:02Z",
+   "body": "So far, so good. I confirmed 5/5 reports I studied, and opened PRs with the exact suggestions included therein. As I'm already doing the job of a reviewer, I feel like it should be okay if I \"self\"-merge these, though, before I do, would you be okay with this approach @rgommers ?"
+  },
+  {
+   "author": "rgommers",
+   "created_at": "2026-03-31T07:33:48Z",
+   "body": "@neutrinoceros sure, that sounds fine to me. I have browsed the most recent open PRs, and those all look good to me. In case you want review on a specific one, please ping me."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/519",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/520",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/521",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/522",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/523",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/524",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/525",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/526",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/527",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/528",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/529",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/530",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/531",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/532",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

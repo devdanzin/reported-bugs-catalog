@@ -1,0 +1,52 @@
+{
+ "repo": "python/cpython",
+ "number": 143807,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/143807",
+ "title": "JIT: Assertion `size < MAX_EXECUTORS_SIZE` failed in `get_index_for_executor`",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2026-01-13T16:23:05Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to cause an abort in a patched JIT build by running the code below. This bug doesn't seem to repro if using an interpreter from a venv with lots o stuff installed, but it does when directly calling Python from a build dir: `/path/to/build/python mre.py`.\n\nNecessary patch:\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex fadd11f04ec..3e779a141af 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -125,7 +125,7 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n #define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(_PyPolicy *policy)\n@@ -139,7 +139,7 @@ initial_jump_backoff_counter(_PyPolicy *policy)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n+#define SIDE_EXIT_INITIAL_VALUE 63\n #define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n```\n\n\n<details><summary>MRE</summary>\n<p>\n\n```python\nfrom sys import stderr\nimport gc\ngc.set_threshold(1)\nimport random\n\n# u/U means an undefined name\ndef f1():\n    def v(a=2): ...\n\n    try: res = v()\n    except Exception: u()\n    except U: u\n\n    class A:\n        def _(self): ...\n\n    d = {}\n    for i in range(10):\n        try: u\n        except Exception: pass\n        def _(): ...\n\n    class B:\n        def _(self): b = 1\n\n    class C(B):\n        def f(self):\n            for i in [4**62]:\n                C._(object)\n\n    for i in (-1, 0):\n        c = C()\n    for _ in range(299):\n        try: _ = c.f()\n        except Exception: u\n\n    for i in range(76):\n        C.__bases__ = (object,)\n    for _ in range(100):\n        try: _ = c.f()\n        except AttributeError: pass\n\n    for i in range(501):\n        if i - 9 == 3: u\n        elif u / 9 == 2: (var,) = {}\n        elif u / 1 != 3:\n            for i in [24]: 1 / 0\n        try: u(u)\n        except U: u\n\n    for i in []:\n        class D: u\n    t = 2, 0\n    (u,)\n\nfor i in range(300):\n    try: f1()\n    except Exception as e: print(i, file=stderr)\n```\n\n</p>\n</details>\n\n\n<details><summary>Backtrace</summary>\n<p>\n\n```\npython: Python/optimizer.c:71: int32_t get_index_for_executor(PyCodeObject *, _Py_CODEUNIT *): Assertion `size < MAX_EXECUTORS_SIZE' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x00005555563ff51e in get_index_for_executor (code=0x7d9ff6dfaa90, instr=0x7d9ff6dfaed2) at Python/optimizer.c:71\n#8  _PyOptimizer_Optimize (frame=frame@entry=0x7e8ff6de52b0, tstate=tstate@entry=0x555556ed3030 <_PyRuntime+359408>) at Python/optimizer.c:177\n#9  0x0000555555eda0a4 in stop_tracing_and_jit (tstate=0x555556ed3030 <_PyRuntime+359408>, frame=frame@entry=0x7e8ff6de52b0) at Python/ceval.c:1461\n#10 0x0000555555e9693a in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:11868\n#11 0x0000555555e72e68 in _PyEval_EvalFrame (tstate=0x555556ed3030 <_PyRuntime+359408>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#12 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2541\n#13 0x0000555555e72885 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff6e863c0) at Python/ceval.c:1005\n#14 0x000055555649d01f in run_eval_code_obj (tstate=tstate@entry=0x555556ed3030 <_PyRuntime+359408>, co=co@entry=0x7d3ff6e16050, globals=globals@entry=0x7c7ff6e863c0,\n    locals=locals@entry=0x7c7ff6e863c0) at Python/pythonrun.c:1366\n#15 0x000055555649c1ec in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1469\n#16 0x00005555564967ed in pyrun_file (fp=fp@entry=0x7d4ff6defa80, filename=filename@entry=0x7ccff6dfaef0, start=start@entry=257, globals=globals@entry=0x7c7ff6e863c0,\n    locals=locals@entry=0x7c7ff6e863c0, closeit=closeit@entry=1, flags=0x7bfff5c1e910) at Python/pythonrun.c:1294\n#17 0x000055555649434d in _PyRun_SimpleFileObject (fp=<optimized out>, filename=<optimized out>, closeit=<optimized out>, flags=<optimized out>) at Python/pythonrun.c:518\n#18 0x00005555564936be in _PyRun_AnyFileObject (fp=fp@entry=0x7d4ff6defa80, filename=filename@entry=0x7ccff6dfaef0, closeit=closeit@entry=1, flags=flags@entry=0x7bfff5c1e910)\n    at Python/pythonrun.c:81\n#19 0x000055555650ff2b in pymain_run_file_obj (program_name=0x7caff6e230d0, filename=0x7ccff6dfaef0, skip_source_first_line=0) at Modules/main.c:410\n#20 pymain_run_file (config=0x555556e9e0f8 <_PyRuntime+142520>) at Modules/main.c:429\n#21 0x000055555650dff4 in pymain_run_python (exitcode=0x7bfff5c1e500) at Modules/main.c:691\n#22 Py_RunMain () at Modules/main.c:772\n#23 0x000055555650eef7 in pymain_main (args=<optimized out>) at Modules/main.c:802\n#24 0x000055555650f068 in Py_BytesMain (argc=<optimized out>, argv=0x7fffffffdbb8) at Modules/main.c:826\n#25 0x00007ffff7c2a575 in __libc_start_call_main (main=main@entry=0x55555591ec40 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffdbb8) at ../sysdeps/nptl/libc_start_call_main.h:58\n#26 0x00007ffff7c2a628 in __libc_start_main_impl (main=0x55555591ec40 <main>, argc=2, argv=0x7fffffffdbb8, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\n    stack_end=0x7fffffffdba8) at ../csu/libc-start.c:360\n#27 0x00005555558354f5 in _start ()\n```\n\n</p>\n</details>\n\nOutput from running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`:\n[3495_abort_lltrace_opt_debug.txt](https://github.com/user-attachments/files/24594987/3495_abort_lltrace_opt_debug.txt)\n\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ (heads/main-dirty:fca7fec88ce, Jan 13 2026, 13:04:59) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-143812\n* gh-143814\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-13T19:30:47Z",
+   "body": "There seems to be no code checking that `PyMem_Realloc` in `get_index_for_executor` is below the limit even though there's an assert there."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7ba983bf81f0785b1943cd8a03f563bfc01b2200",
+   "actor": "VanshAgarwal24036"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143812",
+   "commit": null,
+   "actor": "VanshAgarwal24036"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ee2f62166f9a9aea8e60b7687108545f6fadc994",
+   "actor": "VanshAgarwal24036"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143814",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ]
+}

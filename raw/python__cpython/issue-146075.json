@@ -1,0 +1,74 @@
+{
+ "repo": "python/cpython",
+ "number": 146075,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146075",
+ "title": "Assertion failure from `functools.partial` using a `str` subclass that raises on `__eq__`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.15"
+ ],
+ "created_at": "2026-03-17T18:14:07Z",
+ "closed_at": "2026-03-18T14:20:37Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to make the interpreter abort by passing an evil `str` subclass that raises on `__eq__` to be used as a keyword by `partial`.\n\n### Automated diagnosis:\n\nBug: `PyDict_Contains` -1 treated as truthy in `partial.__call__` vectorcall. When a keyword key's `__eq__` or `__hash__` raises during the `PyDict_Contains` check, the error return (-1) is treated as \"found\" (truthy), silently swallowing the exception and taking the wrong code path for keyword merging.\n\nFile: `Modules/_functoolsmodule.c`, line 455\n\nMRE:\n```python\nfrom functools import partial\n\nclass BadStr(str):\n    def __eq__(self, other):\n        raise RuntimeError\n    def __hash__(self):\n        return str.__hash__(self)\n\ndef f(**kwargs):\n    return kwargs\n\np = partial(f, poison=\"\")\nresult = p(**{BadStr(\"poison\"): \"new_value\"})\n```\n\nBacktrace:\n```\npython: Python/generated_cases.c.h:12739: PyObject *_PyEval_EvalFrameDefault(PyThreadState *, _PyInterpreterFrame *, int): Assertion `!_PyErr_Occurred(tstate)' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555e5d037 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:12739\n#8  0x0000555555e57778 in _PyEval_EvalFrame (tstate=0x5555568f7b18 <_PyRuntime+360664>, frame=0x7e8ff6fe52a8, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#9  _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2134\n#10 0x0000555555ab9e00 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x5555568f7b18 <_PyRuntime+360664>, callable=0x7cfff703cf60, args=args@entry=0x7bfff5b7e4a8,\n    nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:136\n#11 0x0000555555abcda5 in PyObject_CallOneArg (func=<optimized out>, arg=0x7d3ff7026870) at Objects/call.c:395\n#12 0x0000555555c6fb74 in call_unbound_noarg (unbound=1, func=0x7cfff703cf60, self=0x7d3ff7026870) at Objects/typeobject.c:3033\n#13 maybe_call_special_no_args (self=<optimized out>, attr=<optimized out>, attr_is_none=<optimized out>) at Objects/typeobject.c:3146\n#14 0x0000555555caaeb6 in slot_tp_hash (self=<optimized out>) at Objects/typeobject.c:10705\n#15 0x0000555555b97cd7 in _PyObject_HashFast (op=0x7d3ff7026870) at ./Include/internal/pycore_object.h:849\n#16 setitem_take2_lock_held (mp=0x7c7ff70decc0, key=0x7d3ff7026870, value=0x7c6ff70eb5a0) at Objects/dictobject.c:2737\n#17 0x000055555625d598 in partial_vectorcall (self=<optimized out>, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at ./Modules/_functoolsmodule.c:467\n#18 0x0000555555abc520 in _PyVectorcall_Call (tstate=<optimized out>, func=<optimized out>, callable=<optimized out>, tuple=0x5555568c0b50 <_PyRuntime+135440>, kwargs=<optimized out>)\n    at Objects/call.c:285\n#19 0x0000555555e904e2 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:2937\n#20 0x0000555555e57778 in _PyEval_EvalFrame (tstate=0x5555568f7b18 <_PyRuntime+360664>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#21 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2134\n#22 0x0000555555e57195 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff70884c0) at Python/ceval.c:681\n#23 0x0000555556061fb0 in run_eval_code_obj (tstate=tstate@entry=0x5555568f7b18 <_PyRuntime+360664>, co=co@entry=0x7d2ff6ffdfd0, globals=globals@entry=0x7c7ff70884c0,\n    locals=locals@entry=0x7c7ff70884c0) at Python/pythonrun.c:1368\n#24 0x000055555606117c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1471\n```\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/_functoolsmodule.c all deep` command.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:99e2c5eccd2, Mar 17 2026, 08:26:50) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146078\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "FocusMode-coder",
+   "created_at": "2026-03-17T18:43:17Z",
+   "body": "\nHey! I may be able to help with this bug.\n\nI build custom fixes for Python projects and automation systems.\n\nIf you'd like help resolving this issue quickly feel free to reach out.\n\nHappy to take a look \ud83d\udc4d\n"
+  },
+  {
+   "author": "brijkapadia",
+   "created_at": "2026-03-17T19:26:45Z",
+   "body": "Created a PR as it is quite a simple fix and I am already working on a much larger change to `functools.partial`"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T14:20:37Z",
+   "body": "The initial issue has been fixed by https://github.com/python/cpython/pull/146078, so I close the issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5eb798e0c67eb240e96978ebf9e79d4125c23e6",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146078",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "64862112b7beb005523e7bca15c59c78c5319e58",
+   "actor": "encukou"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "19261ad013b0547980e6349929d7de1dcced72c9",
+   "actor": "ljfp"
+  }
+ ]
+}

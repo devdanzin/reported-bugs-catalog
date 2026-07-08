@@ -1,0 +1,283 @@
+{
+ "repo": "python/cpython",
+ "number": 146102,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146102",
+ "title": "Umbrella issue: bugs found using cpython-review-toolkit",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "interpreter-core",
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2026-03-18T10:28:20Z",
+ "closed_at": null,
+ "body": "# Bug report\n\n### What happened?\n\nThis is an umbrella issue for 50 select bugs found using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit),  distributed across ~350K lines of CPython C code (Modules/, Objects/, Python/).\n\nFeel free to work on any report, opening an issue if one doesn't exist yet. Comment with the issue and respective gist/bug here and I'll update the table. If you find an issue listed below that is a duplicate of an existing report, let me know and I'll also mark it in the table.\n\n### Modules/ (18 gists)\n\n| Gist | Description | CPython Issue |\n|------|-------------|---------------|\n| [gist](https://gist.github.com/devdanzin/50f9880636df43efd3886f6bda2077b3) | _ssl.c: Py_DECREF(NULL) in SNI callback | [#146080](https://github.com/python/cpython/issues/146080) FIXED |\n| [gist](https://gist.github.com/devdanzin/69aff7ff2d64ce8c7c21622f7f36e84c) | _sqlite: collation assertion + missing PyErr_NoMemory | [#146090](https://github.com/python/cpython/issues/146090) FIXED |\n| [gist](https://gist.github.com/devdanzin/572a616b51ded20b0494c1107a29e63c) | functools partial PyDict_Contains -1 as truthy | [#146075](https://github.com/python/cpython/issues/146075) FIXED |\n| [gist](https://gist.github.com/devdanzin/efd3edd49aff97ed348c392bc6afe980) | _csv.c: _set_str missing NULL check | [#146093](https://github.com/python/cpython/issues/146093) FIXED |\n| [gist](https://gist.github.com/devdanzin/9f0a3f2a08edc37b8369d7f5db8d5854) | _zoneinfo: SEGV in get_weak_cache | [#146076](https://github.com/python/cpython/issues/146076) FIXED |\n| [gist](https://gist.github.com/devdanzin/701746869975be8c3fa673f52ef0e315) | _zoneinfo: missing PyErr_NoMemory in load_data | [#146092](https://github.com/python/cpython/issues/146092) FIXED |\n| [gist](https://gist.github.com/devdanzin/829b08903c28f8e345052256cb1b7cb4) | termios: NULL to PyLong_AsLong | [#146091](https://github.com/python/cpython/issues/146091) FIXED |\n| [gist](https://gist.github.com/devdanzin/546cf053a5b307dbe3ec9f6c6d916b87) | _struct: segfault/assertion on uninitialized Struct | Fixed in https://github.com/python/cpython/commit/515ae4078dffa0b74e5e5431462c2f4fe4563ffa |\n| [gist](https://gist.github.com/devdanzin/6d7781857c2a0cd29b636cf759081888) | pyexpat: ExternalEntityParserCreate crash | Fixed in https://github.com/python/cpython/commit/e6b9a1406980fbb1d4032eca9cc0b4f8f252b716 |\n| [gist](https://gist.github.com/devdanzin/03c462108168cf6b35054fb0b85bf775) | _interpqueuesmodule: use-after-free dangling last | #146427 |\n| [gist](https://gist.github.com/devdanzin/63348fc11425730393ef0d601078cbe2) | selectmodule: errno < 0 always false | #146205 FIXED |\n| [gist](https://gist.github.com/devdanzin/ed7691a99c26ede561a549ab1dba00b2) | _lsprof: exception clobbering | #153068 FIXED |\n| [gist](https://gist.github.com/devdanzin/c0e661ad36a12581333740414e20098e) | deque.copy() ref corruption on OOM | #152017 |\n| [gist](https://gist.github.com/devdanzin/60aed55f44fba133ee2d34d46aa8d197) | readline: begidx NULL on OOM | \u2014 |\n| [gist](https://gist.github.com/devdanzin/ada54523342276bbdb66228de2ec863e) | zlibmodule: PyErr_NewException unchecked | [false alarm](https://github.com/python/cpython/pull/151342) |\n| [gist](https://gist.github.com/devdanzin/9f1ce3fece9407aacef0e16cd419ffb2) | socketmodule: audit hook ref/buffer leaks | #146245 FIXED |\n| [gist](https://gist.github.com/devdanzin/d9975354c27e57f2589acfd0a777a2f1) | _interpchannelsmodule: missing PyErr_NoMemory | https://github.com/python/cpython/issues/150213 |\n| [gist](https://gist.github.com/devdanzin/edc4c140cb2eb4d3b64ce886b1bb1c65) | _interpretersmodule: SEGV on create under OOM | \u2014 |\n\n### Objects/ (13 gists)\n\n| Gist | Description | CPython Issue |\n|------|-------------|---------------|\n| [gist](https://gist.github.com/devdanzin/dceaa8b70de035607d78025337af9798) | ExceptionGroup repr OOB \u2014 3-line segfault | [#146096](https://github.com/python/cpython/issues/146096) FIXED |\n| [gist](https://gist.github.com/devdanzin/1c1e9ba549c26332c387b23406c84ad5) | `SyntaxError.__init__` ref leaks on re-init | #146250 FIXED |\n| [gist](https://gist.github.com/devdanzin/d602d174ce2b8959759c94729a35c54e) | codeobject: code_richcompare swallows errors | #146199 FIXED |\n| [gist](https://gist.github.com/devdanzin/768b5163f0f743bd940c5d96ca9e9981) | codeobject: co_tlbc NULL + replacement_locations leak | \u2014 |\n| [gist](https://gist.github.com/devdanzin/f7d0c7694b2be2345f4cf85f4eedc3ee) | weakref WRAP_BINARY ref leak (~20 operators) | #153058 |\n| [gist](https://gist.github.com/devdanzin/0a3dd4f8fb0fb144efcc02c3e86665a5) | FrameLocalsProxy swallows/overwrites errors | \u2014 |\n| [gist](https://gist.github.com/devdanzin/551cace22f112ef0ff4ed3fdbe54d235) | typeobject: missing return -1 in type_ready | commit c398490fbf15ede5de3389b4ca4e32fb9a7c5d67 |\n| [gist](https://gist.github.com/devdanzin/6119b9d13c24bb30a07a44b75384e8ff) | typeobject: buffer leak in slot_bf_getbuffer | https://github.com/python/cpython/pull/151346 FIXED |\n| [gist](https://gist.github.com/devdanzin/196f041a81611b2fbff22684b2f7166e) | object.c: PyObject_Print missing LeaveRecursiveCall | commit e2fa10e04d3fed4c248881d69411fc208d05ad6b |\n| [gist](https://gist.github.com/devdanzin/4fe9c3299dd2269bd849bba147ade0b4) | structseq: get_type_attr_as_size NULL deref | #148119 |\n| [gist](https://gist.github.com/devdanzin/266ca45099796a2373866a07447d5ebf) | genericaliasobject: two NULL dereference bugs | https://github.com/python/cpython/pull/148226 FIXED |\n| [gist](https://gist.github.com/devdanzin/9015c335e324a94ea06932bdd643a7dc) | odictobject: spurious PyErr_Clear | https://github.com/python/cpython/pull/151347 FIXED |\n| [gist](https://gist.github.com/devdanzin/577421b083bad6802aa391b909d1a725) | unicode_format: wrong return + PY_SSIZE_T_MIN UB | #151845 #151847 |\n\n### Python/ (16 gists)\n\n| Gist | Description | CPython Issue |\n|------|-------------|---------------|\n| [gist](https://gist.github.com/devdanzin/432d9af1a8833bef53bc9ae342310622) | import.c: wrong interpreter + double lock release | #150454 #150374 FIXED |\n| [gist](https://gist.github.com/devdanzin/a29b3efc400d564b195f09dc94fb6b1e) | instrumentation.c: PyLong leak per monitoring call | \u2014 |\n| [gist](https://gist.github.com/devdanzin/330026d6a4c40048c771a61f706ac75e) | instrumentation.c: use-after-Py_DECREF comparison | https://github.com/python/cpython/issues/151524 |\n| [gist](https://gist.github.com/devdanzin/55ed5cf0d452eb6ce881e7a8fad30ddb) | ceval.c: missing PyErr_NoMemory + PyEval_GetLocals NULL | #153205 FIXED |\n| [gist](https://gist.github.com/devdanzin/cc84f43d7a5c774b47551060c061391f) | bltinmodule: `__lazy_import__` NULL deref | #151510 FIXED |\n| [gist](https://gist.github.com/devdanzin/a56b8cb579b1950b4206e8a42d6be650) | crossinterp: UAF + leaked exception + shadowed var | \u2014 |\n| [gist](https://gist.github.com/devdanzin/1053175c252bf8430cc2c2b96671d15f) | compiler pipeline: 6 ref leaks and error bugs | https://github.com/python/cpython/issues/146442 |\n| [gist](https://gist.github.com/devdanzin/60b787bfa22651ba6a18aef3b6e1439d) | marshal: 8 refs leaked on corrupt TYPE_CODE | #148418 |\n| [gist](https://gist.github.com/devdanzin/b022ff2d1304a4b2b8d3d8750abd8da5) | pylifecycle: 5 init/fini cleanup bugs | \u2014 |\n| [gist](https://gist.github.com/devdanzin/1a61f5e30036bc6aa5eac154626e4870) | initconfig: SET_ITEM macro leaks dict | #146244 FIXED |\n| [gist](https://gist.github.com/devdanzin/7636db063c4b2af5da66389171121bfc) | ast.c: LEAVE_RECURSIVE missing on 30 paths | \u2014 |\n| [gist](https://gist.github.com/devdanzin/332a120e4c7750e8a7aff47419311696) | hamt.c: sub_node leaked in bitmap ops | https://github.com/python/cpython/issues/150178 |\n| [gist](https://gist.github.com/devdanzin/86eda5ca53243ef667773991312c2e74) | pythonrun: main_module ref leak | https://github.com/python/cpython/issues/146355 FIXED |\n| [gist](https://gist.github.com/devdanzin/9b0cc09a0ec2dd055b9b117115842f0b) | modsupport: missing va_end (UB) | https://github.com/python/cpython/issues/146386 FIXED |\n| [gist](https://gist.github.com/devdanzin/d1a6ab9f62970be0cae139366ce3c482) | legacy_tracing: unchecked PyLong_AsInt | \u2014 |\n| [gist](https://gist.github.com/devdanzin/14a5663604e1d7fb930d121b4e0c8d25) | optimizer_symbols: make_bottom NULL deref | https://github.com/python/cpython/issues/146388 FIXED |\n\n### Duplicates (3 gists \u2014 same bugs uploaded from different runs)\n\n| Gist | Duplicate of |\n|------|-------------|\n| [gist](https://gist.github.com/devdanzin/5624326e8ccc9632aa69ea7f930e310b) | ExceptionGroup repr (dup of dceaa8b7) |\n| [gist](https://gist.github.com/devdanzin/0c8004487c9eacddbd85b7b40d93c448) | sqlite collation (dup of 69aff7ff) |\n| [gist](https://gist.github.com/devdanzin/bc8816ef316b72e2baf401f42b209823) | SSL SNI (dup of 50f98806) |\n\nThese issues were found with Claude Opus 4.6, using the `/cpython-review-toolkit:explore [file or directory] all deep` command.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:e0f7c1097e1, Mar 17 2026, 18:10:52) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146443\n* gh-151342\n* gh-151346\n* gh-151347\n* gh-151534\n* gh-151578\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "A0su",
+   "created_at": "2026-03-24T16:01:00Z",
+   "body": "The table can be updated with https://github.com/python/cpython/issues/146355 for [gist](https://gist.github.com/devdanzin/86eda5ca53243ef667773991312c2e74). Issue: pythonrun: main_module ref leak"
+  },
+  {
+   "author": "A0su",
+   "created_at": "2026-03-24T18:16:34Z",
+   "body": "These two as well\n\n- https://github.com/python/cpython/issues/146388 -> Issue: optimizer_symbols: make_bottom NULL deref\n- https://github.com/python/cpython/issues/146386 -> Issue: modsupport: missing va_end (UB)"
+  },
+  {
+   "author": "A0su",
+   "created_at": "2026-03-26T03:45:49Z",
+   "body": "This one can also be added to the table:\n\nhttps://github.com/python/cpython/issues/146442 : compiler pipeline: 6 ref leaks and error bugs"
+  },
+  {
+   "author": "prakashsellathurai",
+   "created_at": "2026-04-18T16:48:16Z",
+   "body": "genericaliasobject: two NULL dereference bugs  https://github.com/python/cpython/issues/148222  fixed "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-11T14:55:00Z",
+   "body": "The [zlib report](https://gist.github.com/devdanzin/ada54523342276bbdb66228de2ec863e) is a false alarm: it's ok to pass NULL to PyModule_AddObjectRef() with an exception set."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146103",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146199",
+   "commit": null,
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146244",
+   "commit": null,
+   "actor": "Wulian233"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146250",
+   "commit": null,
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146355",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146356",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146386",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146387",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146388",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146389",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2825",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146442",
+   "commit": null,
+   "actor": "A0su"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146443",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/147960",
+   "commit": null,
+   "actor": "hyongtao-code"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148074",
+   "commit": null,
+   "actor": "Wulian233"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148119",
+   "commit": null,
+   "actor": "Wulian233"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148208",
+   "commit": null,
+   "actor": "Wulian233"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148222",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148263",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/149630",
+   "commit": null,
+   "actor": "Wulian233"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150178",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150213",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150374",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150379",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150454",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/150546",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151342",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151346",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151347",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3b7c0025be4f9d08d5f4259b8ffc7b05fa0ba7f",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ec7c9d17e0eab5bad60796cad8dcf3632f571df",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151524",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151525",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151534",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151578",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8cd462efe3ed536af628ab48c27f93035e10b57d",
+   "actor": "philthompson10"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d440325921d46bf83fcb337b3378e2cbe1931d8e",
+   "actor": "philthompson10"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152017",
+   "commit": null,
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152398",
+   "commit": null,
+   "actor": "brijkapadia"
+  }
+ ]
+}

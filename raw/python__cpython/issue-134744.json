@@ -1,0 +1,105 @@
+{
+ "repo": "python/cpython",
+ "number": 134744,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/134744",
+ "title": "Abort in `_PyEval_EvalFrameDefault` originating on calling `fcntl.ioctl`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2025-05-26T18:52:21Z",
+ "closed_at": "2025-06-09T10:56:03Z",
+ "body": "# Crash report\n\n### What happened?\n\nThere are two ways to get aborts starting from `fcntl.ioctl`: one happens in  `_PyEval_EvalFrameDefault`, the other results in a `Fatal Python error`. Not sure this is a single issue, so reporting both ways.\n\nHere's a MRE for the first abort:\n```python\nfrom pathlib._os import _ficlone\n\ntry:\n    _ficlone(None, None)\nexcept:\n    _ficlone(\"A\" * 2048, True)\n```\nIt results in this backtrace:\n\n```\n/home/danzin/projects/main_gilful_debug/Lib/pathlib/_os.py:50: RuntimeWarning: bool is used as a file descriptor\n  fcntl.ioctl(target_fd, fcntl.FICLONE, source_fd)\npython: Python/generated_cases.c.h:2269: _PyEval_EvalFrameDefault: Assertion `(res_o != NULL) ^ (_PyErr_Occurred(tstate) != NULL)' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140737340064384) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140737340064384) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140737340064384, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff72f7476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff72dd7f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff72dd71b in __assert_fail_base (fmt=0x7ffff7492130 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\n    assertion=0x5555561ea6e0 \"(res_o != NULL) ^ (_PyErr_Occurred(tstate) != NULL)\", file=0x5555561e9c80 \"Python/generated_cases.c.h\", line=2269,\n    function=<optimized out>) at ./assert/assert.c:94\n#6  0x00007ffff72eee96 in __GI___assert_fail (assertion=assertion@entry=0x5555561ea6e0 \"(res_o != NULL) ^ (_PyErr_Occurred(tstate) != NULL)\",\n    file=file@entry=0x5555561e9c80 \"Python/generated_cases.c.h\", line=line@entry=2269,\n    function=function@entry=0x5555561eeee0 <__PRETTY_FUNCTION__.84> \"_PyEval_EvalFrameDefault\") at ./assert/assert.c:103\n#7  0x0000555555d3e31d in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555556681960 <_PyRuntime+331232>, frame=0x629000005298,\n    frame@entry=0x629000005220, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:2269\n#8  0x0000555555d926ac in _PyEval_EvalFrame (throwflag=0, frame=0x629000005220, tstate=0x555556681960 <_PyRuntime+331232>)\n    at ./Include/internal/pycore_ceval.h:119\n#9  _PyEval_Vector (tstate=tstate@entry=0x555556681960 <_PyRuntime+331232>, func=func@entry=0x610000040560, locals=locals@entry=0x60800009e5c0,\n    args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1961\n#10 0x0000555555d929b0 in PyEval_EvalCode (co=co@entry=0x614000036a50, globals=globals@entry=0x60800009e5c0, locals=locals@entry=0x60800009e5c0)\n    at Python/ceval.c:853\n```\n\nHere's a MRE for the second abort:\n```python\nimport fcntl\n\ntry:\n    fcntl.ioctl(None, fcntl.FICLONE, None)\nexcept:\n    pass\nfcntl.ioctl(True, fcntl.FICLONE,\"A\" * 2048)\n```\n\nIt results in this backtrace:\n\n```\n/mnt/c/Users/ddini/crashers/main/pathlib__os-cpu_load-assertion/source2.py:13: RuntimeWarning: bool is used as a file descriptor\n  fcntl.ioctl(True, fcntl.FICLONE,\"A\" * 2048)\nFatal Python error: _Py_CheckFunctionResult: a function returned NULL without setting an exception\nPython runtime state: initialized\nSystemError: <built-in function ioctl> returned NULL without setting an exception\n\nCurrent thread 0x00007ffff7294280 [python] (most recent call first):\n  File \"/mnt/c/Users/ddini/crashers/main/pathlib__os-cpu_load-assertion/source2.py\", line 13 in <module>\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140737340064384) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140737340064384) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140737340064384, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff72f7476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff72dd7f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x0000555555ea92d7 in fatal_error_exit (status=<optimized out>) at Python/pylifecycle.c:3150\n#6  0x0000555555ebfc0e in fatal_error (fd=fd@entry=2, header=header@entry=1,\n    prefix=prefix@entry=0x5555560fdc60 <__func__.23> \"_Py_CheckFunctionResult\",\n    msg=msg@entry=0x5555560fc9c0 \"a function returned NULL without setting an exception\", status=status@entry=-1) at Python/pylifecycle.c:3366\n#7  0x0000555555ebfcc5 in _Py_FatalErrorFunc (func=func@entry=0x5555560fdc60 <__func__.23> \"_Py_CheckFunctionResult\",\n    msg=msg@entry=0x5555560fc9c0 \"a function returned NULL without setting an exception\") at Python/pylifecycle.c:3382\n#8  0x000055555598ceaf in _Py_CheckFunctionResult (tstate=tstate@entry=0x555556681960 <_PyRuntime+331232>, callable=callable@entry=0x6080000cbac0,\n    result=<optimized out>, where=where@entry=0x0) at Objects/call.c:43\n#9  0x000055555598ddf5 in _PyObject_VectorcallTstate (tstate=0x555556681960 <_PyRuntime+331232>, callable=0x6080000cbac0, args=0x7fffffffcdc8,\n    nargsf=9223372036854775811, kwnames=0x0) at ./Include/internal/pycore_call.h:170\n#10 0x000055555598df3c in PyObject_Vectorcall (callable=callable@entry=0x6080000cbac0, args=args@entry=0x7fffffffcdc8, nargsf=<optimized out>,\n    kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#11 0x0000555555d38dbe in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555556681960 <_PyRuntime+331232>, frame=frame@entry=0x629000005220,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:1619\n#12 0x0000555555d926ac in _PyEval_EvalFrame (throwflag=0, frame=0x629000005220, tstate=0x555556681960 <_PyRuntime+331232>)\n    at ./Include/internal/pycore_ceval.h:119\n#13 _PyEval_Vector (tstate=tstate@entry=0x555556681960 <_PyRuntime+331232>, func=func@entry=0x610000040560, locals=locals@entry=0x60800009e5c0,\n    args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1961\n#14 0x0000555555d929b0 in PyEval_EvalCode (co=co@entry=0x613000026150, globals=globals@entry=0x60800009e5c0, locals=locals@entry=0x60800009e5c0)\n    at Python/ceval.c:853\n#15 0x0000555555ecdfc1 in run_eval_code_obj (tstate=tstate@entry=0x555556681960 <_PyRuntime+331232>, co=co@entry=0x613000026150,\n    globals=globals@entry=0x60800009e5c0, locals=locals@entry=0x60800009e5c0) at Python/pythonrun.c:1365\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 (heads/main:56743afe879, May 26 2025, 15:23:40) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-134748\n* gh-134795\n* gh-134798\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-26T19:31:35Z",
+   "body": "I propose https://github.com/python/cpython/pull/134748 to fix the regression."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3e920a49fd8229c43383e929db1705b553a63af7",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134748",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9300a596d37d058e6e58d00a2ad70617c863a3de",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "34ac00c9f0c51b414a9b4f872c14a93a132d1d08",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134795",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8a6a6f39c869a6601babc31592e156ce22478a47",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "968d688f995ecfb25c727f84df522a5adce582e8",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134798",
+   "commit": null,
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "741040236e05a3789e5d9756530b5ff92e0bc52d",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e22646743e6bb999614ee70c1c585bf34b46d456",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "315e6aa03d4a33da784a92473867efc93c7e2699",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b9d427e5d5348c1bff236f9cca225ec576d94541",
+   "actor": "gostak-dd"
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+{
+ "repo": "zopefoundation/zope.interface",
+ "number": 365,
+ "type": "pull",
+ "url": "https://github.com/zopefoundation/zope.interface/pull/365",
+ "title": "Guard 4 unprotected PyErr_Clear calls with exception type checks",
+ "state": "closed",
+ "state_reason": null,
+ "author": "jensens",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-30T01:27:18Z",
+ "closed_at": "2026-04-10T06:11:32Z",
+ "body": "## Summary\n\n- Guard 4 bare `PyErr_Clear()` calls in `implementedBy` and `providedBy` with\n  `PyErr_ExceptionMatches` checks, matching the pattern already used at 7 other\n  sites in the same file\n- Without the guard, `KeyboardInterrupt`, `MemoryError`, and `SystemExit` are\n  silently swallowed instead of propagated\n\n## Sites fixed\n\n| Function | Line | After | Guard |\n|----------|------|-------|-------|\n| `implementedBy` | 2436 | `PyObject_GetAttr(cls, \"__dict__\")` | `PyExc_AttributeError` |\n| `implementedBy` | 2454 | `PyObject_GetItem(dict, \"__implemented__\")` | `PyExc_KeyError` |\n| `providedBy` | 2601 | `PyObject_GetAttr(ob, \"__provides__\")` | `PyExc_AttributeError` |\n| `providedBy` | 2615 | `PyObject_GetAttr(cls, \"__provides__\")` | `PyExc_AttributeError` |\n\n## Performance impact\n\nZero on the happy path. `PyErr_ExceptionMatches` only executes when an error has\nalready occurred. Normal operation never enters these blocks.\n\n## Test plan\n\n- [x] New test: `test_catches_only_KeyError_on_implemented` (C-only, verifies\n  `KeyboardInterrupt` from `__getitem__` propagates instead of being swallowed)\n- [x] Full test suite passes: 1359 tests, both `PURE_PYTHON=0` and `PURE_PYTHON=1`\n- [x] No regressions\n\nFixes #358\n\nBased on analysis from https://gist.github.com/devdanzin/5afbad864934b165a2cc080f110aa720\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.ai/claude-code)",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "89665f67abef163d3f69a5f6cba3bb76e96cae09",
+   "actor": "icemac"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "icemac"
+  }
+ ]
+}

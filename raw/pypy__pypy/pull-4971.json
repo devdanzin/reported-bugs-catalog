@@ -1,0 +1,42 @@
+{
+ "repo": "pypy/pypy",
+ "number": 4971,
+ "type": "pull",
+ "url": "https://github.com/pypy/pypy/pull/4971",
+ "title": "Add cmath.tau, take 2",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-05-26T17:39:02Z",
+ "closed_at": "2024-05-27T05:40:26Z",
+ "body": "Use `math.pi * 2.0` to define it, as `math.tau` isn't available on Python 2.\r\n\r\n@mattip said:\r\n> should also inject the constant into the `math` module\r\n\r\nBut I don't know what that means, or how to do it. Any clues?\r\n\r\nAddresses part of https://github.com/pypy/pypy/issues/4962.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-05-27T05:39:45Z",
+   "body": "Sorry, my bad. `math.tau` already exists."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4964",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e0dbbefb2cd4880da47c26f09cfbed474256c0a6",
+   "actor": "mattip"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

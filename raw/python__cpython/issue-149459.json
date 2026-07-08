@@ -1,0 +1,70 @@
+{
+ "repo": "python/cpython",
+ "number": 149459,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/149459",
+ "title": "JIT: segfault from `_PyObject_LookupSpecialMethod`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2026-05-06T13:11:19Z",
+ "closed_at": "2026-05-08T11:21:29Z",
+ "body": "# Crash report\n\n### What happened?\n\nA JIT-enabled interpreter will crash by running the following code:\n\nMRE:\n```python\ndef f1():\n    class Context:\n        def __enter__(self): ...\n        def __exit__(self, e, v, t): ...\n\n    with Context():\n        pass\n\nfor i_f1 in range(4100):\n    f1()\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555555c9f8d4 in _Py_TYPE_impl (ob=0x0) at ./Include/object.h:234\n234         return ob->ob_type;\n\n#0  0x0000555555c9f8d4 in _Py_TYPE_impl (ob=0x0) at ./Include/object.h:234\n#1  _PyObject_LookupSpecialMethod (attr=attr@entry=0x555556a2d9d8 <_PyRuntime+80600>, method_and_self=method_and_self@entry=0x7e8ff6de5300) at Objects/typeobject.c:2972\n#2  0x0000555555e95f5c in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:9933\n#3  0x0000555555e89408 in _PyEval_EvalFrame (tstate=0x555556a72138 <_PyRuntime+361016>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:122\n#4  _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2124\n#5  0x0000555555e88e25 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff6e8a0c0) at Python/ceval.c:686\n#6  0x000055555617a090 in run_eval_code_obj (tstate=tstate@entry=0x555556a72138 <_PyRuntime+361016>, co=co@entry=0x7d1ff6e85f50, globals=globals@entry=0x7c7ff6e8a0c0,\n    locals=locals@entry=0x7c7ff6e8a0c0) at Python/pythonrun.c:1369\n#7  0x000055555617925c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1472\n#8  0x00005555561736ad in pyrun_file (fp=fp@entry=0x7d4ff6e03a80, filename=filename@entry=0x7ccff6e2ccd0, start=start@entry=257, globals=globals@entry=0x7c7ff6e8a0c0,\n    locals=locals@entry=0x7c7ff6e8a0c0, closeit=closeit@entry=1, flags=0x7bfff5c77710) at Python/pythonrun.c:1296\n#9  0x000055555617120d in _PyRun_SimpleFileObject (fp=<optimized out>, filename=<optimized out>, closeit=<optimized out>, flags=<optimized out>) at Python/pythonrun.c:518\n#10 0x000055555617057e in _PyRun_AnyFileObject (fp=fp@entry=0x7d4ff6e03a80, filename=filename@entry=0x7ccff6e2ccd0, closeit=closeit@entry=1, flags=flags@entry=0x7bfff5c77710)\n    at Python/pythonrun.c:81\n#11 0x00005555561f0cdb in pymain_run_file_obj (program_name=0x7caff6e82500, filename=0x7ccff6e2ccd0, skip_source_first_line=0) at Modules/main.c:411\n#12 pymain_run_file (config=0x555556a3d0f0 <_PyRuntime+143856>) at Modules/main.c:430\n#13 0x00005555561eef72 in pymain_run_python (exitcode=0x7bfff5c77300) at Modules/main.c:715\n#14 Py_RunMain () at Modules/main.c:796\n#15 0x00005555561efca7 in pymain_main (args=<optimized out>) at Modules/main.c:826\n#16 0x00005555561efe18 in Py_BytesMain (argc=<optimized out>, argv=0x7fffffffdb78) at Modules/main.c:850\n#17 0x00007ffff7c2a575 in __libc_start_call_main (main=main@entry=0x555555913c40 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffdb78) at ../sysdeps/nptl/libc_start_call_main.h:58\n#18 0x00007ffff7c2a628 in __libc_start_main_impl (main=0x555555913c40 <main>, argc=2, argv=0x7fffffffdb78, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\n    stack_end=0x7fffffffdb68) at ../csu/libc-start.c:360\n#19 0x000055555582a4f5 in _start ()\n```\n\n\nOutput from running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`:\n[lltrace_opt_debug.txt](https://github.com/user-attachments/files/27439779/lltrace_opt_debug.txt)\nThis log file ends in:\n```\n[...]\n  55 uop: _CHECK_VALIDITY_r11 (0, jump_target=132, operand0=0, operand1=0)\n    locals=[<type at 0x6f8dffa7c9a0>]\n    stack=[]\n    cache=[<Context at 0x6f2dffa3f4b0>, ---, ---]\n  56 uop: _COPY_1_r12 (1, target=18, operand0=0, operand1=0)\n    locals=[<type at 0x6f8dffa7c9a0>]\n    stack=[]\n    cache=[<Context at 0x6f2dffa3f4b0>, <Context at 0x6f2dffa3f4b0>, ---]\n  57 uop: _SPILL_OR_RELOAD_r21 (0, target=0, operand0=0, operand1=0)\n    locals=[<type at 0x6f8dffa7c9a0>]\n    stack=[<Context at 0x6f2dffa3f4b0>]\n    cache=[<Context at 0x6f2dffa3f4b0>, ---, ---]\n  58 uop: _INSERT_NULL_r10 (1, target=19, operand0=0, operand1=0)\n    locals=[<type at 0x6f8dffa7c9a0>]\n    stack=[<Context at 0x6f2dffa3f4b0>, <NULL>, <Context at 0x6f2dffa3f4b0>]\n    cache=[---, ---, ---]\n  59 uop: _GUARD_TYPE_VERSION_r01 (0, jump_target=133, operand0=0x20110, operand1=0)\n    locals=[<type at 0x6f8dffa7c9a0>]\n    stack=[<Context at 0x6f2dffa3f4b0>, <NULL>, <Context at 0x6f2dffa3f4b0>]\n    cache=[---, ---, ---]\n 133 uop: _EXIT_TRACE_r00 (0, target=19, operand0=0x6ffdff9f3158, operand1=0)\nSIDE EXIT: [UOp _EXIT_TRACE_r00 (0, target=19, operand0=0x6ffdff9f3158, operand1=0), exit 5, temp 510, target 19 -> LOAD_SPECIAL, is_control_flow 0]\n    locals=[<type at 0x6f8dffa7c9a0>]\n    stack=[<Context at 0x6f2dffa3f4b0>, <NULL>, <Context at 0x6f2dffa3f4b0>]\n    cache=[---, ---, ---]\n   0 uop: _COLD_EXIT_r00 (52685, jump_target=52685, operand0=0xcdcdcdcdcdcdcdcd, operand1=0xcdcdcdcdcdcdcdcd)\nAddressSanitizer:DEADLYSIGNAL\n=================================================================\n==2328978==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000008 (pc 0x61a5c39808d4 bp 0x7fff81470a50 sp 0x7fff814709f0 T0)\n==2328978==The signal is caused by a READ memory access.\n==2328978==Hint: address points to the zero page.\n    #0 0x61a5c39808d4 in _Py_TYPE_impl /home/danzin/projects/jit_cpython/./Include/object.h:234:16\n    #1 0x61a5c39808d4 in _PyObject_LookupSpecialMethod /home/danzin/projects/jit_cpython/Objects/typeobject.c:2972:38\n    #2 0x61a5c3b76f5b in _PyEval_EvalFrameDefault /home/danzin/projects/jit_cpython/Python/generated_cases.c.h:9933:27\n    #3 0x61a5c3b6a407 in _PyEval_EvalFrame /home/danzin/projects/jit_cpython/./Include/internal/pycore_ceval.h:122:16\n[...]\n```\n\nClaude's one sentence explanation:\n\n> The JIT's `_LOAD_SPECIAL` specialisation in `Python/optimizer_bytecodes.c:2015\u20132031` injects `_GUARD_TYPE_VERSION` *after* `_INSERT_NULL` has already been emitted into the output trace, but the guard's deopt target is the `LOAD_SPECIAL` bytecode, which expects the stack in its pre-`_INSERT_NULL` state. When the guard fails, tier 1 re-runs the full `LOAD_SPECIAL` macro on a stack that's already been bumped by `_INSERT_NULL`, producing one extra slot that propagates through the surrounding `SWAP 2`/`SWAP 3` and lands a `NULL` as the receiver of the next `LOAD_SPECIAL` (`__enter__`), where `_PyObject_LookupSpecialMethod` does `Py_TYPE(self)` on it.\n\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n### CPython versions tested on:\n\nCPython main branch, 3.15\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a8+ (heads/main-dirty:0bf6e31941f, May  6 2026, 07:41:51) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-149478\n* gh-149552\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/149478",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "93db7958bfe267fb87d48a3489a8cf71a03a4a8e",
+   "actor": "cocolato"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b9c06179f461498e2d39c54c31978f15c7718618",
+   "actor": "cocolato"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "888060178a283dea4816a8b598608efb432f2b5a",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c341e341b25cec03d28d1b2c368bb871d76ca88b",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/149552",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f9e5975deb6b01c434eadff66f28bd53e0ca4c55",
+   "actor": "kumaraditya303"
+  }
+ ]
+}

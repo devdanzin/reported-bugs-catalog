@@ -1,0 +1,198 @@
+{
+ "done_repos": [
+  "dpdani/cereggii",
+  "GrahamDumpleton/wrapt",
+  "aio-libs/aiohttp",
+  "aio-libs/multidict",
+  "bloomberg/memray",
+  "cython/cython",
+  "duckdb/duckdb-python",
+  "enthought/traits",
+  "giampaolo/psutil",
+  "h5py/h5py",
+  "igraph/python-igraph",
+  "ilanschnell/bitarray",
+  "indygreg/python-zstandard",
+  "matplotlib/matplotlib",
+  "nucleic/atom",
+  "nucleic/enaml",
+  "nucleic/kiwi",
+  "numpy/numpy",
+  "protocolbuffers/protobuf",
+  "pycurl/pycurl",
+  "pydata/bottleneck",
+  "pygame-community/pygame-ce",
+  "pypy/pypy",
+  "python-greenlet/greenlet",
+  "python-lz4/python-lz4",
+  "python-pillow/Pillow",
+  "python/cpython",
+  "rogerbinns/apsw",
+  "scipy/scipy",
+  "simplejson/simplejson",
+  "zhuyifei1999/guppy3",
+  "zopefoundation/zope.interface"
+ ],
+ "counts": {
+  "dpdani/cereggii": {
+   "ok": 0,
+   "skip": 15,
+   "err": 0
+  },
+  "GrahamDumpleton/wrapt": {
+   "ok": 0,
+   "skip": 0,
+   "err": 0
+  },
+  "aio-libs/aiohttp": {
+   "ok": 0,
+   "skip": 0,
+   "err": 0
+  },
+  "aio-libs/multidict": {
+   "ok": 5,
+   "skip": 0,
+   "err": 0
+  },
+  "bloomberg/memray": {
+   "ok": 2,
+   "skip": 0,
+   "err": 0
+  },
+  "cython/cython": {
+   "ok": 4,
+   "skip": 0,
+   "err": 0
+  },
+  "duckdb/duckdb-python": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "enthought/traits": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "giampaolo/psutil": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "h5py/h5py": {
+   "ok": 25,
+   "skip": 0,
+   "err": 0
+  },
+  "igraph/python-igraph": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "ilanschnell/bitarray": {
+   "ok": 2,
+   "skip": 0,
+   "err": 0
+  },
+  "indygreg/python-zstandard": {
+   "ok": 12,
+   "skip": 0,
+   "err": 0
+  },
+  "matplotlib/matplotlib": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "nucleic/atom": {
+   "ok": 9,
+   "skip": 0,
+   "err": 0
+  },
+  "nucleic/enaml": {
+   "ok": 8,
+   "skip": 0,
+   "err": 0
+  },
+  "nucleic/kiwi": {
+   "ok": 9,
+   "skip": 0,
+   "err": 0
+  },
+  "numpy/numpy": {
+   "ok": 10,
+   "skip": 0,
+   "err": 0
+  },
+  "protocolbuffers/protobuf": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "pycurl/pycurl": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "pydata/bottleneck": {
+   "ok": 24,
+   "skip": 0,
+   "err": 0
+  },
+  "pygame-community/pygame-ce": {
+   "ok": 2,
+   "skip": 0,
+   "err": 0
+  },
+  "pypy/pypy": {
+   "ok": 31,
+   "skip": 0,
+   "err": 0
+  },
+  "python-greenlet/greenlet": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "python-lz4/python-lz4": {
+   "ok": 6,
+   "skip": 0,
+   "err": 0
+  },
+  "python-pillow/Pillow": {
+   "ok": 24,
+   "skip": 0,
+   "err": 0
+  },
+  "python/cpython": {
+   "ok": 173,
+   "skip": 0,
+   "err": 2
+  },
+  "rogerbinns/apsw": {
+   "ok": 1,
+   "skip": 0,
+   "err": 0
+  },
+  "scipy/scipy": {
+   "ok": 3,
+   "skip": 0,
+   "err": 0
+  },
+  "simplejson/simplejson": {
+   "ok": 17,
+   "skip": 0,
+   "err": 0
+  },
+  "zhuyifei1999/guppy3": {
+   "ok": 2,
+   "skip": 0,
+   "err": 0
+  },
+  "zopefoundation/zope.interface": {
+   "ok": 9,
+   "skip": 0,
+   "err": 0
+  }
+ }
+}

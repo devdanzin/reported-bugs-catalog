@@ -1,0 +1,252 @@
+{
+ "repo": "python/cpython",
+ "number": 126316,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126316",
+ "title": "`grp` is not thread safe",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-subinterpreters",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-01T23:38:04Z",
+ "closed_at": "2024-11-21T14:52:06Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to crash `grp` in a no-gil build by repeatedly calling functions in threads, it only happens with `PYTHON_GIL=0`.\n\n```python\nfrom threading import Thread\nimport grp\n\nfor x in range(5000):\n    alive = [\n        Thread(target=grp.getgrgid, args=(1,)),\n        Thread(target=grp.getgrall),\n        Thread(target=grp.getgrnam, args=('root',)),\n    ]\n\n    for obj in alive:\n        print('START', obj)\n        obj.start()\n```\n\nBacktrace is:\n```gdb\n(gdb) bt\n#0  __strlen_avx2 ()\n    at ../sysdeps/x86_64/multiarch/strlen-avx2.S:74\n#1  0x00005555557ad3cb in PyUnicode_DecodeFSDefault (\n    s=s@entry=0x3838323432353a78 <error: Cannot access memory at address 0x3838323432353a78>) at Objects/unicodeobject.c:4058\n#2  0x00007ffff7c3f952 in mkgrent (\n    module=module@entry=0x20000795b80, p=<optimized out>)\n    at ./Modules/grpmodule.c:83\n#3  0x00007ffff7c3fc41 in grp_getgrall_impl (\n    module=0x20000795b80) at ./Modules/grpmodule.c:291\n#4  0x00007ffff7c3fcad in grp_getgrall (\n    module=<optimized out>, _unused_ignored=<optimized out>)\n    at ./Modules/clinic/grpmodule.c.h:83\n#5  0x00005555556fca83 in cfunction_vectorcall_NOARGS (\n    func=0x2000079f820, args=<optimized out>,\n    nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/methodobject.c:495\n#6  0x000055555567b4bc in _PyVectorcall_Call (\n    tstate=tstate@entry=0x555555d2ac70,\n    func=0x5555556fc8b5 <cfunction_vectorcall_NOARGS>,\n    callable=callable@entry=0x2000079f820,\n    tuple=tuple@entry=0x555555c5d1d8 <_PyRuntime+128984>,\n    kwargs=kwargs@entry=0x2001a0400d0) at Objects/call.c:273\n#7  0x000055555567b894 in _PyObject_Call (\n    tstate=0x555555d2ac70,\n    callable=callable@entry=0x2000079f820,\n    args=args@entry=0x555555c5d1d8 <_PyRuntime+128984>,\n    kwargs=kwargs@entry=0x2001a0400d0) at Objects/call.c:348\n#8  0x000055555567b8f1 in PyObject_Call (\n    callable=callable@entry=0x2000079f820,\n    args=args@entry=0x555555c5d1d8 <_PyRuntime+128984>,\n    kwargs=kwargs@entry=0x2001a0400d0) at Objects/call.c:373\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main:d467d9246c, Nov  1 2024, 09:05:56) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126488\n* gh-126504\n* gh-126506\n* gh-127055\n* gh-127104\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-02T15:45:19Z",
+   "body": "Thanks for the bug reports. What is fusil?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-02T16:12:54Z",
+   "body": "> What is fusil?\r\n\r\nfusil is a fuzzer written in Python by Victor Stinner around 2007 I think. Somehow it has been memory holed, but some references can still be found in the WayBack Machine:\r\n[RTD](https://web.archive.org/web/20160625015827/http://fusil.readthedocs.io/)\r\n[Home](https://web.archive.org/web/20100221061659/http://bitbucket.org/haypo/fusil/wiki/Home)\r\n[List of Python bugs found](https://web.archive.org/web/20100129052429/http://bitbucket.org/haypo/fusil/wiki/Python) (way back when)\r\n[Articles by Victor in French](http://haypo.alwaysdata.net/blog/index.php/Fuzzing)\r\n\r\nI used it in the old days to find a couple of issues and was curious whether it could still find some. The source is [still available](http://apt-mirror.sepia.ceph.com/pypi/packages/source/f/fusil/) even if not so easy to find. I got it, fixed some issues, added a bit of (very rough) threading, and let it search for crashes.\r\n\r\nNot sure what to do with the code, first I'd like to know why it disappeared. But I'd be happy to share privately."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-02T20:00:25Z",
+   "body": "From a quick glance, it looks like `getgrall` uses `setgrent()`, `getgrent()`, `endgrent()`, which are not thread-safe on Linux.\r\n\r\nThe macOS implementations appear to be [thread-safe](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/setgrent.3.html#:~:text=these%20routines%20are-,thread%2Dsafe,-.%20%20The%20getgrent()%2C)\r\n\r\nLinux with glibc 2.19+ has [`fgetgrent_r`](https://man7.org/linux/man-pages/man3/fgetgrent_r.3.html), which is thread-safe."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-06T11:09:31Z",
+   "body": "As a quick fix, I think the module should be marked with `Py_MOD_GIL_USED` "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T11:32:50Z",
+   "body": "> As a quick fix, I think the module should be marked with Py_MOD_GIL_USED\r\n\r\nI wrote a fix https://github.com/python/cpython/pull/126488 using `@critical_section`."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-06T13:30:54Z",
+   "body": "I don't think that would fix the issue, there can be two instances of module which can race with each other. The correct fix would be to have a global lock which would serialize calls across modules. "
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-06T13:58:57Z",
+   "body": "Yeah, this will still race if there are subinterpreters using `grp` at the same time. Kumar's suggestion is probably the way to go."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T14:28:13Z",
+   "body": "> I don't think that would fix the issue, there can be two instances of module which can race with each other.\r\n\r\nOh, I forgot that we can have more than one extension instance, you're right.\r\n\r\n> The correct fix would be to have a global lock which would serialize calls across modules.\r\n\r\nI wrote PR gh-126504 which adds one mutex per function. IMO it's safe to call the 3 functions in parallel, but not to call the same function in parallel. At least, it works on Linux."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T14:32:28Z",
+   "body": "Recently, the ssl module was fixed by using `@critical_section`. When `@critical_section` is used on a method, `Py_BEGIN_CRITICAL_SECTION(self);` is used which sounds correct. But when `@critical_section` is used on a module function, `Py_BEGIN_CRITICAL_SECTION(module);` is used which seems to have the issue that @kumaraditya303 described before. What if there are more than one `_ssl` module instance?\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-06T14:35:28Z",
+   "body": "Critical sections only apply to the current interpreter (or really, they only apply to one object, but objects can't be shared directly anyway). The SSL problem was that OpenSSL doesn't support concurrent use on the same socket, but since those sockets can't be shared between interpreters, there wasn't any issue there."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-06T14:55:23Z",
+   "body": "I think we should use the thread-safe function, [`fgetgrent_r`](https://man7.org/linux/man-pages/man3/fgetgrent_r.3.html), when available, and not mess with locking here."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-06T14:55:47Z",
+   "body": ">  is used which seems to have the issue that kumaraditya303 described before. What if there are more than one _ssl module instance?\r\n\r\nYes, that isn't thread safe, adding critical section makes it thread safe if you only have one instance of such module, if there are multiples of them then a global lock is necessary. "
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-06T15:12:30Z",
+   "body": "I am not a fan of locking around these sorts of libc functions:\r\n\r\n* It assumes that all calls to these libc functions go through our library code, but CPython is used with lots of C and C++ libraries that make their own libc calls (unprotected by our locks).\r\n* Our `mkgrent` function calls a into the Python API. I don't think the API calls are likely to be re-entrant, but it's hard to tell for sure. (Not triggering GC on object allocation helps.)"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T15:13:15Z",
+   "body": "> I think we should use the thread-safe function, [fgetgrent_r](https://man7.org/linux/man-pages/man3/fgetgrent_r.3.html), when available, and not mess with locking here.\r\n\r\nI don't know how to use this function, and I'm not sure that it's available on all (non-Windows) platforms. For example, it's not available on FreeBSD."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-06T16:05:52Z",
+   "body": "FreeBSD's version of [`getgrent_r`](https://man.freebsd.org/cgi/man.cgi?query=getgrent) is thread-safe and `setgrent` and `endgrent` appear to use thread-local storage on FreeBSD:\r\n\r\n* https://github.com/freebsd/freebsd-src/blob/main/lib/libc/gen/getgrent.c#L103\r\n* https://github.com/freebsd/freebsd-src/blob/main/lib/libc/include/nss_tls.h"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T16:29:15Z",
+   "body": "Ok, so apparently, only `grp.getgrall()` is not thread-safe, and `getgrent_r()` can be used instead of `getgrent()` to make the function reentrant. I didn't want to use `fgetgrent_r()` to not have to open a file (which file?).\r\n\r\nIn short, I wrote PR gh-126506 to fix the issue using getgrent_r()."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-06T17:46:01Z",
+   "body": "Ugh, `getgrent_r` is not thread-safe on Linux with glibc. Yuck. And `fgetgrent_r` isn't a good substitute if groups use LDAP or anything that's not `/etc/groups`.\r\n\r\nI guess locks it is... at least for Linux."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-20T10:24:21Z",
+   "body": "> I guess locks it is... at least for Linux.\r\n\r\nI proposed `@critical_section` (PR gh-126488), but @ZeroIntensity wrote that it's not correct since it doesn't solve the problem for subinterpreters which have their GIL.\r\n\r\nI proposed adding PyMutex (PR gh-126504), but @colesbury is afraid of deadlock because \"mkgrent() function calls a into the Python API\".  Maybe I can release the mutex while calling `mkgrent()`?\r\n\r\nI also wrote PR gh-126506 to use getgrent_r(), but @colesbury noticed that getgrent_r() is not thread-safe on Linux, so it doesn't solve this issue.\r\n\r\nI suppose that the only solution is to use a lock and release it around `mkgrent()`."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-21T14:52:06Z",
+   "body": "Fixed by change https://github.com/python/cpython/commit/3c2bd66e21bd8de69a89ebf09ff9d8e78ddfb839. Backport to 3.13 will follow."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-21T14:52:32Z",
+   "body": "Thank you @devdanzin for your bug report."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c898b70fe52bcd70da9a764075d12a54c75e0498",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ede8bc493e951e74d95562ab8353ad71e78f8d3b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d56383c142003aa8e4e4c2ab43807447905e3ad0",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126488",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "85903fb210683df51f342b8bdb28c2dac40827c8",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126504",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "71a908107849f9d32e132bed50b8233d75094e41",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "087722408678a66ef18649796d53c43f6828764a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "66af42144bfe17fed6bf8d69a2b3718bb189cc93",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126506",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d39929376a4c387442cbdba2c66a01d9250ad9f9",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "40744e4cf77c348104753d3e3d2a7201fa484920",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127055",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/127081",
+   "commit": null,
+   "actor": "colesbury"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3c2bd66e21bd8de69a89ebf09ff9d8e78ddfb839",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127104",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c36d77dab36ee0f291e5117ae7ef26ac98782f2a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9187ac3f2d22a7505da8cc9e159c75068b8b9a50",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2629000b254e6bed249e51902c96e3c5df9b71d6",
+   "actor": "ebonnal"
+  }
+ ]
+}

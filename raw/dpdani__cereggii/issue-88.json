@@ -1,0 +1,32 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 88,
+ "type": "issue",
+ "url": "https://github.com/dpdani/cereggii/issues/88",
+ "title": "Race condition between `AtomicDict.fast_iter` and modification leads to segfault",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "fusil-fuzzer"
+ ],
+ "created_at": "2025-10-25T12:58:53Z",
+ "closed_at": "2025-12-29T15:08:00Z",
+ "body": "Running the code below eventually results in a segfault:\n\n```python\nimport random\nimport threading\nimport time\n\nimport cereggii\n\ndef fast_iter_vs_mutation_race(\n    num_iter_threads=4, num_chaos_threads=1, duration_sec=0.2\n):\n    \"\"\"\n    Creates a race condition between multiple threads iterating with `fast_iter`\n    and \"chaos\" threads that are concurrently inserting and deleting keys.\n    This directly tests the iterator's robustness against mutation.\n    \"\"\"\n    d = cereggii.AtomicDict()\n    # Pre-populate with enough items to make iteration meaningful\n    for i in range(num_iter_threads * 100):\n        d[i] = i\n\n    stop_event = threading.Event()\n\n    # Worker for threads that will be iterating\n    def iterator_worker(thread_id: int):\n        while not stop_event.is_set():\n            for _, _ in d.fast_iter(\n                partitions=num_iter_threads, this_partition=thread_id\n            ):\n                pass\n\n    # Worker for threads that will be causing chaos\n    def chaos_worker():\n        key_counter = num_iter_threads * 100\n        while not stop_event.is_set():\n            # Choose a random action\n            action = random.randint(0, 10)\n            key = random.randint(0, key_counter)\n\n            if action < 6:  # 60% chance to set/update\n                d[key] = key_counter\n                key_counter += 1\n            else:  # 40% chance to delete\n                try:\n                    del d[key]\n                except KeyError:\n                    pass  # Key might have already been deleted by another chaos thread\n\n    iter_threads = [\n        threading.Thread(target=iterator_worker, args=(i,))\n        for i in range(num_iter_threads)\n    ]\n    chaos_threads = [\n        threading.Thread(target=chaos_worker) for _ in range(num_chaos_threads)\n    ]\n\n    all_threads = iter_threads + chaos_threads\n    for t in all_threads:\n        t.start()\n\n    time.sleep(duration_sec)\n    stop_event.set()\n\n    for t in all_threads:\n        t.join()\n\nfor x in range(2500):\n    fast_iter_vs_mutation_race()\n```\n\nBacktrace:\n```\nThread 1999 \"Thread-1998 (it\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7ffff2efd640 (LWP 151429)]\nAtomicDictFastIterator_Next (self=0x7fffc09e09d0) at /home/danzin/projects/cereggii/src/cereggii/atomic_dict/iter.c:106\n106         Py_INCREF(entry.key);\n\n#0  AtomicDictFastIterator_Next (self=0x7fffc09e09d0) at /home/danzin/projects/cereggii/src/cereggii/atomic_dict/iter.c:106\n#1  0x0000555555dc478b in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x529005569210, frame=0x5290055ff3a8, frame@entry=0x5290055ff328,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:5745\n#2  0x0000555555e09002 in _PyEval_EvalFrame (throwflag=0, frame=0x5290055ff328, tstate=0x529005569210) at ./Include/internal/pycore_ceval.h:121\n#3  _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=locals@entry=0x0, args=<optimized out>, argcount=1,\n    kwnames=<optimized out>) at Python/ceval.c:1965\n#4  0x00005555559a961d in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/call.c:413\n#5  0x00005555559b4407 in _PyObject_VectorcallTstate (kwnames=0x0, nargsf=1, args=0x7ffff2efbc30, callable=0x7fffb24c5e90, tstate=0x529005569210)\n    at ./Include/internal/pycore_call.h:169\n#6  method_vectorcall (method=<optimized out>, args=0x7ffff2efc708, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/classobject.c:73\n#7  0x0000555555e52e3b in _PyObject_VectorcallTstate (tstate=tstate@entry=0x529005569210, callable=0x7fffc09a06d0, args=args@entry=0x7ffff2efc708,\n    nargsf=nargsf@entry=0, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:169\n#8  0x0000555555e55afa in context_run (self=0x7fffb2d685f0, args=0x7ffff2efc700, nargs=1, kwnames=0x0) at Python/context.c:728\n#9  0x0000555555db34f8 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x529005569210, frame=0x5290055ff298, frame@entry=0x5290055ff220,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:3744\n#10 0x0000555555e09002 in _PyEval_EvalFrame (throwflag=0, frame=0x5290055ff220, tstate=0x529005569210) at ./Include/internal/pycore_ceval.h:121\n#11 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=locals@entry=0x0, args=<optimized out>, argcount=1,\n    kwnames=<optimized out>) at Python/ceval.c:1965\n#12 0x00005555559a961d in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/call.c:413\n```\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dpdani/cereggii/pull/99",
+   "commit": null,
+   "actor": "dpdani"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "dpdani"
+  }
+ ]
+}

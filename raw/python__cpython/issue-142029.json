@@ -1,0 +1,101 @@
+{
+ "repo": "python/cpython",
+ "number": 142029,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/142029",
+ "title": "Assertion failures from calling `create_builtin` with invalid object",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-importlib"
+ ],
+ "created_at": "2025-11-28T02:04:54Z",
+ "closed_at": "2025-12-15T12:20:58Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort the interpreter by running the code below:\n\n\n```python\nimport importlib\n\nclass S(str): pass\nclass A: pass\n\na = A()\na.name = S(\"123\")\nimportlib._imp.create_builtin(a)\n```\n\nIt's also possible to get a different abort by running this code:\n\n```python\nimport importlib\n\nclass S(str): pass\nclass A: pass\n\na = A()\na.name = S()\nimportlib._imp.create_builtin(a)\n```\n\n\nBacktrace for the first abort:\n```\npython: Python/import.c:2438: PyObject *create_builtin(PyThreadState *, PyObject *, PyObject *, PyModInitFunction): Assertion `is_core_module(tstate->interp, info.name, info.path)' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x00005555558c6a4a in create_builtin (tstate=tstate@entry=0x555555d988c0 <_PyRuntime+358640>, name=name@entry=0x7ffff6d2f580, spec=spec@entry=0x7ffff6c222c0, initfunc=initfunc@entry=0x0)\n    at Python/import.c:2438\n#8  0x00005555558cc023 in _imp_create_builtin (module=0x7ffff6d6e840, spec=0x7ffff6c222c0) at Python/import.c:4423\n#9  0x00005555557136f5 in cfunction_vectorcall_O (func=func@entry=0x7ffff6d8a2d0, args=args@entry=0x7fffffffc468, nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0)\n    at Objects/methodobject.c:536\n#10 0x0000555555698e0e in _PyObject_VectorcallTstate (tstate=0x555555d988c0 <_PyRuntime+358640>, callable=0x7ffff6d8a2d0, args=0x7fffffffc468, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:169\n#11 0x0000555555836303 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d988c0 <_PyRuntime+358640>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:1620\n```\n\nBacktrace for the second abort:\n```\npython: ./Python/importdl.c:159: int _Py_ext_module_loader_info_init_for_builtin(struct _Py_ext_module_loader_info *, PyObject *): Assertion `PyUnicode_GetLength(name) > 0' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x00005555558cd986 in _Py_ext_module_loader_info_init_for_builtin (info=info@entry=0x7fffffffc228, name=name@entry=0x7ffff6d2f580) at ./Python/importdl.c:159\n#8  0x00005555558c6696 in create_builtin (tstate=tstate@entry=0x555555d988c0 <_PyRuntime+358640>, name=0x53465, name@entry=0x7ffff6d2f580, spec=0x6, spec@entry=0x7ffff6c222c0,\n    initfunc=0x7ffff7ca5fed <__GI___pthread_kill+285>, initfunc@entry=0x0) at Python/import.c:2405\n#9  0x00005555558cc023 in _imp_create_builtin (module=0x7ffff6d6e840, spec=0x7ffff6c222c0) at Python/import.c:4423\n#10 0x00005555557136f5 in cfunction_vectorcall_O (func=func@entry=0x7ffff6d8a2d0, args=args@entry=0x7fffffffc468, nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0)\n    at Objects/methodobject.c:536\n#11 0x0000555555698e0e in _PyObject_VectorcallTstate (tstate=0x555555d988c0 <_PyRuntime+358640>, callable=0x7ffff6d8a2d0, args=0x7fffffffc468, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:169\n```\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a2+ (heads/main-dirty:bc9e63dd9d2, Nov 26 2025, 19:23:56) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-142033\n* gh-142054\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-11-28T05:37:35Z",
+   "body": "Can reproduce with main branch on Linux. Note that the new `S` class is unnecessary - it will crash with normal strings too.\n\nDoesn't seem to occur in 3.14 but I've only checked with the prebuilt binary and not the latest development version.\n\nWith regards to the second part:\nSeems that the call checks that `name` is a string, but nothing more:\nhttps://github.com/python/cpython/blob/5ec03cf3b086fd01614cbd97bb99d45aac3668fe/Python/import.c#L4410-L4423\n\nBut in the underlying implementation, the length of the string is also checked:\nhttps://github.com/python/cpython/blob/5ec03cf3b086fd01614cbd97bb99d45aac3668fe/Python/importdl.c#L158-L159"
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-11-28T06:08:00Z",
+   "body": "The first issue seems to be a regression in https://github.com/python/cpython/commit/1e4e59bb3714ba7c6b6297f1a74e231b056f004c\n\nIt used to be that if a module was not found within the init table (i.e. it was not a built-in module), `create_builtin()` would return `None`. However, when this codeblock was rewritten, the case where `name` is not found automatically assumes that it is an internal module (`sys` or `builtins`).\nhttps://github.com/python/cpython/blob/5ec03cf3b086fd01614cbd97bb99d45aac3668fe/Python/import.c#L2433-L2442"
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-11-28T06:34:23Z",
+   "body": "Adding a check for being a core module seems to fix the first issue:\n- Reverting to the previous behaviour of returning `None` (instead of crashing) if not found\n- Still performing the current behaviour under any circumstance that wouldn't currently crash.\n\n```diff\n@@ -2435,9 +2435,14 @@ create_builtin(\n         p0 = lookup_inittab_initfunc(&info);\n         if (p0 == NULL) {\n             /* Cannot re-init internal module (\"sys\" or \"builtins\") */\n-            assert(is_core_module(tstate->interp, info.name, info.path));\n-            mod = import_add_module(tstate, info.name);\n-            goto finally;\n+            if (is_core_module(tstate->interp, info.name, info.path)) {\n+                mod = import_add_module(tstate, info.name);\n+                goto finally;\n+            }\n+            else {\n+                mod = Py_NewRef(Py_None);\n+                goto finally;\n+            }\n         }\n     }\n```\n\nHappy to open a PR if that's warranted."
+  },
+  {
+   "author": "itamaro",
+   "created_at": "2025-12-01T00:34:13Z",
+   "body": "sorry about the regression from gh-139196! I missed that there was different handling for the case of \"no matching inittab entry\" vs \"found inittab entry but the initfunc is NULL\". it wasn't an intentional omission.\n\nI wrote https://github.com/itamaro/cpython/commit/2b839b9dedaee0bda86022d225f5492609200bcb to restore the intended behavior. @dr-carlos since you already have a PR going, it might be best if you integrate my changes into your PR."
+  },
+  {
+   "author": "dr-carlos",
+   "created_at": "2025-12-01T01:24:14Z",
+   "body": "> sorry about the regression from [gh-139196](https://github.com/python/cpython/pull/139196)! I missed that there was different handling for the case of \"no matching inittab entry\" vs \"found inittab entry but the initfunc is NULL\". it wasn't an intentional omission.\n\nNo problem! Thanks for the clarification.\n\n\n> I wrote [itamaro@2b839b9](https://github.com/itamaro/cpython/commit/2b839b9dedaee0bda86022d225f5492609200bcb) to restore the intended behavior. [@dr-carlos](https://github.com/dr-carlos) since you already have a PR going, it might be best if you integrate my changes into your PR.\n\nAnd thanks for a far more robust fix than my patch. I've now integrated it into #142054!"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-12-15T12:22:07Z",
+   "body": "Thanks for your bug report, both issues have been fixed."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142033",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142054",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2b839b9dedaee0bda86022d225f5492609200bcb",
+   "actor": "itamaro"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142365",
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "70671267c11c562c6ca682eebf863616b258c20a",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cd2ca74c53d3cb502db40e3f52911d4429797daf",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7dfa26cef099474460f1b223726e0566c46f82b5",
+   "actor": "fatelei"
+  }
+ ]
+}

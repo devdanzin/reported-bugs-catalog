@@ -1,0 +1,43 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2848,
+ "type": "pull",
+ "url": "https://github.com/h5py/h5py/pull/2848",
+ "title": "BUG: always release resources in `DatasetID.get_chunk_info`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "neutrinoceros",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "bug"
+ ],
+ "created_at": "2026-03-26T15:06:30Z",
+ "closed_at": "2026-03-27T18:06:50Z",
+ "body": "close #2830",
+ "comments": [
+  {
+   "author": "codecov[bot]",
+   "created_at": "2026-03-26T15:21:11Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/h5py/h5py/pull/2848?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py) Report\n:white_check_mark: All modified and coverable lines are covered by tests.\n:white_check_mark: Project coverage is 90.39%. Comparing base ([`2ebb63a`](https://app.codecov.io/gh/h5py/h5py/commit/2ebb63a4de9372c6861288fefbe9931957f3ed01?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)) to head ([`7fb59b7`](https://app.codecov.io/gh/h5py/h5py/commit/7fb59b74856c4e33bd9e4f45a55d8200a67a206e?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)).\n:warning: Report is 79 commits behind head on master.\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@           Coverage Diff           @@\n##           master    #2848   +/-   ##\n=======================================\n  Coverage   90.39%   90.39%           \n=======================================\n  Files          16       16           \n  Lines        2509     2509           \n=======================================\n  Hits         2268     2268           \n  Misses        241      241           \n```\n</details>\n\n[:umbrella: View full report in Codecov by Harness](https://app.codecov.io/gh/h5py/h5py/pull/2848?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-27T17:45:50Z",
+   "body": "Thanks, looks good once the CI passes."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "55248376ff850c4cd0c0ed3941418426e38d99be",
+   "actor": "takluyver"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "takluyver"
+  }
+ ]
+}

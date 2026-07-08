@@ -1,0 +1,35 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5121,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5121",
+ "title": "`SystemError` from `logging._str_formatter.vformat` with invalid `format_string`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-15T09:15:08Z",
+ "closed_at": "2024-11-15T09:20:04Z",
+ "body": "Calling `logging._str_formatter.vformat` with a `format_string` of `b\"\\xff\"` will result in a `SystemError`:\r\n\r\n```python\r\nPython 3.10.14 (39dc8d3c85a7, Aug 27 2024, 14:32:27)\r\n[PyPy 7.3.17 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>>> import logging\r\n>>>> logging._str_formatter.vformat(b\"\\xff\", (), \"\")\r\nRPython traceback:\r\n  File \"pypy_interpreter.c\", line 51609, in BuiltinCode1_fastcall_1\r\n  File \"pypy_objspace_std_8.c\", line 41106, in TemplateFormatter_formatter_parser\r\nTraceback (most recent call last):\r\n  File \"<python-input-1>\", line 1, in <module>\r\n    logging._str_formatter.vformat(b\"\\xff\", (), \"\")\r\n  File \"/home/ubuntu/projects/pypy3.10-v7.3.17-linux64/lib/pypy3.10/string.py\", line 165, in vformat\r\n    result, _ = self._vformat(format_string, args, kwargs, used_args, 2)\r\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/ubuntu/projects/pypy3.10-v7.3.17-linux64/lib/pypy3.10/string.py\", line 175, in _vformat\r\n    self.parse(format_string):\r\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/ubuntu/projects/pypy3.10-v7.3.17-linux64/lib/pypy3.10/string.py\", line 259, in parse\r\n    return _string.formatter_parser(format_string)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nSystemError: unexpected internal exception (please report a bug): <CheckError object at 0x7f8ef99d7710>; internal traceback was dumped to stderr\r\n```\r\n\r\nFound using fusil by @vstinner.",
+ "comments": [
+  {
+   "author": "cfbolz",
+   "created_at": "2024-11-15T09:20:04Z",
+   "body": "this is a duplicate of one of your earlier bugs, which affected quite a few functions. it's fixed in a nightly. could you please update the binary you use for fuzzing so that we don't get lots of repeated instances of this problem?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-15T09:42:01Z",
+   "body": "> this is a duplicate of one of your earlier bugs\r\n\r\nSorry for the noise, will update the binary!\r\n\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "cfbolz"
+  }
+ ]
+}

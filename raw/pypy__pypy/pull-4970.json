@@ -1,0 +1,42 @@
+{
+ "repo": "pypy/pypy",
+ "number": 4970,
+ "type": "pull",
+ "url": "https://github.com/pypy/pypy/pull/4970",
+ "title": "Add array.typecodes, take 2",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-05-26T11:18:48Z",
+ "closed_at": "2024-05-26T14:46:14Z",
+ "body": "Copy `array.typecodes` from CPython, but assert that they match the set of typecodes used in PyPy code.\r\n\r\nHopefully targeting the correct branch this time :)\r\n\r\nAddresses part of https://github.com/pypy/pypy/issues/4962.",
+ "comments": [
+  {
+   "author": "cfbolz",
+   "created_at": "2024-05-26T14:46:19Z",
+   "body": "Looks good! Thank you"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/pull/4965",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "3dfaab2a54e1b6fc82d9d349e2218319893658a5",
+   "actor": "cfbolz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "cfbolz"
+  }
+ ]
+}

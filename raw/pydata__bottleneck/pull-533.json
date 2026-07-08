@@ -1,0 +1,32 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 533,
+ "type": "pull",
+ "url": "https://github.com/pydata/bottleneck/pull/533",
+ "title": "BUG: fix memory leaks on error in `partition` and `argpartition`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "neutrinoceros",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "bug"
+ ],
+ "created_at": "2026-03-30T14:19:41Z",
+ "closed_at": "2026-03-31T07:44:21Z",
+ "body": "Close #520 as suggested and confirmed therein. I don't think it's possible to promote the reproducer script from the issue to a proper test; it works perfectly in isolation, but I expect it'd be extremely brittle within a test session.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b1cd15a93df8345afd0390204a47805c973b6981",
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

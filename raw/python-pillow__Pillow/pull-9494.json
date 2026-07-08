@@ -1,0 +1,36 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9494,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9494",
+ "title": "Check if PyObject_CallMethod result is NULL",
+ "state": "closed",
+ "state_reason": null,
+ "author": "radarhere",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-25T13:23:48Z",
+ "closed_at": "2026-03-26T21:43:32Z",
+ "body": null,
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "da729c832c26facdcc3afac52417cecc7641f232",
+   "actor": "radarhere"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "radarhere"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  }
+ ]
+}

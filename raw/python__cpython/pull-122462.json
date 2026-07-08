@@ -1,0 +1,72 @@
+{
+ "repo": "python/cpython",
+ "number": 122462,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/122462",
+ "title": "gh-122461: Document that compile() and ast.parse() raise SyntaxError for null bytes",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "docs",
+  "awaiting review",
+  "skip news",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
+  "needs backport to 3.15"
+ ],
+ "created_at": "2024-07-30T13:43:59Z",
+ "closed_at": null,
+ "body": "Update docs for `compile()` and `ast.parse()` because they raise `SyntaxError` instead of `ValueError` for null bytes since https://github.com/python/cpython/pull/97594.\r\n\n\n<!-- gh-issue-number: gh-122461 -->\n* Issue: gh-122461\n<!-- /gh-issue-number -->\n\r\n\r\n<!-- readthedocs-preview cpython-previews start -->\r\n----\n\ud83d\udcda Documentation preview \ud83d\udcda: https://cpython-previews--122462.org.readthedocs.build/\n\r\n<!-- readthedocs-preview cpython-previews end -->",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-30T13:45:25Z",
+   "body": "Requesting review from @JelleZijlstra."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-31T09:23:28Z",
+   "body": "Thank you both for the reviews!"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2024-07-31T09:40:29Z",
+   "body": "There are also mentions of ValueError in the `codeop` documentation and docstrings. I do not know whether they are still valid."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-31T09:53:05Z",
+   "body": "> Note that UnicodeEncodeError (which is a subclass of ValueError) can still be raised if the source string is not encodable.\r\n\r\nYes, for code such as `ast.parse(\"\\ud800\")`. Should this possibility be added to the documentation?\r\n\r\nPlus MemoryError and RecursionError are possible for too deeply nested code."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2024-07-31T11:16:15Z",
+   "body": "OverflowError is documented in `codeop`, and it can still be raised. For example:\r\n```pycon\r\n>>> import ast\r\n>>> try: ast.parse('x'*2**31, '?', 'exec')\r\n... except BaseException as err: e = err\r\n... \r\n>>> str(e)\r\n'Parser column offset overflow - source line is too big'\r\n>>> type(e)\r\n<class 'OverflowError'>\r\n```\r\n\r\nI do not know whether ValueError other than UnicodeEncodeError can be raised, but it is safer to document ValueError, OverflowError and RecursionError in all these places. I do not think that it is worth to document MemoryError or say KeyboardInterrupt specially, because they depend rather on the environment than on the input and you cannot fix them."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-31T11:26:50Z",
+   "body": "Would this count?\r\n\r\n```python\r\n>>> ast.parse(\"\", feature_version=(2,2))\r\nTraceback (most recent call last):\r\n  File \"<python-input-2>\", line 1, in <module>\r\n    ast.parse(\"\", feature_version=(2,2))\r\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\ast.py\", line 50, in parse\r\n    raise ValueError(f\"Unsupported major version: {major}\")\r\nValueError: Unsupported major version: 2\r\n```\r\n\r\nEdit: here's another one:\r\n\r\n```python\r\n>>> ast.parse(\"\", \"\\0\")\r\nTraceback (most recent call last):\r\n  File \"<python-input-9>\", line 1, in <module>\r\n    ast.parse(\"\", \"\\0\")\r\n    ~~~~~~~~~^^^^^^^^^^\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\ast.py\", line 53, in parse\r\n    return compile(source, filename, mode, flags,\r\n                   _feature_version=feature_version, optimize=optimize)\r\nValueError: embedded null character\r\n```"
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-18T09:35:21Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-04-17T18:17:55Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122461",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ]
+}

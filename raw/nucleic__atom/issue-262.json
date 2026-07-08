@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/atom",
+ "number": 262,
+ "type": "issue",
+ "url": "https://github.com/nucleic/atom/issues/262",
+ "title": "Modernization notes: dead version guards, deprecated APIs, private APIs, free-threading gaps",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:30:05Z",
+ "closed_at": null,
+ "body": "Collected lower-priority findings for consideration:\n\n### Version compatibility cleanup\n\n- **11 dead `#if PY_VERSION_HEX >= 0x03090000` guards** across 8 files \u2014 minimum is 3.10, can be unconditionally removed\n- **19 deprecated `PyModule_AddObject` calls** \u2014 should migrate to `PyModule_AddObjectRef` (available since 3.10, the minimum version). 10 of these are unchecked (see #261).\n- **`Py_TPFLAGS_HAVE_VERSION_TAG`** in 2 type specs (`atomdict.cpp:349,430`) \u2014 no-op since Python 3.0\n- **`PyErr_Fetch`/`PyErr_Restore`** in `modifyguard.h:42,60` \u2014 deprecated in 3.12, clean migration to `PyErr_GetRaisedException`/`PyErr_SetRaisedException`\n- **`PyMapping_HasKey`** fallback for 3.10-3.12 (`catom.cpp:454-460`) suppresses exceptions\n\n### Private API uses\n\n- **`_Py_NewReference`** in `eventbinder.cpp:170` and `signalconnector.cpp:184` (freelist reuse) \u2014 private API, may change across versions\n- **`_PyObject_GetDictPtr`** in `catom.cpp:383` \u2014 private API, no public equivalent with identical semantics\n- **`pythoncapi-compat`** adoption would eliminate the active `PyMapping_HasKeyWithError` version guard and enable forward API migrations\n\n### Free-threading readiness\n\n- **2 freelists** (EventBinder, SignalConnector) without synchronization \u2014 would race under `Py_GIL_DISABLED`\n- **Global `GuardMap` and `RefMap`** (`catom.cpp:653`, `atomref.cpp:37`) \u2014 process-global mutable state\n- **Non-atomic bitfield** operations on CAtom flags\n- **`set_slot` TOCTOU** between validation and store\n- **ObserverPool** unprotected container operations\n- **No `Py_MOD_GIL_NOT_USED`** declared in either module\n\n### Type slot notes\n\n- **`MethodWrapper` and `AtomMethodWrapper`** have `PyObject*` members but no `Py_TPFLAGS_HAVE_GC` \u2014 GC can't break cycles through these types\n- **`sortedmap_modexec` returns `false`(0) not -1** \u2014 wrong return convention for `Py_mod_exec` (should return -1 on error)\n\n### Module state\n\n- **Multi-phase init without per-module state**: Both `PyModuleDef` have `m_size=0` despite ~47 global `PyObject*` variables. HIGH migration difficulty.\n- **`Py_TPFLAGS_IMMUTABLETYPE`** not set on any type (available since 3.10)\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

@@ -1,0 +1,38 @@
+{
+ "repo": "python/cpython",
+ "number": 125852,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/125852",
+ "title": "`sys.addaudithook(None)` breaks the REPL",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug"
+ ],
+ "created_at": "2024-10-22T18:23:10Z",
+ "closed_at": "2024-10-22T19:30:07Z",
+ "body": "# Bug report\n\n### Bug description:\n\nRunning the code below exits the interpreter if using PyREPL, results in an infinite loop in basic REPL and breaks IDLE. Nevertheless, it might be a case of \"just don't do that then\".\n\n```python\nimport sys\nsys.addaudithook(None)\n```\n\nIt might be necessary to hit `Enter` again to see this behavior.\n\nIn basic REPL, the loop prints (and doesn't seem to be interruptible with `Ctrl+C`):\n```\nException ignored in audit hook:\nTypeError: 'NoneType' object is not callable\n```\n\nIn Windows with PyREPL, the error is (and then the interpreter exits):\n```\n>>> Exception ignored in audit hook:\nTypeError: 'NoneType' object is not callable\nException ignored in audit hook:\nTypeError: 'NoneType' object is not callable\nTraceback (most recent call last):\n  File \"~\\PycharmProjects\\cpython\\Lib\\runpy.py\", line 198, in _run_module_as_main\n  File \"~\\PycharmProjects\\cpython\\Lib\\runpy.py\", line 88, in _run_code\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\__main__.py\", line 6, in <module>\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\main.py\", line 59, in interactive_console\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\simple_interact.py\", line 151, in run_multiline_interactive_console\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\readline.py\", line 389, in multiline_input\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\reader.py\", line 801, in readline\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\reader.py\", line 756, in handle1\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\windows_console.py\", line 486, in wait\nTypeError: 'NoneType' object is not callable\n```\n\nIn Linux with PyREPL the error is (and then the interpreter exits):\n```\nException ignored in audit hook:\nTypeError: 'NoneType' object is not callable\nTraceback (most recent call last):\n  File \"~/projects/mycpython/Lib/_pyrepl/unix_console.py\", line 451, in getheightwidth\n  File \"<frozen os>\", line 708, in __getitem__\nKeyError: 'LINES'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"~/projects/mycpython/Lib/_pyrepl/__main__.py\", line 6, in <module>\n  File \"~/projects/mycpython/Lib/_pyrepl/main.py\", line 59, in interactive_console\n  File \"~/projects/mycpython/Lib/_pyrepl/simple_interact.py\", line 151, in run_multiline_interactive_console\n  File \"~/projects/mycpython/Lib/_pyrepl/readline.py\", line 389, in multiline_input\n  File \"~/projects/mycpython/Lib/_pyrepl/reader.py\", line 795, in readline\n  File \"~/projects/mycpython/Lib/_pyrepl/historical_reader.py\", line 302, in prepare\n  File \"~/projects/mycpython/Lib/_pyrepl/reader.py\", line 635, in prepare\n  File \"~/projects/mycpython/Lib/_pyrepl/unix_console.py\", line 349, in prepare\n  File \"~/projects/mycpython/Lib/_pyrepl/unix_console.py\", line 454, in getheightwidth\nTypeError: 'NoneType' object is not callable\nException ignored in audit hook:\nTypeError: 'NoneType' object is not callable\n```\n\nIt also breaks IDLE:\n```\n----------------------------------------\nUnhandled exception in user code execution server!'\nThread: SockThread\nIDLE Client Address: ('127.0.0.1', 59153)\nRequest: <socket.socket fd=340, family=2, type=1, proto=0, laddr=('127.0.0.1', 59154), raddr=('127.0.0.1', 59153)>\n\nException in thread SockThread:\nTraceback (most recent call last):\n  File \"~\\scoop\\apps\\python\\current\\Lib\\socketserver.py\", line 318, in _handle_request_noblock\n  File \"~\\scoop\\apps\\python\\current\\Lib\\socketserver.py\", line 349, in process_request\n  File \"~\\scoop\\apps\\python\\current\\Lib\\socketserver.py\", line 362, in finish_request\n  File \"~\\scoop\\apps\\python\\current\\Lib\\idlelib\\rpc.py\", line 514, in __init__\n  File \"~\\scoop\\apps\\python\\current\\Lib\\socketserver.py\", line 761, in __init__\n  File \"~\\scoop\\apps\\python\\current\\Lib\\idlelib\\run.py\", line 547, in handle\n  File \"~\\scoop\\apps\\python\\current\\Lib\\idlelib\\rpc.py\", line 291, in getresponse\n  File \"~\\scoop\\apps\\python\\current\\Lib\\idlelib\\rpc.py\", line 311, in _getresponse\n  File \"~\\scoop\\apps\\python\\current\\Lib\\idlelib\\rpc.py\", line 432, in pollresponse\n  File \"~\\scoop\\apps\\python\\current\\Lib\\idlelib\\rpc.py\", line 388, in pollmessage\nTypeError: 'NoneType' object is not callable\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"~\\scoop\\apps\\python\\current\\Lib\\threading.py\", line 1075, in _bootstrap_inner\n  File \"~\\scoop\\apps\\python\\current\\Lib\\threading.py\", line 1012, in run\n  File \"~\\scoop\\apps\\python\\current\\Lib\\idlelib\\run.py\", line 205, in manage_socket\n  File \"~\\scoop\\apps\\python\\current\\Lib\\socketserver.py\", line 298, in handle_request\n  File \"~\\scoop\\apps\\python\\current\\Lib\\socketserver.py\", line 320, in _handle_request_noblock\n  File \"~\\scoop\\apps\\python\\current\\Lib\\idlelib\\run.py\", line 421, in handle_error\n  File \"~\\scoop\\apps\\python\\current\\Lib\\traceback.py\", line 180, in print_exc\n  File \"~\\scoop\\apps\\python\\current\\Lib\\traceback.py\", line 124, in print_exception\n  File \"~\\scoop\\apps\\python\\current\\Lib\\traceback.py\", line 728, in __init__\nTypeError: 'NoneType' object is not callable\n```\n\n### CPython versions tested on:\n\n3.10, 3.12, 3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-10-22T19:30:07Z",
+   "body": "Oh, this is tracked as #83363 already."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/83363",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

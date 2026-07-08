@@ -1,0 +1,65 @@
+{
+ "repo": "python/cpython",
+ "number": 127192,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127192",
+ "title": "Segfault or abort in free-threaded build calling methods from exception in threads",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-23T11:57:33Z",
+ "closed_at": "2024-11-23T18:30:43Z",
+ "body": "# Crash report\n\n### What happened?\n\nIn a no-gil build with `PYTHON_GIL=0`, it's possible to get the interpreter to segfault or abort with the message `Fatal Python error: PyMutex_Unlock: unlocking mutex that is not locked` by running the following code:\n\n```python\nfrom threading import Thread\nimport email.errors\n\nalive = []\nfor x in range(100):\n    obj = email.errors.InvalidMultipartContentTransferEncodingDefect()\n\n    alive.append(Thread(target=obj.__getstate__, args=()))\n    alive.append(Thread(target=obj.__repr__, args=()))\n    for x in range(20):\n        obj.__init__([\"a\" * (2 ** 16)])\n    alive.append(Thread(target=obj.__init__, args=([\"a\" * (2 ** 16)],)))\n\nfor obj in alive:\n    try:\n        print('START', obj)\n        obj.start()\n    except Exception:\n        pass\n```\nSomehow it seems very hard to trigger a segfault under gdb, so here's the backtrace from the abort:\n```gdb\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140736531846720) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=140736531846720) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=140736531846720, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7ce0476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc67f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x0000555555944db0 in fatal_error_exit (status=<optimized out>) at Python/pylifecycle.c:3059\n#6  0x00005555559519fb in fatal_error (fd=2, header=header@entry=1,\n    prefix=prefix@entry=0x555555b0bb20 <__func__.0> \"PyMutex_Unlock\",\n    msg=msg@entry=0x555555b0b950 \"unlocking mutex that is not locked\", status=status@entry=-1)\n    at Python/pylifecycle.c:3275\n#7  0x0000555555951a6d in _Py_FatalErrorFunc (\n    func=func@entry=0x555555b0bb20 <__func__.0> \"PyMutex_Unlock\",\n    msg=msg@entry=0x555555b0b950 \"unlocking mutex that is not locked\") at Python/pylifecycle.c:3291\n#8  0x000055555592a36f in PyMutex_Unlock (m=<optimized out>) at Python/lock.c:615\n#9  0x00005555556c6e23 in _PyMutex_Unlock (m=<optimized out>) at ./Include/cpython/lock.h:60\n#10 _PyCriticalSection_End (c=0x7fffc6fcc5f0) at ./Include/internal/pycore_critical_section.h:148\n#11 list_repr (self=<optimized out>) at Objects/listobject.c:581\n#12 0x0000555555709951 in PyObject_Repr (\n    v=[<unknown at remote 0xdddddddddddddddd>, <unknown at remote 0xdddddddddddddddd>, <unknown at remote 0xdddddddddddddddd>, <unknown at remote 0xdddddddddddddddd>]) at Objects/object.c:737\n#13 0x00005555557accbf in unicode_fromformat_arg (writer=writer@entry=0x7fffc6fcc750,\n    f=0x555555a590bc \"R)\", f@entry=0x555555a590bb \"%R)\", vargs=vargs@entry=0x7fffc6fcc700)\n    at Objects/unicodeobject.c:3048\n#14 0x00005555557ad0dd in unicode_from_format (writer=writer@entry=0x7fffc6fcc750,\n    format=format@entry=0x555555a590b8 \"%s(%R)\", vargs=vargs@entry=0x7fffc6fcc7c0)\n    at Objects/unicodeobject.c:3167\n#15 0x00005555557ad287 in PyUnicode_FromFormatV (format=0x555555a590b8 \"%s(%R)\",\n    vargs=vargs@entry=0x7fffc6fcc7c0) at Objects/unicodeobject.c:3201\n#16 0x00005555557ad363 in PyUnicode_FromFormat (format=format@entry=0x555555a590b8 \"%s(%R)\") at Objects/unicodeobject.c:3215\n#17 0x00005555556986fb in BaseException_repr (self=self@entry=0x200005d2aa0) at Objects/exceptions.c:170\n#18 0x000055555574c3f3 in wrap_unaryfunc (self=<InvalidMultipartContentTransferEncodingDefect(line=['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...(truncated), args=<optimized out>, wrapped=0x555555698672 <BaseException_repr>) at Objects/typeobject.c:8947\n#19 0x0000555555691ce5 in wrapperdescr_raw_call (kwds={}, args=(), self=<optimized out>, descr=<optimized out>) at Objects/descrobject.c:531\n#20 wrapper_call (self=self@entry=<method-wrapper '__repr__' of InvalidMultipartContentTransferEncodingDefect object at 0x200005d2aa0>, args=args@entry=(), kwds=kwds@entry={}) at Objects/descrobject.c:1438\n#21 0x000055555567f6ef in _PyObject_Call (tstate=0x555555dd7700, callable=callable@entry=<method-wrapper '__repr__' of InvalidMultipartContentTransferEncodingDefect object at 0x200005d2aa0>, args=args@entry=(), kwargs=kwargs@entry={}) at Objects/call.c:361\n#22 0x000055555567f811 in PyObject_Call (callable=callable@entry=<method-wrapper '__repr__' of InvalidMultipartContentTransferEncodingDefect object at 0x200005d2aa0>, args=args@entry=(), kwargs=kwargs@entry={}) at Objects/call.c:373\n```\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a2+ experimental free-threading build (heads/main-dirty:a13e94d84bf, Nov 23 2024, 07:16:19) [GCC 11.4.0]",
+ "comments": [
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-23T17:35:56Z",
+   "body": "```\r\n    alive.append(Thread(target=obj.__init__, args=([\"a\" * (2 ** 16)],)))\r\n```\r\n\r\nWe are not currently planning on supporting concurrent re-initializations by calling `__init__()` on the same object. Would it be possible to exclude that pattern from your fuzzing?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-23T18:03:35Z",
+   "body": "> Would it be possible to exclude that pattern from your fuzzing?\r\n\r\nSure, will do. Thanks for the heads up!\r\n\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132713",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132899",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dpdani/cereggii/issues/78",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/148058",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ]
+}

@@ -1,0 +1,204 @@
+{
+ "repo": "python/cpython",
+ "number": 146613,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146613",
+ "title": "`itertools._grouper.__next__` has the same re-entrant use-after-free that was fixed in `groupby.__next__`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2026-03-29T22:03:12Z",
+ "closed_at": "2026-04-02T13:35:00Z",
+ "body": "# Crash report\n\n### What happened?\n\nAI Disclosure: this issue, including the reproducer code, has been drafted by an LLM.\n\n## Bug description\n\ngh-143543 / commit a91b5c3fb5a fixed a re-entrant use-after-free in `groupby_next` by snapshotting `gbo->tgtkey` and `gbo->currkey` with `Py_INCREF` before calling `PyObject_RichCompareBool`. However, the sibling function `_grouper_next` (the inner group iterator) has the exact same unprotected comparison at `Modules/itertoolsmodule.c:681`:\n\n```c\nrcmp = PyObject_RichCompareBool(igo->tgtkey, gbo->currkey, Py_EQ);\n```\n\nNeither `igo->tgtkey` nor `gbo->currkey` is held with a strong reference during the comparison. A user-defined `__eq__` that re-enters the `_grouper` iterator can trigger `groupby_step`, which calls `Py_XSETREF(gbo->currkey, newkey)` \u2014 freeing the old `currkey` while `PyObject_RichCompareBool` still holds a dangling pointer to it as local variable `w`. When `__eq__` returns `NotImplemented`, `do_richcompare` tries the reverse comparison `w.__eq__(v)` on the freed object.\n\n## Reproducer\n\nCrashes with a segfault:\n\n```python\nimport itertools\n\ngrouper_iter = None\n\nclass Key:\n    __hash__ = None\n\n    def __init__(self, do_advance):\n        self.do_advance = do_advance\n        self.payload = bytearray(256)\n\n    def __eq__(self, other):\n        if self.do_advance:\n            self.do_advance = False\n            if grouper_iter is not None:\n                try:\n                    next(grouper_iter)\n                except StopIteration:\n                    pass\n            for _ in range(50):\n                bytearray(256)\n            return NotImplemented\n        return True\n\ndef keyfunc(element):\n    if element == 0:\n        return Key(do_advance=True)\n    return Key(do_advance=False)\n\ng = itertools.groupby(range(4), keyfunc)\nkey, grouper_iter = next(g)\nitems = list(grouper_iter)  # segfault\n```\n\n## Backtrace\n\n```\nProgram received signal SIGSEGV, Segmentation fault.\ndo_richcompare (tstate=0x555555d6cfd8 <_PyRuntime+405272>, v=0x20002542ba0, w=0x200025428a0, op=2) at Objects/object.c:1065\nwarning: Source file is more recent than executable.\n1065            Py_DECREF(res);\n\n#0  do_richcompare (tstate=0x555555d6cfd8 <_PyRuntime+405272>, v=0x20002542ba0, w=0x200025428a0, op=2) at Objects/object.c:1065\n#1  PyObject_RichCompare (v=v@entry=0x20002542ba0, w=w@entry=0x200025428a0, op=op@entry=2) at Objects/object.c:1109\n#2  0x000055555573deca in PyObject_RichCompareBool (v=0x20002542ba0, w=0x200025428a0, op=op@entry=2) at Objects/object.c:1131\n#3  0x0000555555a32c03 in _grouper_next (op=0x20002151c80) at ./Modules/itertoolsmodule.c:681\n#4  0x00005555556f2805 in list_extend_iter_lock_held (self=self@entry=0x200029bd4b0, iterable=iterable@entry=0x20002151c80) at Objects/listobject.c:1318\n#5  0x00005555556ed858 in _list_extend (self=self@entry=0x200029bd4b0, iterable=iterable@entry=0x20002151c80) at Objects/listobject.c:1507\n#6  0x00005555556f7ba8 in list___init___impl (self=self@entry=0x200029bd4b0, iterable=0x20002151c80) at Objects/listobject.c:3541\n#7  0x00005555556f0c46 in list_vectorcall (type=type@entry=0x555555cd8ef8 <PyList_Type>, args=args@entry=0x7fffffffa6c8, nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0)\n    at Objects/listobject.c:3565\n#8  0x000055555569f1de in _PyObject_VectorcallTstate (tstate=0x555555d6cfd8 <_PyRuntime+405272>, callable=0x555555cd8ef8 <PyList_Type>, args=0x7fffffffa6c8, nargsf=9223372036854775809,\n    kwnames=0x0) at ./Include/internal/pycore_call.h:136\n#9  0x0000555555869fc1 in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=0x555555da57d0, total_args=total_args@entry=1, kwnames=kwnames@entry=...,\n    call_instrumentation=false, frame=0x555555da5770, this_instr=0x200023e8f3a, tstate=0x555555d6cfd8 <_PyRuntime+405272>) at Python/ceval.c:770\n#10 0x0000555555874b23 in _PyEval_EvalFrameDefault (tstate=0x555555d6cfd8 <_PyRuntime+405272>, frame=<optimized out>, throwflag=0) at Python/generated_cases.c.h:1842\n#11 0x0000555555869779 in _PyEval_EvalFrame (tstate=0x555555d6cfd8 <_PyRuntime+405272>, frame=0x555555da5770, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#12 _PyEval_Vector (tstate=tstate@entry=0x555555d6cfd8 <_PyRuntime+405272>, func=func@entry=0x200024c3e30, locals=locals@entry=0x2000270cbb0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2133\n#13 0x0000555555869292 in PyEval_EvalCode (co=co@entry=0x200023e8dd0, globals=globals@entry=0x2000270cbb0, locals=locals@entry=0x2000270cbb0) at Python/ceval.c:681\n#14 0x0000555555977e7a in run_eval_code_obj (tstate=tstate@entry=0x555555d6cfd8 <_PyRuntime+405272>, co=co@entry=0x200023e8dd0, globals=globals@entry=0x2000270cbb0,\n    locals=locals@entry=0x2000270cbb0) at Python/pythonrun.c:1366\n#15 0x0000555555977b39 in run_mod (mod=mod@entry=0x200027e6508, filename=filename@entry=0x20002235290, globals=globals@entry=0x2000270cbb0, locals=locals@entry=0x2000270cbb0,\n    flags=0x7fffffffb9f0, arena=arena@entry=0x200020508b0, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1469\n```\n\n## Root cause\n\n`_grouper_next` at line 681 passes `igo->tgtkey` and `gbo->currkey` to `PyObject_RichCompareBool` without incrementing their refcounts. `PyObject_RichCompareBool` \u2192 `PyObject_RichCompare` \u2192 `do_richcompare` does **not** INCREF the arguments. When `__eq__` re-enters the `_grouper` iterator:\n\n1. Inner `_grouper_next` calls `groupby_step`\n2. `groupby_step` calls `Py_XSETREF(gbo->currkey, newkey)` \u2014 this decrefs the old `currkey` to refcount 0, freeing it\n3. `__eq__` returns `NotImplemented`\n4. `do_richcompare` tries the reverse: `w.__eq__(v)` where `w` is the freed `currkey` \u2014 **use-after-free**\n\n## Suggested fix\n\nApply the same fix from `groupby_next` (commit a91b5c3fb5a) to `_grouper_next`:\n\n```c\n// Before (vulnerable):\nrcmp = PyObject_RichCompareBool(igo->tgtkey, gbo->currkey, Py_EQ);\n\n// After (safe):\nPyObject *tgtkey = igo->tgtkey;\nPyObject *currkey = gbo->currkey;\nPy_INCREF(tgtkey);\nPy_INCREF(currkey);\nint rcmp = PyObject_RichCompareBool(tgtkey, currkey, Py_EQ);\nPy_DECREF(tgtkey);\nPy_DECREF(currkey);\n```\n\n## Versions affected\n\nSame as gh-143543 \u2014 all versions with `itertools.groupby`, regardless of GIL or JIT being enabled. The fix for `groupby_next` was applied to 3.13 and 3.14; this sibling function needs the same treatment, besides also hitting 3.15.\n\n**Found using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit).**\n\n### CPython versions tested on:\n\nCPython main branch, 3.15, 3.14\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a6+ free-threading build (heads/main:592e8f0865c, Mar  2 2026, 16:35:36) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-147962\n* gh-148010\n* gh-148011\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-29T23:14:32Z",
+   "body": "This is a dupe of https://github.com/python/cpython/issues/145678 I believe and we had issues with the reproducer... I'm going to close this one for now, but please check that the reproducer reproduces."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-29T23:25:22Z",
+   "body": "Thank you, sorry for not checking first :(\n\nI can confirm the reproducer here works across Python versions and build options on my machine and the one in #145678 doesn't."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-29T23:47:05Z",
+   "body": "Cool. So I'll keep yours open and close the other actually. That way, we can have a cleaner history."
+  },
+  {
+   "author": "TheSkyC",
+   "created_at": "2026-04-01T11:01:26Z",
+   "body": "Thanks for the excellent minimal reproducer! I've reproduced the crash on current `main`.\n\nThis is exactly the same re-entrant use-after-free that was fixed in `groupby.__next__` (gh-143543 / a91b5c3), but it was missed in the sibling `_grouper.__next__`.\n\nI've prepared the patch (temporary `Py_INCREF` / `Py_DECREF` protection on the borrowed keys) and regression test in `test_itertools.py`.\n\nI'll open the PR shortly"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9aa672e163a669faf540c893149459b647457af9",
+   "actor": "TheSkyC"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/147962",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5c9ff8b34638a8b19aece1a092ffdf821616594c",
+   "actor": "TheSkyC"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fc7a188fe70a7b98696b4fcee8db9eb8398aeb7b",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e6d83253eaf5b73df7afc58c4a82920f41cc1652",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "afa86501ee907e0dfc5c8e49de452dd4300faa4c",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148010",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148011",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "07158b605d638c3e79709939ceb114de4658b3d9",
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7fc8507f3d5251b8a5dc84049b261d69ca02f996",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/deep-learnings/pull/11",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/botpress-accuracy-reporters/pull/83",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/coding-tests/pull/43",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-cleaners/pull/32",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-extension-converters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/github-wiki-organisers/pull/30",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/itunes-file-delimiter-replacers/pull/28",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/json-data-sorters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/natural-language-processing/pull/10",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/pr-title-printers/pull/17",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/template-creators/pull/16",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/tutorials/pull/219",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/web-scrapers/pull/14",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7c4fe17c8efb025f50c16774a1d5018a78be09b2",
+   "actor": "ljfp"
+  }
+ ]
+}

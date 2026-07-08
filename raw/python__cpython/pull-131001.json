@@ -1,0 +1,168 @@
+{
+ "repo": "python/cpython",
+ "number": 131001,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/131001",
+ "title": "gh-130999: Avoid exiting the new REPL when there are non-string candidates for suggestions",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-repl"
+ ],
+ "created_at": "2025-03-09T03:10:30Z",
+ "closed_at": "2025-06-02T11:04:59Z",
+ "body": "The new REPL will exit when given code like:\r\n```python\r\n>>> import runpy\r\n... runpy._run_module_code(\"blech\", {0: \"\", \"bluch\": \"\"}, \"\")\r\n...\r\n```\r\n(See full traceback in https://github.com/python/cpython/issues/130999#issue-2905163382)\r\n\r\nWith this PR, the repr of the error causing the exit will be displayed instead:\r\n```python\r\n>>> import runpy\r\n... runpy._run_module_code(\"blech\", {0: \"\", \"bluch\": \"\"}, \"\")\r\n...\r\nTypeError(\"all elements in 'candidates' must be strings\")\r\n>>>\r\n```\r\n\r\nThis is an easy, but perhaps too rough, solution. Suggestions for a better way to display the error (or even catch the exception) are very welcome.\n\n<!-- gh-issue-number: gh-130999 -->\n* Issue: gh-130999\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "pablogsal",
+   "created_at": "2025-03-10T21:43:27Z",
+   "body": "I am not convincing this is the right solution. This will hide the real error and as the traceback is missing will make it very difficult to find out what the problem is. The real solution is probably to filter the candidates in the traceback module before submitting it to the `_generate_suggestions` function.\r\n\r\n@ambv @iritkatriel what do you think?"
+  },
+  {
+   "author": "iritkatriel",
+   "created_at": "2025-03-10T21:59:30Z",
+   "body": "I agree with @pablogsal.\r\n\r\nEither filter in `traceback`, or error out in `runpy` when the globals dict is weird."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-03-29T12:19:05Z",
+   "body": "Thank you both for the review, sorry for taking so long to address it.\r\n\r\n> Either filter in `traceback`, or error out in `runpy` when the globals dict is weird.\r\n\r\n`runpy` is just an easy path to a `NameError` with a user provided globals, but it also works with e.g.:\r\n```python\r\n>>> g = {0:1, \"p\": 1}\r\n>>> exec(compile(\"pa\", 'g', \"exec\"), g)\r\n[...]\r\nNameError: name 'pa' is not defined\r\nDuring handling of the above exception, another exception occurred:\r\n[...]\r\nTypeError: all elements in 'candidates' must be strings\r\n[And the REPL exits]\r\n```\r\n\r\nSo, the current situation in `trackeback._compute_suggestion_error()` is:\r\n- `ImportError`: if the module has a non-string in its `__dict__`, no suggestion is offered and no error happens.\r\n- `AttributeError`: object returns a non-string in its `__dir__` (or has one in `__dict__`), no suggestion is offered and no error happens.\r\n- `NameError`: if `f_locals`, `f_globals` or `f_builtins` has a non-string key, an error is raised that exits the new REPL.\r\n\r\nI suggest we just guard against an exception in the `NameError` case and offer no suggestions (by returning `None`). An alternative that gets the same result is to return `None` if a check like `any(not isinstance(x, str) for x in candidates)` succeeds. \r\n\r\nOr we can filter non-strings from the candidates in the `NameError` case, which would provide suggestions while avoiding the error. If this is preferred, I suggest to also filter non-strings in the `ImportError` and `AttributeError` cases, for the same effect."
+  },
+  {
+   "author": "tomasr8",
+   "created_at": "2025-04-14T14:21:22Z",
+   "body": "@devdanzin  If you just want to fix the crash, this one-liner does the job:\r\n\r\n```diff\r\ndiff --git a/Lib/traceback.py b/Lib/traceback.py\r\nindex 647c23ed782..cd5e2a88f07 100644\r\n--- a/Lib/traceback.py\r\n+++ b/Lib/traceback.py\r\n@@ -1527,6 +1527,7 @@ def _compute_suggestion_error(exc_value, tb, wrong_name):\r\n             + list(frame.f_globals)\r\n             + list(frame.f_builtins)\r\n         )\r\n+        d = [name for name in d if isinstance(name, str)]\r\n \r\n         # Check first if we are in a method and the instance\r\n         # has the wrong name as attribute\r\n\r\n```"
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-18T09:28:06Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-05-13T09:50:06Z",
+   "body": "Gentle ping @iritkatriel @pablogsal . Should we go with guarding against the exception and not offering suggestions on `NameError` case? What's your preference?"
+  },
+  {
+   "author": "terryjreedy",
+   "created_at": "2025-05-13T10:31:24Z",
+   "body": "Non-string keys are legal in dicts.  Hints are an excellent by optional (and CPython-specific, I presume) enhancement.  The hinters should just ignore, by filtering out, non-string keys and give a hint if possible.  There is no reason to not give hint.  Hinters are not linters."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-05-29T09:41:45Z",
+   "body": "A decision on this (https://github.com/python/cpython/pull/131001#issuecomment-2763338764) is blocking https://github.com/python/cpython/pull/130997. If no different opinions are presented, I'm going with @terryjreedy's approach in a day or two."
+  },
+  {
+   "author": "ambv",
+   "created_at": "2025-05-29T10:51:33Z",
+   "body": "I agree with Terry and your final suggestion in the comment, let's filter and provide whatever other suggestions still apply. This is interactive, so unlikely to be \"too slow for comfort\"."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-06-02T10:26:54Z",
+   "body": "I've implemented filtering of the candidates, and also guarded against `dir()` raising, so it's protected from exiting the REPL in more cases, while correctly displaying the remaining suggestions.\r\n\r\nOne doubt: when `dir()` raises, I chose to fetch `obj.__dict__.keys()`, but that misses attributes defined in the class, so I also set it to fetch from `obj.__class__.__dict__.keys()`. What is preferred, more candidates for suggestions (current code) or simpler/more strict suggestions (only fetch from the instance dict)?"
+  },
+  {
+   "author": "ambv",
+   "created_at": "2025-06-02T10:55:15Z",
+   "body": "@devdanzin What you did is what users will expect \ud83d\udc4d\ud83c\udffb"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2025-06-02T11:05:02Z",
+   "body": "Thanks @devdanzin for the PR, and @ambv for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-06-02T11:05:12Z",
+   "body": "[GH-135019](https://github.com/python/cpython/pull/135019) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2025-06-02T11:05:17Z",
+   "body": "[GH-135020](https://github.com/python/cpython/pull/135020) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "ambv",
+   "created_at": "2025-06-02T13:55:33Z",
+   "body": "This PR causes failures when doing refleak hunting. I'm on it."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130999",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "baccfdb3d4d004cfb5308674e5e6ea6e598abcd7",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9e90086ad12943dae5fa015da11b06841acbdae8",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3d4ea1894f706a3c5444f553bdf7f013160d9f20",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135030",
+   "commit": null,
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7775d93e2d142ab66c7d8fa7cff068b2522a37b0",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7ca17edd13c77a38d1a7b7f3c0becff63f7e2506",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7a9e5026b5088d2ce48ea1cb1d92a908b1b966e4",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2c7bac955edd3fc60d95e7834ddf205542f6e035",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a16ddb624853ef851dd82850383ac8f17b43523",
+   "actor": "Agent-Hellboy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/139933",
+   "commit": null,
+   "actor": "StanFromIreland"
+  }
+ ]
+}

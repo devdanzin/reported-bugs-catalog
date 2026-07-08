@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/enaml",
+ "number": 604,
+ "type": "issue",
+ "url": "https://github.com/nucleic/enaml/issues/604",
+ "title": "SubscriptionObserver_set_ref returns PyObject* instead of int (setter silently swallows errors)",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:35:25Z",
+ "closed_at": null,
+ "body": "`SubscriptionObserver_set_ref` (`subscription_observer.cpp:160-166`) is declared as returning `PyObject*` but is registered as a setter in `PyGetSetDef` (which requires `int` return: 0 success, -1 error).\n\n**Current code**:\n```cpp\nPyObject*\nSubscriptionObserver_set_ref( SubscriptionObserver* self, PyObject* value, void* context )\n{\n    if( value != Py_None )\n    {\n        return cppy::type_error(\"ref can only be set to None\");\n    }\n    cppy::replace( &self->ref, Py_None );\n    return 0;\n}\n```\n\n**Problems**:\n- Success path returns `0` (as `PyObject*` = NULL), which when cast to `int` is 0 (correct by accident)\n- Error path returns `cppy::type_error(...)` which returns NULL (`PyObject*` 0) after setting the exception \u2014 also cast to `int` 0, meaning the error path **appears to succeed**. The TypeError is set but the caller sees success and does not check for it. The error is silently swallowed.\n\n**Fix**:\n```cpp\nint\nSubscriptionObserver_set_ref( SubscriptionObserver* self, PyObject* value, void* context )\n{\n    if( value != Py_None )\n    {\n        cppy::type_error(\"ref can only be set to None\");\n        return -1;\n    }\n    cppy::replace( &self->ref, Py_None );\n    return 0;\n}\n```\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

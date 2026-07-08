@@ -1,0 +1,88 @@
+{
+ "repo": "python/cpython",
+ "number": 134064,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/134064",
+ "title": "Segfault calling `sys.remote_exec(0, None)`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2025-05-15T19:31:48Z",
+ "closed_at": "2025-05-17T22:26:46Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe following code segfaults ASAN builds and aborts/segfaults on non-ASAN debug builds on main:\n\n```python\nimport sys\n\nsys.remote_exec(0, None)\n```\n\nBacktrace ASAN debug free-threading:\n```shell\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555555f86705 in _Py_TYPE (ob=0x0) at ./Include/object.h:270\n270             return ob->ob_type;\n\n#0  0x0000555555f86705 in _Py_TYPE (ob=0x0) at ./Include/object.h:270\n#1  PyBytes_AS_STRING (op=0x0) at ./Include/cpython/bytesobject.h:25\n#2  sys_remote_exec_impl (module=module@entry=<module at remote 0x7fffb4259d20>, pid=pid@entry=0, script=<optimized out>)\n    at ./Python/sysmodule.c:2491\n#3  0x0000555555f86c65 in sys_remote_exec (module=<optimized out>, args=0x7fffffffafc8, nargs=<optimized out>, kwnames=0x0)\n    at ./Python/clinic/sysmodule.c.h:1614\n#4  0x0000555555ad4921 in cfunction_vectorcall_FASTCALL_KEYWORDS (func=<built-in method remote_exec of module object at remote 0x7fffb4259d20>,\n    args=0x7fffffffafc8, nargsf=<optimized out>, kwnames=0x0) at Objects/methodobject.c:466\n#5  0x00005555559956f0 in _PyObject_VectorcallTstate (tstate=0x555556755e40 <_PyRuntime+362048>,\n    callable=<built-in method remote_exec of module object at remote 0x7fffb4259d20>, args=0x7fffffffafc8, nargsf=9223372036854775810, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:169\n#6  0x000055555599584b in PyObject_Vectorcall (callable=callable@entry=<built-in method remote_exec of module object at remote 0x7fffb4259d20>,\n    args=args@entry=0x7fffffffafc8, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#7  0x0000555555d870fb in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555556755e40 <_PyRuntime+362048>, frame=frame@entry=0x629000005840,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:1619\n#8  0x0000555555de915d in _PyEval_EvalFrame (throwflag=0, frame=0x629000005840, tstate=0x555556755e40 <_PyRuntime+362048>)\n    at ./Include/internal/pycore_ceval.h:119\n```\n\nBacktrace ASAN release gilful:\n```shell\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555555977807 in _PyFreeList_PopNoStats (fl=<optimized out>) at ./Include/internal/pycore_freelist.h:79\n79              fl->freelist = *(void **)obj;\n\n#0  0x0000555555977807 in _PyFreeList_PopNoStats (fl=<optimized out>) at ./Include/internal/pycore_freelist.h:79\n#1  clear_freelist (dofree=<optimized out>, is_finalization=<optimized out>, freelist=<optimized out>) at Objects/object.c:903\n#2  _PyObject_ClearFreeLists (freelists=0x555556276fc8 <_PyRuntime+101256>, is_finalization=is_finalization@entry=0) at Objects/object.c:950\n#3  0x0000555555c45792 in _PyGC_ClearAllFreeLists (interp=<optimized out>) at Python/gc_gil.c:14\n#4  0x0000555555c3f950 in gc_collect_full (stats=0x7fffffffd730, tstate=0x5555562ab2f8 <_PyRuntime+315064>) at Python/gc.c:1686\n#5  _PyGC_Collect (tstate=<optimized out>, generation=generation@entry=2, reason=reason@entry=_Py_GC_REASON_SHUTDOWN) at Python/gc.c:2041\n#6  0x0000555555c43c1e in _PyGC_CollectNoFail (tstate=tstate@entry=0x5555562ab2f8 <_PyRuntime+315064>) at Python/gc.c:2082\n#7  0x0000555555ceb5fa in interpreter_clear (interp=<optimized out>, tstate=tstate@entry=0x5555562ab2f8 <_PyRuntime+315064>)\n    at Python/pystate.c:920\n#8  0x0000555555cec231 in _PyInterpreterState_Clear (tstate=tstate@entry=0x5555562ab2f8 <_PyRuntime+315064>) at Python/pystate.c:994\n#9  0x0000555555cd843a in finalize_interp_clear (tstate=0x5555562ab2f8 <_PyRuntime+315064>) at Python/pylifecycle.c:1904\n#10 0x0000555555ce27fb in _Py_Finalize (runtime=0x55555625e440 <_PyRuntime>) at Python/pylifecycle.c:2210\n#11 0x0000555555ce2dbd in _Py_Finalize (runtime=0x55555625e440 <_PyRuntime>) at Python/pylifecycle.c:2252\n#12 0x0000555555d74884 in Py_RunMain () at Modules/main.c:769\n#13 pymain_main (args=0x7fffffffdc90) at Modules/main.c:797\n#14 Py_BytesMain (argc=<optimized out>, argv=<optimized out>) at Modules/main.c:821\n#15 0x00007ffff72ded90 in __libc_start_call_main (main=main@entry=0x5555556fd530 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffdeb8)\n    at ../sysdeps/nptl/libc_start_call_main.h:58\n#16 0x00007ffff72dee40 in __libc_start_main_impl (main=0x5555556fd530 <main>, argc=2, argv=0x7fffffffdeb8, init=<optimized out>,\n    fini=<optimized out>, rtld_fini=<optimized out>, stack_end=0x7fffffffdea8) at ../csu/libc-start.c:392\n#17 0x000055555573f855 in _start ()\n```\n\nBacktrace debug:\n```shell\n./Python/sysmodule.c:2542: _Py_NegativeRefcount: Assertion failed: object has negative ref count\nEnable tracemalloc to get the memory block allocation traceback\n\nobject address  : 0x7fffffffd4b0\nobject refcount : 4294956288\nobject type     : 0x55555591a387\n\nProgram received signal SIGSEGV, Segmentation fault.\n__strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:74\n74      ../sysdeps/x86_64/multiarch/strlen-avx2.S: No such file or directory.\n\n#0  __strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:74\n#1  0x00007ffff7d14d31 in __vfprintf_internal (s=s@entry=0x7fffffffb200, format=0x555555a0d163 \"object type name: %s\\n\", ap=0x7fffffffd340,\n    mode_flags=2) at ./stdio-common/vfprintf-internal.c:1517\n#2  0x00007ffff7d15665 in buffered_vfprintf (s=0x7ffff7eb96a0 <_IO_2_1_stderr_>, format=format@entry=0x555555a0d163 \"object type name: %s\\n\",\n    args=args@entry=0x7fffffffd340, mode_flags=mode_flags@entry=2) at ./stdio-common/vfprintf-internal.c:2261\n#3  0x00007ffff7d1465e in __vfprintf_internal (s=<optimized out>, format=0x555555a0d163 \"object type name: %s\\n\", ap=ap@entry=0x7fffffffd340,\n    mode_flags=mode_flags@entry=2) at ./stdio-common/vfprintf-internal.c:1236\n#4  0x00007ffff7dd2d13 in ___fprintf_chk (fp=<optimized out>, flag=flag@entry=1, format=format@entry=0x555555a0d163 \"object type name: %s\\n\")\n    at ./debug/fprintf_chk.c:33\n#5  0x000055555570cc1f in fprintf (__fmt=0x555555a0d163 \"object type name: %s\\n\", __stream=<optimized out>)\n    at /usr/include/x86_64-linux-gnu/bits/stdio2.h:105\n#6  _PyObject_Dump (op=op@entry=<unknown at remote 0x7fffffffd4b0>) at Objects/object.c:733\n#7  0x000055555570ce97 in _PyObject_AssertFailed (obj=obj@entry=<unknown at remote 0x7fffffffd4b0>, expr=expr@entry=0x0,\n    msg=msg@entry=0x555555a0d1ee \"object has negative ref count\", file=file@entry=0x555555a855a7 \"./Python/sysmodule.c\", line=line@entry=2542,\n    function=function@entry=0x555555a0d9f0 <__func__.63> \"_Py_NegativeRefcount\") at Objects/object.c:3061\n#8  0x000055555570cfa3 in _Py_NegativeRefcount (filename=filename@entry=0x555555a855a7 \"./Python/sysmodule.c\", lineno=lineno@entry=2542,\n    op=op@entry=<unknown at remote 0x7fffffffd4b0>) at Objects/object.c:272\n#9  0x000055555591a290 in Py_DECREF (op=<unknown at remote 0x7fffffffd4b0>, lineno=2542, filename=0x555555a855a7 \"./Python/sysmodule.c\")\n    at ./Include/refcount.h:407\n#10 sys_remote_exec_impl (module=module@entry=<module at remote 0x7ffff7bec0b0>, pid=pid@entry=0, script=<optimized out>)\n    at ./Python/sysmodule.c:2542\n#11 0x000055555591a387 in sys_remote_exec (module=<module at remote 0x7ffff7bec0b0>, args=0x7fffffffd778, nargs=<optimized out>,\n    kwnames=<optimized out>) at ./Python/clinic/sysmodule.c.h:1614\n#12 0x0000555555704e2e in cfunction_vectorcall_FASTCALL_KEYWORDS (func=<built-in method remote_exec of module object at remote 0x7ffff7bec0b0>,\n    args=0x7fffffffd778, nargsf=<optimized out>, kwnames=0x0) at Objects/methodobject.c:466\n#13 0x00005555556840c2 in _PyObject_VectorcallTstate (tstate=0x555555c8e4a8 <_PyRuntime+331080>,\n    callable=<built-in method remote_exec of module object at remote 0x7ffff7bec0b0>, args=0x7fffffffd778, nargsf=9223372036854775810, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:169\n#14 0x00005555556841e1 in PyObject_Vectorcall (callable=callable@entry=<built-in method remote_exec of module object at remote 0x7ffff7bec0b0>,\n    args=args@entry=0x7fffffffd778, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#15 0x00005555558429a2 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555c8e4a8 <_PyRuntime+331080>, frame=frame@entry=0x7ffff7fb0020,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:1619\n#16 0x000055555586f62f in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020, tstate=0x555555c8e4a8 <_PyRuntime+331080>)\n    at ./Include/internal/pycore_ceval.h:119\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 (heads/main:52a7a22a6b8, May 15 2025, 16:27:02) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-134067\n* gh-134162\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-15T20:00:07Z",
+   "body": "I wrote a fix: https://github.com/python/cpython/pull/134067."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-05-17T22:26:46Z",
+   "body": "Fixed. Thanks for your report."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a14dd2e94d5d66b49fc85d09a517bc57bfe989a9",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134067",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "009e7b36981fd07f7cca1fdcfcf172ce1584fac7",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fea3238f5466ed52cdfc78db4a693665047478b9",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134162",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "eaee2ae0333dde4f18bf849e4a90c8eebb7e2cb9",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "119ab42161ecba01ee500654b1f2e5c8dade5441",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "50c934808ee778d9b1238eaca32352b108ffa3ff",
+   "actor": "taegyunkim"
+  }
+ ]
+}

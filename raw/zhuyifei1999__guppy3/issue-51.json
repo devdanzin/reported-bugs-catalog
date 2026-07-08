@@ -1,0 +1,249 @@
+{
+ "repo": "zhuyifei1999/guppy3",
+ "number": 51,
+ "type": "issue",
+ "url": "https://github.com/zhuyifei1999/guppy3/issues/51",
+ "title": "Umbrella issue: guppy3 C Extension Analysis Report",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-31T17:07:27Z",
+ "closed_at": "2026-04-03T10:41:30Z",
+ "body": "This umbrella issue is meant to present the main results of the [guppy3 C Extension Analysis Report \n](https://gist.github.com/devdanzin/b30771d22104e6fa0c30c41a6e27a355). The findings below were automated, so it's probable that there are false positives or just acceptable choices flagged as problems (specially CONSIDER findings).\n\nThanks @zhuyifei1999 for being receptive!\n\n## Critical Findings (FIX) \u2014 13\n\n### Crash Bugs (7)\n\n| &check; | # | Finding | File | Agents | Addressed by |\n|---------|---|---------|------|--------|--------------|\n| &check; | 1 | **`ng_iter` checks wrong variable** \u2014 `!v` instead of `!iter` after `PyObject_GC_New`. Crashes on OOM during `iter(nodegraph)`. | `nodegraph.c:581-584` | 1 agent | 89c9953f7157f6a0cbeb08cac0ab142cc5749bb5 |\n| &check; | 2 | **`mutbitset_initset` deref before check** \u2014 dereferences `PyObject_Realloc` result before NULL check. Check is dead code. | `bitset.c:793-796` | 1 agent | 6c3483ecd3d4a5cce91734620157fc08c8defdff |\n| &cross; | 3 | **`immbitset_realloc` unchecked `PyObject_Realloc`** \u2014 dereferences result through `PyObject_InitVar`. Also corrupts object tracking via prior `_Py_ForgetReference`. | `bitset.c:960-962` | 1 agent | https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4167618490 |\n| &check; | 4 | **`hv_cli_findex` only checks one of two `PyTuple_New` results** \u2014 `s->cmps` NULL flows to `PyTuple_SET_ITEM(NULL, ...)` | `hv_cli_findex.c:125-128,144` | 2 agents | 736a848b461e970828933c851d685364cb787353 |\n| &check; | 5 | **`sf_slice` unchecked `NyImmBitSet_New` at two points** \u2014 bitset slicing crashes on OOM | `bitset.c:2958,2998` | 1 agent | f179e321975f3ba6b382c87c11371cc438d8254d |\n| &check; | 6 | **`_hiding_tag__name` unchecked after `PyUnicode_FromString`** \u2014 NULL stored in global, later passed to `PyDict_GetItem` in every heap traversal | `heapyc.c:253` | 3 agents | b6a10a686d59cd7bab66390469eccfe64e131e5b |\n| &check; | 7 | **`frame_traverse` infinite loop on Python 3.14** \u2014 `for (p = ...; p < ...; i++)` increments `i` but loop variable is `p` | `stdtypes.c:452` | 1 agent | 12546ee273e0ccacf76bd4ee6277905568aca198 |\n\n### Type Slot / GC (2)\n\n| &check; | # | Finding | File | Agents | Addressed by |\n|---------|---|---------|------|--------|--------------|\n| &check; | 25 | **`NyHeapView` tp_traverse missing `_hiding_tag_` visit** \u2014 GC cannot see through this owned PyObject* member. `tp_clear` correctly clears it. | `hv.c:124-141` | 1 agent | 0bac6f0e4379e50cdd9c3ecd860236ba0c41f2b4 |\n| &cross; | 26 | **`NyNodeTuple_Type` missing `tp_dealloc`** \u2014 items stored via `PyTuple_SET_ITEM` never decref'd. Leaks refs on every NodeTuple destruction. Used as dict keys in classifier memoization. | `hv_cli_and.c:266-278` | 1 agent | https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4169222280 |\n\n### `__new__`-without-`__init__` (1)\n\n| &check; | # | Finding | File | Agents | Addressed by |\n|---------|---|---------|------|--------|--------------|\n| &check; | 24 | **`ObjectClassifier()` segfaults** \u2014 exported type, `NYFILL` macro assigns `PyType_GenericNew`, all methods dereference NULL `def` pointer. Directly callable from Python. | `classifier.c:321, heapyc.c:245` | 1 agent | 29885239ece94f65069331c76776e41ef0bb0324 |\n\n### Reference Leaks / Error Propagation (4)\n\n| &check; | # | Finding | File | Agents | Addressed by |\n|---------|---|---------|------|--------|--------------|\n| &check; | 8 | **`set_relate` triple bug** \u2014 iterator `it` leaked, matched `obj` leaked, unchecked `PyLong_FromSsize_t` NULL passed to `r->visit`. On every successful set membership check. | `stdtypes.c:157-181` | 2 agents | 16ed1df12f7f01730d49db81cf936704af0dd2f0 84edf4a51ef62638eecc2693635f12e50a79d82f |\n| &check; | 9 | **`hv_extra_type` converts allocation failure to silent `xt_error` sentinel** \u2014 loses error context, causes cascade of `return NULL` without exception across ~15 call sites | `hv.c:462-464` | 1 agent | 488f1b960d94bf5d29bc2d4aeba199d044f45023 |\n| &cross; | 10 | **`hv_relate` returns NULL without exception** via `xt_error` cascade | `hv.c:1295-1318` | 1 agent | https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4166555393 |\n| &cross; | 11 | **Unchecked `PyUnicode_FromString` passed to `r->visit`** in `xt_relate` \u2014 NULL relator depends on defensive visitor code | `hv.c:514` | 1 agent | https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4166218750 |\n\n### Refcount Bugs (6)\n\n| &check; | # | Finding | File | Agents | Addressed by |\n|---------|---|---------|------|--------|--------------|\n| &check; | 14 | **`cli_partition_iter` over-decrements borrowed/released `sp` on error** \u2014 `Py_XDECREF(sp)` in error label on a ref the function doesn't own. Double-free / refcount underflow. | `classifier.c:94-120` | 1 agent | 3f4ebb8ace7550a17d4ed756d72e1f0832f2b2e3 d5fe039761b5ce49cdf20722157eae901722aaf3 |\n| &check; | 15 | **`outrel_visit` borrowed ref used after `Py_DECREF`** \u2014 `PyDict_GetItem` borrowed ref or decref'd new relation passed to `NyNodeSet_setobj` | `hv_cli_rel.c:273-284` | 1 agent | fa1f13834cef135980392ee63073b2bbc572e5b0 |\n| &cross; | 16 | **`hv_cli_prod_le` borrowed refs across arbitrary Python comparisons** \u2014 `PyTuple_GetItem` borrowed refs used across `PyObject_RichCompareBool` which runs `__eq__`/`__le__` | `hv_cli_prod.c:142-194` | 1 agent | https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4169401705 |\n| &cross; | 17 | **`dict_relate_kv` passes unchecked NULL to `r->visit`** \u2014 `PyLong_FromSsize_t` OOM silently swallowed by visitor. Same pattern across ~25 call sites. | `stdtypes.c:62-65` | 1 agent | https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4166218750 |\n| &check; | 18 | **`hv_PyList_Pop` leaks reference when `PyList_SetSlice` fails** \u2014 `Py_XINCREF`'d item not decref'd on error. Affects 5 heap traversal call sites. | `hv.c:107-111` | 1 agent | 44763a7cab09560ce4176c9100a27142e4b7ec6d |\n| &check; | 19 | **`mutnsiter_iternext` leaks `bitobj` on conversion error** \u2014 `PyLong_AsSsize_t` error path missing `Py_DECREF(bitobj)` | `nodeset.c:232-234` | 1 agent | 44763a7cab09560ce4176c9100a27142e4b7ec6d |\n\n### Resource Lifecycle (4)\n\n| &check; | # | Finding | File | Agents | Addressed by |\n|---------|---|---------|------|--------|--------------|\n| &check; | 20 | **`immbitset_realloc` + `union_realloc` \u2014 `_Py_ForgetReference` + NULL `PyObject_Realloc` = memory leak + object list corruption** \u2014 2 sites with identical pattern | `bitset.c:957-963,900-906` | 2 agents | d1fb7077a06f80c76ca695bc5bb80b6e20c92ff4 5a397d13f43c0b6a9beaf5182872990ec5fde70c |\n| &check; | 21 | **`NyNodeGraph_AddEdge` \u2014 `PyMem_RESIZE` overwrites `ng->edges` with NULL** \u2014 old buffer with incref'd `PyObject*` permanently lost | `nodegraph.c:169-176` | 1 agent | 4ae85a70a35a009e680c5b2fa663f661ffbeefcf |\n| &check; | 22 | **`NyImmBitSet_SubtypeNewArg` unchecked alloc before `memcpy`** \u2014 NULL deref in ImmBitSet constructor | `bitset.c:726-727` | 1 agent | aa066e0ed9828a5d0b7a27b34141da36531f8ca0 |\n| &check; | 23 | **`sf_slice` unchecked `NyImmBitSet_New` at 2 points** \u2014 bitset slicing crashes on OOM | `bitset.c:2958,2998` | 2 agents | f179e321975f3ba6b382c87c11371cc438d8254d |\n\n### PyErr_Clear / Exception Handling (2)\n\n| &check; | # | Finding | File | Agents | Addressed by |\n|---------|---|---------|------|--------|--------------|\n| &check; | 12 | **`hv_cli_indisize_memoized_kind` missing `PyErr_Occurred` check** \u2014 the ONE outlier among 6 structurally identical `memoized_kind` functions | `hv_cli_indisize.c:14` | 2 agents | fa1f13834cef135980392ee63073b2bbc572e5b0 |\n| &check; | 13 | **`cli_partition_iter` missing `PyErr_Occurred` check** \u2014 user-defined classifier keys with arbitrary `__hash__` go through `PyDict_GetItem`. Highest risk: `kind` is arbitrary user code. | `classifier.c:102` | 2 agents | 3f4ebb8ace7550a17d4ed756d72e1f0832f2b2e3 |\n\n---\n\n## Important Findings (CONSIDER) \u2014 16\n\n### PyDict_GetItem Exception Swallowing (3)\n- Unguarded `PyErr_Clear` in `lazy_init_hv_cli_prod` (`hv_cli_prod.c:62`)\n  Addressed: d9269a4e22247b7439fcf75abfd9d6625ea50f9f\n- `outrel_visit` missing `PyErr_Occurred` after `PyDict_GetItem` (`hv_cli_rel.c:273`)\n  Addressed: fa1f13834cef135980392ee63073b2bbc572e5b0\n- 3 hiding-tag checks use `PyDict_GetItem` for pointer comparison (benign but imprecise)\n  Intended: see fa1f13834cef135980392ee63073b2bbc572e5b0 commit message.\n\n### Module Init (4)\n- 7 unchecked `PyDict_SetItemString` in heapyc init (`heapyc.c:241-252`)\n  Addressed: e3ad5ba3a7c45edbf5fcb8a180fa253dcb6f71f9\n- 5 unchecked `PyDict_SetItemString` in bitset init (`bitset.c:4464-4474`)\n  Addressed: bdb08c3a6aceb8bfdeebdfd3e340955a87c8242c\n- `NyStdTypes_init` returns void, ignores allocation failures (`stdtypes.c:800-830`)\n  Addressed: e3ad5ba3a7c45edbf5fcb8a180fa253dcb6f71f9\n- Unchecked `PyCapsule_New` NULL passed to `PyDict_SetItemString` (`bitset.c:4468`)\n  Addressed: bdb08c3a6aceb8bfdeebdfd3e340955a87c8242c\n\n### Visit Protocol Inconsistency (3)\n- `r->visit` return value ignored in `nodeset_relate_visit` (`nodeset.c:432`)\n  Addressed: https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4182015332\n- `nodegraph_relate` returns 0 instead of propagating visit errors (`nodegraph.c:760-775`)\n  Addressed: https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4182015332\n- Unchecked `PyLong_FromSsize_t` passed to callbacks (multiple sites)\n  Addressed: https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4166218750\n\n### Version Compatibility (3)\n- 13 `PyDict_GetItem` calls \u2014 should migrate to `PyDict_GetItemWithError`\n  Addressed: fa1f13834cef135980392ee63073b2bbc572e5b0\n- `PySys_GetObject` deprecated in 3.13 (`hv_cli_prod.c:34`)\n  Addressed: https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4182015332\n- Outdated vendored `pythoncapi_compat.h`\n  Addressed: 206e5a95990284bd9254185644631cd69caa2cb8\n\n### Other (3)\n- `hv_numedges` return 0 may lack exception via `xt_error` cascade (`hv.c:1047`)\n  Addressed: https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4166555393\n- `PySequence_Length` -1 return treated as truthy (`hv_cli_prod.c:121`)\n  Addressed: 3eb728ecdfeaf182edd34efd630233fffeb66ebc\n- Dead Python 2 file `initheapyc.c`\n  Addressed: e3ad5ba3a7c45edbf5fcb8a180fa253dcb6f71f9\n\n\n----\n\nCreated with [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-03-31T17:36:12Z",
+   "body": "Would you be okay with me editing the initial message? I want to add a checkbox column and an addressed by column to each of the tables"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-31T17:54:56Z",
+   "body": "Sure, go ahead."
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-03-31T22:22:20Z",
+   "body": "(Sorry, took a bit to get a JIT-enabled python running)\n\nhttps://gist.github.com/devdanzin/b30771d22104e6fa0c30c41a6e27a355#finding-7-frame_traverse-infinite-loop-on-python-314-with-jit\n\nThis repro does not work:\n\n```\n$ PYTHON_JIT=1 python \nPython 3.14.3 (main, Mar 31 2026, 15:12:34) [GCC 15.2.1 20260214] on linux\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n>>> import sys; sys._jit.is_enabled()\nTrue\n>>> import sys\n... sys.path.insert(0, \".\")\n... \n... def hot_function(x):\n...     return x + 1\n... \n... # JIT warmup \u2014 compile many calls\n... for i in range(10000):\n...     hot_function(i)\n... \n... from guppy import hpy\n... h = hpy()\n... \n... def profiled():\n...     return h.heap()\n... \n... # Warm up profiled \u2014 triggers traversal of JIT-compiled frames\n... for i in range(10000):\n...     profiled()\n...     \nPartition of a set of 66803 objects. Total size = 9371722 bytes.\n Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)\n     0   4370   7  1787352  19   1787352  19 types.CodeType\n     1  19957  30  1537318  16   3324670  35 str\n     2  13800  21  1097488  12   4422158  47 tuple\n     3    838   1   975512  10   5397670  58 type\n     4   9655  14   733482   8   6131152  65 bytes\n     5   4269   6   717192   8   6848344  73 function\n     6    953   1   331560   4   7179904  77 dict (no owner)\n     7    694   1   278472   3   7458376  80 dict of type\n     8      2   0   262480   3   7720856  82 _io.BufferedWriter\n     9    152   0   213216   2   7934072  85 dict of module\n<332 more rows. Type e.g. '_.more' to view.>\nPartition of a set of 66803 objects. Total size = 9371722 bytes.\n Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)\n     0   4370   7  1787352  19   1787352  19 types.CodeType\n     1  19957  30  1537318  16   3324670  35 str\n     2  13800  21  1097488  12   4422158  47 tuple\n     3    838   1   975512  10   5397670  58 type\n     4   9655  14   733482   8   6131152  65 bytes\n     5   4269   6   717192   8   6848344  73 function\n     6    953   1   331560   4   7179904  77 dict (no owner)\n     7    694   1   278472   3   7458376  80 dict of type\n     8      2   0   262480   3   7720856  82 _io.BufferedWriter\n     9    152   0   213216   2   7934072  85 dict of module\n<332 more rows. Type e.g. '_.more' to view.>\n```\n\nLet me try to come up with something better to add to tests\n\nEdit: I don't see how JIT clears `f_executable`, or any way I can consistently have it nulled in the test (might need GC hooks or something). I guess I'll fix it without a patch then (since the typo is obvious)\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-31T23:05:18Z",
+   "body": "Sorry for the faulty reproducer. I think Claude saw that the script would take a lot of time and give no output (unlike in the REPL) and believed the hang happened, but if we change the code to:\n```python\nfor i in range(10000):\n    print(profiled())\n```\n\nWe can see there's no hang indeed: it repeatedly prints profiling info. "
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-03-31T23:06:52Z",
+   "body": "> set_relate triple bug \u2014 iterator it leaked, matched obj leaked, unchecked PyLong_FromSsize_t NULL passed to r->visit. On every successful set membership check.\n\nI can confirm this. However, the unchecked NULL is a wontfix. The only visitor I know of is `hv_relate_visit`, which is coded defensively:\n\nhttps://github.com/zhuyifei1999/guppy3/blob/12546ee273e0ccacf76bd4ee6277905568aca198/src/heapy/hv.c#L994-L1004\n\nIf I were to fix this, ... there are way too many unchecked callsites...\n\nCorrection, there's another visitor, but it's also written defensively:\n\nhttps://github.com/zhuyifei1999/guppy3/blob/fa1f13834cef135980392ee63073b2bbc572e5b0/src/heapy/hv_cli_rel.c#L259-L270"
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-03-31T23:45:08Z",
+   "body": "> hv_extra_type converts allocation failure to silent xt_error sentinel \u2014 loses error context, causes cascade of return NULL without exception across ~15 call sites\n\nThis does not look valid to me\n\nThis function `hv_new_extra_type` can fail at three sites:\n\nhttps://github.com/zhuyifei1999/guppy3/blob/12546ee273e0ccacf76bd4ee6277905568aca198/src/heapy/hv.c#L417-L422\nhttps://github.com/zhuyifei1999/guppy3/blob/12546ee273e0ccacf76bd4ee6277905568aca198/src/heapy/hv.c#L394-L397\nhttps://github.com/zhuyifei1999/guppy3/blob/12546ee273e0ccacf76bd4ee6277905568aca198/src/heapy/hv.c#L402-L406\n\nIn all three cases, an error is set... unless I'm missing something."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-31T23:55:06Z",
+   "body": "> > hv_extra_type converts allocation failure to silent xt_error sentinel \u2014 loses error context, causes cascade of return NULL without exception across ~15 call sites\n> \n> This does not look valid to me\n> \n> [...]\n>\n> In all three cases, an error is set... unless I'm missing something.\n\nClaude agrees with you, but thinks there's still an issue (I'm not sure I agree):\n\n> Our report's wording \"loses error context\" was imprecise. The exception IS set initially. The real issue is that the xt_error sentinel pattern delays the error return through an indirection layer, and the xt_error_* functions return -1 without ensuring an exception is still set. A more accurate description would be: \"the xt_error sentinel converts a direct error return into a deferred error via vtable dispatch, where the exception may be stale by the time callers see the -1.\"\n>\n>\n> The issue is in `hv_extra_type` (line 462-464) and its callers:\n> \n> ```c\n> // hv_extra_type, line 462-464:\n> xt = hv_new_extra_type(hv, type);\n> if (!xt)\n>     xt = &xt_error;    // Exception IS set here, but...\n> return xt;             // ...returns xt_error, not NULL\n> ```\n> \n> The problem is that `hv_extra_type` **never returns NULL** \u2014 it returns `&xt_error` on failure. This means callers split into two categories:\n> \n> 1. **Callers that check for `xt_error`** (lines 1219, 1254) \u2014 these correctly return 0/NULL and the exception propagates. These are fine.\n> \n> 2. **Callers that DON'T check for `xt_error`** (lines 575, 581, 588, 1628) \u2014 these pass `&xt_error` directly to `xt_size()`, `xt_relate()`, or `xt_traverse()`, which dispatch to `xt_error_size`, `xt_error_relate`, `xt_error_traverse`. These return -1, but **the original exception may have been cleared or overwritten** by the time the -1 propagates back up the call chain. The `xt_error_*` functions don't set their own exceptions \u2014 they just return -1.\n> \n> So the finding should be reframed: it's not that `hv_new_extra_type` fails silently \u2014 the maintainer is correct that it doesn't. It's that the `xt_error` sentinel **decouples the error return from the exception**, so callers like `hv_std_size`, `hv_std_relate`, and `hv_std_traverse` get a -1 return value but the exception may no longer be pending (if any intervening Python API call cleared it)."
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-01T00:21:14Z",
+   "body": "> Callers that DON'T check for xt_error (lines 575, 581, 588, 1628) \u2014 these pass &xt_error directly to xt_size(), xt_relate(), or xt_traverse(), which dispatch to xt_error_size, xt_error_relate, xt_error_traverse.\n\nI fail to see why this is an issue. In each of `hv_std_size`, `hv_std_relate`, and `hv_std_traverse`, they call `xt_size`, `xt_relate`, `xt_traverse` immediately after `hv_extra_type`, so \"if any intervening Python API call cleared it\" isn't possible.\n\nLine 1628 in `hv_update_referrers` is more sensible, although it will probably require a GC in the middle of that function to trigger a bug. I'll fix this one\n"
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-01T05:44:28Z",
+   "body": "> immbitset_realloc unchecked PyObject_Realloc \u2014 dereferences result through PyObject_InitVar. \n\nThis is not an issue. `PyObject_InitVar` is defensive https://github.com/python/cpython/blob/9e1f1644cd7b7661f0748bb37351836e8d6f37e2/Objects/object.c#L542-L547\n\n> ... Also corrupts object tracking via prior _Py_ForgetReference.\n\nThis is part of finding 20 and has been fixed.\n\n\n"
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-01T07:56:44Z",
+   "body": "> hv_cli_indisize_memoized_kind missing PyErr_Occurred check \u2014 the ONE outlier among 6 structurally identical memoized_kind functions\n\n`PyDict_GetItem` eats all the errors regardless, so `PyErr_Occurred` is kinda useless.\n\nhttps://github.com/python/cpython/blob/4497cf3aed587593199baadb83d68c3602ee99ec/Objects/dictobject.c#L2382-L2387\n\nProper fix would be to convert everything to PyDict_GetItemWithError & PyDict_GetItemRef I guess\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-01T08:41:35Z",
+   "body": "Sorry for the false leads.\n\nAnd thank you for the detailed feedback, I can use it to enhance the tool. "
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-01T09:12:02Z",
+   "body": "> Sorry for the false leads.\n>\n> And thank you for the detailed feedback, I can use it to enhance the tool.\n\nThe tool has been surprisingly decent. It made me re-read the code and find issues it didn't find (2b76fce9d589e8450a81728bdb78a9a415068ca7 is a big one, 4ae85a70a35a009e680c5b2fa663f661ffbeefcf has a second minor half)\n\nI think it's just that it's been a lot of work verifying everything it said, writing test cases, (re-)understanding what is going on... writing fix, etc. Luckily it's been mostly correct about what it's saying, unlike certain stories I heard about other agents... \ud83d\ude2c"
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-01T10:53:40Z",
+   "body": "> NyNodeTuple_Type missing tp_dealloc \u2014 items stored via PyTuple_SET_ITEM never decref'd. Leaks refs on every NodeTuple destruction. Used as dict keys in classifier memoization.\n\n`NyNodeTuple_Type.tp_dealloc` inherits `tuple_dealloc` from its base class (checked via gdb), which does Py_XDECREF on all the items. I assume this is invalid too?\n\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-01T11:06:49Z",
+   "body": "Not invalid, this finding is a false positive indeed. The inherited `tuple_dealloc` correctly handles item cleanup. The scanner flagged the missing explicit slot without accounting for inheritance from `PyTuple_Type` and the agent didn't catch it, nor did I."
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-01T11:13:46Z",
+   "body": "Oh I meant the finding wasn't valid. Thanks for confirming!"
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-01T11:28:26Z",
+   "body": "> hv_cli_prod_le borrowed refs across arbitrary Python comparisons \u2014 PyTuple_GetItem borrowed refs used across PyObject_RichCompareBool which runs __eq__/__le__\n\nI'm trying to reason why this is an issue. Normally, you can't call PyObject_RichCompareBool on borrowed references, because `PyObject_RichCompareBool` can enter Python code, and that might unref the objects and end up destroying them, while we are still using the objects as borrowed references.\n\nHowever, in this instance, that can't happen. The tuple holds references to the objects we are borrowing from, and we own strong references to both tuples as function arguments, so Python code can't destroy these objects on borrowed refs, right? Unless Python code somehow mutates tuples but that's illegal."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-01T11:49:45Z",
+   "body": "Another false positive, sorry. The refcount auditor flagged \"borrowed ref across Python call\" as a blanket rule without reasoning about whether the container guarantees the ref stays alive.\n\nThese will all be improved in the tool rule set, thank you!"
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-02T07:44:10Z",
+   "body": "> Unguarded PyErr_Clear in lazy_init_hv_cli_prod (hv_cli_prod.c:62)\n\nI want it to eat all the errors and just generate a warning & use a fallback value. Is there a better way of doing this, or am I misunderstanding?\n\nFor context, the value I need is `sizeof(PyGC_Head)`, to compute the pointer to get the tracemalloc traceback. It tries to use `_testinternalcapi.SIZEOF_PYGC_HEAD` if possible, which is why it can fail."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-02T08:29:23Z",
+   "body": "This is a false positive then, because it missed the intent and focused instead on the code pattern.\n\nAn unguarded `PyErr_Clear` could e.g. swallow `MemoryError` (suggesting something like `PyErr_ExceptionMatches(PyExc_ImportError)` could be used instead?), but it's a non-issue here."
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-02T09:02:37Z",
+   "body": "> suggesting something like PyErr_ExceptionMatches(PyExc_ImportError) could be used instead?\n\nHmm, I think I do prefer a catchall for generic errors. Maybe `PyErr_ExceptionMatches(PyExc_Exception) && !PyErr_ExceptionMatches(PyExc_MemoryError)`"
+  },
+  {
+   "author": "zhuyifei1999",
+   "created_at": "2026-04-03T05:48:13Z",
+   "body": "> PySys_GetObject deprecated in 3.13 (hv_cli_prod.c:34)\n\nIs this actually true? I can't find any deprecation notice about it.\n\nhttps://github.com/python/cpython/blob/main/Include/sysmodule.h#L13\nhttps://docs.python.org/3/c-api/sys.html#c.PySys_GetObject\n\n> r->visit return value ignored in nodeset_relate_visit (nodeset.c:432)\n> nodegraph_relate returns 0 instead of propagating visit errors (nodegraph.c:760-775)\n\nI had a closer look. I don't believe this is an issue, since if there's a visit error, in both visitors, the error is also recorded in the \"arg\" that's subsequently checked by the defensive visitors (https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4166218750). \n\nI guess the code is indeed a bit confusing and the return values are inconsistent (some return 0, some return 1, some ignore errors, some don't, but all the visitor cares about is if it is -1, and even then, it only matters if the error originates outside the visitor), but since there are quite a few relators I'd need to change, I don't find it worth changing if it's not causing problems.\n\nThis is the last of the findings addressed"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-03T10:35:13Z",
+   "body": "> > PySys_GetObject deprecated in 3.13 (hv_cli_prod.c:34)\n> \n> Is this actually true? I can't find any deprecation notice about it.\n\nIt's not correct, but amusingly Google's AI summary also thinks it was deprecated in 3.13. I think both AIs get fooled by the fact that a nearby function was deprecated in 3.13: https://docs.python.org/3/c-api/sys.html#c.PySys_GetObject.\n\n> > r->visit return value ignored in nodeset_relate_visit (nodeset.c:432)\n> > nodegraph_relate returns 0 instead of propagating visit errors (nodegraph.c:760-775)\n> \n> I had a closer look. I don't believe this is an issue, since if there's a visit error, in both visitors, the error is also recorded in the \"arg\" that's subsequently checked by the defensive visitors ([#51 (comment)](https://github.com/zhuyifei1999/guppy3/issues/51#issuecomment-4166218750)).\n> \n> I guess the code is indeed a bit confusing and the return values are inconsistent (some return 0, some return 1, some ignore errors, some don't, but all the visitor cares about is if it is -1, and even then, it only matters if the error originates outside the visitor), but since there are quite a few relators I'd need to change, I don't find it worth changing if it's not causing problems.\n\nClaude agrees with you, not a bug.\n\n> This is the last of the findings addressed\n\nGreat, thank you for your amazing response to this report! Let's keep working on improving guppy3 \ud83e\udd47."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "12546ee273e0ccacf76bd4ee6277905568aca198",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "89c9953f7157f6a0cbeb08cac0ab142cc5749bb5",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "16ed1df12f7f01730d49db81cf936704af0dd2f0",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "84edf4a51ef62638eecc2693635f12e50a79d82f",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6c3483ecd3d4a5cce91734620157fc08c8defdff",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "488f1b960d94bf5d29bc2d4aeba199d044f45023",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3f4ebb8ace7550a17d4ed756d72e1f0832f2b2e3",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d1fb7077a06f80c76ca695bc5bb80b6e20c92ff4",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4ae85a70a35a009e680c5b2fa663f661ffbeefcf",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "29885239ece94f65069331c76776e41ef0bb0324",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "736a848b461e970828933c851d685364cb787353",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f179e321975f3ba6b382c87c11371cc438d8254d",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b6a10a686d59cd7bab66390469eccfe64e131e5b",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "aa066e0ed9828a5d0b7a27b34141da36531f8ca0",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "172fc2147f467471befedeacdf24a2575a0f518d",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "44763a7cab09560ce4176c9100a27142e4b7ec6d",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0bac6f0e4379e50cdd9c3ecd860236ba0c41f2b4",
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/cext-review-toolkit/issues/25",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "zhuyifei1999"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/cext-review-toolkit/pull/26",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

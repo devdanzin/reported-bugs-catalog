@@ -1,0 +1,110 @@
+{
+ "repo": "python/cpython",
+ "number": 145076,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/145076",
+ "title": "`__lazy_import__` throws a `SystemError` if `globals` is not any dict",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "interpreter-core",
+  "topic-importlib"
+ ],
+ "created_at": "2026-02-21T11:43:51Z",
+ "closed_at": "2026-02-22T11:07:25Z",
+ "body": "# Bug report\n\n### Bug description:\n\n\nThe interpreter will raise a `SystemError` when `__lazy_import__` is called with a second positional argument:\n\n```python\n>>> __lazy_import__('', 1)\nTraceback (most recent call last):\n  File \"<python-input-82>\", line 1, in <module>\n    __lazy_import__('', 1)\n    ~~~~~~~~~~~~~~~^^^^^^^\nSystemError: Objects/dictobject.c:2499: bad argument to internal function\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-145086\n* gh-145088\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "johnslavik",
+   "created_at": "2026-02-21T12:40:32Z",
+   "body": "This reproduces just as well without any positional arguments:\n\n```pycon\n>>> __lazy_import__(name='foo', globals=1)\nTraceback (most recent call last):\n  File \"<python-input-0>\", line 1, in <module>\n    __lazy_import__(name='foo', globals=1)\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\nSystemError: Objects/dictobject.c:2499: bad argument to internal function\n```\n\n`globals` isn't validated to be a `dict` or `frozendict` before being passed to `PyDict_GetItemRef` in `builtin___lazy_import___impl`.\n\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-21T18:44:20Z",
+   "body": "I wrote https://github.com/python/cpython/pull/145086 to check *globals* type before calling `PyDict_GetItemRef()` on it."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-22T21:44:46Z",
+   "body": "Thanks for the bug report @devdanzin."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145079",
+   "commit": null,
+   "actor": "johnslavik"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ab66a5cabe54aeac0746e5453033221901bdd4f1",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145086",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5f4feba3c4e6553b3a16b9514b664c52d0b81cc7",
+   "actor": "andresliszt"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145088",
+   "commit": null,
+   "actor": "andresliszt"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6ca585195efbfa66fa6f6f08e842252f741613cd",
+   "actor": "andresliszt"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "22ed965bc1472d5cabaf58f8cc1544c1f05af480",
+   "actor": "andresliszt"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3d5d090e565f25bee85c8dfa39eebd0dbd8ff807",
+   "actor": "andresliszt"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2be2dd5fc219a5c252d72f351c85db14314bfca5",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ff15c9e3575fc6b92dd8590cafbee08772065d17",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b55c050becd1a97ad70f7670a49111fe7264d39d",
+   "actor": "ljfp"
+  }
+ ]
+}

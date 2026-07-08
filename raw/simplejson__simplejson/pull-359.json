@@ -1,0 +1,48 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 359,
+ "type": "pull",
+ "url": "https://github.com/simplejson/simplejson/pull/359",
+ "title": "Fix NULL dereferences on OOM in module init and static string init",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:42:57Z",
+ "closed_at": "2026-04-06T17:41:30Z",
+ "body": "Fixes #353 (part of #348).\n\n## Changes\n\n1. **`moduleinit`**: Add `if (m == NULL) return NULL;` after `PyModule_Create`.\n2. **`_encoded_const`**: Add NULL checks after each `JSON_InternFromString` for `s_null`, `s_true`, `s_false`.\n3. **`encoder_listencode_dict`/`list`**: Check each `JSON_InternFromString` individually to prevent partial init leaving NULL statics for subsequent calls.\n\nAll three are OOM-only paths, but they cause hard crashes (NULL dereference) instead of raising `MemoryError`.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "188b4378d3a0b94c2b214c4a1ea25f154208d01a",
+   "actor": "etrepum"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dbf6f64fcea1b8b95ab5b9ad9502899a006990b9",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1621e6cc818b2a097e316a3f193b1458a8cb7c27",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae7cd18c2df9ba696fad92a31e2755ef468a1b25",
+   "actor": "netbsd-srcmastr"
+  }
+ ]
+}

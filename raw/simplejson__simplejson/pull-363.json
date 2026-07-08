@@ -1,0 +1,48 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 363,
+ "type": "pull",
+ "url": "https://github.com/simplejson/simplejson/pull/363",
+ "title": "Move lazy-init static string caches to module init (free-threading safety)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-07T09:17:40Z",
+ "closed_at": "2026-04-08T00:05:24Z",
+ "body": "Part of #362.\n\n## Summary\n\nMove 11 function-scoped `static PyObject*` variables from lazy initialization to\neager initialization in `init_constants()` / `moduleinit()`. Under free-threaded\nPython (PEP 703), the lazy-init pattern is a data race \u2014 two threads can both see\nNULL, both allocate, and one result leaks.\n\n## Changes\n\n**Moved to `init_constants()`** (interned strings + empty tuple):\n- `s_null`, `s_true`, `s_false` (from `_encoded_const`)\n- `open_dict`, `close_dict`, `empty_dict` (from `encoder_listencode_dict`)\n- `open_array`, `close_array`, `empty_array` (from `encoder_listencode_list`)\n- `sortargs` \u2014 empty tuple (from `encoder_dict_iteritems`)\n\n**Moved to `moduleinit()`** (requires import):\n- `itemgetter0` \u2014 `operator.itemgetter(0)` (from `encoder_new`)\n\nAll 11 are now file-scope statics with a `JSON_` prefix, initialized once during\nmodule import (which is serialized by Python's import lock). The functions that\npreviously did lazy init now use the pre-initialized globals directly.\n\n`joinfn` (Python 2 only, inside `#if PY_MAJOR_VERSION < 3`) is left as-is since\nfree-threading only applies to Python 3.13+.\n\n## Test plan\n\n- [x] `python -m pytest simplejson/tests/ -x -q` \u2014 147 tests pass\n- [x] C extension loads correctly, all moved constants work\n- [x] Net -15 lines (69 insertions, 84 deletions)\n\nFound using [ft-review-toolkit](https://github.com/devdanzin/ft-review-toolkit).\n\n<sub>This PR was drafted by Claude Code and reviewed by a human.</sub>",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6d7d8fa0d2cb05964e639a631ea5a7a7138ff1bc",
+   "actor": "etrepum"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dbf6f64fcea1b8b95ab5b9ad9502899a006990b9",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1621e6cc818b2a097e316a3f193b1458a8cb7c27",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae7cd18c2df9ba696fad92a31e2755ef468a1b25",
+   "actor": "netbsd-srcmastr"
+  }
+ ]
+}

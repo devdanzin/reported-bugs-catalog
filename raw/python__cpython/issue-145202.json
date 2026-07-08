@@ -1,0 +1,76 @@
+{
+ "repo": "python/cpython",
+ "number": 145202,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/145202",
+ "title": "Segfault from `unicodedata.iter_graphemes` on a free threaded build",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2026-02-25T08:37:19Z",
+ "closed_at": "2026-02-26T09:30:59Z",
+ "body": "# Crash report\n\n### What happened?\n\nA free-threaded build will segfault when calling `unicodedata.iter_graphemes()` and storing the result, even with `PYTHON_GIL=0`.\n\n```python\nimport unicodedata\n\nres = unicodedata.iter_graphemes(\"a\")\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\nGBI_dealloc (self=0x20002ac2b60) at ./Modules/unicodedata.c:1992\n1992        Py_DECREF(((GraphemeBreakIterator *)self)->iter.str);\n\n#0  GBI_dealloc (self=0x20002ac2b60) at ./Modules/unicodedata.c:1992\n#1  0x000055555573b0b7 in _Py_Dealloc (op=0x20002ac2b60) at Objects/object.c:3271\n#2  0x000055555570cbce in Py_DECREF (lineno=513, op=0x20002ac2b60, filename=<optimized out>) at ./Include/refcount.h:356\n#3  Py_XDECREF (op=0x20002ac2b60) at ./Include/refcount.h:513\n#4  dictkeys_decref (dk=dk@entry=0x200020d4a10, use_qsbr=true) at Objects/dictobject.c:494\n#5  0x000055555571132b in clear_lock_held (op=op@entry=0x2000270ccd0) at Objects/dictobject.c:2998\n#6  0x0000555555711578 in PyDict_Clear (op=0x2000270ccd0) at Objects/dictobject.c:3027\n#7  0x00005555557174a9 in dict_tp_clear (op=0x20002ac2b60) at Objects/dictobject.c:4843\n#8  0x00005555558f5c61 in delete_garbage (state=0x7fffffffd5c0) at Python/gc_free_threading.c:1780\n#9  gc_collect_internal (interp=0x555555d33880 <_PyRuntime+174016>, state=0x7fffffffd5c0, generation=2) at Python/gc_free_threading.c:2375\n#10 gc_collect_main (tstate=0x555555d6bfd8 <_PyRuntime+405272>, generation=2, reason=_Py_GC_REASON_SHUTDOWN) at Python/gc_free_threading.c:2446\n#11 0x000055555594203e in finalize_modules (tstate=tstate@entry=0x555555d6bfd8 <_PyRuntime+405272>) at Python/pylifecycle.c:1793\n#12 0x000055555594081a in _Py_Finalize (runtime=<optimized out>) at Python/pylifecycle.c:2295\n#13 0x00005555559aa459 in Py_RunMain () at Modules/main.c:774\n#14 0x00005555559aafe1 in pymain_main (args=args@entry=0x7fffffffda40) at Modules/main.c:802\n#15 0x00005555559ab042 in Py_BytesMain (argc=<optimized out>, argv=0xffffffffffffffe8) at Modules/main.c:826\n#16 0x00007ffff7c2a575 in __libc_start_call_main (main=main@entry=0x5555555ed170 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffdb98) at ../sysdeps/nptl/libc_start_call_main.h:58\n#17 0x00007ffff7c2a628 in __libc_start_main_impl (main=0x5555555ed170 <main>, argc=2, argv=0x7fffffffdb98, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\n    stack_end=0x7fffffffdb88) at ../csu/libc-start.c:360\n#18 0x00005555555ed0a5 in _start ()\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a6+ free-threading build (heads/main:1ac9d138ae0, Feb 25 2026, 05:27:56) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-145203\n* gh-145216\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-02-25T14:04:58Z",
+   "body": "Good catch. I think that remove the `tp_clear` slots would be a better solution. These objects are virtually immutable and cannot create a loop (they can only participate in a loop created by a str subclass)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a9b583dd270a0a02c846f95ac918d7c774eaa31c",
+   "actor": "gourijain029-del"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145203",
+   "commit": null,
+   "actor": "gourijain029-del"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4134f4dd911078e0630d11097609c94c7561ab99",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145216",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "812ef66759f9fe27d68283d8e67d6cd3eb512be2",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3032154b86a8d5a5fd41659bc4fe1b5550b4efad",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5179bd7986679711cf23345f3dd3ee784c9c3ce2",
+   "actor": "ljfp"
+  }
+ ]
+}

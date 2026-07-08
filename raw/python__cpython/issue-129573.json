@@ -1,0 +1,104 @@
+{
+ "repo": "python/cpython",
+ "number": 129573,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/129573",
+ "title": "Failed assertion in `_PyUnicode_Equal` from `calculate_suggestions` with non-string candidate",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.13",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2025-02-02T11:31:19Z",
+ "closed_at": "2025-06-29T14:56:52Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe interpreter will abort if `runpy._run_module_code` is called with invalid values:\n```python\nimport runpy\nrunpy._run_module_code(\"A\", {0: \"\"}, \"\")\n```\n\nAnother way to trigger:\n```python\nclass Parent:\n    def __dir__(self):\n        return [0]\n\nclass WithNonStringAttrs(Parent):\n    blech = None\n\nWithNonStringAttrs().bluch\n```\n\nAbort message:\n```\npython: Objects/unicodeobject.c:10799: _PyUnicode_Equal: Assertion `PyUnicode_Check(str2)' failed.\nAborted (core dumped)\n```\n\nThe suggestions machinery is the source of the issue, with `calculate_suggestions` calling `_PyUnicode_Equal(name, item)` for an item that might not be unicode.\n\nOnly aborts in 3.12. In 3.13 and main it results in an error in the traceback machinery:\n```\nException ignored in the internal traceback machinery:\nTraceback (most recent call last):\n  File \"/home/danzin/projects/upstream_cpython/Lib/traceback.py\", line 139, in _print_exception_bltin\n    return print_exception(exc, limit=BUILTIN_EXCEPTION_LIMIT, file=file, colorize=colorize)\n  File \"/home/danzin/projects/upstream_cpython/Lib/traceback.py\", line 129, in print_exception\n    te = TracebackException(type(value), value, tb, limit=limit, compact=True)\n  File \"/home/danzin/projects/upstream_cpython/Lib/traceback.py\", line 1090, in __init__\n    suggestion = _compute_suggestion_error(exc_value, exc_traceback, wrong_name)\n  File \"/home/danzin/projects/upstream_cpython/Lib/traceback.py\", line 1531, in _compute_suggestion_error\n    return _suggestions._generate_suggestions(d, wrong_name)\nTypeError: all elements in 'candidates' must be strings\n[...]\n```\n\nWill submit a PR shortly.\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.12\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.12.8+ (heads/3.12:580d7810946, Feb  2 2025, 01:56:47) [GCC 13.3.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-129574\n* gh-130997\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-02-02T16:15:13Z",
+   "body": "@picnixz, could you take a second look at this? I think this issue is more serious than it looks, and I want a core dev opinion before applying security labels.\n\n- `_PyUnicode_Equal` should be *crashing* here, but instead, it's doing something much worse: it's accessing arbitrary memory, via `unicode_compare_eq`, which is secretely passing in the reproducer. This means we're prone to buffer overflow attacks!\n- This code affects 3.11+, including main, but we sidestep the issue on 3.13+ by incidentally having a few checks beforehand that prevent a non-string from making it to that piece of code. @devdanzin, I'll close your PR, then please open a new one for main so we can backport accordingly.\n\nI'm not certain on how accessible the attack is, but it's not making me particularly comfortable. There's some other ways to trigger this, for example:\n\n```py\nglobals()[1] = \"a\"\nb\n```\n\nMy main concern would be things that do some sort of runtime introspection or construction, but I'm definitely doing a good deal of speculation. Imagine a library that wants to expose JSON responses as objects, they might design an object like this:\n\n```py\nclass DynamicJSON:\n    def __init__(self, response):\n        self.response = response\n        for k, v in response.items():\n            setattr(self, str(k), v)\n\n    def __dir__(self):\n        return list(self.response.keys())\n```\n\nSomeone could in theory hijack the API response, and then wait for a developer downstream to mistype and get a `NameError`. (I do understand this is far-fetched, but my point is that we probably shouldn't leave invisible buffer overflows on 3.11.)\n\nTL;DR Do you think this is worth backporting to 3.11?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-02-02T16:21:04Z",
+   "body": "> I want a core dev opinion before applying security labels.\n\nI don't think that it deserves to be handled a security vulnerability: an attacker requires to be able to execute arbitrary Python code, so it's already game over."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-02-02T16:25:51Z",
+   "body": "Right--but my point is that this sort of thing could reasonably slip past reviews for supply chain attacks.\n\nIf you were to look at the reproducer (especially the `DynamicJSON` example I gave), would that scream \"security vulnerability\" to you? (It certainly doesn't to me!) I'm worried that we're giving attackers a way to slip invisible buffer overflows into codebases, but I'll definitely yield to you."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-02-02T16:27:58Z",
+   "body": "> Right--but my point is that this sort of thing could reasonably slip past reviews for supply chain attacks.\n\nIMO there are simpler ways to inject malwares."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-02-02T16:36:33Z",
+   "body": "Ok, I'll leave it up to you. Is there any downside to backporting the fix?"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-02T16:37:00Z",
+   "body": "> There's some other ways to trigger this, for example:\n\nI think this is something we already had in another issue (I think @ncoghlan was involved in this issue but I don't exactly remember which one it was). I think we decided that messing up with globals like this is at your own risk though and didn't treat it as a security issue.\n\n> it's accessing arbitrary memory, via\u00a0unicode_compare_eq\n\nAs I'm on mobile it's quite hard to check the relevant code part but IIUC, you mean we are accessing other part of the memory because we are not crashing in a release build (there is no issue with DEBUG builds right? just that release builds may access arbitrary memory because we didn't abort in time).\n\nIf this is the case, it's indeed a possible security issue but we need to take into account how likely it can be exploited. As I don't have time (nor the resources) to audit this, I'll cc some other security experts: @gpshead @sethmlarson (@alex if you can have a look at it, it would be appreciated, thanks in advance).\n\n---\n\nNow, even though it could be a hard-to-exploit vulnerability, I still think we can afford a backport up to 3.9 though I'll wait for \"practical\" experts' opinion (this kind of security issues is not my area of expertise though I have some skills as part of my curriculum).\n\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-02-02T16:41:56Z",
+   "body": "> you mean we are accessing other part of the memory because we are not crashing in a release build (there is no issue with DEBUG builds right? just that release builds may access arbitrary memory because we didn't abort in time).\n\nYeah, `PyUnicode_LENGTH` and `PyUnicode_DATA` are called on something that can be any arbitrary Python object.\n\n> Now, even though it could be a hard-to-exploit vulnerability, I still think we can afford a backport up to 3.9 though I'll wait for \"practical\" experts' opinion\n\nNote that this doesn't affect <3.11, the relevant code there uses functions that do check if the argument is a unicode object. \n\nI'm inclined to follow Victor's opinion here--if he thinks the chance of a vulnerability is too small, then it's probably fine to keep the fix on 3.12+"
+  },
+  {
+   "author": "alex",
+   "created_at": "2025-02-02T16:48:02Z",
+   "body": "In Rust parlance we'd say that this code is \"unsound\" -- there's not a vulnerability to be directly exploited, but depending on the code written by the user, it may be possible to produce a vulnerability.\n\nThe question here is whether there is non-pathological Python code that might make this exploitable by a user? I'm not sure if there is."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-02T17:22:57Z",
+   "body": "I can't think of a non-pathological path that could be exploited. Maybe we could make the interpreter segfault though but again, I don't have my laptop to perform some experiments (in this case I'm just interested in making a segfault / memory access violation, which would make it more of a DoS attack). \n\nFor now, let's treat it as a regular bug and fix it on 3.12+. If I have time next week, I'll see if we can make it more catastrophic but I don't see an obvious way to do it (and if Alex doesn't see it either then I doubt I'd be able to find one)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-06-04T15:23:10Z",
+   "body": "Can you still reproduce the issue? I failed to reproduce the issue with the two reproducer of the initial message."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-06-29T14:54:51Z",
+   "body": "I think it was fixed in baccfdb3d4d004cfb5308674e5e6ea6e598abcd7 (https://github.com/python/cpython/issues/130999). I also can't reproduce on 3.14 nor main so I'll close this one as completed."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/129574",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130997",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130999",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  }
+ ]
+}

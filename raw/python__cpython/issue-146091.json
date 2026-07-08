@@ -1,0 +1,84 @@
+{
+ "repo": "python/cpython",
+ "number": 146091,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146091",
+ "title": "`SystemError` from `termios.tcsetwinsize`passing `NULL` to `PyLong_AsLong`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2026-03-17T22:30:02Z",
+ "closed_at": "2026-03-19T10:50:20Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to raise `SystemError` from `termios.tcsetwinsize` by passing a sequence that raises on `__getitem__` to it.\n\n### Automated diagnosis:\n\nBug: `termios.tcsetwinsize` passes `NULL` to `PyLong_AsLong`. `PySequence_GetItem(winsz, 0)` can return `NULL` (e.g., `__getitem__` raises). The result is passed directly to `PyLong_AsLong(NULL)` which calls `PyErr_BadInternalCall()`, masking the real error with `SystemError`.\n\nFile: `Modules/termios.c`, lines 502-510\n\nMRE:\n```python\nimport termios\nimport os\n\nfd = os.open(\"/dev/tty\", os.O_RDWR | os.O_NOCTTY)\n\nclass BadSequence:\n    def __len__(self):\n        return 2\n    def __getitem__(self, idx):\n        raise TypeError\n\ntermios.tcsetwinsize(fd, BadSequence())\n```\n\nBacktrace:\n```python\nTraceback (most recent call last):\n  File \"/home/danzin/crashers/trigger_termios_null_pylong.py\", line 23, in <module>\n    termios.tcsetwinsize(fd, BadSequence())\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\nSystemError: Objects/longobject.c:598: bad argument to internal function\n```\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/termios.c all deep` command.\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:e0f7c1097e1, Mar 17 2026, 18:10:52) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146147\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "okiemute04",
+   "created_at": "2026-03-18T19:59:06Z",
+   "body": "@devdanzin This is interesting. Let me work on this issue. I do understand the problem is that PySequence_GetItem can return NULL, which gets passed to PyLong_AsLong, causing a SystemError instead of the original exception. I'll add NULL checks and proper error propagation, and any suggestions that can help?"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae90cb10a635e284cf9f0ba4c9c83118e0040500",
+   "actor": "okiemute04"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146147",
+   "commit": null,
+   "actor": "okiemute04"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5e8ef92bf1efd57cf69d73f40b383f974c70be5c",
+   "actor": "okiemute04"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "113df89b82b64e5824ba1fb6c3154d132278f7ff",
+   "actor": "okiemute04"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "89a154a0c0f6b8844e1fe7fd761f75ead13608bd",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2f8f8bc128ede3ee0c2b88117474543ef1b33a41",
+   "actor": "ljfp"
+  }
+ ]
+}

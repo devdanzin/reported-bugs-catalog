@@ -1,0 +1,24 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 148,
+ "type": "pull",
+ "url": "https://github.com/dpdani/cereggii/pull/148",
+ "title": "Fix cyclic-GC double-counting of pages shared across a resize",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "COLLABORATOR",
+ "labels": [],
+ "created_at": "2026-07-07T22:24:27Z",
+ "closed_at": null,
+ "body": "\nThis is the real fix for gist bug #2 (\"concurrent stores of a deferred-refcount key corrupt the key's refcount\"). rr showed the refcount is *not* corrupted \u2014 the bug is a **cyclic-GC double-count of shared pages**.\n\n## Root cause\n\n`AtomicDictPage` is a `PyObject` but is created with `PyObject_New` (not GC-tracked), and `AtomicDictMeta_traverse` walks its pages by calling `AtomicDictPage_traverse(self->pages[i], ...)` **inline** \u2014 i.e. the meta reports its pages' keys/values to the cyclic GC directly.\n\nOn a resize, `meta_copy_pages` **shares the page objects** between the old and new meta (both hold a reference; the pages are copied by pointer). A stale per-accessor `storage->meta` (e.g. an exited worker's accessor storage, still in `self->accessors` and visited by `AtomicDict_traverse`) keeps the **old meta alive**. So the same page object is reachable from two live metas, and each meta's traverse reports that page's keys \u2014 the GC subtracts one internal reference **per meta** for a key that the page references only **once**.\n\n`update_refs` then computes `gc_refs = Py_REFCNT \u2212 internal_refs` as negative, and the debug GC aborts:\n\n```\nPython/gc_free_threading.c: validate_gc_objects:\n    Assertion \"gc_get_refs(op) >= 0\" failed: refcount is too small\n  object type name: function\n```\n\nIt needs enough concurrent inserters to fill a page and force a resize (8 threads reproduce; 2 don't \u2014 8 \u00d7 `reservation_buffer_size` = a full page). It is fatal specifically with **deferred-refcount keys** (functions/types/modules): their `gc_refs` seed is `Py_REFCNT \u2212 _Py_REF_DEFERRED`, which is small, so one extra subtraction crosses zero. On a release build the assertion is compiled out and no crash was observed under heavy stress, but the miscount is real.\n\n### How I pinned it (rr)\n\nReverse-watching the key's `ob_tid` (which the GC repurposes as `gc_refs`) from the assertion showed the decrements come from **two different meta objects** (`AtomicDictMeta_traverse` at two addresses) both traversing the **same page object** \u2014 the smoking gun. (An earlier reverse-watch on `ob_ref_local` proved the refcount itself is correct, which is what redirected the diagnosis away from refcounting.)\n\n## Fix\n\nMake each page a first-class GC node so a shared page is traversed **once** by the collector regardless of how many metas reference it:\n\n- `AtomicDictPage_Type`: add `Py_TPFLAGS_HAVE_GC` and `tp_traverse = AtomicDictPage_traverse`.\n- `AtomicDictPage_New`: `PyObject_GC_New` + `PyObject_GC_Track`.\n- `AtomicDictPage_dealloc`: `PyObject_GC_UnTrack` first.\n- `AtomicDictMeta_traverse`: `Py_VISIT(self->pages[i])` instead of recursing.\n\n11 lines of source. Works for all key types, and doesn't touch reference counting or vendor any CPython internals.\n\n## Testing\n\nBuilt on a debug free-threaded ASan CPython 3.14.\n- New regression test `test_concurrent_store_forcing_resize_gc_safe` (8 threads storing a function key, forcing a resize, then `gc_collect_until_stable()`): aborts on the unfixed build, passes with the fix.\n- Original reproducer: 0/15 (was 5/5). 40-round soak with function + type keys: clean.\n- Full suite green. (`test_racy_deletes` is a pre-existing flaky lock-free-read crash \u2014 ~1/20 on *pristine* main too, unrelated to this change; deselect it or treat separately.)\n- ruff + black clean.\n\n## How this replaces the gist's proposed fix\n\nThe gist proposed guarding `_Py_SetWeakrefAndIncref` for deferred objects. rr showed that was a red herring: the refcount is correct, and the guard's only real effect (keeping `ob_ref_local` stable single-threaded) fixes a benign asymmetry that already self-corrects via `_Py_MergeZeroLocalRefcount`. This GC fix is the actual root cause, so the `fix/deferred-refcount-key` draft can be dropped. (If you still want the refcount-hygiene tidy-up as a separate change, happy to, but it isn't needed for correctness.)\n\nFound by fusil in allocation-failure mode.\n\n*Investigation, fix and PR draft by Claude Code (Opus 4.8).*\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dpdani/cereggii/issues/149",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

@@ -1,0 +1,121 @@
+{
+ "repo": "python/cpython",
+ "number": 127870,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127870",
+ "title": "Segfaults in ctypes _as_parameter_ handling when called with `MagicMock`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-ctypes",
+  "type-crash"
+ ],
+ "created_at": "2024-12-12T15:03:45Z",
+ "closed_at": "2024-12-13T13:06:45Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter by calling any of the 3 functions below with `MagicMock` as argument. It takes a long time to trigger the crash (up to 3 minutes in my slow machine).\n\n```python\nfrom unittest.mock import MagicMock\nimport _pyrepl._minimal_curses\n\nobj = _pyrepl._minimal_curses.tparm(MagicMock(), 0, 0, 0, 0, 0, 0, 0)\nobj = _pyrepl._minimal_curses.setupterm(MagicMock(), 0)\nobj = _pyrepl._minimal_curses.tigetstr(MagicMock())\n```\n\nThe backtrace is very long, with over 87k entries in one case. Here's part of it:\n```gdb\n#0  0x00005555556b04e6 in compare_unicode_unicode (mp=0x0, dk=0x55556ce6f460, ep0=0x55556ce6f500, ix=38, key=0x7ffff73ae860, hash=5657245593745306375)\n    at Objects/dictobject.c:1136\n#1  0x00005555556af1cb in do_lookup (mp=mp@entry=0x0, dk=dk@entry=0x55556ce6f460, key=key@entry=0x7ffff73ae860, hash=hash@entry=5657245593745306375, \n    check_lookup=check_lookup@entry=0x5555556b04da <compare_unicode_unicode>) at Objects/dictobject.c:1066\n#2  0x00005555556af242 in unicodekeys_lookup_unicode (dk=dk@entry=0x55556ce6f460, key=key@entry=0x7ffff73ae860, hash=hash@entry=5657245593745306375)\n    at Objects/dictobject.c:1151\n#3  0x00005555556b3c99 in _Py_dict_lookup (mp=0x7fffbe6a3c50, key=key@entry=0x7ffff73ae860, hash=hash@entry=5657245593745306375, \n    value_addr=value_addr@entry=0x7fffff7ff0f0) at Objects/dictobject.c:1265\n#4  0x00005555556b4746 in _PyDict_GetItemRef_KnownHash (op=<optimized out>, key=key@entry=0x7ffff73ae860, hash=hash@entry=5657245593745306375, \n    result=result@entry=0x7fffff7ff130) at Objects/dictobject.c:2317\n#5  0x00005555556ff874 in find_name_in_mro (type=type@entry=0x55556ce6cca0, name=name@entry=0x7ffff73ae860, error=error@entry=0x7fffff7ff194)\n    at Objects/typeobject.c:5108\n#6  0x00005555556ffa3c in _PyType_LookupRef (type=type@entry=0x55556ce6cca0, name=name@entry=0x7ffff73ae860) at Objects/typeobject.c:5260\n#7  0x00005555556ca8b8 in _PyObject_GenericSetAttrWithDict (obj=obj@entry=0x7fffbe6b9920, name=0x7ffff73ae860, value=0x555555ae8100 <_Py_NoneStruct>, \n    dict=dict@entry=0x0) at Objects/object.c:1773\n#8  0x00005555556cab5f in PyObject_GenericSetAttr (obj=obj@entry=0x7fffbe6b9920, name=<optimized out>, value=<optimized out>) at Objects/object.c:1849\n#9  0x00005555556f541e in wrap_setattr (self=0x7fffbe6b9920, args=<optimized out>, wrapped=0x5555556cab4d <PyObject_GenericSetAttr>) at Objects/typeobject.c:8792\n#10 0x000055555567ee41 in wrapperdescr_raw_call (descr=descr@entry=0x7ffff7b002f0, self=self@entry=0x7fffbe6b9920, args=args@entry=0x7fffc5b5bd90, \n    kwds=kwds@entry=0x0) at Objects/descrobject.c:531\n#11 0x000055555567f2c5 in wrapperdescr_call (_descr=_descr@entry=0x7ffff7b002f0, args=0x7fffc5b5bd90, args@entry=0x7fffc5a48c50, kwds=kwds@entry=0x0)\n    at Objects/descrobject.c:569\n#12 0x0000555555672a51 in _PyObject_MakeTpCall (tstate=tstate@entry=0x555555b564c0 <_PyRuntime+299040>, callable=callable@entry=0x7ffff7b002f0, \n    args=args@entry=0x7ffff7e29850, nargs=<optimized out>, keywords=keywords@entry=0x0) at Objects/call.c:242\n#13 0x0000555555672c91 in _PyObject_VectorcallTstate (tstate=0x555555b564c0 <_PyRuntime+299040>, callable=callable@entry=0x7ffff7b002f0, \n    args=args@entry=0x7ffff7e29850, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:166\n#14 0x0000555555672ce7 in PyObject_Vectorcall (callable=callable@entry=0x7ffff7b002f0, args=args@entry=0x7ffff7e29850, nargsf=<optimized out>, \n    kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#15 0x00005555557a293c in _PyEval_EvalFrameDefault (tstate=0x555555b564c0 <_PyRuntime+299040>, frame=0x7ffff7e297c8, throwflag=0) at Python/generated_cases.c.h:1839\n#16 0x00005555557b0957 in _PyEval_EvalFrame (tstate=tstate@entry=0x555555b564c0 <_PyRuntime+299040>, frame=<optimized out>, throwflag=throwflag@entry=0)\n    at ./Include/internal/pycore_ceval.h:119\n#17 0x00005555557b0a76 in _PyEval_Vector (tstate=0x555555b564c0 <_PyRuntime+299040>, func=0x7ffff6a893d0, locals=locals@entry=0x0, args=0x7fffff7ff650, argcount=3, \n    kwnames=0x0) at Python/ceval.c:1807\n#18 0x00005555556728a2 in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/call.c:413\n#19 0x00005555556f4c21 in _PyObject_VectorcallTstate (tstate=0x555555b564c0 <_PyRuntime+299040>, callable=0x7ffff6a893d0, args=0x7fffff7ff650, nargsf=3, \n    kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:168\n#20 0x00005555556f4cd8 in vectorcall_unbound (tstate=<optimized out>, unbound=<optimized out>, func=<optimized out>, args=<optimized out>, nargs=<optimized out>)\n    at Objects/typeobject.c:2566\n#21 0x0000555555700c61 in vectorcall_method (name=<optimized out>, args=args@entry=0x7fffff7ff650, nargs=nargs@entry=3) at Objects/typeobject.c:2597\n```\n\nI realize these functions are implemented with `ctypes` and internal to an internal package and hence this issue can be of very low importance. I just report in case they can point to some interesting related bug.\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.13.1+ (heads/3.13:d51c1444e36, Dec 12 2024, 11:22:09) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-127872\n* gh-127917\n* gh-127918\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-12T15:35:13Z",
+   "body": "ctypes `c_char_p_from_param_impl()` runs into a loop when it gets a `MagicMock`:\r\n\r\n```c\r\nstatic PyObject *\r\nc_char_p_from_param_impl(PyObject *type, PyTypeObject *cls, PyObject *value)\r\n{\r\n    ...\r\n    if (PyObject_GetOptionalAttr(value, &_Py_ID(_as_parameter_), &as_parameter) < 0) {\r\n        return NULL;\r\n    }\r\n    if (as_parameter) {\r\n        value = c_char_p_from_param_impl(type, cls, as_parameter);\r\n        Py_DECREF(as_parameter);\r\n        return value;\r\n    }\r\n    PyErr_Format(PyExc_TypeError,\r\n                 \"'%.200s' object cannot be interpreted \"\r\n                 \"as ctypes.c_char_p\", Py_TYPE(value)->tp_name);\r\n    return NULL;\r\n}\r\n```\r\n\r\nGetting `magic_mock._as_parameter` creates a new MagicMock object and c_char_p_from_param_impl() is called on it. Then the same thing happens again, until we reach a **stack overflow**.\r\n\r\nSimpler reproducer:\r\n\r\n```py\r\nimport ctypes.util\r\nfrom unittest.mock import MagicMock\r\n\r\nlibc = ctypes.cdll.LoadLibrary(\"libc.so.6\")\r\nlibc.strlen.argtypes = [ctypes.c_char_p]\r\nlibc.strlen.restype = ctypes.c_size_t\r\n\r\nfake_str = MagicMock()\r\nobj = libc.strlen(fake_str)\r\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-12T16:05:43Z",
+   "body": "I wrote https://github.com/python/cpython/pull/127872 to fix this issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-12-13T13:06:53Z",
+   "body": "Fixed, thanks for your bug report."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a0e243bcc4f81a611ea27b9d3b16209f716c6362",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7eab1708d3916cf8890d3752247654db31eee500",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "19b727b3b079747ed7d744c697d2f7db6a1a371e",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127872",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6ff38fc4e2af8e795dc791be6ea596d2146d4119",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d3ba41564ed0d38852893fc2fcacb812336f4f61",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127917",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f1f525c2128ecca9ef6cd23d3e7806c1e02defdf",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1b80bfbb81f7c06a83028d4092450e5e2bdfb8be",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127918",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0f38b897f933849f01293af622482c5b8502a2b4",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "21c056ec272ea3b11bb212d0429886e94c63fff4",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9358ce761a8d70e647904651703c8e851d0f27ef",
+   "actor": "srinivasreddy"
+  }
+ ]
+}

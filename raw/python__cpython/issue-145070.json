@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 145070,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/145070",
+ "title": "Teach `pprint` about `frozendict`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-feature",
+  "stdlib",
+  "easy"
+ ],
+ "created_at": "2026-02-21T11:05:04Z",
+ "closed_at": "2026-02-21T16:10:47Z",
+ "body": "# Feature or enhancement\n\n### Proposal:\n\nThe `pprint` code has a number of type or protocol specific handlers but doesn't have one for `frozendict` yet. So, we don't currently get pretty printing for `frozendict`:\n```python\n>>> f = frozendict.fromkeys(range(10))\n>>> g = frozendict.fromkeys(range(10))\n>>> h = {0: f, 1: frozendict({2: g})}\n>>> pprint.pp(h)\n{0: frozendict({0: None, 1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None, 8: None, 9: None}),\n 1: frozendict({2: frozendict({0: None, 1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None, 8: None, 9: None})})}\n```\n\nWe want `frozendict` to be pretty printed like this:\n```python\n>>> f = frozendict.fromkeys(range(10))\n>>> g = frozendict.fromkeys(range(10))\n>>> h = {0: f, 1: frozendict({2: g})}\n>>> pprint.pp(h)\n{0: frozendict({0: None,\n                1: None,\n                2: None,\n                3: None,\n                4: None,\n                5: None,\n                6: None,\n                7: None,\n                8: None,\n                9: None}),\n 1: frozendict({2: frozendict({0: None,\n                               1: None,\n                               2: None,\n                               3: None,\n                               4: None,\n                               5: None,\n                               6: None,\n                               7: None,\n                               8: None,\n                               9: None})})}\n```\n\nLet me know whether you think the pretty printing should be different.\n\ncc: @rhettinger for validating that the pretty printing should be as above.\n\nI'll create a trivial PR to fix this once validated.\n\n\n\n### Has this already been discussed elsewhere?\n\nThis is a minor feature, which does not need previous discussion elsewhere\n\n### Links to previous discussion of this feature:\n\n_No response_",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2026-02-21T11:15:48Z",
+   "body": "Being addressed in https://github.com/python/cpython/pull/144908, which technically makes this a duplicate of https://github.com/python/cpython/issues/141510.\n\nI think it's worth keeping it open as it has a tighter scope than that issue, please close if you disagree."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-21T16:10:47Z",
+   "body": "Feature implementated in the change commit 770d354549914e3538e7db07e537dab17ece2610. I close the issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/144908",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ]
+}

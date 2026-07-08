@@ -1,0 +1,42 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9488,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9488",
+ "title": "Check all allocs in the Arrow tree",
+ "state": "closed",
+ "state_reason": null,
+ "author": "wiredfool",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-24T21:19:09Z",
+ "closed_at": "2026-04-01T11:56:16Z",
+ "body": "Changes proposed in this pull request:\r\n\r\n* handle alloc failure in all cases\r\n* Ensure we're calling release so the refcount on the image is decremented\r\n* Ensure that release array/schema can handle partially allocated children arrays.\r\n\r\nThanks to @devdanzin for the report.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/wiredfool/Pillow/pull/16",
+   "commit": null,
+   "actor": "radarhere"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "ecf011ea15991d4cebacd946e58270cc30b0f2c1",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  }
+ ]
+}

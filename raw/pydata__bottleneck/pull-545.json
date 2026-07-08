@@ -1,0 +1,37 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 545,
+ "type": "pull",
+ "url": "https://github.com/pydata/bottleneck/pull/545",
+ "title": "BUG: fix memory leaks in `init_iter_all` when called on non C-contiguous arrays",
+ "state": "open",
+ "state_reason": null,
+ "author": "neutrinoceros",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "bug"
+ ],
+ "created_at": "2026-04-02T20:38:46Z",
+ "closed_at": null,
+ "body": "close #528 as suggested.\nThis is extremely similar to #534, with the difference that I don't know how to add a direct test for it.",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-04-03T09:11:03Z",
+   "body": "> This is modifying the wrong file. The two headers in bottleneck/include/ are outdated copies of the ones in bottleneck/src/, they're unused and should simply be deleted.\r\n\r\noh, thanks for catching that, I was completely unaware.\r\n\r\n> The `PyArray_Ravel` usage on line 148 seems to have the same issue.\r\n\r\nright, no idea how I missed that.\r\n\r\n> return `NULL` isn't correct, because this is a static inline void function. This looks like it requires larger changes, changing the return type to int with return 0; at the end of the function and `if (tmp == NULL) return -1;` if the ravel call fails.\r\n\r\nIt looked funky to me, but seeing it didn't break compilation I just jumped to the conclusion that my understanding of the signature must have been wrong. Instead, I should have realised I was editing a file that is not compiled at all...\r\n\r\nThanks for catching all of this, I'll update the PR shortly !\r\n\r\n"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-04-03T09:29:58Z",
+   "body": "I hit a deterministic segfault, which is fixed by dropping calls to `Py_DECREF(a)`. This was a shot in the dark, but then I studies `PyArray_Ravel`'s definition an now it looks to me like the only case where the ref count is actually incremented is for `order == NPY_KEEPORDER && !(PyArray_IS_C_CONTIGUOUS(arr)) && !( PyArray_IS_F_CONTIGUOUS(arr))`, which shouldn't happen here, so `Py_DECREF(a)` was always unneeded and an incorrect suggestion from #521 (followed in #534) ?"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/546",
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

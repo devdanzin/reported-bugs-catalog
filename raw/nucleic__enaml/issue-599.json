@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/enaml",
+ "number": 599,
+ "type": "issue",
+ "url": "https://github.com/nucleic/enaml/issues/599",
+ "title": "Segfaults from PyUnicode_AsUTF8 NULL passed to strcmp in DynamicScope hot path + repr functions",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:33:54Z",
+ "closed_at": null,
+ "body": "`PyUnicode_AsUTF8` returns NULL on encoding errors (e.g., lone surrogates). The return value is used without NULL checks in ~20 sites across 4 files. The most critical sites pass NULL to `strcmp()` \u2014 undefined behavior, crashes immediately.\n\n### DynamicScope_getitem \u2014 segfault (`dynamicscope.cpp:613-640`)\n\nEvery attribute lookup in enaml's declarative scope hits this code. The function calls `PyUnicode_AsUTF8(key)` repeatedly and passes the result to `strcmp(\"self\")`, `strcmp(\"change\")`, etc.\n\n**Reproducer**:\n```python\nfrom enaml.core._dynamicscope import _DynamicScope\n\nclass FakeOwner: pass\nds = _DynamicScope(FakeOwner(), {}, {}, {})\nds[\"\\ud800\"]  # Segmentation fault\n```\n\n### DynamicScope___contains__ \u2014 segfault (`dynamicscope.cpp:746-762`)\n\nSame pattern in the `sq_contains` slot.\n\n**Reproducer**:\n```python\nfrom enaml.core._dynamicscope import _DynamicScope\n\nclass FakeOwner: pass\nds = _DynamicScope(FakeOwner(), {}, {}, {})\n\"\\ud800\" in ds  # Segmentation fault\n```\n\n### Nonlocals_repr \u2014 segfault (`dynamicscope.cpp:354`)\n\n`PyObject_Str(self->owner)` can return a string with surrogates if `__str__` does. The result is passed to `PyUnicode_AsUTF8` then to `PyUnicode_FromFormat` with `%s` \u2014 UB with NULL.\n\n**Reproducer**:\n```python\nfrom enaml.core._dynamicscope import _DynamicScope\n\nclass FakeOwner:\n    def __str__(self): return \"owner\\ud800name\"\n\nds = _DynamicScope(FakeOwner(), {}, {}, {})\nrepr(ds[\"nonlocals\"])  # Segmentation fault\n```\n\n### Also affected (SystemError, not segfault)\n\n- `Font_repr` (`fontext.cpp:147`) \u2014 `PyUnicode_AsUTF8(self->family)` to ostream\n- `DFunc_repr`, `BoundDMethod_repr` (`declarative_function.cpp:179,182,343,346,349`) \u2014 `PyUnicode_AsUTF8` to ostream\n- `alias_load_fail` (`alias.cpp:87,94`) \u2014 `PyUnicode_AsUTF8` to ostream\n- `Nonlocals_getattro`/`setattro` error messages (`dynamicscope.cpp:404,419`) \u2014 `PyUnicode_AsUTF8` to `PyErr_Format`\n- `set_dynamic_attr` error message (`dynamicscope.cpp:299`) \u2014 same\n\n**Fix for DynamicScope** \u2014 cache the result once and check:\n```cpp\nconst char* key_str = PyUnicode_AsUTF8( key );\nif( !key_str )\n    return 0;\nif( strcmp( key_str, \"self\" ) == 0 )\n    return cppy::incref( self->owner );\n// ... etc\n```\n\nThis also eliminates the redundant `PyUnicode_AsUTF8` calls (performance improvement).\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

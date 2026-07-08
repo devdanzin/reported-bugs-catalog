@@ -1,0 +1,93 @@
+{
+ "repo": "python/cpython",
+ "number": 126907,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126907",
+ "title": "Running `atexit` from threads in free-threading build segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-16T14:46:40Z",
+ "closed_at": "2024-12-16T20:00:30Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault or abort a no-gil interpreter running with `PYTHON_GIL=0` by calling `atexit` functions from threads:\n\n```python\nfrom threading import Thread\nimport atexit\n\ndef g():\n    pass\n\ndef f():\n    for x in range(100):\n        atexit.register(g)\n        atexit._clear()\n        atexit.register(g)\n\nfor x in range(100):\n    Thread(target=f, args=()).start()\n```\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main-dirty:612ac283b81, Nov 16 2024, 01:37:56) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126908\n* gh-127935\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-16T14:51:58Z",
+   "body": "Please also post the stack trace preferably with a debug build for ease with crashers. "
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-16T14:54:43Z",
+   "body": "At a glance, `atexit` just needs some locks on the interpreter state field. I can do it."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T15:02:23Z",
+   "body": "> Please also post the stack trace preferably with a debug build for ease with crashers.\r\n\r\nSorry, will do from now on.\r\n\r\nI get this backtrace for a slightly modified code (because original code wasn't triggering under gdb):\r\n\r\n```gdb\r\n#0  atexit_delete_cb (state=state@entry=0x555555cfd8f8 <_PyRuntime+140088>, i=i@entry=0)\r\n    at ./Modules/atexitmodule.c:58\r\n#1  0x000055555598d962 in atexit_cleanup (state=0x555555cfd8f8 <_PyRuntime+140088>)\r\n    at ./Modules/atexitmodule.c:75\r\n#2  0x000055555598d9b6 in atexit_clear (module=<optimized out>, unused=<optimized out>)\r\n    at ./Modules/atexitmodule.c:249\r\n#3  0x0000555555702405 in cfunction_vectorcall_NOARGS (\r\n    func=<built-in method _clear of module object at remote 0x200007752c0>, args=<optimized out>,\r\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:495\r\n#4  0x000055555567cc55 in _PyObject_VectorcallTstate (tstate=0x555555dc8fe0,\r\n    callable=<built-in method _clear of module object at remote 0x200007752c0>, args=0x7ffff7c42b48,\r\n    nargsf=9223372036854775808, kwnames=0x0) at ./Include/internal/pycore_call.h:167\r\n#5  0x000055555567cd74 in PyObject_Vectorcall (\r\n    callable=callable@entry=<built-in method _clear of module object at remote 0x200007752c0>,\r\n    args=args@entry=0x7ffff7c42b48, nargsf=<optimized out>, kwnames=kwnames@entry=0x0)\r\n    at Objects/call.c:327\r\n#6  0x00005555558441f7 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555dc8fe0,\r\n    frame=<optimized out>, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:955\r\n#7  0x0000555555872978 in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>, tstate=0x555555dc8fe0)\r\n    at ./Include/internal/pycore_ceval.h:116\r\n#8  _PyEval_Vector (tstate=<optimized out>, func=0x20000a8b530, locals=locals@entry=0x0,\r\n    args=0x7ffff7c42cd8, argcount=1, kwnames=<optimized out>) at Python/ceval.c:1901\r\n#9  0x000055555567c622 in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>,\r\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/call.c:413\r\n#10 0x00005555556816b4 in _PyObject_VectorcallTstate (kwnames=0x0, nargsf=1, args=0x7ffff7c42cd8,\r\n    callable=<function at remote 0x20000a8b530>, tstate=0x555555dc8fe0)\r\n    at ./Include/internal/pycore_call.h:167\r\n```\r\n\r\nCode that caused it:\r\n```python\r\nfrom threading import Thread\r\nimport atexit\r\n\r\ndef g():\r\n    pass\r\n\r\ndef f():\r\n    for x in range(100):\r\n        atexit.register(g)\r\n        atexit._clear()\r\n        atexit.register(g)\r\n        atexit.unregister(g)\r\n        atexit._run_exitfuncs()\r\n\r\nfor x in range(100):\r\n    Thread(target=f, args=()).start()\r\n```\r\n\r\nAlso possible to get this error message:\r\n```\r\nDebug memory block at address p=0x20002110f90: API '\ufffd'\r\n    9789596714021935601 bytes originally requested\r\n    The 7 pad bytes at p-7 are not all FORBIDDENBYTE (0xfd):\r\n        at p-7: 0xdd *** OUCH\r\n        at p-6: 0xdd *** OUCH\r\n        at p-5: 0xdd *** OUCH\r\n        at p-4: 0xdd *** OUCH\r\n        at p-3: 0xdd *** OUCH\r\n        at p-2: 0xdd *** OUCH\r\n        at p-1: 0xdd *** OUCH\r\n    Because memory is corrupted at the start, the count of bytes requested\r\n       may be bogus, and checking the trailing pad bytes may segfault.\r\n    The 8 pad bytes at tail=0x87dba4580bace981 are \r\nThread 84 \"python\" received signal SIGSEGV, Segmentation fault.\r\n[Switching to Thread 0x7ffff6430640 (LWP 828561)]\r\n```\r\n\r\nIn that case the backtrace is:\r\n```gdb\r\n#0  0x000055555570fa78 in _PyObject_DebugDumpAddress (p=p@entry=0x20002110f90) at Objects/obmalloc.c:3016\r\n#1  0x000055555570fde6 in _PyMem_DebugCheckAddress (\r\n    func=func@entry=0x555555a6c860 <__func__.8> \"_PyMem_DebugRawFree\", api=<optimized out>,\r\n    p=p@entry=0x20002110f90) at Objects/obmalloc.c:2956\r\n#2  0x000055555571390a in _PyMem_DebugRawFree (ctx=ctx@entry=0x555555cdb928 <_PyRuntime+872>,\r\n    p=p@entry=0x20002110f90) at Objects/obmalloc.c:2762\r\n#3  0x0000555555713986 in _PyMem_DebugFree (ctx=0x555555cdb928 <_PyRuntime+872>, ptr=0x20002110f90)\r\n    at Objects/obmalloc.c:2904\r\n#4  0x000055555572c740 in PyMem_Free (ptr=ptr@entry=0x20002110f90) at Objects/obmalloc.c:1018\r\n#5  0x000055555598d93c in atexit_delete_cb (state=state@entry=0x555555cfd8f8 <_PyRuntime+140088>,\r\n    i=i@entry=1) at ./Modules/atexitmodule.c:61\r\n#6  0x000055555598dc94 in atexit_unregister (module=<optimized out>,\r\n    func=<function at remote 0x20000a8dbb0>) at ./Modules/atexitmodule.c:291\r\n#7  0x00005555557021ef in cfunction_vectorcall_O (\r\n    func=<built-in method unregister of module object at remote 0x200007752c0>, args=<optimized out>,\r\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:523\r\n#8  0x000055555567cc55 in _PyObject_VectorcallTstate (tstate=0x555555dc8fe0,\r\n    callable=<built-in method unregister of module object at remote 0x200007752c0>, args=0x7ffff642fb48,\r\n    nargsf=9223372036854775809, kwnames=0x0) at ./Include/internal/pycore_call.h:167\r\n#9  0x000055555567cd74 in PyObject_Vectorcall (\r\n    callable=callable@entry=<built-in method unregister of module object at remote 0x200007752c0>,\r\n    args=args@entry=0x7ffff642fb48, nargsf=<optimized out>, kwnames=kwnames@entry=0x0)\r\n    at Objects/call.c:327\r\n#10 0x00005555558441f7 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555dc8fe0,\r\n    frame=<optimized out>, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:955\r\n#11 0x0000555555872978 in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>, tstate=0x555555dc8fe0)\r\n    at ./Include/internal/pycore_ceval.h:116\r\n```"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-16T15:03:45Z",
+   "body": "Eh, stack traces are generally not that helpful on the free-threaded build (mimalloc screws up most error messages), especially in a data race."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126908",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127935",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3b766824fe59030100964752be0556084d4461af",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "559e0a19d4ce3df955c748a0ea71c5173764a1b3",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "454d143e1324680a121f8004b217471552973818",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "458bf0fe2960332033327c9865f39c8a9a37282d",
+   "actor": "srinivasreddy"
+  }
+ ]
+}

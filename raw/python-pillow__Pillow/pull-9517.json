@@ -1,0 +1,38 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9517,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9517",
+ "title": "Cleanup .spider extension in the same test where it is added",
+ "state": "closed",
+ "state_reason": null,
+ "author": "radarhere",
+ "author_association": "MEMBER",
+ "labels": [
+  "Testing"
+ ],
+ "created_at": "2026-03-31T11:13:13Z",
+ "closed_at": "2026-03-31T12:55:31Z",
+ "body": "When an image is saved to a file with SpiderImagePlugin, the file extension of the path is registered for future use.\r\nhttps://github.com/python-pillow/Pillow/blob/1f74a55be222ee1281a46ac3af38ece9c51f5f7d/src/PIL/SpiderImagePlugin.py#L291-L295\r\n\r\n#9398 added `teardown_module()` to test_file_spider.py to remove that extension after the test file is complete.\r\n\r\nHowever, there is actually only one test in test_file_spider.py that saves to a path.\r\nhttps://github.com/python-pillow/Pillow/blob/1f74a55be222ee1281a46ac3af38ece9c51f5f7d/Tests/test_file_spider.py#L56-L62\r\n\r\nSo it would be simpler to remove `teardown_module` and just cleanup at the end of that specific test.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d66a77223b2cba5a6b1872021ec812a6c6d2e69d",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  }
+ ]
+}

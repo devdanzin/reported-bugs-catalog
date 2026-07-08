@@ -1,0 +1,34 @@
+{
+ "repo": "python/cpython",
+ "number": 153354,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/153354",
+ "title": "Generated `__annotate__` uses `COMPARE_OP` without the bool-conversion flag, feeding a non-bool to `POP_JUMP_IF_FALSE`",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-typing"
+ ],
+ "created_at": "2026-07-08T16:45:23Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nThe compiler-generated `__annotate__` function (PEP 649) begins with a guard `if .format > VALUE_WITH_FAKE_GLOBALS: raise NotImplementedError`. That comparison is emitted as a `COMPARE_OP` **without the \"convert result to bool\" flag**, immediately followed by `POP_JUMP_IF_FALSE` \u2014 which requires a boolean operand. When `__annotate__` is called with a `format` whose `>` comparison returns a non-bool, the raw value reaches the jump:\n\n```\npython: Python/generated_cases.c.h: _PyEval_EvalFrameDefault:\n    Assertion `PyStackRef_BoolCheck(cond)' failed.\n```\n\nMinimal reproducer (aborts on a debug build):\n\n```python\nclass NonBool:\n    def __gt__(self, other):\n        return None            # any non-bool result\n\ndef f(a: int):                 # any annotated function/class/module has __annotate__\n    ...\n\nf.__annotate__(NonBool())\n```\n\nIt reproduces via a module `__annotate__`, a function `__annotate__`, and a class `__annotate_func__` alike (the codegen is shared). Original find was `wsgiref.types.__annotate__(obj)` where `obj.__gt__` returns a non-bool.\n\n### Root cause\n\n`Python/codegen.c`, `codegen_setup_annotations_scope()`:\n\n```c\n// if .format > VALUE_WITH_FAKE_GLOBALS: raise NotImplementedError\n...\nADDOP_I(c, loc, COMPARE_OP, (Py_GT << 5) | compare_masks[Py_GT]);   // no bool-cast bit (0x10)\nNEW_JUMP_TARGET_LABEL(c, body);\nADDOP_JUMP(c, loc, POP_JUMP_IF_FALSE, body);\n```\n\nThe `COMPARE_OP` oparg omits bit `0x10`, which the eval loop checks to convert the comparison result to a bool (`if (oparg & 16)` in `_COMPARE_OP`, `Python/bytecodes.c`). `POP_JUMP_IF_FALSE` asserts its operand is a bool. Normal comparisons emit `COMPARE_OP` without the bit and rely on the later `TO_BOOL`-folding optimizer pass to set it \u2014 see the comment in `codegen_addcompare()`:\n\n```c\n// ... The fifth-lowest bit indicates whether the result should be converted to\n// bool and is set later):\nADDOP_I(c, loc, COMPARE_OP, (cmp << 5) | compare_masks[cmp]);\n```\n\nBut this guard emits `COMPARE_OP` directly followed by `POP_JUMP_IF_FALSE` with no intervening `TO_BOOL`, so the optimizer has nothing to fold and the bit is never set.\n\nDisassembling the same `>` comparison two ways makes the difference concrete:\n\n```\nif x > 2:                     ->  COMPARE_OP  148  (bool(>))     # bit 0x10 SET\n<generated __annotate__>      ->  COMPARE_OP  132  (>)           # bit 0x10 CLEAR\n```\n\nWith a normal integer `format` (`annotationlib.Format.VALUE`, ...), `int > int` returns a real bool, so the assertion holds and the bug is latent. A `format` whose rich comparison returns a non-bool sends the raw object to the jump.\n\n### Behavior by build\n\n- **Debug build:** `assert(PyStackRef_BoolCheck(cond))` fails \u2192 abort.\n- **Release build:** no assert, but `POP_JUMP_IF_FALSE` treats the non-`Py_False` value as truthy \u2192 `__annotate__` spuriously raises `NotImplementedError`; and it consumes the operand without a decref (the jump assumes an immortal bool), leaking a heap comparison result.\n\nMore generally, the compiler is supposed to guarantee that every `POP_JUMP_IF_FALSE`/`POP_JUMP_IF_TRUE` operand is a bool; this codegen path breaks that guarantee for arbitrary `format` arguments.\n\n### Proposed fix\n\nSet the bool-conversion bit on the guard's `COMPARE_OP`, matching what a normal `if a > b:` ends up with:\n\n```diff\n-    ADDOP_I(c, loc, COMPARE_OP, (Py_GT << 5) | compare_masks[Py_GT]);\n+    ADDOP_I(c, loc, COMPARE_OP, (Py_GT << 5) | compare_masks[Py_GT] | 16);\n```\n\n`(Py_GT << 5) | compare_masks[Py_GT] | 16` == 148, identical to the oparg the optimizer produces for `if a > b:`. (Emitting a `TO_BOOL` after the `COMPARE_OP` would also work; maintainers may prefer a named constant over the literal `16`.)\n\n---\n\n*Found by the fusil fuzzer (@vstinner's fuzzer, revived by @devdanzin);\ninvestigated and drafted by Claude Code (Opus 4.8).*\n\n\n### CPython versions tested on:\n\nCPython main branch, 3.16, 3.15, 3.14\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.16.0a0 (heads/main:bcf98ddbc40, Jul  4 2026, 15:04:52) [Clang 21.1.8 (6ubuntu1)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-153360\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "JelleZijlstra",
+   "created_at": "2026-07-08T19:33:40Z",
+   "body": "The difficulty here is that the obvious fix changes bytecode compiler output. Therefore, we probably can't apply it in bugfix branches.\n\nWhat's the best way around this?"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153360",
+   "commit": null,
+   "actor": "BHUVANSH855"
+  }
+ ]
+}

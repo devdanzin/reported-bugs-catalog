@@ -1,0 +1,42 @@
+{
+ "repo": "ilanschnell/bitarray",
+ "number": 249,
+ "type": "pull",
+ "url": "https://github.com/ilanschnell/bitarray/pull/249",
+ "title": "fix reference counts in bitarray_encode()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "ilanschnell",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-03-31T21:25:30Z",
+ "closed_at": "2026-03-31T21:26:35Z",
+ "body": "In this PR, we fix some reference count issues in `bitarray_encode()`, and add unit tests.",
+ "comments": [
+  {
+   "author": "ilanschnell",
+   "created_at": "2026-04-01T05:12:02Z",
+   "body": "Fixes finding 1 and 2 in #250"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "a5cb182d94411ef0c30e9bb03c37accd4a546930",
+   "actor": "ilanschnell"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ilanschnell"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/ilanschnell/bitarray/issues/250",
+   "commit": null,
+   "actor": "ilanschnell"
+  }
+ ]
+}

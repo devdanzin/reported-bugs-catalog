@@ -1,0 +1,57 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2832,
+ "type": "issue",
+ "url": "https://github.com/h5py/h5py/issues/2832",
+ "title": "`h5i.get_name` has unchecked malloc",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-25T10:09:54Z",
+ "closed_at": "2026-03-28T11:22:27Z",
+ "body": "`malloc(sizeof(char)*(namelen+1))` passed to `H5Iget_name` without NULL check. Segfault when getting an HDF5 object name under OOM.\n- `h5i.pyx:101`",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T11:12:28Z",
+   "body": "`h5i.templ.pyx:103`"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T11:25:45Z",
+   "body": "just to make sure I understand, you mean \"unchecked\" as is \"not checked for NULL pointers\" here, right ?"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T11:43:12Z",
+   "body": "(and if so, would this be the appropriate fix ?)\n```patch\ndiff --git a/h5py/h5i.templ.pyx b/h5py/h5i.templ.pyx\nindex b4f08e51..b6136ee8 100644\n--- a/h5py/h5i.templ.pyx\n+++ b/h5py/h5i.templ.pyx\n@@ -101,6 +101,8 @@ def get_name(ObjectID obj not None):\n\n     assert namelen > 0\n     name = <char*>malloc(sizeof(char)*(namelen+1))\n+    if name == NULL:\n+        return None\n     try:\n         H5Iget_name(obj.id, name, namelen+1)\n         pystring = name\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-25T13:18:10Z",
+   "body": "> just to make sure I understand, you mean \"unchecked\" as is \"not checked for NULL pointers\" here, right ?\n\nCorrect.\n\n> (and if so, would this be the appropriate fix ?)\n\nI think that, since it's specifically a `malloc` failure, raising a `MemoryError` would be better. Even more so if the caller doesn't expect `None`, which would move the error location far from its origin.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/pull/2843",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2825",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "takluyver"
+  }
+ ]
+}

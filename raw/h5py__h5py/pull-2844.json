@@ -1,0 +1,63 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2844,
+ "type": "pull",
+ "url": "https://github.com/h5py/h5py/pull/2844",
+ "title": "BUG: avoid zombie identifiers arising in `ObjectID.__dealloc__`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "neutrinoceros",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "bug"
+ ],
+ "created_at": "2026-03-25T17:22:13Z",
+ "closed_at": "2026-03-27T18:03:28Z",
+ "body": "close #2837\nThe suggested fix would have made `ObjectID._dealloc` almost identical to `ObjectID._close` with only 2 unimportant (I think) differences:\n- a slightly different debug message (unused in prod)\n- extensibility beyond the builtin warnings.warn function (unused, as far as I can tell)",
+ "comments": [
+  {
+   "author": "codecov[bot]",
+   "created_at": "2026-03-25T17:38:24Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/h5py/h5py/pull/2844?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py) Report\n:white_check_mark: All modified and coverable lines are covered by tests.\n:white_check_mark: Project coverage is 90.39%. Comparing base ([`e142958`](https://app.codecov.io/gh/h5py/h5py/commit/e14295820933e9cc87a63149e3197b12ee1b27bc?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)) to head ([`acd2c75`](https://app.codecov.io/gh/h5py/h5py/commit/acd2c75d90dc42e1c22dc1ee8120e2da86095b0f?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)).\n:warning: Report is 81 commits behind head on master.\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@           Coverage Diff           @@\n##           master    #2844   +/-   ##\n=======================================\n  Coverage   90.39%   90.39%           \n=======================================\n  Files          16       16           \n  Lines        2509     2509           \n=======================================\n  Hits         2268     2268           \n  Misses        241      241           \n```\n</details>\n\n[:umbrella: View full report in Codecov by Harness](https://app.codecov.io/gh/h5py/h5py/pull/2844?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-27T16:54:51Z",
+   "body": "The `warn=` parameter isn't about extensibility - the comment just above explains why it's there :wink: :\r\n\r\n> During interpreter shutdown, module attributes are set to None before `__dealloc__` and `__del__` methods are executed.\r\n\r\nAttaching globals to parameter defaults is 'one weird trick' - their values are attached to the function object, so you can still use them at interpreter shutdown, whereas using globals breaks. People also occasionally do it as a micro-optimisation - accessing local variables is (or was?) faster than globals.\r\n\r\nI'd also kind of like to keep the debug message difference. You don't need it often, but when you are debugging something involving references & h5py IDs, details like explicitly closed vs. deallocated can be useful.\r\n\r\nI think you're right that the `_close` and `_dealloc` methods can be combined, though."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-27T17:18:04Z",
+   "body": "> the comment just above explains why it's there\r\n\r\nyou know, I'm sure I read it, but it doesn't have enough context that I could understand it without your additional explanation (thank you !)\r\n\r\n> accessing local variables is (or was?) faster than globals.\r\n\r\nI think it's still true."
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-27T17:24:34Z",
+   "body": "No worries, it does assume a fair bit of knowledge. Feel free to expand it a bit."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-27T17:34:30Z",
+   "body": "Thanks. I rewrote this and expanded the comment."
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-27T17:44:55Z",
+   "body": "Thanks, I'm happy with this assuming the CI passes."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "6a290e1a2d42dd31d7ddf41a2ed35a6d5289f2ad",
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

@@ -1,0 +1,54 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 350,
+ "type": "issue",
+ "url": "https://github.com/simplejson/simplejson/issues/350",
+ "title": "Error-as-truthy bugs in maybe_quote_bigint and is_raw_json",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:21:50Z",
+ "closed_at": "2026-04-07T03:10:48Z",
+ "body": "Part of #348 (C extension analysis). [Full report](https://gist.github.com/devdanzin/e8a25ea988dc0461c2fd378efd84a8a3).\n\n## Finding 1: `maybe_quote_bigint` \u2014 `PyObject_RichCompareBool` returns -1 on error\n\n**Lines 381-382.** `PyObject_RichCompareBool` returns -1 on error, which is truthy in C. When a custom `__ge__`/`__le__` raises, the exception is silently carried through the quoting logic.\n\n**Reproducer (100% reproducible \u2014 abort on debug builds, silent wrong behavior on release):**\n```python\nimport simplejson\n\nclass BadInt(int):\n    def __ge__(self, other):\n        raise RuntimeError(\"comparison bomb\")\n    def __le__(self, other):\n        raise RuntimeError(\"comparison bomb\")\n\nsimplejson.dumps(BadInt(2**60), int_as_string_bitcount=53)\n# Debug build: Fatal Python error + abort\n# Release build: RuntimeError silently swallowed, integer incorrectly quoted\n```\n\n**Suggested fix:**\n```c\nint ge = PyObject_RichCompareBool(obj, s->max_long_size, Py_GE);\nif (ge < 0) return NULL;\nint le = PyObject_RichCompareBool(obj, s->min_long_size, Py_LE);\nif (le < 0) { Py_DECREF(encoded); return NULL; }\nif (ge || le) { /* quote */ }\n```\n\n---\n\n## Finding 11: `is_raw_json` \u2014 `PyObject_IsInstance` error mapped to false\n\n**Line ~2900.** `PyObject_IsInstance` returns -1 on error. The ternary `? 1 : 0` maps -1 to 0 (false), silently converting an error into \"not RawJSON\" and taking the wrong encoding path with a pending exception.\n\n**Status:** Code-confirmed. Cannot trigger without patching `RawJSONType` at the C level (normal classes have no custom `__instancecheck__`), but the pattern is incorrect and should be fixed defensively.\n\n**Suggested fix:**\n```c\nint is_raw = PyObject_IsInstance(obj, RawJSONType);\nif (is_raw < 0) goto bail;\nif (is_raw) { /* handle RawJSON */ }\n```",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/348",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "31167a970f200ca7d6a9820bb905bbcf7fa10a47",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/356",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "93db08c5973bcf0beb6fd74ad27e82c556fc6657",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d0bffce13b24c55f1074556b93a16a8d81c3cb6e",
+   "actor": "github-merge-queue[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  }
+ ]
+}

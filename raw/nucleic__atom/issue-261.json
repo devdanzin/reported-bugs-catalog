@@ -1,0 +1,24 @@
+{
+ "repo": "nucleic/atom",
+ "number": 261,
+ "type": "issue",
+ "url": "https://github.com/nucleic/atom/issues/261",
+ "title": "Copy-paste bug in init_containerlistchange + unchecked PyModule_AddObject x10 + cached_property stores NULL",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:29:39Z",
+ "closed_at": null,
+ "body": "Three smaller bugs:\n\n### 1. Copy-paste bug in `init_containerlistchange` (`atomlist.cpp:552-553`)\n\nCreates `PySStr::__delitem__str` but checks `PySStr::typestr` (the previous variable):\n```cpp\nPySStr::__delitem__str = PyUnicode_InternFromString( \"__delitem__\" );\nif( !PySStr::typestr )  // BUG: should be !PySStr::__delitem__str\n```\n\nIf `__delitem__str` creation fails, the error is silently ignored and a NULL pointer propagates.\n\n**Fix**: check the correct variable:\n```cpp\nif( !PySStr::__delitem__str )\n```\n\n### 2. Unchecked `PyModule_AddObject` for 10 enum types (`catommodule.cpp:151-160`)\n\nReturn values ignored for all 10 `PyModule_AddObject` calls for enum types (GetAttr, SetAttr, etc.). On failure, the manually `cppy::incref()`'d references are leaked and the module loads in a broken state. The other 9 `PyModule_AddObject` calls (lines 79-135) correctly check return values.\n\n**Fix**: either check return values and return `false` on failure, or replace with `PyModule_AddObjectRef` (available since 3.10):\n```cpp\nif( PyModule_AddObjectRef( mod, \"GetAttr\", PyGetAttr ) < 0 )\n    return false;\n```\n\n### 3. `cached_property_handler` stores NULL in slot (`getattrbehavior.cpp:185-186`)\n\nIf `property_handler` fails (returns NULL), `set_slot(member->index, value.get())` stores NULL in the atom's slot. Subsequent reads from the cached property slot return NULL, masking the original error.\n\n**Fix**: check for NULL before storing:\n```cpp\nvalue = property_handler( member, atom );\nif( !value )\n    return 0;\natom->set_slot( member->index, value.get() );\nreturn value.release();\n```\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/nucleic/atom/issues/262",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

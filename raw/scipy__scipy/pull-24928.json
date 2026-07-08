@@ -1,0 +1,86 @@
+{
+ "repo": "scipy/scipy",
+ "number": 24928,
+ "type": "pull",
+ "url": "https://github.com/scipy/scipy/pull/24928",
+ "title": "BUG: special: fix leaked `py_SpecialFunctionWarning` in `sf_error_v`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "defect",
+  "scipy.special",
+  "C/C++"
+ ],
+ "created_at": "2026-03-28T20:35:12Z",
+ "closed_at": "2026-04-25T06:20:56Z",
+ "body": "#### Reference issue\r\n\r\nSee gh-24927.\r\n\r\n#### What does this implement/fix?\r\n\r\n`sf_error_v` in `sf_error.cc` obtains a new reference to `SpecialFunctionWarning` (or `SpecialFunctionError`) via `PyObject_GetAttrString` but never calls `Py_DECREF` after passing it to `PyErr_WarnEx` / `PyErr_SetString`. Since neither API steals its argument, the reference count grows by one on every call.\r\n\r\nThis is not a memory leak in the usual sense: `SpecialFunctionWarning` and `SpecialFunctionError` are class objects that live for the lifetime of the process, so their inflated refcount doesn't cause heap growth. It just prevents their refcount from ever reaching zero and means every call does one extra refcount increment that is never balanced.\r\n\r\nThis adds `Py_DECREF(py_SpecialFunctionWarning)` after the warn/raise block. The early `goto skip_warn` paths correctly bypass the decref since `py_SpecialFunctionWarning` is either not yet set or NULL on those paths.\r\n\r\nReproducer (shows refcount growth directly):\r\n```python\r\nimport sys, warnings\r\nfrom scipy import special\r\n\r\nprint(\"Before:\", sys.getrefcount(special.SpecialFunctionWarning))\r\n\r\nspecial.seterr(domain=\"warn\")\r\nwarnings.simplefilter(\"ignore\")\r\nfor _ in range(1000):\r\n    special.ndtri(2.0)\r\n\r\nprint(\"After:\", sys.getrefcount(special.SpecialFunctionWarning))\r\n# Before fix:\r\n#   Before: 6\r\n#   After:  1006   (1000 extra references from 1000 calls)\r\n# After fix:\r\n#   Before: 6\r\n#   After:  6      (refcount balanced)\r\n```\r\n\r\nThe same pattern applies to `SpecialFunctionError` when `domain=\"raise\"` is set.\r\n\r\n#### Additional information\r\n\r\nThanks to @nickodell for catching that the original description mischaracterized this as a memory leak: the `tracemalloc` numbers in the first reproducer were inflated by `warnings.catch_warnings(record=True)` holding onto warning instances in its list, which was unrelated to the actual bug. The fix itself is unchanged and still correct.\r\n\r\nOne-line fix. Originally found by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).\r\n\r\n#### AI Generation Disclosure\r\n\r\nClaude Opus 4.6 was used to identify this bug during a systematic C extension analysis using the cext-review-toolkit plugin, write the reproducer script, and prepare this PR. The one-line fix was confirmed correct by human review.\r\n",
+ "comments": [
+  {
+   "author": "nickodell",
+   "created_at": "2026-03-30T16:29:15Z",
+   "body": "```\r\n# Before fix: Leaked 406975 bytes over 1000 warnings (~406 bytes/call)\r\n# After fix: no leak\r\n```\r\n\r\nAre you sure about this number? I get the following result:\r\n\r\nmain: Leaked 1130 bytes over 1000 warnings\r\nfix-sf-error-warning-leak: Leaked 2925 bytes over 1000 warnings\r\n\r\n(The exact results vary run to run.)\r\n\r\nMore generally, since the class `scipy.special.SpecialFunctionWarning` is a single object that is intended to be around for the life of the process, I don't see how this could create a leak. An incorrectly high ref count, yes. But we'd need more than one object to have a leak.\r\n\r\nThe other part of the benchmark that is hard to interpret is `with warnings.catch_warnings(record=True):`. This is intended to store warnings in a list, which may throw off a measurement of whether warnings are being properly cleaned up. I *think* that not assigning this context manager to a variable cleans the list up at the end of the context manager, but I am not sure. Is `record=True` needed to trigger the issue? If not, I'd ask you to drop it to simplify the reproducer."
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-03-30T16:38:42Z",
+   "body": "To expand on the remark \"an incorrectly high ref count,\" I modified the reproducer like so:\r\n\r\n```python\r\nimport warnings, tracemalloc, gc, sys\r\ntracemalloc.start()\r\ngc.disable()\r\nfrom scipy import special\r\ndef show_ref_cnt():\r\n    print(\"SFW ref cnt\", sys.getrefcount(special.SpecialFunctionWarning))\r\n    print(\"SFW ref list size\", len(gc.get_referrers(special.SpecialFunctionWarning)))\r\n    print(\"SFE ref cnt\", sys.getrefcount(special.SpecialFunctionError))\r\n    print(\"SFE ref list size\", len(gc.get_referrers(special.SpecialFunctionError)))\r\nshow_ref_cnt()\r\ngc.collect()\r\nbefore = tracemalloc.get_traced_memory()[0]\r\nprint(\"running compute\")\r\ndef compute():\r\n    special.seterr(domain=\"warn\")\r\n    warnings.simplefilter(\"ignore\")\r\n    for _ in range(1000):\r\n        special.ndtri(2.0)\r\n    special.seterr(domain=\"raise\")\r\n    for _ in range(1000):\r\n        try:\r\n            special.ndtri(2.0)\r\n        except:\r\n            # ignore domain error\r\n            pass\r\ncompute()\r\nshow_ref_cnt()\r\ngc.collect()\r\nafter = tracemalloc.get_traced_memory()[0]\r\nprint(f\"Leaked {after - before} bytes over 1000 warnings\")\r\n```\r\n\r\nThis shows the following output on main:\r\n\r\n```\r\nSFW ref cnt 6\r\nSFW ref list size 5\r\nSFE ref cnt 5\r\nSFE ref list size 4\r\nrunning compute\r\nSFW ref cnt 1006\r\nSFW ref list size 5\r\nSFE ref cnt 1005\r\nSFE ref list size 4\r\nLeaked 2667 bytes over 1000 warnings\r\n```\r\n\r\nThe line `SFW ref cnt 1006` is quite suspicious. Note that the ref count for SpecialFunctionWarning goes up by 1000 compared to before the loop. However, when using `gc.get_referrers()` to look for heap objects which reference SpecialFunctionWarning, there are 5 objects referring to it both before and after."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-31T00:42:31Z",
+   "body": "Thank you for the review! \r\n\r\nI agree on both points. The fix is correct (but less important than I believed), but the issue description is wrong.\r\n\r\nThe \"406 bytes per warning\" claim is wrong. The tracemalloc numbers are incorrect due to `catch_warnings(record=True)` storing warning instances in a list as you say. I should have used `sys.getrefcount` directly as you did. Sorry for the confusion.\r\n\r\nThe issue is indeed just one of refcount growth (1000 extra refs after 1000 calls), not a memory leak. `SpecialFunctionWarning`'s inflated refcount doesn't cause memory growth. It just prevents the refcount from ever reaching zero.\r\n\r\nHere's a reproducer that shows only the refcount issue:\r\n\r\n```python\r\nimport sys, warnings\r\nfrom scipy import special\r\n\r\nprint(\"Before:\", sys.getrefcount(special.SpecialFunctionWarning))\r\n\r\nspecial.seterr(domain=\"warn\")\r\nwarnings.simplefilter(\"ignore\")\r\nfor _ in range(1000):\r\n    special.ndtri(2.0)\r\n\r\nprint(\"After:\", sys.getrefcount(special.SpecialFunctionWarning))\r\n# Before: 6\r\n# After: 1006  (leaked 1000 references)\r\n```\r\n\r\n`PyObject_GetAttrString` returns a new reference at line 93/95, and neither `PyErr_WarnEx` nor `PyErr_SetString` steals it, so the `Py_DECREF` is needed to balance the refcount.\r\n\r\nDoes that seem correct?\r\n"
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-03-31T04:30:39Z",
+   "body": "> `PyObject_GetAttrString` returns a new reference at line 93/95, and neither `PyErr_WarnEx` nor `PyErr_SetString` steals it, so the `Py_DECREF` is needed to balance the refcount.\r\n>\r\n>Does that seem correct?\r\n\r\nAgreed."
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-03-31T04:56:50Z",
+   "body": "(This is not about your PR, this is just an aside.)\r\n\r\nI don't quite understand why `py_SpecialFunctionWarning` is declared `static` here. When this variable was initially created in a4bac29605bfce6a561ced66775f0bb5d39db58a, the `static` declaration functioned as a cache: it would look up SpecialFunctionWarning once, then re-use the type when the function was called multiple times.\r\n\r\nWhen #6753 added the capability for users to choose either warnings or exceptions, this caching was removed.\r\n\r\nIn its current form, every read of py_SpecialFunctionWarning is preceded by a write, so it seems like the only circumstance where it would matter that it is declared static is when multiple threads are calling sf_error_v. In that circumstance, declaring it static seems undesirable."
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-04-08T18:15:21Z",
+   "body": "@devdanzin Can you update the PR cover letter to reflect our current understanding of what this PR does?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-09T10:15:18Z",
+   "body": "Done, please let me know if it still needs adjusting."
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-04-20T03:12:15Z",
+   "body": "Okay, I'm happy with this. @steppi Any additional review you'd like to do?"
+  },
+  {
+   "author": "nickodell",
+   "created_at": "2026-04-25T06:21:15Z",
+   "body": "Thanks @devdanzin !"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "f1f7a63f990660662841c326cf4951b44298d20d",
+   "actor": "nickodell"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "nickodell"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/25140",
+   "commit": null,
+   "actor": "nickodell"
+  }
+ ]
+}

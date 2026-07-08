@@ -1,0 +1,152 @@
+{
+ "repo": "python/cpython",
+ "number": 137007,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/137007",
+ "title": "JIT: assertion failure in _PyObject_GC_UNTRACK",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.14",
+  "topic-JIT"
+ ],
+ "created_at": "2025-07-22T14:43:20Z",
+ "closed_at": "2025-12-11T11:18:28Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to non-deterministically abort a special debug JIT build by running the code below, running from a Python executable from a venv where you installed **two** packages in editable mode.\n\n\nFor this special build, apply this diff:\n```diff\nindex 454c8dde031..9e21c41421a 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -99,8 +99,8 @@ backoff_counter_triggers(_Py_BackoffCounter counter)\n // Must be larger than ADAPTIVE_COOLDOWN_VALUE, otherwise when JIT code is\n // invalidated we may construct a new trace before the bytecode has properly\n // re-specialized:\n-#define JUMP_BACKWARD_INITIAL_VALUE 4095\n-#define JUMP_BACKWARD_INITIAL_BACKOFF 12\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n+#define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n {\n@@ -112,8 +112,8 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4095\n-#define SIDE_EXIT_INITIAL_BACKOFF 12\n+#define SIDE_EXIT_INITIAL_VALUE 63\n+#define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n initial_temperature_backoff_counter(void)\ndiff --git a/Include/internal/pycore_optimizer.h b/Include/internal/pycore_optimizer.h\nindex 8b7f12bf03d..8cc51959063 100644\n--- a/Include/internal/pycore_optimizer.h\n+++ b/Include/internal/pycore_optimizer.h\n@@ -163,7 +163,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n // progress (and inserting a new ENTER_EXECUTOR instruction). In practice, this\n // is the \"maximum amount of polymorphism\" that an isolated trace tree can\n // handle before rejoining the rest of the program.\n-#define MAX_CHAIN_DEPTH 4\n+#define MAX_CHAIN_DEPTH 16\n\n /* Symbols */\n /* See explanation in optimizer_symbols.c */\n```\n\nThis MRE must be invoked like this:\n```\n/path/to/venv/with/editable/installs/bin/python mre.py\n```\n\nSorry about another long MRE, this code also seems stubbornly hard to reduce. MRE:\n```python\nfrom random import randint\n\nclass UnstableHash_unstable_hash_object_v4:\n    hash_count = 0\n\n    def __hash__(self):\n        self.hash_count += 1\n        new_hash = 5 if self.hash_count < 70 else randint(0, 1024)\n        print(new_hash)\n        return new_hash\nunstable_hash_object_v4 = UnstableHash_unstable_hash_object_v4()\ntuple_v6 = (90.1433,)\n\ndef uop_harness_f1():\n\n    class ShapeA_la_7776:\n        payload = 123\n\n    class ShapeB_la_7776:\n\n        @property\n        def payload(self):\n            return 'property_payload'\n\n    class ShapeC_la_7776:\n\n        def payload(self):\n            return id(self)\n\n    class ShapeD_la_7776:\n        __slots__ = ['payload']\n\n        def __init__(self):\n            self.payload = 'slot_payload'\n    shapes_la_7776 = [ShapeA_la_7776(), ShapeB_la_7776(), ShapeC_la_7776(), ShapeD_la_7776()]\n    for i in range(500):\n        obj = shapes_la_7776[i % len(shapes_la_7776)]\n        try:\n            payload_val = obj.payload\n            if callable(payload_val):\n                payload_val()\n                payload_val()\n                payload_val()\n                payload_val()\n        except Exception:\n            pass\n    {unstable_hash_object_v4, unstable_hash_object_v4}\n    {unstable_hash_object_v4, unstable_hash_object_v4}\n    {unstable_hash_object_v4, unstable_hash_object_v4}\n    {unstable_hash_object_v4, unstable_hash_object_v4}\n    for i_loop_1589 in {2, 1, 2, 3, 4, 5, 6, 8, 10, 9, 12, 10, 12, 13, 14, 15, 17, 17}:\n        x, *y = tuple_v6\n    x, *y = tuple_v6\nfor i_f1 in range(300):\n    try:\n        uop_harness_f1()\n    except Exception as e:\n        break\n```\n\nBacktrace:\n```\nPython/optimizer.c:269: _PyObject_GC_UNTRACK: Assertion \"_PyObject_GC_IS_TRACKED(((PyObject*)(op)))\" failed: object not tracked by the garbage collector\nEnable tracemalloc to get the memory block allocation traceback\n\nobject address  : 0x555555f82230\nobject refcount : 0\nobject type     : 0x555555c5e680\nobject type name: uop_executor\nobject repr     : <refcnt 0 at 0x555555f82230>\n\nFatal Python error: _PyObject_AssertFailed: _PyObject_AssertFailed\nPython runtime state: initialized\n\nCurrent thread 0x00007ffff7ea8780 [python] (most recent call first):\n  File \"/home/danzin/crashers/jit/reduced_crash_retcode_child_15732_2.py\", line 47 in uop_harness_f1\n  File \"/home/danzin/crashers/jit/reduced_crash_retcode_child_15732_2.py\", line 56 in <module>\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c4579e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c288cd in __GI_abort () at ./stdlib/abort.c:73\n#5  0x00005555558bba92 in fatal_error_exit (status=<optimized out>) at Python/pylifecycle.c:3155\n#6  0x00005555558bd07d in fatal_error (fd=2, header=header@entry=1, prefix=prefix@entry=0x5555559f7e90 <__func__.11> \"_PyObject_AssertFailed\",\n    msg=msg@entry=0x555555980fe5 \"_PyObject_AssertFailed\", status=status@entry=-1) at Python/pylifecycle.c:3371\n#7  0x00005555558bd0ef in _Py_FatalErrorFunc (func=func@entry=0x5555559f7e90 <__func__.11> \"_PyObject_AssertFailed\",\n    msg=msg@entry=0x555555980fe5 \"_PyObject_AssertFailed\") at Python/pylifecycle.c:3387\n#8  0x00005555556dd237 in _PyObject_AssertFailed (obj=obj@entry=0x555555f82230,\n    expr=expr@entry=0x5555559a9f60 \"_PyObject_GC_IS_TRACKED(((PyObject*)(op)))\",\n    msg=msg@entry=0x5555559a9f30 \"object not tracked by the garbage collector\", file=file@entry=0x55555598c050 \"Python/optimizer.c\",\n    line=line@entry=269, function=function@entry=0x555555a9c010 <__func__.9> \"_PyObject_GC_UNTRACK\") at Objects/object.c:3165\n#9  0x00005555558a2303 in _PyObject_GC_UNTRACK (filename=filename@entry=0x55555598c050 \"Python/optimizer.c\", lineno=lineno@entry=269,\n    op=op@entry=0x555555f82230) at ./Include/internal/pycore_gc.h:269\n#10 0x00005555558a3198 in uop_dealloc (op=op@entry=0x555555f82230) at Python/optimizer.c:269\n#11 0x00005555556dc978 in _Py_Dealloc (op=op@entry=0x555555f82230) at Objects/object.c:3206\n#12 0x00005555557b47ab in Py_DECREF_MORTAL (filename=filename@entry=0x5555559aaec8 \"./Include/internal/pycore_stackref.h\", lineno=lineno@entry=701,\n    op=0x555555f82230) at ./Include/internal/pycore_object.h:450\n#13 0x00005555557b485b in PyStackRef_CLOSE (ref=..., ref@entry=...) at ./Include/internal/pycore_stackref.h:701\n#14 0x00005555557cfe33 in _PyEval_EvalFrameDefault (tstate=0x555555cca298 <_PyRuntime+331064>, frame=0x7fffffffce30, throwflag=0)\n    at Python/generated_cases.c.h:7656\n#15 0x00005555557dd559 in _PyEval_EvalFrame (tstate=tstate@entry=0x555555cca298 <_PyRuntime+331064>, frame=frame@entry=0x7ffff7fac180,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:119\n#16 0x00005555557dd72a in _PyEval_Vector (tstate=0x555555cca298 <_PyRuntime+331064>, func=0x7ffff74e8650, locals=locals@entry=0x0,\n    args=0x7fffffffd008, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:1977\n#17 0x000055555567dc31 in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/call.c:413\n#18 0x000055555567df88 in _PyObject_VectorcallTstate (tstate=0x555555cca298 <_PyRuntime+331064>, callable=callable@entry=0x7ffff74e8650,\n    args=args@entry=0x7fffffffd008, nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:169\n#19 0x000055555567e0b4 in PyObject_CallOneArg (func=func@entry=0x7ffff74e8650, arg=arg@entry=0x7ffff728c8a0) at Objects/call.c:395\n#20 0x000055555570a05e in call_unbound_noarg (unbound=unbound@entry=1, func=func@entry=0x7ffff74e8650, self=self@entry=0x7ffff728c8a0)\n    at Objects/typeobject.c:3019\n#21 0x000055555571717f in maybe_call_special_no_args (self=self@entry=0x7ffff728c8a0, attr=<optimized out>,\n    attr_is_none=attr_is_none@entry=0x7fffffffd084) at Objects/typeobject.c:3132\n#22 0x000055555571746b in slot_tp_hash (self=0x7ffff728c8a0) at Objects/typeobject.c:10489\n#23 0x00005555556dbf44 in PyObject_Hash (v=0x7ffff728c8a0) at Objects/object.c:1158\n#24 0x00005555556fb0b2 in _PyObject_HashFast (op=op@entry=0x7ffff728c8a0) at ./Include/internal/pycore_object.h:872\n#25 0x00005555556ffaaf in _PySet_AddTakeRef (so=0x7ffff72e5c70, key=0x7ffff728c8a0) at Objects/setobject.c:234\n#26 0x00007ffff706a948 in ?? ()\n#27 0xfffffffffffffffe in ?? ()\n#28 0x0000555555cca298 in _PyRuntime ()\n#29 0x00007fffffffd420 in ?? ()\n#30 0x00007ffff70a9017 in ?? ()\n#31 0x0000555555eb4dc0 in ?? ()\n#32 0x00007ffff70a9000 in ?? ()\n#33 0x0000555555cca298 in _PyRuntime ()\n#34 0x00007ffff7fac0a0 in ?? ()\n#35 0x00007ffff7fac160 in ?? ()\n#36 0x00005555557ca1c0 in _PyEval_EvalFrameDefault (tstate=<error reading variable: Cannot access memory at address 0xfffffffffffffda0>,\n    frame=0xffffffffffffffff, throwflag=<error reading variable: Cannot access memory at address 0xfffffffffffffd8c>)\n    at Python/generated_cases.c.h:5598\nBacktrace stopped: previous frame inner to this frame (corrupt stack?)\n```\n\nHere are the outputs from running with PYTHON_OPT_DEBUG=4 and PYTHON_LLTRACE=4, since they are too long I've attached them as files:\n\n[opt_debug_15732.txt](https://github.com/user-attachments/files/21369964/opt_debug_15732.txt)\n[lltrace_15732.txt](https://github.com/user-attachments/files/21369963/lltrace_15732.txt)\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 (heads/main-dirty:6bf1c0ab349, Jul 22 2025, 11:26:33) [GCC 14.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-137016\n* gh-142541\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-07-22T15:52:55Z",
+   "body": "I cannot seem to reproduce this with a debug build of the JIT and with a patch applied, for the reproducer. The reproducer runs till completion for me."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-07-22T15:55:31Z",
+   "body": "Wait sorry, I didn't see that you need two packages in editable mode for this. Re-investigating."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-22T15:59:47Z",
+   "body": "I feel like that part is probably a red herring. Probably the import machinery is taking a different path to find `random` when that's the case, causing GC to happen or something."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-07-22T16:14:57Z",
+   "body": "> I feel like that part is probably a red herring. Probably the import machinery is taking a different path to find `random` when that's the case, causing GC to happen or something.\n\nI tried tweaking GC thresholds and don't get anything either. It's not a GC problem. I narrowed it down to the code path in the executor code deallocating the executor when it's not yet tracked by GC."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-22T17:10:38Z",
+   "body": "I was able to reproduce this by (cloning, then) installing pip and pypa/sampleproject as editable. However, it somehow led to a segfault this time:\n\n```\nProgram received signal SIGSEGV, Segmentation fault.\n_PyObject_GC_UNTRACK (op=0x555555e448a0) at ./Include/internal/pycore_gc.h:279\n279         _PyGCHead_SET_NEXT(prev, next);\n\n#0  _PyObject_GC_UNTRACK (op=0x555555e448a0) at ./Include/internal/pycore_gc.h:279\n#1  uop_dealloc (op=0x555555e448a0) at Python/optimizer.c:269\n#2  0x00005555556c059d in _Py_Dealloc (op=0x555555e448a0) at Objects/object.c:3206\n#3  0x00005555557c86de in Py_DECREF_MORTAL (op=<optimized out>) at ./Include/internal/pycore_object.h:482\n#4  PyStackRef_CLOSE (ref=...) at ./Include/internal/pycore_stackref.h:701\n#5  _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:7656\n#6  0x00005555557d2b3c in _PyEval_EvalFrame (tstate=0x555555bb9a48 <_PyRuntime+315048>, frame=<optimized out>, throwflag=0)\n    at ./Include/internal/pycore_ceval.h:119\n#7  _PyEval_Vector (tstate=0x555555bb9a48 <_PyRuntime+315048>, func=0x7ffff7496fb0, locals=0x0, args=0x7fffffffd178, argcount=<optimized out>,\n    kwnames=<optimized out>) at Python/ceval.c:1977\n#8  0x000055555564905b in _PyObject_VectorcallTstate (tstate=0x555555bb9a48 <_PyRuntime+315048>, callable=0x7ffff7496fb0, args=0x7fffffffd178,\n    nargsf=9223372036854775809, kwnames=0x0) at ./Include/internal/pycore_call.h:169\n#9  PyObject_CallOneArg (func=func@entry=0x7ffff7496fb0, arg=arg@entry=0x7ffff7333b60) at Objects/call.c:395\n#10 0x00005555556feed2 in call_unbound_noarg (unbound=<optimized out>, func=0x7ffff7496fb0, self=0x7ffff7333b60) at Objects/typeobject.c:3019\n#11 maybe_call_special_no_args (self=0x7ffff7333b60, attr=<optimized out>, attr_is_none=<synthetic pointer>) at Objects/typeobject.c:3132\n#12 slot_tp_hash (self=0x7ffff7333b60) at Objects/typeobject.c:10489\n#13 0x00005555556e8e95 in _PyObject_HashFast (op=0x7ffff7333b60) at ./Include/internal/pycore_object.h:872\n#14 _PySet_AddTakeRef (so=0x7ffff73bd2a0, key=0x7ffff7333b60) at Objects/setobject.c:234\n#15 0x00007ffff71c0225 in ?? ()\n#16 0x00007fffffffd590 in ?? ()\n#17 0xfffffffffffffffe in ?? ()\n#18 0x00007fffffffd590 in ?? ()\n#19 0x00007ffff71c7017 in ?? ()\n#20 0x00007ffff7fac0a0 in ?? ()\n#21 0x00007ffff7fac160 in ?? ()\n#22 0x0000555555c720c0 in ?? ()\n#23 0x0000555555b70319 in _PyRuntime ()\n#24 0x0000555555d11116 in ?? ()\n#25 0x00005555557ca888 in _PyEval_EvalFrameDefault (tstate=<error reading variable: Cannot access memory at address 0xfffffffffffffd58>,\n    frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:5598\nBacktrace stopped: previous frame inner to this frame (corrupt stack?)\n```\n\nCan you reproduce by installing those two packages?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-22T18:23:56Z",
+   "body": "Here's a reproducer for the segfault in a JIT non-debug build without the need of installing packages, please use this diff:\n\n```diff\nindex 454c8dde031..9e21c41421a 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -99,8 +99,8 @@ backoff_counter_triggers(_Py_BackoffCounter counter)\n // Must be larger than ADAPTIVE_COOLDOWN_VALUE, otherwise when JIT code is\n // invalidated we may construct a new trace before the bytecode has properly\n // re-specialized:\n-#define JUMP_BACKWARD_INITIAL_VALUE 4095\n-#define JUMP_BACKWARD_INITIAL_BACKOFF 12\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n+#define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n {\n@@ -112,8 +112,8 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4095\n-#define SIDE_EXIT_INITIAL_BACKOFF 12\n+#define SIDE_EXIT_INITIAL_VALUE 63\n+#define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n initial_temperature_backoff_counter(void)\ndiff --git a/Include/internal/pycore_optimizer.h b/Include/internal/pycore_optimizer.h\nindex 8b7f12bf03d..fee929f122f 100644\n--- a/Include/internal/pycore_optimizer.h\n+++ b/Include/internal/pycore_optimizer.h\n@@ -121,7 +121,7 @@ PyAPI_FUNC(void) _Py_Executors_InvalidateCold(PyInterpreterState *interp);\n // This is the length of the trace we project initially.\n #define UOP_MAX_TRACE_LENGTH 800\n\n-#define TRACE_STACK_SIZE 5\n+#define TRACE_STACK_SIZE 10\n\n int _Py_uop_analyze_and_optimize(_PyInterpreterFrame *frame,\n     _PyUOpInstruction *trace, int trace_len, int curr_stackentries,\n@@ -152,7 +152,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n }\n\n // Holds locals, stack, locals, stack ... co_consts (in that order)\n-#define MAX_ABSTRACT_INTERP_SIZE 4096\n+#define MAX_ABSTRACT_INTERP_SIZE 8192\n\n #define TY_ARENA_SIZE (UOP_MAX_TRACE_LENGTH * 5)\n\n@@ -163,7 +163,7 @@ static inline uint16_t uop_get_error_target(const _PyUOpInstruction *inst)\n // progress (and inserting a new ENTER_EXECUTOR instruction). In practice, this\n // is the \"maximum amount of polymorphism\" that an isolated trace tree can\n // handle before rejoining the rest of the program.\n-#define MAX_CHAIN_DEPTH 4\n+#define MAX_CHAIN_DEPTH 16\n\n /* Symbols */\n /* See explanation in optimizer_symbols.c */\n```\n\nAnd this reproducer:\n```python\nimport sys\nfrom importlib.machinery import all_suffixes as module_suffixes  # Not sure why, but this unused import seems necessary\nfrom importlib.util import spec_from_file_location\n\nclass _EditableFinder:\n    @classmethod\n    def _find_spec(cls, fullname, candidate_path):\n        return spec_from_file_location(fullname, candidate_path.with_suffix(\"pyc\"))\n\nclass _EditableFinder2:\n    @classmethod\n    def _find_spec(cls, fullname, candidate_path):\n        return spec_from_file_location(fullname, candidate_path.with_suffix(\"py\"))\n\nsys.meta_path.append(_EditableFinder)\nsys.meta_path.append(_EditableFinder2)\n\nfrom random import randint\n\nclass UnstableHash_unstable_hash_object_v4:\n    hash_count = 0\n\n    def __hash__(self):\n        self.hash_count += 1\n        new_hash = 5 if self.hash_count < 70 else randint(0, 1024)\n        print(new_hash)\n        return new_hash\nunstable_hash_object_v4 = UnstableHash_unstable_hash_object_v4()\ntuple_v6 = (90.1433,)\n\ndef uop_harness_f1():\n\n    class ShapeA_la_7776:\n        payload = 123\n\n    class ShapeB_la_7776:\n\n        @property\n        def payload(self):\n            return 'property_payload'\n\n    class ShapeC_la_7776:\n\n        def payload(self):\n            return id(self)\n\n    class ShapeD_la_7776:\n        __slots__ = ['payload']\n\n        def __init__(self):\n            self.payload = 'slot_payload'\n    shapes_la_7776 = [ShapeA_la_7776(), ShapeB_la_7776(), ShapeC_la_7776(), ShapeD_la_7776()]\n    for i in range(500):\n        obj = shapes_la_7776[i % len(shapes_la_7776)]\n        try:\n            payload_val = obj.payload\n            if callable(payload_val):\n                payload_val()\n                payload_val()\n                payload_val()\n                payload_val()\n        except Exception:\n            pass\n    {unstable_hash_object_v4, unstable_hash_object_v4}\n    {unstable_hash_object_v4, unstable_hash_object_v4}\n    {unstable_hash_object_v4, unstable_hash_object_v4}\n    {unstable_hash_object_v4, unstable_hash_object_v4}\n    for i_loop_1589 in {2, 1, 2, 3, 4, 5, 6, 8, 10, 9, 12, 10, 12, 13, 14, 15, 17, 17}:\n        x, *y = tuple_v6\n    x, *y = tuple_v6\nfor i_f1 in range(300):\n    try:\n        uop_harness_f1()\n    except Exception as e:\n        break\n\n```"
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-22T20:18:38Z",
+   "body": "> Here's a reproducer for the segfault in a JIT non-debug build without the need of installing packages, please use this diff:\n\nHm, this isn't working for me. Non-debug build, patches applied, no venv."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-22T22:15:34Z",
+   "body": "> Hm, this isn't working for me. Non-debug build, patches applied, no venv.\n\nThis isn't my make-it-reliably-reproducible day, is it? It doesn't work without a venv for me either, and it turns out I had [lafleur](https://github.com/devdanzin/lafleur/) installed when I though I didn't and removing it stops reproducing. What a mess. Sorry again. I will spend a lot more time making sure any reports are reproducible.\n\nSo here's how it's working for me:\n```\n(release_jit_cpython_venv) :~ $ pip3 list\nPackage    Version Editable project location\n---------- ------- -----------------------------\nlafleur    0.0.1   /home/danzin/projects/lafleur\npeppercorn 0.6\npip        25.1.1\n(release_jit_cpython_venv) :~ $ ~/venvs/release_jit_cpython_venv/bin/python ~/crashers/jit/reduced_crash_retcode_child_15732_2.py\n5\n5\n5\n5\n[... a bunch of numbers]\n427\n493\n35\nSegmentation fault (core dumped)\n```\n\nI hope it works now."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-22T22:21:46Z",
+   "body": "Also, for the future, setting a random seed really helps when randomness is involved. ;)"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-22T22:54:02Z",
+   "body": "> Also, for the future, setting a random seed really helps when randomness is involved. ;)\n\nThere's a seed for the mutations (that is, test case generation is reproducible), it just never occurred to me to add it to the fuzzing script (that is, doh)\ud83e\udd26. Thanks, will adopt it :)\n\nAre you able to reproduce it with latest instructions?\n\nHere's a small reduction I got, that shows calling randint isn't necessary:\n```python\nimport gc\ngc.set_threshold(10)  # Doesn't seem to work with 1 or most numbers, but 10 works\nfrom random import randint  # Seems necessary to get GC to where we want\n\n\nclass _EditableFinder:\n    @classmethod\n    def _find_spec(cls, fullname, candidate_path):\n        pass\n\n\nclass UnstableHash_unstable_hash_object_v4:\n    def __hash__(self):\n        print(5, end=\" \", flush=True)  # If we don't flush, no crash. If we do a bare print, it also crashes.\n        return 5\nunstable_hash_object_v4 = UnstableHash_unstable_hash_object_v4()\n\ntuple_v6 = (90.1433,)\n\ndef uop_harness_f1():\n\n    class ShapeA_la_7776:\n        payload = 123\n\n    class ShapeB_la_7776:\n        @property\n        def payload(self):\n            return 'property_payload'\n\n    class ShapeC_la_7776:\n        def payload(self):\n            return id(self)\n\n    class ShapeD_la_7776:\n        __slots__ = ['payload']\n        def __init__(self):\n            self.payload = 'slot_payload'\n\n    shapes_la_7776 = [ShapeA_la_7776(), ShapeB_la_7776(), ShapeC_la_7776(), ShapeD_la_7776()]\n    for i in range(500):\n        obj = shapes_la_7776[i % len(shapes_la_7776)]\n        payload_val = obj.payload\n        if callable(payload_val):\n            payload_val()\n\n    {unstable_hash_object_v4, unstable_hash_object_v4, unstable_hash_object_v4}\n\n    for i_loop_1589 in {2, 1, 2, 3, 4, 5, 6, 8, 10, 9, 12, 10, 12, 13, 14, 15, 15, 17}:\n        x, *y = tuple_v6\n\nfor i_f1 in range(100):\n        uop_harness_f1()\n```"
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-22T22:56:25Z",
+   "body": "Here's where I am:\n\n```py\nfrom importlib.machinery import all_suffixes as module_suffixes\nfrom importlib.util import spec_from_file_location\n\nclass C:\n    @classmethod\n    def f():\n        pass\n\nclass D:\n    def f(self):\n        pass\n\nfrom random import randint\nfrom random import seed\n\nseed(5)\n\n# import gc\n\n# gc.set_threshold(1)\n\nclass XXX:\n    hash_count = 0\n\n    def __hash__(self):\n        self.hash_count += 1\n        new_hash = None\n        return randint(0, 1)\n\nxxx = XXX()\ntuple_v6 = (0,)\n\ndef f():\n\n    class W:\n        payload = None\n\n    class X:\n        @property\n        def payload(self):\n            return 'property_payload'\n\n    class Y:\n        def payload(self):\n            return id(self)\n\n    class Z:\n        __slots__ = ['payload']\n        def __init__(self):\n            self.payload = 'slot_payload'\n\n    stuff = [W(), X(), Y(), Z()]\n\n    for i in range(500):\n        try:\n            if callable(stuff[i % 4].payload):\n                pass\n        except:\n            pass\n    {xxx, xxx, xxx, xxx, xxx, xxx}\n    for i_loop_1589 in {0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13}:\n        x, *y = tuple_v6\n\nfor i_f1 in range(88):\n    f()\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-01T17:53:27Z",
+   "body": "I can no longer repro on main. I think https://github.com/python/cpython/pull/136411 fixed this."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-09-01T22:28:21Z",
+   "body": "I can still repro on main by changing the gc tuning to `gc.set_threshold(11)` and raising number of iterations from 100 to 400. Does it abort for you too?\n\n```python\nimport gc\ngc.set_threshold(11)  # Doesn't seem to work with 1 or most numbers, but 10 works\nfrom random import randint  # Seems necessary to get GC to where we want\n\n\nclass _EditableFinder:\n    @classmethod\n    def _find_spec(cls, fullname, candidate_path):\n        pass\n\n\nclass UnstableHash_unstable_hash_object_v4:\n    def __hash__(self):\n        print(5, end=\" \", flush=True)  # If we don't flush, no crash. If we do a bare print, it also crashes.\n        return 5\nunstable_hash_object_v4 = UnstableHash_unstable_hash_object_v4()\n\ntuple_v6 = (90.1433,)\n\ndef uop_harness_f1():\n\n    class ShapeA_la_7776:\n        payload = 123\n\n    class ShapeB_la_7776:\n        @property\n        def payload(self):\n            return 'property_payload'\n\n    class ShapeC_la_7776:\n        def payload(self):\n            return id(self)\n\n    class ShapeD_la_7776:\n        __slots__ = ['payload']\n        def __init__(self):\n            self.payload = 'slot_payload'\n\n    shapes_la_7776 = [ShapeA_la_7776(), ShapeB_la_7776(), ShapeC_la_7776(), ShapeD_la_7776()]\n    for i in range(500):\n        obj = shapes_la_7776[i % len(shapes_la_7776)]\n        payload_val = obj.payload\n        if callable(payload_val):\n            payload_val()\n\n    {unstable_hash_object_v4, unstable_hash_object_v4, unstable_hash_object_v4}\n\n    for i_loop_1589 in {2, 1, 2, 3, 4, 5, 6, 8, 10, 9, 12, 10, 12, 13, 14, 15, 15, 17}:\n        x, *y = tuple_v6\n\nfor i_f1 in range(400):\n        uop_harness_f1()\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-02T12:27:16Z",
+   "body": "I'm unable to repro with the given code."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-09-03T08:39:53Z",
+   "body": "Hm, in another machine it only repros with `gc.set_threshold(14)`. Can you try a few different values for that threshold if it still doesn't abort for you?\n\nSorry for the fickle MRE."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-11T11:18:28Z",
+   "body": "Since this can't be reproduced anymore, I'm closing the isssue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/137016",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/lafleur/issues/12",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/139540",
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "97e19014ddc652beae58e7eceb591f5d65a875e6",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "25a48d980938e4c7c3658287e7e7c200fc27ba6b",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142541",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "acd5b9708222e768fe0d0e1fb6071c6602acb63f",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ]
+}

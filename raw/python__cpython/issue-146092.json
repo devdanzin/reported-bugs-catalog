@@ -1,0 +1,327 @@
+{
+ "repo": "python/cpython",
+ "number": 146092,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146092",
+ "title": "Missing `PyErr_NoMemory` in `_zoneinfo` `load_data` and `ts_to_local`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.13",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2026-03-17T23:23:48Z",
+ "closed_at": "2026-03-20T16:18:48Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to cause assertion errors due to calls returning `NULL` on OOM in `_zoneinfo`.\n\n### Automated diagnosis:\n\nMultiple `PyMem_Malloc`/`PyMem_Calloc` calls in `load_data` (including `ts_to_local` at line 2130) return `NULL` on OOM and goto `error` without setting an exception. The caller returns `NULL` without exception \u2192 assertion failure.\n\nFile: `Modules/_zoneinfo.c`, lines 1029-1137 (`load_data`), 2130 (`ts_to_local`)\n\nMRE for `load_data`:\n```python\nimport _testcapi, sys\n\nfor mod in [\"zoneinfo\", \"_zoneinfo\"]:\n    if mod in sys.modules:\n        del sys.modules[mod]\n\nfor n in range(1, 50):\n    for mod in [\"zoneinfo\", \"_zoneinfo\"]:\n        if mod in sys.modules:\n            del sys.modules[mod]\n    print(n)\n    _testcapi.set_nomemory(n, 0)\n    try:\n        from zoneinfo import ZoneInfo\n        z = ZoneInfo(\"UTC\")\n        _testcapi.remove_mem_hooks()\n        break\n    except MemoryError:\n        _testcapi.remove_mem_hooks()\n```\n\nMRE for `ts_to_local`:\n```python\nimport _testcapi\nfrom zoneinfo import ZoneInfo\n\n# Warm up imports \u2014 we only want OOM during zone construction\n_ = ZoneInfo(\"UTC\")\ndel _\n\n# Clear cache so America/New_York gets re-loaded from TZif data\nZoneInfo.clear_cache()\n\n# Persistent failure from allocation #9 onward.\n# Early allocs (import machinery, arg parsing) succeed;\n# the PyMem_Malloc in load_data/ts_to_local fails.\n_testcapi.set_nomemory(9, 0)\n\nz = ZoneInfo(\"America/New_York\")  # crashes: assertion `obj != NULL'\n```\n\nBacktrace:\n```\npython: ./Include/internal/pycore_stackref.h:554: _PyStackRef PyStackRef_FromPyObjectSteal(PyObject *): Assertion `obj != NULL' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x000055555587fd55 in PyStackRef_FromPyObjectSteal (obj=<optimized out>) at ./Include/internal/pycore_stackref.h:554\n#8  0x0000555555842cd0 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, frame=<optimized out>, frame@entry=0x7ffff7fa70a0, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:292\n#9  0x000055555583f08b in _PyEval_EvalFrame (tstate=0x555555d99c08 <_PyRuntime+360664>, frame=0x7ffff7fa70a0, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#10 _PyEval_Vector (tstate=0x555555d99c08 <_PyRuntime+360664>, func=0x7ffff75e9190, locals=0x0, args=0x7fffffffb310, argcount=2, kwnames=0x0) at Python/ceval.c:2130\n#11 0x00005555556a2ebe in _PyObject_VectorcallTstate (tstate=0x555555d99c08 <_PyRuntime+360664>, callable=callable@entry=0x7ffff75e9190, args=args@entry=0x7fffffffb310,\n    nargsf=nargsf@entry=2, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:144\n#12 0x00005555556a625a in object_vacall (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, base=base@entry=0x0, callable=callable@entry=0x7ffff75e9190,\n    vargs=vargs@entry=0x7fffffffb460) at Objects/call.c:823\n#13 0x00005555556a5f0b in PyObject_CallMethodObjArgs (obj=0x7ffff75b08c0, name=0x555555d57470 <_PyRuntime+88384>) at Objects/call.c:960\n#14 0x000055555595136b in import_find_and_load (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, abs_name=abs_name@entry=0x7ffff74f86d0) at Python/import.c:4125\n#15 0x0000555555950f66 in PyImport_ImportModuleLevelObject (name=name@entry=0x7ffff74f86d0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0,\n    fromlist=0x7ffff7477cf0, level=level@entry=0) at Python/import.c:4241\n#16 0x00005555558f7265 in _PyEval_ImportNameWithImport (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, import_func=0x7ffff75be9f0, globals=globals@entry=0x7ffff746a4b0,\n    locals=locals@entry=0x7ffff746a4b0, name=name@entry=0x7ffff74f86d0, fromlist=fromlist@entry=0x7ffff7477cf0, level=0x555555d49188 <_PyRuntime+30296>) at Python/ceval.c:2975\n#17 0x00005555558848bf in _PyEval_ImportName (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, builtins=0x7ffff75be930, globals=0x7ffff746a4b0, locals=0x7ffff746a4b0,\n    name=0x7ffff74f86d0, fromlist=0x7ffff7477cf0, level=0x555555d49188 <_PyRuntime+30296>) at Python/ceval.c:2954\n#18 0x000055555586141a in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:6460\n#19 0x000055555583f08b in _PyEval_EvalFrame (tstate=0x555555d99c08 <_PyRuntime+360664>, frame=0x7ffff7fa7020, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#20 _PyEval_Vector (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, func=func@entry=0x7ffff7466690, locals=locals@entry=0x7ffff746a4b0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2130\n#21 0x000055555583ee1e in PyEval_EvalCode (co=co@entry=0x555555f3baf0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0) at Python/ceval.c:686\n#22 0x00005555559c8f8e in run_eval_code_obj (tstate=0x555555d99c08 <_PyRuntime+360664>, co=co@entry=0x555555f3baf0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0)\n    at Python/pythonrun.c:1368\n#23 0x00005555559c8adb in run_mod (mod=mod@entry=0x555555f43b30, filename=filename@entry=0x7ffff74e8580, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0,\n    flags=0x7fffffffc950, arena=arena@entry=0x7ffff74dad40, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1471\n```\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/_zoneinfo.c all deep` command.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:e0f7c1097e1, Mar 17 2026, 18:10:52) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146117\n* gh-146119\n* gh-146124\n* gh-146132\n* gh-146138\n* gh-146165\n* gh-146223\n* gh-146224\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T15:17:46Z",
+   "body": "> MRE for ts_to_local\n\nThis script triggers a bug in `Python/ceval.c`, not in `Modules/_zoneinfo.c`. I wrote https://github.com/python/cpython/pull/146117 to fix this unrelated bug."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T16:42:47Z",
+   "body": "> MRE for load_data\n\nThis script triggers a bug in _PyFrame_GetLocals(): I wrote https://github.com/python/cpython/pull/146124 to fix it."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-19T11:26:39Z",
+   "body": "> Multiple PyMem_Malloc/PyMem_Calloc calls in load_data (including ts_to_local at line 2130) return NULL on OOM and goto error without setting an exception. The caller returns NULL without exception \u2192 assertion failure.\n\nI wrote https://github.com/python/cpython/pull/146165 to raise MemoryError on memory allocation failures."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-20T16:18:48Z",
+   "body": "Thanks for your bug report. It should be fixed by https://github.com/python/cpython/commit/6450b1d142b6254d2e3b2eba47d69125ca79b3fe."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e7379c0c2a96c9c30fa8b140f77a42767c2f724e",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146117",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a14e2c247d1311f9922fc644134a4e414eb62b35",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3bd1e9db2ae21cfc12e417b461f44d4cfc50cb89",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146119",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1e4ed932109c4f8ee4f43bc3e6fdb7710a3606bd",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f34f735cd9dced02796f0f11c1e85cc473e6dc70",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "458277f72af340534d0cfab7ec95feca717ce138",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146124",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e1e4852133ea548479bc9b975420a32331df7cee",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5ec809bfc71b600dcfa1d3ad46183cd4135a42fc",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146132",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8eeb800faf5562e6ce3805416f656ab09243c9a6",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f785cb5b70e3a40d4a0cacb23938732991729cdc",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146138",
+   "commit": null,
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "53b544a6a7d14fbbb07a18b3c324ac5167d0597f",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7f29c1d0dabb84fc91caf874881b501345702793",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5d51fa9e1006e4f3bffbf1ecfc394cb76608bb76",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146165",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6450b1d142b6254d2e3b2eba47d69125ca79b3fe",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8403da24608a0519f99a61a58d1d20d7cc7d02ef",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8025e78e9822f7ba43df4ec215325714d8bf350f",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146223",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146224",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cfd7f94c12c7ee85d51838b306b8c30596094ebc",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a2a45d7d13ceaf6d44b5b58392a36920937f63f7",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2691ad9d6a47b4beee7b5f299d878b4ef36e830c",
+   "actor": "CuriousLearner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/deep-learnings/pull/11",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/botpress-accuracy-reporters/pull/83",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/coding-tests/pull/43",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-cleaners/pull/32",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-extension-converters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/github-wiki-organisers/pull/30",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/itunes-file-delimiter-replacers/pull/28",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/json-data-sorters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/natural-language-processing/pull/10",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/pr-title-printers/pull/17",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/template-creators/pull/16",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/tutorials/pull/219",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/web-scrapers/pull/14",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/cext-review-toolkit/pull/43",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4f4627f32d8ed1da87bf20981322a28adb79489b",
+   "actor": "ljfp"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5fdfa41fe95685918385a177a271d70bdcf1de0c",
+   "actor": "ljfp"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bd94f64b736eadb1d54ba796e7854020a83cabf3",
+   "actor": "ljfp"
+  }
+ ]
+}

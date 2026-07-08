@@ -1,0 +1,108 @@
+{
+ "repo": "rogerbinns/apsw",
+ "number": 609,
+ "type": "issue",
+ "url": "https://github.com/rogerbinns/apsw/issues/609",
+ "title": "Investigate linter report",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "rogerbinns",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-03-28T00:00:33Z",
+ "closed_at": "2026-04-03T00:17:23Z",
+ "body": "The report is [here](https://gist.github.com/devdanzin/db96bedb4e2ec6712fc6b71191ff4bd0) made by [this tool](https://github.com/devdanzin/cext-review-toolkit) which is doing Claude Code under the hood.   They seem credible, but to require deep investigation.",
+ "comments": [
+  {
+   "author": "rogerbinns",
+   "created_at": "2026-04-02T16:49:18Z",
+   "body": "(AI made the original report.  In the same spirit I made a response here that wasn't pretty, and had ChatGPT reformat it.  See 2 revisions ago for the original.)\n\n## Hits\n\n1. Yes \u2014 possible for UTF-16 database with conversion to UTF-8.  \n   Missed `sqlite3_column_blob`, which could also fail.\n\n2. Yes \u2014 unlikely.  \n   Also missed `sqlite3_value_blob`.\n\n3. Yes \u2014 although not realistic in practice, as the buffer is only ever shortened.\n\n4. Yes.\n\n5. Yes \u2014 not practically fault-injectable, which is why it was missed.\n\n6. Yes.\n\n8. Good practice.\n\n9. Yes.\n\n10. Yes.  \n    Not originally checked because failure to allocate a few hundred bytes at module load is already catastrophic.  \n    Now the code is longer and more complex as a result.\n\n### Additional considerations\n\n- `MakeExistingException` leaks:\n  - Correct in 2 places, **incorrect in 5**\n\n- `PyDict_GetItemString`:\n  - Could be replaced, but failure is not practical to test or likely in reality\n\n- GIL handling:\n  - Several `sqlite3` calls release the GIL\n\n- `cursor.tp_traverse`:\n  - Missing bindings  \n  - Report is incorrect for two cases, but upcoming changes will require them anyway\n\n- `PyDict_Next`:\n  - Risk underestimated \u2014 dictionary mutation during iteration \u2192 undefined behavior\n\n---\n\n## Misses\n\n7. `tp_traverse` is invoked by `gc.get_referents`.  \n   These objects cannot implement `tp_clear`, hence no `Py_TPFLAGS_HAVE_GC`.\n\n11. Deliberate:  \n    `sqlite3_mprintf` explicitly allows NULL:  \n    > The argument is either a zero-terminated string that is displayed, or a null pointer which is treated as an empty string  \n    No additional error handling is possible.\n\n12. Explained in code comments:  \n    `changesetbuilder` must hold a strong reference (mirroring SQLite behavior).  \n    This cannot be undone \u2014 weakref/tracking failure is acceptable.\n\n### Additional considerations\n\n- Connection/cursor GC:\n  - No `tp_clear` by design \u2014 SQLite owns the lifecycle\n\n- Session `tp_traverse`:\n  - Covered in point 7\n\n- Connection `tp_traverse`:\n  - Members are `int` and `str` \u2192 no traversal needed\n\n- `PyObject_RichCompareBool` in module `getattr`/`setattr`:\n  - Was deliberate, but reasoning was wrong and possible to get crashes with debug CPython build\n  - Later fixed\n\n- `PyModule_AddObject`:\n  - Deliberate \u2014 avoids taking ownership  \n  - Alternative (`PyModule_AddObjectRef`) would require explicit `DECREF` after each call\n\n- Private API usage:\n  - `_PyObject_New` is what `PyObject_New` macro expands to and can be fault-injected\n  - `_PyTuple_Resize` is effectively the correct API despite naming\n  - Exception chaining: https://github.com/python/cpython/issues/116809\n\n- `capi-compat`:\n  - Custom polyfills allow fault-injection testing\n\n- `jsonb_decode_utf8_string_complex`:\n  - No meaningful benefit from additional handling\n\n- `carraybind_init`:\n  - No duplication \u2014 just multiple distinct checks\n\n- `Py_IsInitialized` in destructors:\n  - No identified reason to use it\n\n---\n\n## Policy\n\n- **Multi-phase init**:  \n  No practical benefit. SQLite is process-global, so APSW database objects cannot support subinterpreters in a meaningful way.  \n  Unicode support *does* benefit, which is why it uses multi-phase init.\n\n- **Free-threading**:  \n  Requires substantial work \u2014 see #568.\n\n- **Polyfills**:  \n  Maintained in-tree to:\n  - Enable fault-injection testing\n  - Avoid external dependencies\n  - Support alpha Python versions"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f01d41ac445bbb200669110b6e96ff6eb7729202",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "28b0306399ac97077b72efd39169dad2d323779b",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7b7c2442a09e01a96645b47f2ae651108737f025",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b8d1661aaba91e47a9aa44947f826e9a612b600f",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e8fbcea36a00b64bc210bd6dbb76ab47421cce22",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "226f0460629f02e7352a403feace1c0101389686",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5fbaf86e73219f072efcfac7d5b5042702d9526d",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "45976904f52d7fdf9798610826e4a59545caf651",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6077cdbe9b9a6d7e3ff88dd193197d55307dc10a",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "08879f8f931d0b11848dbfdf6d180f82bb434d87",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dcbab7276d4113e8c3f23eeb81bbca075c737666",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "17c19e1c7600ed3ce2d7babe3f812ef450df1065",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ee59ca652c4d517aaebc508e2fc99925c8571b5e",
+   "actor": "rogerbinns"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "rogerbinns"
+  }
+ ]
+}

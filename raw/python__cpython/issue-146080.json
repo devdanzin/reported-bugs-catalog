@@ -1,0 +1,256 @@
+{
+ "repo": "python/cpython",
+ "number": 146080,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146080",
+ "title": "Segfault from `Py_DECREF(NULL)` in `_servername_callback` error label in `_ssl.c`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-SSL",
+  "3.13",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2026-03-17T20:08:45Z",
+ "closed_at": "2026-03-29T13:15:32Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to cause a segfault in `_servername_callback` error label by making `ssl_socket` to be `NULL`.\n\n### Automated diagnosis:\n\nBug: `Py_DECREF(NULL)` crash in `_ssl _servername_callback`. When the SSL socket/owner weakref has been garbage collected during an SNI callback, `ssl_socket` is `NULL`. The error label at line 5197 calls `Py_DECREF(ssl_socket)` on `NULL` -> segfault.\nFix: Change `Py_DECREF` to `Py_XDECREF`\nFile: `Modules/_ssl.c`, line 5197\n\n[Full report](https://gist.github.com/devdanzin/50f9880636df43efd3886f6bda2077b3)\n\n\n**WARNING**: THIS MRE WILL **RUN openssl** IN A SUBPROCESS AND **LEAK** THE CERT AND KEY FILES\nMRE:\n```python\n\"\"\"\nWARNING: THIS MRE WILL RUN openssl IN A SUBPROCESS AND LEAK THE CERT AND KEY FILES\n\nStrategy: Use SSLObject (not SSLSocket) so the Python-level wrapper can\nbe GC'd independently of the C-level SSL object. In the SNI callback,\ndelete the only reference to the SSLObject and force GC. The weakref\nin ssl->owner dies, PyWeakref_GetRef returns 0, ssl_socket = NULL,\ngoto error -> Py_DECREF(NULL) -> crash.\n\"\"\"\nimport ssl\nimport gc\nimport tempfile\nimport subprocess\n\ndef generate_self_signed_cert():\n    \"\"\"\n    Generate a self-signed cert+key for testing.\n    WARNING: THIS RUNS openssl IN A SUBPROCESS AND LEAKS THE CERT AND KEY FILES\n    \"\"\"\n    certpath = tempfile.mktemp(suffix='.pem')\n    keypath = tempfile.mktemp(suffix='.key')\n    subprocess.run([\n        'openssl', 'req', '-x509', '-newkey', 'rsa:2048',\n        '-keyout', keypath, '-out', certpath,\n        '-days', '1', '-nodes', '-subj', '/CN=test'\n    ], capture_output=True, check=True)\n    return certpath, keypath\n\ndef sni_callback(sslobj, servername, sslctx):\n    pass\n\ncertpath, keypath = generate_self_signed_cert()\nserver_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)\nserver_ctx.load_cert_chain(certpath, keypath)\n\nserver_ctx.set_servername_callback(sni_callback)\n\n# Approach: Use MemoryBIO-based SSLObject (not socket-based SSLSocket)\n# to have more control over the object lifecycle.\nserver_incoming = ssl.MemoryBIO()\nserver_outgoing = ssl.MemoryBIO()\nserver_sslobj = server_ctx.wrap_bio(\n    server_incoming, server_outgoing, server_side=True\n)\n\nclient_ctx = ssl.create_default_context()\nclient_ctx.check_hostname = False\nclient_ctx.verify_mode = ssl.CERT_NONE\n\nclient_incoming = ssl.MemoryBIO()\nclient_outgoing = ssl.MemoryBIO()\nclient_sslobj = client_ctx.wrap_bio(\n    client_incoming, client_outgoing,\n    server_side=False, server_hostname='test'\n)\n\n# Get the internal _SSLSocket objects\nserver_ssl_internal = server_sslobj._sslobj\nclient_ssl_internal = client_sslobj._sslobj\n\n# The _SSLSocket's \"owner\" weakref points to the SSLObject.\n# If we delete the SSLObject, the weakref dies.\n# Try to do the handshake\nfor i in range(20):\n    # Client step\n    try:\n        client_sslobj.do_handshake()\n    except ssl.SSLWantReadError:\n        pass\n\n    # Transfer client -> server\n    data = client_outgoing.read()\n    if data:\n        server_incoming.write(data)\n\n    # NOW: before server processes the ClientHello (which triggers SNI),\n    # try to kill the server SSLObject so the weakref dies.\n    if i == 0 and data:\n        # The server hasn't processed ClientHello yet.\n        # Delete the SSLObject wrapper \u2014 the internal _SSLSocket\n        # still exists (we hold server_ssl_internal).\n        # The weakref ssl->owner should now be dead.\n        del server_sslobj\n        gc.collect()\n        print(f\"server_ssl_internal still alive: {server_ssl_internal is not None}\")\n\n        # Now do_handshake on the internal object directly\n        # This will trigger the SNI callback with a dead owner weakref\n        server_ssl_internal.do_handshake()\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x00007bfff59bf197 in Py_DECREF (lineno=5197, op=0x0, filename=<optimized out>) at ./Include/refcount.h:390\n390         if (op->ob_refcnt_full <= 0 || op->ob_refcnt > (((PY_UINT32_T)-1) - (1<<20))) {\n\n#0  0x00007bfff59bf197 in Py_DECREF (lineno=5197, op=0x0, filename=<optimized out>) at ./Include/refcount.h:390\n#1  _servername_callback (s=0x7e1ff6ff8100, al=<optimized out>, args=0x7d4ff7011930) at ./Modules/_ssl.c:5197\n#2  0x00007bfff459d89a in ?? () from /lib/x86_64-linux-gnu/libssl.so.3\n#3  0x00007bfff459eddc in ?? () from /lib/x86_64-linux-gnu/libssl.so.3\n#4  0x00007bfff45c15f2 in ?? () from /lib/x86_64-linux-gnu/libssl.so.3\n#5  0x00007bfff45abdbb in ?? () from /lib/x86_64-linux-gnu/libssl.so.3\n#6  0x00007bfff59bff61 in _ssl__SSLSocket_do_handshake_impl (self=0x7caff70e4070) at ./Modules/_ssl.c:1052\n#7  _ssl__SSLSocket_do_handshake (self=0x7caff70e4070, _unused_ignored=<optimized out>) at ./Modules/clinic/_ssl.c.h:30\n#8  0x0000555555ae6992 in method_vectorcall_NOARGS (func=func@entry=0x7c7ff70f14c0, args=args@entry=0x7bfff5d8c728, nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0)\n    at Objects/descrobject.c:448\n#9  0x0000555555ab9e00 in _PyObject_VectorcallTstate (tstate=0x5555568f7b18 <_PyRuntime+360664>, callable=0x7c7ff70f14c0, args=0x7bfff5d8c728, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:136\n#10 0x0000555555e588dd in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=<optimized out>, total_args=1, kwnames=..., call_instrumentation=<optimized out>,\n    frame=<optimized out>, this_instr=<optimized out>, tstate=<optimized out>) at Python/ceval.c:770\n#11 0x0000555555e94263 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1838\n#12 0x0000555555e57778 in _PyEval_EvalFrame (tstate=0x5555568f7b18 <_PyRuntime+360664>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#13 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2134\n#14 0x0000555555e57195 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff70884c0) at Python/ceval.c:681\n#15 0x0000555556061fb0 in run_eval_code_obj (tstate=tstate@entry=0x5555568f7b18 <_PyRuntime+360664>, co=co@entry=0x7d8ff7016690, globals=globals@entry=0x7c7ff70884c0,\n    locals=locals@entry=0x7c7ff70884c0) at Python/pythonrun.c:1368\n#16 0x000055555606117c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1471\n```\n\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/_ssl.c all deep` command.\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:99e2c5eccd2, Mar 17 2026, 08:26:50) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146573\n* gh-146597\n* gh-146598\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-17T22:16:52Z",
+   "body": "Is there a less intricate MRE so that we can have a simpler regression test?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-17T22:31:27Z",
+   "body": "I'll try to create one."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-17T22:47:26Z",
+   "body": "This is a bit better suited for a regression test, albeit still long:\n```python\nimport gc\nimport ssl\nimport test.support\n\nCERTFILE = test.support.findfile(\"keycert.pem\", subdir=\"certdata\")\n\nserver_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)\nserver_ctx.load_cert_chain(CERTFILE)\nserver_ctx.set_servername_callback(lambda *a: None)\n\nclient_ctx = ssl.create_default_context()\nclient_ctx.check_hostname = False\nclient_ctx.verify_mode = ssl.CERT_NONE\n\nserver_in, server_out = ssl.MemoryBIO(), ssl.MemoryBIO()\nclient_in, client_out = ssl.MemoryBIO(), ssl.MemoryBIO()\n\nserver_sslobj = server_ctx.wrap_bio(server_in, server_out, server_side=True)\nclient_sslobj = client_ctx.wrap_bio(client_in, client_out,\n                                       server_side=False, server_hostname='test')\n\n# Keep a reference to the internal C-level _SSLSocket\nserver_internal = server_sslobj._sslobj\n\n# Client sends ClientHello\ntry:\n    client_sslobj.do_handshake()\nexcept ssl.SSLWantReadError:\n    pass\nserver_in.write(client_out.read())\n\n# Kill the SSLObject wrapper \u2014 the owner weakref in the C object dies\ndel server_sslobj\ngc.collect()\n\n# Trigger the SNI callback with a dead owner weakref \u2192 Py_DECREF(NULL)\nserver_internal.do_handshake()  # crashes here\n```\n\nIs it good enough, or should I keep trying to get it smaller?"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-17T22:52:10Z",
+   "body": "This one seems fine. "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T08:35:41Z",
+   "body": "Do you want to make a PR or should I address it myself? I will have some time today so I can do it.\n\n@devdanzin "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-18T10:02:39Z",
+   "body": "Please handle it, I'll be busy working on more reports."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T14:14:37Z",
+   "body": "I confirm that the following change does fix the crash:\n\n```py\ndiff --git a/Modules/_ssl.c b/Modules/_ssl.c\nindex 2eb31229a9b..61282484185 100644\n--- a/Modules/_ssl.c\n+++ b/Modules/_ssl.c\n@@ -5194,7 +5194,7 @@ _servername_callback(SSL *s, int *al, void *args)\n     return ret;\n \n error:\n-    Py_DECREF(ssl_socket);\n+    Py_XDECREF(ssl_socket);\n     *al = SSL_AD_INTERNAL_ERROR;\n     ret = SSL_TLSEXT_ERR_ALERT_FATAL;\n     PyGILState_Release(gstate);\n```\n\nThe non-trivial part is to write a regression test :-)\n\n@picnixz plans to write a PR to fix this issue."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-28T12:30:23Z",
+   "body": "I eneded up doing a bit more work because the reproducers weren't crashing reliably on my side. As usual, fixes are easy, but tests are complex :( I wish we had a more elegant way to write those tests (like, doing the `client_sslobj.do_handshake()`). If we fail to complete the handshake, I'm not entirely sure that we will trigger the same error paths so I made sure to properly complete the handshake on the client's side (namely, sending the correct data)."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-28T12:31:08Z",
+   "body": "Aaaannd AWS-LC is not happy with this \ud83d\ude20 It looks like we are hitting different code paths (maybe) "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-29T13:15:32Z",
+   "body": "Thanks for the report!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8cc1861ad8446bae1fee507acf652efa6ffb926d",
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146573",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "24db78c5329dd405460bfdf76df380ced6231353",
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146597",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a3372303bab2f82cb1b226195275a228c7e56151",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "eee64e780dee59e1c8ce0d3b7da9155e975b37f3",
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146598",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "883b6d22d17c3b2fff2ed14e1ff42ddbeb23c504",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "59f33e82ff8f530cfe589ca47a6fdff538d1a1d3",
+   "actor": "picnixz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a0ea81b65c2e41d22addc23ddd64da0782855db",
+   "actor": "maurycy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/deep-learnings/pull/11",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/botpress-accuracy-reporters/pull/83",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/coding-tests/pull/43",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-cleaners/pull/32",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-extension-converters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/github-wiki-organisers/pull/30",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/itunes-file-delimiter-replacers/pull/28",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/json-data-sorters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/natural-language-processing/pull/10",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/pr-title-printers/pull/17",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/template-creators/pull/16",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/tutorials/pull/219",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/web-scrapers/pull/14",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "daeca97f2ccb10108b4f0c02c3b130efcb7de191",
+   "actor": "clin1234"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d40a274b7a3b80f49c4a17072bfdb1da0cf205eb",
+   "actor": "ljfp"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151673",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151773",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  }
+ ]
+}

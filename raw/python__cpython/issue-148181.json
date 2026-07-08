@@ -1,0 +1,73 @@
+{
+ "repo": "python/cpython",
+ "number": 148181,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/148181",
+ "title": "`itertools.zip_longest` stores NULL in GC-tracked `ittuple` when iterators exhaust",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2026-04-06T17:15:19Z",
+ "closed_at": "2026-05-11T19:10:26Z",
+ "body": "# Crash report\n\n### What happened?\n\n`itertools.zip_longest` stores `NULL` in its internal `ittuple` (the tuple of iterators) when an iterator is exhausted, at `Modules/itertoolsmodule.c:3847,3877`:\n\n```c\nPyTuple_SET_ITEM(lz->ittuple, i, NULL);\nPy_DECREF(it);\n```\n\nThe `ittuple` is GC-tracked and visited by `zip_longest_traverse`. When exposed via `gc.get_referents()`, the tuple contains `NULL` items. On builds without the `PyUnicodeWriter_WriteRepr` NULL fix (gh-146056), `repr()` of this tuple segfaults. On builds with the fix, it displays `<NULL>`.\n\nThis is the same class of bug as gh-146056 (NULL items in GC-tracked containers), but in `itertools.zip_longest` rather than `xml.etree.ElementTree`.\n\n### Reproducer\n\n```python\nimport itertools\nimport gc\n\nzl = itertools.zip_longest(iter([1]), iter([1, 2, 3]))\nnext(zl)  # (1, 1) \u2014 both iterators alive\nnext(zl)  # (None, 2) \u2014 first iterator exhausted, ittuple[0] set to NULL\n\n# Expose the internal ittuple via gc.get_referents\nrefs = gc.get_referents(zl)\nfor r in refs:\n    if isinstance(r, tuple):\n        print(repr(r))  # Segfault on builds without gh-146056 fix\n                         # Shows (<NULL>, <list_iterator ...>) on builds with it\n```\n\n\n### Suggested fix\n\nReplace `NULL` with `Py_None` as the sentinel for exhausted iterators. `Py_None` can never be a valid iterator in the `ittuple` (passing `None` as an iterable to `zip_longest` fails at `PyObject_GetIter` in `zip_longest_new`).\n\n```diff\n--- a/Modules/itertoolsmodule.c\n+++ b/Modules/itertoolsmodule.c\n@@ -3832,7 +3832,7 @@\n         for (i=0 ; i < tuplesize ; i++) {\n             it = PyTuple_GET_ITEM(lz->ittuple, i);\n-            if (it == NULL) {\n+            if (it == Py_None) {\n                 item = Py_NewRef(lz->fillvalue);\n             } else {\n@@ -3844,7 +3844,7 @@\n                     } else {\n                         item = Py_NewRef(lz->fillvalue);\n-                        PyTuple_SET_ITEM(lz->ittuple, i, NULL);\n+                        PyTuple_SET_ITEM(lz->ittuple, i, Py_NewRef(Py_None));\n                         Py_DECREF(it);\n                     }\n```\n\nThe same change applies to both the result-reuse path (line ~3835/3847) and the new-result path (line ~3865/3877) \u2014 4 lines total.\n\n\nFound with assistance from Claude Code, while investigating a related crash reported by @zhuyifei1999.\n\n\n\n\n### CPython versions tested on:\n\nCPython main branch, 3.15, 3.14\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ free-threading build (heads/main:4d0e8ee649c, Mar 29 2026, 23:20:29) [Clang 21.1.2 (2ubuntu6)]",
+ "comments": [
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-04-06T18:29:32Z",
+   "body": "As you know, segfault was fixed in #146056. So what is the issue again?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-06T18:39:20Z",
+   "body": "I assumed having `NULL` accessible wouldn't be desirable. Seems to be the case:\n```python\nimport itertools\nimport gc\n\nzl = itertools.zip_longest(iter([1]), iter([1, 2, 3]))\nnext(zl)  # (1, 1) \u2014 both iterators alive\nnext(zl)  # (None, 2) \u2014 first iterator exhausted, ittuple[0] set to NULL\n\n# Expose the internal ittuple via gc.get_referents\nrefs = gc.get_referents(zl)\nfor r in refs:\n    if isinstance(r, tuple):\n        print(repr(r))\n        break  \nprint(r[0])\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555555caa089 in _Py_atomic_load_uint32_relaxed (obj=0xc) at ./Include/cpython/pyatomic_gcc.h:367\n367     { return __atomic_load_n(obj, __ATOMIC_RELAXED); }\n\n#0  0x0000555555caa089 in _Py_atomic_load_uint32_relaxed (obj=0xc) at ./Include/cpython/pyatomic_gcc.h:367\n#1  Py_INCREF (op=0x0) at ./Include/refcount.h:267\n#2  _Py_NewRef (obj=0x0) at ./Include/refcount.h:529\n#3  tuple_item (op=op@entry=0x7bffb69bc790, i=i@entry=0) at Objects/tupleobject.c:429\n#4  0x0000555555caa5d2 in tuple_subscript (op=0x7bffb69bc790, item=0x55555693c378 <_PyRuntime+30392>) at Objects/tupleobject.c:886\n#5  0x0000555555a5c6fc in PyObject_GetItem (o=0x7bffb69bc790, key=0x55555693c378 <_PyRuntime+30392>) at Objects/abstract.c:163\n#6  0x0000555555ee14e2 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:65\n#7  0x0000555555ea8d04 in _PyEval_EvalFrame (tstate=0x555556997d60 <_PyRuntime+405664>, frame=0x7e8ff6fe0220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#8  _PyEval_Vector (tstate=tstate@entry=0x555556997d60 <_PyRuntime+405664>, func=func@entry=0x7bffb64c3e30, locals=locals@entry=0x7bffb670ca90, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2179\n#9  0x0000555555ea80db in PyEval_EvalCode (co=co@entry=0x7bffb63e7a90, globals=globals@entry=0x7bffb670ca90, locals=locals@entry=0x7bffb670ca90) at Python/ceval.c:686\n#10 0x00005555560c6ca0 in run_eval_code_obj (tstate=tstate@entry=0x555556997d60 <_PyRuntime+405664>, co=co@entry=0x7bffb63e7a90, globals=0x7bffb670ca90, locals=locals@entry=0x7bffb670ca90)\n    at Python/pythonrun.c:1369\n#11 0x00005555560c6322 in run_mod (mod=mod@entry=0x7bffb67dcd58, filename=filename@entry=0x7bffb64d0590, globals=globals@entry=0x7bffb670ca90, locals=locals@entry=0x7bffb670ca90,\n    flags=0x7fffffffba50, arena=arena@entry=0x7bffb60508b0, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1472\n#12 0x00005555560c002d in pyrun_file (fp=fp@entry=0x7d4ff6fe3000, filename=filename@entry=0x7bffb64d0590, start=start@entry=257, globals=globals@entry=0x7bffb670ca90,\n    locals=locals@entry=0x7bffb670ca90, closeit=closeit@entry=1, flags=0x7fffffffba50) at Python/pythonrun.c:1296\n#13 0x00005555560bda8f in _PyRun_SimpleFileObject (fp=0x7d4ff6fe3000, filename=0x7bffb64d0590, closeit=closeit@entry=1, flags=flags@entry=0x7fffffffba50) at Python/pythonrun.c:518\n#14 0x00005555560bce01 in _PyRun_AnyFileObject (fp=fp@entry=0x7d4ff6fe3000, filename=filename@entry=0x7bffb64d0590, closeit=closeit@entry=1, flags=flags@entry=0x7fffffffba50)\n    at Python/pythonrun.c:81\n#15 0x000055555613f6ab in pymain_run_file_obj (program_name=0x7bffb64d0610, filename=0x7bffb64d0590, skip_source_first_line=0) at Modules/main.c:410\n#16 pymain_run_file (config=config@entry=0x555556961590 <_PyRuntime+182480>) at Modules/main.c:429\n#17 0x000055555613d601 in pymain_run_python (exitcode=<optimized out>) at Modules/main.c:714\n#18 Py_RunMain () at Modules/main.c:795\n#19 0x000055555613e6b0 in pymain_main (args=<optimized out>) at Modules/main.c:825\n#20 0x000055555613e828 in Py_BytesMain (argc=<optimized out>, argv=0x7fffffffbee8) at Modules/main.c:849\n#21 0x00007ffff7c2a575 in __libc_start_call_main (main=main@entry=0x5555558e6c70 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffbee8) at ../sysdeps/nptl/libc_start_call_main.h:58\n#22 0x00007ffff7c2a628 in __libc_start_main_impl (main=0x5555558e6c70 <main>, argc=2, argv=0x7fffffffbee8, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\n    stack_end=0x7fffffffbed8) at ../csu/libc-start.c:360\n#23 0x00005555557fd525 in _start ()\n```\n\nEdit: accessing `NULL` in the list that contains it also crashes using the reproducer in https://github.com/python/cpython/issues/146056. So it seems any container displaying a `NULL` could be susceptible to this, right?"
+  },
+  {
+   "author": "manueljacob",
+   "created_at": "2026-04-06T20:52:21Z",
+   "body": "The segfault for the code in https://github.com/python/cpython/issues/148181#issue-4213002125 was fixed by commit 0f2246b1553f401da5ade47e0fd1c80ad7a8dfa5, but the code in https://github.com/python/cpython/issues/148181#issuecomment-4194254296 still causes a segfault on current main (commit a0c57a8d17eb0f5c4e620d83a13a47cf4d85e76f)."
+  },
+  {
+   "author": "sunmy2019",
+   "created_at": "2026-04-08T13:44:46Z",
+   "body": "Code in https://github.com/python/cpython/issues/148181#issuecomment-4194254296 also crashes in non-free-threading build."
+  },
+  {
+   "author": "sunmy2019",
+   "created_at": "2026-04-08T13:49:26Z",
+   "body": "I would suggest this fix. using Py None API.\n\n(Edited:) It seems `== Py_None` is more frequent than `Py_IsNone`. I think either is fine.\n\n```diff\ndiff --git a/Modules/itertoolsmodule.c b/Modules/itertoolsmodule.c\nindex a6bfa78a461..72389386382 100644\n--- a/Modules/itertoolsmodule.c\n+++ b/Modules/itertoolsmodule.c\n@@ -3897,7 +3897,7 @@ zip_longest_next_lock_held(PyObject *op)\n         Py_INCREF(result);\n         for (i=0 ; i < tuplesize ; i++) {\n             it = PyTuple_GET_ITEM(lz->ittuple, i);\n-            if (it == NULL) {\n+            if (Py_IsNone(it)) {\n                 item = Py_NewRef(lz->fillvalue);\n             } else {\n                 item = PyIter_Next(it);\n@@ -3909,7 +3909,7 @@ zip_longest_next_lock_held(PyObject *op)\n                         return NULL;\n                     } else {\n                         item = Py_NewRef(lz->fillvalue);\n-                        PyTuple_SET_ITEM(lz->ittuple, i, NULL);\n+                        PyTuple_SET_ITEM(lz->ittuple, i, Py_None);\n                         Py_DECREF(it);\n                     }\n                 }\n@@ -3927,7 +3927,7 @@ zip_longest_next_lock_held(PyObject *op)\n             return NULL;\n         for (i=0 ; i < tuplesize ; i++) {\n             it = PyTuple_GET_ITEM(lz->ittuple, i);\n-            if (it == NULL) {\n+            if (Py_IsNone(it)) {\n                 item = Py_NewRef(lz->fillvalue);\n             } else {\n                 item = PyIter_Next(it);\n@@ -3939,7 +3939,7 @@ zip_longest_next_lock_held(PyObject *op)\n                         return NULL;\n                     } else {\n                         item = Py_NewRef(lz->fillvalue);\n-                        PyTuple_SET_ITEM(lz->ittuple, i, NULL);\n+                        PyTuple_SET_ITEM(lz->ittuple, i, Py_None);\n                         Py_DECREF(it);\n                     }\n                 }\n\n```"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-04-09T12:35:09Z",
+   "body": "I am not sure that we can guarantee that all objects exposed to the garbage collector are fully functional.\n\nAlthough, using a tuple to store iterators and freeing exhausted iterators is an implementation detail. We have many other options, for example:\n\n* Do not free exhausted iterators.\n* Use raw array instead of tuple. It will need explicit loops in tp_traverse, tp_clear and destructor.\n* Make the tuple untrackable. It will likely need explicit loops in tp_traverse and tp_clear.\n\ncc @rhettinger "
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2026-04-09T12:47:06Z",
+   "body": "> I am not sure that we can guarantee that all objects exposed to the garbage collector are fully functional.\n\nThey shouldn't be fully functional, but they should be properly initialized. At least, all fields that used in `tp_traverse` or `tp_clear` shouldn't be NULL or should be checked before visit.\n\nOnly exclusion is a PyTuple, which allowed to have NULL elements."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-05-06T05:54:51Z",
+   "body": "I got curious about other ways to trigger the crash, maybe these can be used for tests:\n```python\nimport itertools\nimport gc\n\nimport array\nimport operator\n\nzl = itertools.zip_longest([1], [1], [1], [1], [1], [1, 2, 3])\nnext(zl)\nnext(zl)\nrefs = gc.get_referents(zl)\nfor r in refs:\n    if isinstance(r, tuple):\n        print(repr(r))\n        break\n\noperator.itemgetter(0)(r)  # segfault via `itemgetter_call_impl`\nr.index(1)  # SystemError: Objects/object.c:1106: bad argument to internal function (also `1 in r`)\narray.array('i', *r)  # segfault via `list_extend_fast`\nsum(*r)  # segfault via `PyObject_GetIter`\nr[0:-1]  # segfault via `PyTuple_FromArray`\nr * 2  # segfault via `tuple_repeat`\nhash(r)  # segfault via `tuple_hash`\n\"%s %s\" % r  # Fatal Python error: _Py_CheckSlotResult: Slot % of type str failed without setting an exception\nr += r  # segfault via `_PyTuple_Concat`\n```"
+  },
+  {
+   "author": "rhettinger",
+   "created_at": "2026-05-11T19:10:26Z",
+   "body": "> I am not sure that we can guarantee that all objects exposed to the garbage collector are fully functional.\n\nI believe that has been established multiple times.\n\n> refs = gc.get_referents(zl)\n\nHistorically, we won't deem an issue to be a bug if it depends on GC introspection to break the internal invariants.  This isn't a problem that regular users encounter and it is difficult to prevent in the general case.\n\nSee also:  `Lib/test/crashers/gc_inspection.py`\n\nI'm closing this for now, but it can be reopened someone can find a non-gc related exploit through the normal public API for `itertools.zip_longest`."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "rhettinger"
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9493,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9493",
+ "title": "Add error messages before returning NULL when encoding",
+ "state": "closed",
+ "state_reason": null,
+ "author": "radarhere",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-25T12:14:10Z",
+ "closed_at": "2026-03-25T12:25:43Z",
+ "body": "While I'm here, I've also removed\r\nhttps://github.com/python-pillow/Pillow/blob/9a89944e735283ce4bbdf2dde1ea7c44798d9683/src/encode.c#L1346-L1347\r\nsince \"jpt\" is never used.\r\nhttps://github.com/python-pillow/Pillow/blob/9a89944e735283ce4bbdf2dde1ea7c44798d9683/src/PIL/Jpeg2KImagePlugin.py#L382-L385",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "2654d736269a4a4ecd9e212702dbb46046f78890",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  }
+ ]
+}

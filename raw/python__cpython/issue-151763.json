@@ -1,0 +1,426 @@
+{
+ "repo": "python/cpython",
+ "number": 151763,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/151763",
+ "title": "CPython crashes on memory-allocation failure (OOM): 35 findings  (4 dups \u2192 31 distinct)",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2026-06-20T00:55:43Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nAllocation-failure fuzzing of CPython `main` turned up **35 distinct ways the interpreter\ncrashes** \u2014 segfault, failed `assert(...)`, or `Py_FatalError` \u2014 when a memory allocation (4 have since been confirmed as duplicates via `rr` \u2192 31 distinct; see the dedup comment)\nfails part-way through an operation. Each is a separate underlying bug with a minimal,\nstdlib-only reproducer, a backtrace, a root-cause analysis, and a suggested fix, published\nas a self-contained gist (linked below).\n\nI'm filing them under one umbrella so they can be picked off individually without flooding\nthe tracker with 35 issues at once. **To take one:** open a normal CPython issue (or PR) for\nit and drop a comment here with the link \u2014 I'll mark it in the table. If any turn out to be\nduplicates or non-bugs, say so and I'll annotate them.\n\nThese were found with [fusil](https://github.com/devdanzin/fusil)'s OOM-injection mode\n(fusil originally by @vstinner). The reports and reduced reproducers were drafted with\nAI assistance (Claude Code) and then reviewed and re-verified by hand \u2014 see *Disclosure*.\n\n## Reproducing\n\n- Found on `main` (3.16.0a0) at commit `15d7406`. These are allocation-path bugs, so they\n  are not tied to that exact revision.\n- Every gist ships a minimal `OOM-ID-repro.py` (standard library only) that drives the failing path\n  while `_testcapi.set_nomemory(...)` forces allocations to fail. Just run **`python\n  OOM-ID-repro.py`** \u2014 where the exact failing-allocation index is sensitive to the build's\n  allocation count, the repro *self-sweeps* (a fresh subprocess per index) and stops at the\n  first crash, so no manual tuning is needed.\n- `_testcapi.set_nomemory` requires a test/debug interpreter (`--with-pydebug` exposes it).\n- **Build matrix** (in each report): many of these are debug-only assertion / `Py_FatalError`\n  failures \u2014 the `assert(...)` is compiled out under `-DNDEBUG`, so a *release* build doesn't\n  abort. They are still real bugs: on release the same defect is latent undefined behaviour\n  (a use-after-free, a `Py_DECREF(NULL)`, or a silently-lost exception). A subset segfault on\n  release builds directly; those are called out below.\n\n## Highest-confidence starting points\n\nThese crash a **release** build (not just a debug assertion) **and** have a clean minimal\nreproducer \u2014 the lowest-effort to confirm and fix:\n\n- **OOM-0034**, **OOM-0028** \u2014 unchecked `PyUnicode_AsUTF8` / `PyUnicode_EncodeFSDefault`\n  returning `NULL` is dereferenced (\u2248 one-line NULL checks).\n- **OOM-0001**, **OOM-0002**, **OOM-0014** \u2014 `Py_DECREF(NULL)` on an unchecked-allocation\n  error path.\n- **OOM-0031** \u2014 `_interpreters.capture_exception` calls `_PyXI_FreeExcInfo(NULL)` with no\n  NULL guard.\n- **OOM-0012**, **OOM-0020** \u2014 instrumentation / thread-state corruption under OOM.\n\n## Findings\n\nStatus: blank = not yet filed \u00b7 `#N` = a CPython issue is open \u00b7 \ud83d\udd01 = **confirmed duplicate, folded into another finding \u2014 please don't pursue**.\n\n### Segfaults (7)\n\n| Report | Title | Status |\n|---|---|---|\n| [OOM-0001](https://gist.github.com/devdanzin/464cef74ca8186843f33a38078476ac4) | Segfault: `Py_DECREF` of a NULL `filename` in `do_warn` (`_warnings.c:1139`) | [#151673](https://github.com/python/cpython/issues/151673) |\n| [OOM-0002](https://gist.github.com/devdanzin/2dfeabe7508f8e98f27f6df7e381f1cf) | Segfault: `Py_DECREF(NULL)` in `PyContextVar_Set` (`context.c:367`) | |\n| [OOM-0024](https://gist.github.com/devdanzin/acf15ad4117c6343b48ed8fdfe7ad167) | Segfault: dealloc of uninitialized iterator in `template_iter` (`templateobject.c:232`) |#151815 |\n| [OOM-0028](https://gist.github.com/devdanzin/774867b89b3de8d36d7e2ac405034577) | Segfault: NULL deref in `os__path_normpath_impl` (`posixmodule.c:6149`) | |\n| [OOM-0031](https://gist.github.com/devdanzin/44ffdf25538575e497fd80552ea5d467) | Segfault: NULL `info` deref in `_excinfo_clear_type` (`crossinterp.c:1319`) | #152013 |\n|  [OOM-0033](https://gist.github.com/devdanzin/249032e1746d63406a5f68d7dfdedb79) | [SUPERSEDED \u2014 duplicate of OOM-0036 / #151818] Segfault / negative-refcount: over-decreffed `sys.path` entry in `PyType_IsSubtype` (`typeobject.c:2931`) | \ud83d\udd01 dup of OOM-0036 \u2192 [#151818](https://github.com/python/cpython/issues/151818) |\n| [OOM-0034](https://gist.github.com/devdanzin/9871a21facf4c9c6a415e220f9d10762) | Segfault: unchecked `PyUnicode_AsUTF8` NULL deref in `pegen.c:33` | #151798 |\n\n### Assertion failures / aborts (23)\n\n| Report | Title | Status |\n|---|---|---|\n| [OOM-0003](https://gist.github.com/devdanzin/b628c59722820b55c61a400a973771d5) | Abort: uninitialized `_co_unique_id` assert in `code_dealloc` (`codeobject.c:2440`) | #152034 |\n| [OOM-0004](https://gist.github.com/devdanzin/315e83b2da6a5809ce5ae1d748cdd0ae) | Abort/Segfault: corrupted object freelist in `clear_freelist` (`object.c:909`) | |\n|  [OOM-0005](https://gist.github.com/devdanzin/22b71f61343c81df5bea9b7fca798e87) | [SUPERSEDED \u2014 duplicate of OOM-0036 / #151818] Abort: negative-refcount over-decref in `_PyFrame_ClearLocals` (`frame.c:101`) | \ud83d\udd01 dup of OOM-0036 \u2192 [#151818](https://github.com/python/cpython/issues/151818) |\n| [OOM-0006](https://gist.github.com/devdanzin/c809eb4072c0c787c0c890f54ba1c843) | Abort/Segfault: `_PyObject_GC_UNTRACK` assert on untracked iterator in `dictiter_dealloc` (`dictobject.c:5532`) | |\n| [OOM-0008](https://gist.github.com/devdanzin/3c6690d0561acc62752a953e12b20197) | Abort: `assert(!PyErr_Occurred())` in `_PyType_LookupStackRefAndVersion` (`typeobject.c:6343`) | |\n| [OOM-0009](https://gist.github.com/devdanzin/34b633230f6d2301ba17dec195ffe4b7) | Abort: stale `release1` flag trips an ownership assert in `replace` (`unicodeobject.c:10783`) | #152228 |\n| [OOM-0010](https://gist.github.com/devdanzin/d3c1d06e95c006a320dbbfffcc210d52) | Abort: `assert(_PyErr_Occurred(tstate))` in `_PyEval_EvalFrameDefault` (`generated_cases.c.h:13817`) | |\n| [OOM-0011](https://gist.github.com/devdanzin/892b61619c1b3c8c2018331b3f1f4983) | [SUPERSEDED \u2014 duplicate of OOM-0008]  Abort: `assert(!PyErr_Occurred())` in `specialize` (`specialize.c:364`) | \ud83d\udd01 dup of OOM-0008 (above) |\n| [OOM-0012](https://gist.github.com/devdanzin/610c147c8e2d42a576bab3c1c2713391) | Abort/Segfault: stale instrumentation in `get_tools_for_instruction` (`instrumentation.c:1106`) | |\n| [OOM-0013](https://gist.github.com/devdanzin/1736971107bea3aa04ce19db21c90845) | Abort: builtin breaks result/error contract in `_Py_BuiltinCallFastWithKeywords_StackRef` (`ceval.c:843`) | |\n| [OOM-0014](https://gist.github.com/devdanzin/ceb4b16662d22b3dcb1b56cd8481c9e7) | Abort/Segfault: unchecked NULL in `channelsmod__channel_id` (`_interpchannelsmodule.c:3487`) | |\n| [OOM-0015](https://gist.github.com/devdanzin/d40d39e6abfb746bd9d96de261205190) | Abort: stale exception in `cfunction_check_kwargs` (`methodobject.c:409`) | |\n| [OOM-0016](https://gist.github.com/devdanzin/05be8efe6b08c2b3ac3e2c17c784da0c) | Abort: `assert(!queue->alive)` in `_queue_clear` (`_interpqueuesmodule.c:559`) | #152130 |\n| [OOM-0017](https://gist.github.com/devdanzin/6e7a3a9487689e55d7dd4f70b1ce489f) | Abort: negative `gc_refs` (\"refcount too small\") in `validate_gc_objects` (`gc_free_threading.c:1116`) | |\n| [OOM-0018](https://gist.github.com/devdanzin/99b84915b197ae0ade7face262b8af66) | Abort: ownership assert in `set_keys` (`dictobject.c:205`) | #152254 |\n| [OOM-0019](https://gist.github.com/devdanzin/9bd9423256ea03c08231d1ebe542db89) | Abort: double-free in `_PyPegen_raise_error_known_location` (`pegen_errors.c:363`) | |\n| [OOM-0025](https://gist.github.com/devdanzin/3aaffc18b68ca2ae5fffa72aa6cdb2ea) | Abort: `assert(!PyErr_Occurred())` in `unspecialize` (`specialize.c:378`) | |\n| [OOM-0026](https://gist.github.com/devdanzin/bf6f784d4bcd21acd471ea45b6f23c70) | Abort: err-code vs `PyErr` desync in `handle_channel_error` (`_interpchannelsmodule.c:398` / `:443`) | #152156 |\n| [OOM-0027](https://gist.github.com/devdanzin/d5c602c29ac3881290269b444d77db3c) | Abort: `assert(PyStackRef_BoolCheck(cond))` in `POP_JUMP_IF_FALSE` (`generated_cases.c.h:11120`) | |\n| [OOM-0029](https://gist.github.com/devdanzin/10e0fdaf3d89dbe394d94fbf765c70a1) | [SUPERSEDED \u2014 duplicate of OOM-0036 / #151818] Abort: negative refcount on a `MemoryError` (`tuple_dealloc`, `tupleobject.c:277`) | \ud83d\udd01 dup of OOM-0036 \u2192 [#151818](https://github.com/python/cpython/issues/151818) |\n| [OOM-0030](https://gist.github.com/devdanzin/fbfb9d6cd5eeb518e4f9eeab44be3893) | Abort: `Py_DECREF` of NULL-data unicode in `unicode_subtype_new` (`unicodeobject.c:13986`) | |\n| [OOM-0032](https://gist.github.com/devdanzin/f7e483080647c7b76fbda79bfeb07e9c) | Abort: pending-exception assert from `warn_explicit` normalization (`_warnings.c:799/806`) | |\n| [OOM-0035](https://gist.github.com/devdanzin/8c86ca358f3711740a692eaac730b527) | Abort / malformed str: invalid `maxchar` in `_PyUnicode_FromUCS4` (`unicodeobject.c:2228`) | |\n\n### Fatal Python error (5)\n\n| Report | Title | Status |\n|---|---|---|\n| [OOM-0007](https://gist.github.com/devdanzin/bf9fec4554c58c2a279b05b7ff8e6d9b) | Fatal: `context_tp_dealloc` clears the pending exception (`context.c:535`) | #152083 |\n| [OOM-0020](https://gist.github.com/devdanzin/df523c79368baa0c44bd69e9d5ee0c7e) | Fatal: `_PyMem_DebugRawFree: bad ID` in `free_threadstate` (`pystate.c:1527`) | |\n| [OOM-0021](https://gist.github.com/devdanzin/e113c48a4e249ae7e4d1e42020db65c4) | Fatal: NULL returned without an exception set in `_Py_CheckFunctionResult` (`call.c:43`) | |\n| [OOM-0022](https://gist.github.com/devdanzin/0964a71a7038ee90137f11c2527aad3c) | Fatal: stale `MemoryError` trips `_Py_CheckSlotResult` in `reload_singlephase_extension` (`import.c:2011`) | |\n| [OOM-0023](https://gist.github.com/devdanzin/dc5123e50ea0402292e841411a294d3d) | Fatal: dealloc clears the in-flight exception in `subtype_dealloc` (`typeobject.c:2719`) | |\n\n## Related groups (one fix may cover several)\n\n- **Dealloc clears the in-flight exception** (the gh-89373 `_Py_Dealloc` invariant): **OOM-0007**\n  (`context_tp_dealloc`) and **OOM-0023** (the generic `subtype_dealloc`, covering a family of\n  pure-Python types) free an object while a `MemoryError` is pending and don't save/restore it.\n- **A pending exception survives into code that asserts there is none** (specializer / eval /\n  call layers): **OOM-0008, 0010, 0015, 0025, 0032** (OOM-0011 was a second detector face of\n  OOM-0008 \u2014 same `frame.f_back` swallow \u2014 and is folded). Several share the theme that the\n  adaptive specializer / call machinery is entered with a `MemoryError` already pending.\n- **`Py_DECREF`/`Py_CLEAR` of a NULL or partially-initialized object on the OOM error path:**\n  **OOM-0001, 0002, 0006, 0014, 0024, 0030, 0031** (an allocation fails after a slot is taken\n  but before the object is valid, and the error path frees it anyway).\n- **Over-decref \u2192 negative refcount under OOM** (a real memory-safety bug; the assert is the\n  debug-build detector): **OOM-0019**. *(rr later showed OOM-0005, OOM-0029 and OOM-0033 are\n  all the same `_CALL_LIST_APPEND` `list.append()`-under-`MemoryError` double-free \u2014\n  **OOM-0036, filed [#151818](https://github.com/python/cpython/issues/151818)** \u2014 and are\n  folded; OOM-0019 is a distinct pegen double-free.)*\n- **Free-threading-specific:** **OOM-0003** (`_co_unique_id`), **OOM-0017** (cyclic GC),\n  **OOM-0018** (managed dict), **OOM-0020** (thread-state reservation).\n\n## Disclosure & caveats\n\n- The reports and reduced reproducers were **drafted with AI assistance (Claude Code)**; each\n  gist carries an explicit disclaimer. The reproducers were re-run on the build matrix and the\n  root causes audited against the CPython source before publishing.\n- A few root causes are explicitly marked **partial** \u2014 the trigger is minimal and verified,\n  but the exact offending line wasn't pinned (noted in those reports): OOM-0010, 0027, 0035.\n- **OOM-0001** is already filed as\n  [#151673](https://github.com/python/cpython/issues/151673); the other 34 had no matching\n  python/cpython issue when checked and appear novel.\n\n---\n\n*Found with [fusil](https://github.com/devdanzin/fusil) (OOM-injection mode; fusil originally\nby Victor Stinner). Drafted with Claude Code; reproducers machine-generated and human-verified.*\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.16.0a0 free-threading build (heads/main:15d74068f3a, Jun 18 2026, 16:44:30) [Clang 22.1.2 (1ubuntu1)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151779\n* gh-151798\n* gh-151902\n* gh-151931\n* gh-151968\n* gh-152013\n* gh-152034\n* gh-152069\n* gh-152070\n* gh-152094\n* gh-152095\n* gh-152096\n* gh-152131\n* gh-152155\n* gh-152158\n* gh-152159\n* gh-152160\n* gh-152164\n* gh-152165\n* gh-152836\n* gh-152837\n* gh-152840\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "zainnadeem786",
+   "created_at": "2026-06-20T07:48:20Z",
+   "body": "Hi @devdanzin ,\n\nI'd like to investigate and work on a couple of the findings from this umbrella issue.\n\nI spent some time reviewing the relevant code paths and, based on source inspection, I'm currently looking at:\n\n* **[OOM-0028](https://gist.github.com/devdanzin/774867b89b3de8d36d7e2ac405034577)** (`os__path_normpath_impl` in `Modules/posixmodule.c`)\n* **[OOM-0034](https://gist.github.com/devdanzin/9871a21facf4c9c6a415e220f9d10762)** (`_PyPegen_byte_offset_to_character_offset_line` in `Parser/pegen.c`)\n\n### OOM-0028\n\nMy investigation suggests that there is a potential OOM error path in `os__path_normpath_impl()` where `result` may become `NULL` after Unicode object creation fails, but execution can still proceed into the bytes-path encoding logic. This appears to be a localized fix with conventional `NULL` propagation semantics.\n\n### OOM-0034\n\nFor OOM-0034, I found that `PyUnicode_AsUTF8()` may return `NULL` under allocation failure, while the returned pointer is later used without a guard. However, this one appears slightly more involved because the surrounding tokenization path may also need proper error propagation rather than only adding a local `NULL` check.\n\n### Next Steps\n\nMy plan is:\n\n1. Prepare a focused PR for **OOM-0028** with a minimal fix and regression coverage if feasible.\n2. Investigate and prepare a separate PR for **OOM-0034**, ensuring that any `MemoryError` is propagated correctly through the caller chain rather than only preventing the immediate crash.\n\nI'll continue investigating these code paths and will post updates here as I make progress. If the analysis holds up, I'll prepare focused PRs for the relevant fixes and link them in this issue.\n\nThanks for collecting and documenting these findings.\n"
+  },
+  {
+   "author": "prakashsellathurai",
+   "created_at": "2026-06-20T08:02:37Z",
+   "body": "working on [OOM-0002](https://gist.github.com/devdanzin/2dfeabe7508f8e98f27f6df7e381f1cf)  issue: https://github.com/python/cpython/issues/151773"
+  },
+  {
+   "author": "amruthamodela06",
+   "created_at": "2026-06-21T12:49:44Z",
+   "body": "Took **OOM-0031**: issue #151842, PR #151843."
+  },
+  {
+   "author": "zainnadeem786",
+   "created_at": "2026-06-21T15:15:27Z",
+   "body": "I\u2019d like to take [OOM-0014](https://gist.github.com/devdanzin/ceb4b16662d22b3dcb1b56cd8481c9e7) if no one else is already working on it.\n\nI reproduced it locally on both debug and release builds.\n\nSummary of my investigation:\n\n- `_interpchannels._channel_id(0)` calls `channelsmod__channel_id()`.\n- `channelsmod__channel_id()` calls `get_module_from_owned_type(cls)`.\n- That path can return `NULL` under OOM because `_get_current_module()` allocates the module name with `PyUnicode_FromString(MODULE_NAME_STR)`.\n- `channelsmod__channel_id()` currently treats that return value as infallible:\n\n```c\nPyObject *mod = get_module_from_owned_type(cls);\nassert(mod == self);\nPy_DECREF(mod);\n````\n\nWhen the allocation fails:\n\n* debug build aborts at `assert(mod == self)` because `mod == NULL`\n* release build reaches `Py_DECREF(NULL)` and crashes with an access violation\n\nThe minimal fix appears to be a local NULL check:\n\n```c\nPyObject *mod = get_module_from_owned_type(cls);\nif (mod == NULL) {\n    return NULL;\n}\nassert(mod == self);\nPy_DECREF(mod);\n```\n\nThis preserves the existing invariant check and correctly propagates the pending `MemoryError`.\n\nI also verified the focused test suite still passes locally:\n\n```text\nPCbuild/amd64/python_d.exe -m test test__interpchannels\nResult: SUCCESS, 73 tests run, 5 skipped\n```\n\nI\u2019ll prepare a focused PR with the NULL check and a small subprocess regression test unless there are concerns with this approach.\n\n"
+  },
+  {
+   "author": "manoj-marimuthu",
+   "created_at": "2026-06-22T03:30:08Z",
+   "body": "Working on [OOM-0019](https://gist.github.com/devdanzin/9bd9423256ea03c08231d1ebe542db89), will open an issue and a pr soon"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-06-22T14:21:47Z",
+   "body": "**OOM\u20110005 update**: the use\u2011after\u2011free is now confirmed (not just the debug assert).\nWhen I filed this issue I could only confirm the negative\u2011refcount abort on the debug build and noted the release behaviour was a *latent* UAF I hadn't pinned. There's now direct evidence.\n\nA reduced, stdlib\u2011only reproducer (`pkgutil.get_importer(s)` \u2192 `os.fsdecode` \u2192 `os.fspath`, with the string also kept alive in a dict) makes the `_PyFrame_ClearLocals` over\u2011decref free a still\u2011referenced object:\n\n- On a debug GIL + ASan build, ASan reports a clean `heap-use-after-free` whose freed\u2011by stack is exactly this site \u2014 `PyStackRef_XCLOSE` (`pycore_stackref.h:726`) \u2190 `_PyFrame_ClearLocals` (`frame.c:101`) during `exit_unwind`; the read is a later `Py_INCREF`, the allocation is the victim string. So it's not free\u2011threading\u2011specific and not assert\u2011only.\n- On a debug free\u2011threaded build the same freed local is instead used by `PyOS_FSPath` (`Modules/posixmodule.c`) \u2192 `PyType_HasFeature` reading `Py_TYPE()` on freed memory \u2192 SIGSEGV.\n\nSo this is a genuine memory\u2011safety use\u2011after\u2011free reachable through ordinary stdlib, not merely a refcount\u2011debug assertion. Updated gist (adds `repro_uaf.py` + `backtrace_uaf.txt`): https://gist.github.com/devdanzin/22b71f61343c81df5bea9b7fca798e87\n\n_(Investigation and draft assisted by Claude Code.)_\n"
+  },
+  {
+   "author": "tonghuaroot",
+   "created_at": "2026-06-23T07:24:44Z",
+   "body": "Opened #151968 for OOM-0013 \u2014 `compile()`, `exec()`, `eval()` and `ast.parse()` could return NULL without setting an exception when an allocation fails, crashing on the result/error contract assertion. The PR sets the error indicator at `new_compiler()`, the `_PyPegen_run_parser()` result/exception check, and the tokenizer-init helpers."
+  },
+  {
+   "author": "zainnadeem786",
+   "created_at": "2026-06-24T19:27:37Z",
+   "body": "Hi @devdanzin @StanFromIreland \n\nI'd like to investigate [OOM-0020](https://gist.github.com/devdanzin/df523c79368baa0c44bd69e9d5ee0c7e) and [OOM-0030](https://gist.github.com/devdanzin/fbfb9d6cd5eeb518e4f9eeab44be3893) if no one else is already working on them.\n\nMy plan is to first reproduce both crashes locally, trace the relevant ownership and error-propagation paths, and determine whether they can be addressed with focused fixes before preparing separate PRs.\n\nI'll post updates here as I confirm the root causes and make progress.\n\nThanks!"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2026-06-24T21:29:05Z",
+   "body": "I will take OOM-0004: #152125 "
+  },
+  {
+   "author": "zainnadeem786",
+   "created_at": "2026-06-25T06:28:37Z",
+   "body": "Hi @devdanzin,\n\nI investigated **OOM-0020** and was able to reproduce it on current `main` in both free-threaded debug and release builds.\n\nFrom tracing the allocation and cleanup paths, the crash appears to occur because the preallocated initial thread state can enter the cleanup path before its interpreter back-pointer has been initialized. As a result, `free_threadstate()` fails to recognize it as the embedded initial thread state and incorrectly calls `PyMem_RawFree()` on memory that is embedded within `PyInterpreterState`.\n\nThe fix appears to be localized, and I'm preparing a focused PR based on this investigation. I'll link it here once it's ready.\n\nI'm also continuing to investigate OOM-0030 separately.\n"
+  },
+  {
+   "author": "zainnadeem786",
+   "created_at": "2026-06-25T07:43:49Z",
+   "body": "Hi @devdanzin,\n\nI investigated two additional findings from this umbrella issue and have opened focused PRs for both.\n\n### OOM-0020\n\nOpened: **GH-https://github.com/python/cpython/pull/152165**\n\nThis issue was caused by an early cleanup path in the free-threaded interpreter. During thread state allocation, `tstate->base.interp` was not initialized before later allocations could fail. If cleanup ran in that window, `free_threadstate()` could not recognize the embedded initial thread state and attempted to free embedded memory, leading to `_PyMem_DebugRawFree: bad ID` (debug) or an access violation (release).\n\nThe fix initializes the interpreter back-pointer immediately after obtaining the thread state, allowing the existing cleanup logic to correctly identify the embedded initial thread state while leaving the normal successful initialization path unchanged.\n\n---\n\n### OOM-0030\n\nOpened: **GH-https://github.com/python/cpython/pull/152164**\n\nThis issue occurs during cleanup of a partially constructed non-compact Unicode subtype after an allocation failure. In debug builds, `unicode_is_singleton()` could attempt to read the first character from an object whose internal data pointer was still `NULL`, triggering the `data != NULL` assertion.\n\nThe fix adds a narrow guard for this temporary construction state before calling `PyUnicode_READ_CHAR()`. Fully initialized Unicode objects continue to follow the existing invariants, while failed construction now cleans up without triggering the debug assertion.\n\nBoth fixes were reproduced locally, validated after the changes, and submitted as separate focused PRs to keep review straightforward.\n\nThanks again for collecting and documenting these OOM findings\u2014they've been very helpful to investigate.\n"
+  },
+  {
+   "author": "tonghuaroot",
+   "created_at": "2026-06-25T08:11:41Z",
+   "body": "Taking OOM-0033. Reproduced on a current `--with-pydebug` `main` build \u2014 deterministic `_Py_NegativeRefcount` abort (the negative refcount surfaces in `typeobject.c` `is_subtype_with_mro` during exception/traceback construction).\n\nAblation root-causes the over-decref **producer** to the `zipimport` path hook (`zipimporter.__init__`) on its OOM error path: running each `sys.path_hooks` entry in isolation, `zipimporter` aborts while `FileFinder` is clean, and removing/replacing the zip hook eliminates the crash. It only triggers on the `_path_stat`-fails archive-search retry (an already-existing archive is clean), and only with heap-mortal single-character path components (latin-1 1-char strings are immortal, so the extra decref is a no-op there \u2014 which is why the reproducer needs a non-ASCII path element).\n\nPinning the exact unmatched `Py_DECREF` statement needs an `-O0` watchpoint (the optimized build inlines the decref call sites); I'm working on that and will follow up with a PR.\n\nReproduced and analysis prepared with AI assistance (Claude Code), reviewed and re-verified by hand. Finding credit is @devdanzin's (found with fusil OOM-injection fuzzing).\n\n---\n\n**Update (pinned with an `-O0` watchpoint):** the double-close is in `_CALL_LIST_APPEND` (`Python/bytecodes.c`) \u2014 its list-resize `MemoryError` path uses `ERROR_NO_POP()` after `arg` was already consumed by `_PyList_AppendTakeRef`, so the exception unwind `PyStackRef_XCLOSE`s it a second time (regression from GH-142711; the sibling ops `LIST_APPEND` / `SET_ADD` use `ERROR_IF`). I see this already has its own issue (gh-151818) and fixes in flight (#151826, #152114) \u2014 same root cause, so I'm **standing down** here, no PR needed. Thanks @devdanzin.\n"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-06-25T12:47:40Z",
+   "body": "> I see this already has its own issue ([gh-151818](https://github.com/python/cpython/issues/151818)) and fixes in flight ([#151826](https://github.com/python/cpython/pull/151826), [#152114](https://github.com/python/cpython/pull/152114)) \u2014 same root cause, so I'm **standing down** here, no PR needed.\n\nSorry for the trouble, I've just found out it's the same issue using rr :(\nI'm going through each finding with rr to see if any others are duplicates.\nSorry again!"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-06-25T17:56:34Z",
+   "body": "**rr dedup pass \u2014 4 of the 35 are confirmed duplicates (please don't pursue these)**\n\nFollowing up on my note above: I went through the over-decref / negative-refcount and stale-`MemoryError` clusters with `rr` reverse-execution to pin each crash's *producer* (for these, the assert/segv site is a *detector*, not the bug). Four turned out to be duplicates, now folded:\n\n| Finding | Actually | Evidence |\n|---|---|---|\n| **OOM-0005** (`_PyFrame_ClearLocals` over-decref, `frame.c:101`) | **OOM-0036 \u2192 [#151818](https://github.com/python/cpython/issues/151818)** | rr ledger: the over-decref'd object is freed by `_PyList_AppendTakeRefListResize` \u2190 `_CALL_LIST_APPEND` \u2014 the `list.append()`-under-`MemoryError` double-free. `frame.c:101` is just where the reused object is next touched. |\n| **OOM-0029** (`tuple_dealloc` negref, `tupleobject.c:277`) | **OOM-0036 \u2192 #151818** | same double-freed appended item, surfaced at tuple teardown. |\n| **OOM-0033** (`PyType_IsSubtype` over-decref of a `sys.path` entry) | **OOM-0036 \u2192 #151818** | same; `sys.path[:]=\u2026; __import__` internally `list.append`s a second-referenced object under OOM. |\n| **OOM-0011** (`specialize` `assert(!PyErr_Occurred())`, `specialize.c:364`) | **OOM-0008** | rr: the stale `MemoryError` is set by `PyFrame_GetBack` swallowing it while materializing `frame.f_back` \u2014 exactly OOM-0008, caught at a different `!PyErr_Occurred()` checkpoint. |\n\nSo **OOM-0036 (#151818)** is the canonical bug behind OOM-0005/0029/0033, and **OOM-0008** already covers OOM-0011. I've struck those rows in the table above, removed OOM-0033 from the starting-points list, and retitled the corresponding gists `[SUPERSEDED \u2014 duplicate of \u2026]`. Thanks to everyone who looked at these \u2014 sorry for the wasted cycles.\n\n(Method, for anyone curious: record the repro under `rr`, watch the victim's refcount / `tstate->current_exception`, and `reverse-continue` to the producing decref / exception-set. For the over-decref family it reliably lands on OOM-0036.)\n\n_Dedup analysis and comment draft had assistance from Claude Code_"
+  },
+  {
+   "author": "Abhi210",
+   "created_at": "2026-06-25T18:14:52Z",
+   "body": "I will look into [OOM-0023](https://gist.github.com/devdanzin/dc5123e50ea0402292e841411a294d3d)\tFatal: dealloc clears the in-flight exception in subtype_dealloc (typeobject.c:2719). Will open a PR for this soon."
+  },
+  {
+   "author": "Abhi210",
+   "created_at": "2026-06-27T14:04:58Z",
+   "body": "@devdanzin  I was looking into [OOM-0023](https://gist.github.com/devdanzin/dc5123e50ea0402292e841411a294d3d), and while implementing the proposed fix, I ran into another issue that appears to be distinct from OOM-0023. It looks like a separate free-threaded bug that becomes visible once this fix is applied, rather than being introduced by it.\n\nThe changes I made are:\n\n```diff\n > diff --git a/Objects/typeobject.c b/Objects/typeobject.c\nindex d52cdedff10..3cf7c7afbd8 100644\n--- a/Objects/typeobject.c\n+++ b/Objects/typeobject.c\n@@ -2833,6 +2833,13 @@ subtype_dealloc(PyObject *self)\n        }\n    }\n\n+    /* Save the current exception: clear_slots() and the dict/base-dealloc\n+         below decref arbitrary attribute values, which may clear\n+           tstate->current_exception (gh-89373).  Mirroring slot_tp_finalize(). */\n+    PyThreadState *tstate = _PyThreadState_GET();\n+     PyObject *exc = _PyErr_GetRaisedException(tstate);   /* preserve in-flight exception */\n\n\n    /*  Clear slots up to the nearest base with a different tp_dealloc */\n    base = type;\n    while ((basedealloc = base->tp_dealloc) == subtype_dealloc) {\n@@ -2882,6 +2889,9 @@ subtype_dealloc(PyObject *self)\n    if (type_needs_decref) {\n        _Py_DECREF_TYPE(type);\n    }\n\n+    /* Restore the saved exception (see save above). */\n+   _PyErr_SetRaisedException(tstate, exc);\n}\n\nstatic PyTypeObject *solid_base(PyTypeObject *type);\n```\n\nAfter making this change, I consistently hit the following assertion:\n\n```\n\npython: Objects/dictobject.c:207: set_keys: Assertion `_Py_IsOwnedByCurrentThread((PyObject *)mp) || IS_DICT_SHARED(mp)' failed.\nFatal Python error: Aborted\n\n\n  Binary file \"../cpython/python\", at _Py_HandlePending+0x190 [0x56b5e10dde7a]\n  Binary file \"../cpython/python\", at PyObject_Vectorcall+0x27 [0x56b5e0d4fde1]\n  Binary file \"../cpython/python\", at _Py_VectorCall_StackRefSteal+0x11d [0x56b5e1006879]\n  <truncated rest of calls>\n\nExtension modules: _testcapi (total: 1)\n[1]    465360 IOT instruction (core dumped)  ../cpython/python OOM-0023-repro.py\n\n```\n\nIt seems to me that it aborts on (need to check it very carefully though, since I used Claude Code to debug this):\n\n```\nObjects/dictobject.c:207: set_keys:\n  Assertion `_Py_IsOwnedByCurrentThread((PyObject *)mp) || IS_DICT_SHARED(mp)' failed.\n```\n\nSince this assertion originates from a different function/subsystem than OOM-0023, would you prefer that I fold this into the same PR, or track it as a separate issue? I'm happy to do either.\n\nFor reference, this was reproduced on the latest `main` branch."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-07-04T01:11:16Z",
+   "body": "@Abhi210 Thanks for flagging this and sorry for the delay. It is a genuinely distinct, pre-existing bug that your OOM-0023 fix unmasks. Nice catch! I reproduced and root-caused it, here's what I found with help from Claude.\n\n----\n\n**Answer to your question: file it as a separate issue, don't fold it into the OOM-0023 PR.** Your exception save/restore is correct and can't touch dict ownership \u2014 it's a completely different subsystem, and keeping the PRs separate keeps both reviewable and bisectable.\n\n**Root cause.** The assertion (`set_keys` \u2192 `ASSERT_OWNED_OR_SHARED`, `Objects/dictobject.c:205`) fires from the **`MemoryError`-recovery branch** of `PyObject_ClearManagedDict`:\n\n```c\nerr = detach_dict_from_object(dict, obj);   // materializes the keys \u2014 this ALLOCATES\nif (err) {                                   // reached ONLY on MemoryError\n    assert(PyErr_Occurred() == PyExc_MemoryError);\n    PyErr_FormatUnraisable(\"Exception ignored while clearing an object managed dict\");\n    set_keys(dict, Py_EMPTY_KEYS);           // Objects/dictobject.c:7896  \u2190 the assert\n    dictkeys_decref(oldkeys, IS_DICT_SHARED(dict));\n    ...\n```\n\nWhen an object with a materialized managed dict (still pointing at its inline values) is reclaimed by the **cyclic GC** \u2014 i.e. it's part of a reference cycle \u2014 `delete_garbage \u2192 subtype_clear \u2192 PyObject_ClearManagedDict` tries to materialize the keys via `detach_dict_from_object()`, which **allocates and fails under OOM**. The recovery path then calls `set_keys(dict, Py_EMPTY_KEYS)`. But mid-collection the free-threaded GC has repurposed the dict's `ob_tid` to hold `gc_refs` (it restores `ob_tid` only for *reachable* objects \u2014 `gc_free_threading.c`), and a single-threaded program never marks a dict `_PyGC_BITS_SHARED` (`ensure_shared_on_read`/`ensure_shared_on_resize` only fire on cross-thread access). So `_Py_IsOwnedByCurrentThread(dict) || IS_DICT_SHARED(dict)` is false \u2192 abort.\n\nThat `set_keys` line is reachable **only** when the allocation fails, which is exactly why it needs OOM \u2014 a plain garbage-cycle `gc.collect()` doesn't hit it (the `detach` succeeds, `err == 0`).\n\n**Minimal reproducer** \u2014 stdlib + `_testcapi` only, no argparse/http.server, and (importantly) **no OOM-0023 involvement**. Reproduces 8/8 on a stock free-threaded debug build (`--disable-gil`, `Py_DEBUG`):\n\n```python\nimport gc\nfrom _testcapi import set_nomemory, remove_mem_hooks\n\nclass C:\n    pass\n\ndef make_cyclic():\n    o = C()\n    o.__dict__                       # materialize the managed dict (keeps inline values)\n    o.a = 1; o.b = 2; o.c = 3\n    o.self = o                       # self-cycle \u2192 only the cyclic GC can reclaim it\n\nfor start in range(300):\n    make_cyclic()\n    set_nomemory(start, start + 25)  # fail an allocation window during gc.collect()\n    try:\n        gc.collect()                 # delete_garbage \u2192 ClearManagedDict \u2192 detach fails \u2192 set_keys\n    finally:\n        remove_mem_hooks()\n```\n\n**Scope / severity.** Free-threaded **`Py_DEBUG` only**: on a release build the assert is compiled out and it's benign (the collection is stop-the-world and this is single-threaded, so the `set_keys` store is safe); on a GIL build the assertion doesn't exist. So it's a false/over-strict assertion on a legitimate OOM-recovery-during-GC path rather than a memory-safety bug \u2014 worth fixing, but lower severity than OOM-0023 itself.\n\n**Likely fix direction** (for the free-threading / dict folks): the OOM-recovery `set_keys` / `dictkeys_decref` in `PyObject_ClearManagedDict` need to account for running during cyclic-GC clearing (where the dict's `ob_tid` is `gc_refs` scratch, not a thread id), or the assertion should exempt the stop-the-world-GC context.\n\n----\n\nSince you found it, it's yours to file. Feel free to use the repro and analysis above, and tag me on the issue if you'd like a review.\n\n*Investigation and draft by Claude Code (Opus 4.8).*\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151773",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151779",
+   "commit": null,
+   "actor": "zainnadeem786"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ef4a99abd3a779acc9c04cc08494399d8ce5caf7",
+   "actor": "zainnadeem786"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "73a2b50d2c7cef8e5b8125e635487b59ac7ea8e6",
+   "actor": "zainnadeem786"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151798",
+   "commit": null,
+   "actor": "zainnadeem786"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151815",
+   "commit": null,
+   "actor": "amruthamodela06"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151842",
+   "commit": null,
+   "actor": "amruthamodela06"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151843",
+   "commit": null,
+   "actor": "amruthamodela06"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151902",
+   "commit": null,
+   "actor": "zainnadeem786"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151905",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151931",
+   "commit": null,
+   "actor": "manoj-marimuthu"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151968",
+   "commit": null,
+   "actor": "tonghuaroot"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152013",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152034",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152058",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "22dd5b5b374c8eb4def7d55bb8de5928e345c73a",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152069",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152070",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1b25c79af4ccd6ad7b883f1ed22d5c597dd8f601",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e8b34391e557b44a6f836dff2bfb61769f7b2e39",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ce8b81fff4094bd0cfb0c57193135bfc904c0ca2",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152094",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152095",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152096",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "58476e8cbbe19fb60b5819d30d0020bd790fad30",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "45de3e041968ffb4aa84a67ccd1502099dad7f2f",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4e7843ea3e7d4c01ead20ded70096a819b9d3da7",
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152107",
+   "commit": null,
+   "actor": "zangjiucheng"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152110",
+   "commit": null,
+   "actor": "zangjiucheng"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152125",
+   "commit": null,
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152130",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152131",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152147",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152155",
+   "commit": null,
+   "actor": "zainnadeem786"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152156",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a6c2d4ae3bd744610e1a8b70396effdabca1593d",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152158",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152159",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152160",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e09bc5f0be09dab3f602702b155c9b7c98d799fc",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "00b8dabd5fea39a738af5b3a021a96542586d806",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "703c9bf976227f2d5b90e9dfe47564ab345a7383",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152164",
+   "commit": null,
+   "actor": "zainnadeem786"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152165",
+   "commit": null,
+   "actor": "zainnadeem786"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152228",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/152254",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "669299b62f6c2176d4bedcf550fb9baaabd6a9d6",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152836",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152837",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152840",
+   "commit": null,
+   "actor": "tonghuaroot"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cdc1472dfd1c105a827535bdde73126af7eef12a",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "74c8d5ce0f7ba5eb0f9d299f30ac7c6468a59ef5",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d13f5b27c8e1af059304c857986eec91de9146c8",
+   "actor": "pablogsal"
+  }
+ ]
+}

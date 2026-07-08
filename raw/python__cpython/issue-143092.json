@@ -1,0 +1,86 @@
+{
+ "repo": "python/cpython",
+ "number": 143092,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/143092",
+ "title": "JIT: Segfault from invalid memory read in `_PyTier2Interpreter`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-12-23T08:36:22Z",
+ "closed_at": "2025-12-24T22:03:01Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault a JIT build by running the code below:\n\n```python\ndef f1():\n    a = \"a\"\n    for i in range(50):\n        x = a[i % len(a)]\n\n    s = \"\"\n    for _ in range(10):\n        s += \"\"\n\n    class A: ...\n    class B: ...\n\n    match s:\n        case int(): ...\n        case str(): ...\n        case dict(): ...\n\n    (\n        u0,\n        *u1,\n        u2,\n        u4,\n        u5,\n        u6,\n        u7,\n        u8,\n        u9, u10, u11, \n        u12, u13, u14, u15, u16, u17, u18, u19, u20, u21, u22, u23, u24, u25, u26, u27, u28, u29,\n    ) = [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,\n         None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,\n         None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,\n         None, None, None, None, None, None, None, None,]\n\n    s = \"\"\n    for _ in range(10):\n        s += \"\"\n        s += \"\"\n\nfor i in range(11000):\n    f1()\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n_PyTier2Interpreter (current_executor=<optimized out>, frame=<optimized out>, stack_pointer=<optimized out>, tstate=<optimized out>) at Python/executor_cases.c.h:10549\n10549               if (Py_TYPE(r) != &PyRangeIter_Type) {\n\n#0  _PyTier2Interpreter (current_executor=<optimized out>, frame=<optimized out>, stack_pointer=<optimized out>, tstate=<optimized out>) at Python/executor_cases.c.h:10549\n#1  0x000055555584c1b2 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d5c9b0 <_PyRuntime+358864>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:5348\n#2  0x0000555555830e4b in _PyEval_EvalFrame (tstate=0x555555d5c9b0 <_PyRuntime+358864>, frame=0x7ffff7fa7020, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#3  _PyEval_Vector (tstate=tstate@entry=0x555555d5c9b0 <_PyRuntime+358864>, func=func@entry=0x7ffff6bf2390, locals=locals@entry=0x7ffff6c00ad0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2483\n#4  0x0000555555830bde in PyEval_EvalCode (co=co@entry=0x7ffff6c0c3a0, globals=globals@entry=0x7ffff6c00ad0, locals=locals@entry=0x7ffff6c00ad0) at Python/ceval.c:1008\n#5  0x000055555599b13a in run_eval_code_obj (tstate=0x555555d5c9b0 <_PyRuntime+358864>, co=co@entry=0x7ffff6c0c3a0, globals=globals@entry=0x7ffff6c00ad0, locals=locals@entry=0x7ffff6c00ad0)\n    at Python/pythonrun.c:1366\n#6  0x000055555599ac8b in run_mod (mod=mod@entry=0x555555f17e10, filename=filename@entry=0x7ffff6c4e7a0, globals=globals@entry=0x7ffff6c00ad0, locals=locals@entry=0x7ffff6c00ad0,\n    flags=0x7fffffffd740, arena=arena@entry=0x7ffff6c711e0, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1469\n#7  0x00005555559985ad in pyrun_file (fp=fp@entry=0x555555dd0360, filename=filename@entry=0x7ffff6c4e7a0, start=start@entry=257, globals=globals@entry=0x7ffff6c00ad0,\n    locals=locals@entry=0x7ffff6c00ad0, closeit=closeit@entry=1, flags=0x7fffffffd740) at Python/pythonrun.c:1294\n```\n\nASan output:\n```\nAddressSanitizer:DEADLYSIGNAL\n=================================================================\n==3999430==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000008 (pc 0x7da56db089a7 bp 0x7ffd350e2e90 sp 0x7ffd350e21a0 T0)\n==3999430==The signal is caused by a READ memory access.\n==3999430==Hint: address points to the zero page.\n    #0 0x7da56db089a7  (<unknown module>)\n    #1 0x55577b512f97 in _PyEval_EvalFrame /home/danzin/projects/jit_cpython/./Include/internal/pycore_ceval.h:119:16\n    #2 0x55577b512f97 in _PyEval_Vector /home/danzin/projects/jit_cpython/Python/ceval.c:2483:12\n    #3 0x55577b5129b4 in PyEval_EvalCode /home/danzin/projects/jit_cpython/Python/ceval.c:1008:21\n    #4 0x55577bafc2ce in run_eval_code_obj /home/danzin/projects/jit_cpython/Python/pythonrun.c:1366:12\n    #5 0x55577bafb49b in run_mod /home/danzin/projects/jit_cpython/Python/pythonrun.c:1469:19\n    #6 0x55577baf5a9c in pyrun_file /home/danzin/projects/jit_cpython/Python/pythonrun.c:1294:15\n    #7 0x55577baf35fc in _PyRun_SimpleFileObject /home/danzin/projects/jit_cpython/Python/pythonrun.c:518:13\n    #8 0x55577baf296d in _PyRun_AnyFileObject /home/danzin/projects/jit_cpython/Python/pythonrun.c:81:15\n    #9 0x55577bb6ea4a in pymain_run_file_obj /home/danzin/projects/jit_cpython/Modules/main.c:410:15\n    #10 0x55577bb6ea4a in pymain_run_file /home/danzin/projects/jit_cpython/Modules/main.c:429:15\n    #11 0x55577bb6cb13 in pymain_run_python /home/danzin/projects/jit_cpython/Modules/main.c:691:21\n    #12 0x55577bb6cb13 in Py_RunMain /home/danzin/projects/jit_cpython/Modules/main.c:772:5\n    #13 0x55577bb6da16 in pymain_main /home/danzin/projects/jit_cpython/Modules/main.c:802:12\n    #14 0x55577bb6db87 in Py_BytesMain /home/danzin/projects/jit_cpython/Modules/main.c:826:12\n    #15 0x7da56e62a574 in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16\n    #16 0x7da56e62a627 in __libc_start_main csu/../csu/libc-start.c:360:3\n    #17 0x55577aed64f4 in _start (/home/danzin/projects/jit_cpython/python+0x2db4f4) (BuildId: 2bff0bd42ddf0d6a9c5bada7767fdb560f820115)\n\n==3999430==Register values:\nrax = 0x0000000000000000  rbx = 0x0000000000000000  rcx = 0x0000000000000000  rdx = 0x000055577c2ad760\nrdi = 0x0000000000000000  rsi = 0x00007c356d9e53b8  rbp = 0x00007ffd350e2e90  rsp = 0x00007ffd350e21a0\n r8 = 0x00007c356d9e5408   r9 = 0x0000000000000003  r10 = 0x00000aaaef855aac  r11 = 0x00000aaaef855aac\nr12 = 0x00007c356d9e5298  r13 = 0x00007c356d9e5420  r14 = 0x000055577c509830  r15 = 0x0000000000000001\nAddressSanitizer can not provide additional info.\nSUMMARY: AddressSanitizer: SEGV (<unknown module>)\n==3999430==ABORTING\n```\n\nOutput from running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`:\n[3004_segfault_lltrace_opt_debug.txt](https://github.com/user-attachments/files/24306906/3004_segfault_lltrace_opt_debug.txt)\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ (heads/main-dirty:3cc57505e53, Dec 23 2025, 05:19:47) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-143124\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-23T11:15:59Z",
+   "body": "Thanks, verified. The problem is that the first instruction is a super instruction (`_BINARY_OP_INPLACE_ADD_UNICODE`). The progress requirement forces the trace recorder to record a deopt version of that (`BINARY_OP`). However, that leads to a wrong trace as the following _STORE_FAST is not recorded, as the trace recorder rightfully thinks that a super instruction has executed.\n\nI could add a special case for super instructions in the trace recorder, but that would just be error-prone. I'm thinking of removing the progress requirements from the JIT and just make it so ENTER_EXECUTOR executes itself if `next_instr == this_instr`. WDYT @markshannon ?"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-23T11:17:12Z",
+   "body": "The other benefit of removing the progress requirements is we get more speed -- the first instruction can now be specialized. The first instruction is actually a really important one too because it usually corresponds to a loop header!"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-23T11:23:24Z",
+   "body": "First some thoughts on `_BINARY_OP_INPLACE_ADD_UNICODE`:\n\n`_BINARY_OP_INPLACE_ADD_UNICODE` is a weird special case that only exists because of an historic promise that:\n```\ns = some_string\nfor _ in range(1000):\n    s += \"x\"\n```\nwould not be quadratic.\n\n\nIf we lower the JIT thresholds a bit (which I think we should anyway) we could do the optimization in the JIT and do away with the super-instruction.\n\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-23T11:26:51Z",
+   "body": "> If we lower the JIT thresholds a bit (which I think we should anyway) we could do the optimization in the JIT and do away with the super-instruction.\n\nI don't think we can do that considering it will remove the quadratic optimization for non-JIT platforms/runtimes, which would be quite bad. Having quadratic behavior on interpreter and non-quadratic on JIT is a weird disparity that I don't want to introduce.\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-23T11:27:34Z",
+   "body": "> I'm thinking of removing the progress requirements from the JIT ...\n\nWe need to be careful to  avoid infinite deopt loops that make no progress?\n\n> just make it so `ENTER_EXECUTOR` executes itself if `next_instr == this_instr`\n\nI presume you mean after we return from tier2. How would that work with tailcaliing in the future (when tier2 tailcalls into tier1)"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-23T11:29:36Z",
+   "body": "> I don't think we can do that considering it will remove the quadratic optimization for non-JIT platforms/runtimes, which would be quite bad. Having quadratic behavior on interpreter and non-quadratic on JIT is a weird disparity that I don't want to introduce.\n\nWe don't need to drop it from the interpreter if there is no JIT. We would just don't perform that specialization if the JIT is enabled.\n\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-23T11:31:25Z",
+   "body": "> We don't need to drop it from the interpreter if there is no JIT. We would just don't perform that specialization if the JIT is enabled.\n\nOk fair enough.\n"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2025-12-23T11:37:08Z",
+   "body": "Instead of handling the special case in `ENTER_EXECUTOR`, which doesn't really have enough context to do it properly, we should do it in the jitted code.\n\nWe already have several forms of tier2 -> tier1 transfers: exits, deopts, handle-pending-and-deopt, error.\nAdding another one, exit-but-dont-reenter, wouldn't be too much effort.\nWe can then specialize the first uop, but use a different exit uop for it."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-23T15:19:14Z",
+   "body": "How are you envisioning the deopt exit with guranteed progress? in an ideal world, we would use 1 tier 1 op called PROGRESS and execute that which would execute the ENTER_EXECUTOR's original opcode, but I don't want to use up another more tier 1 ops\n\nI'd prefer we set a bit on the executor that tells it not to be entered, and an extra branch on ENTER_EXECUTOR costs slightly more, but should be negligible as we spend more time in the JIT"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143124",
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cf6758ff9ebd6df8ac2a87755cdbad674c49c9cb",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ]
+}

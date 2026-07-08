@@ -1,0 +1,82 @@
+{
+ "repo": "python/cpython",
+ "number": 125732,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/125732",
+ "title": "gh-125666: Avoid PyREPL exiting when a null byte is in input",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "topic-repl"
+ ],
+ "created_at": "2024-10-19T15:42:10Z",
+ "closed_at": "2024-10-27T01:23:53Z",
+ "body": "This PR adds a guard against `SyntaxError.lineno` being `None` in `code.InteractiveInterpreter._showtraceback`, which should avoid `PyREPL` exiting the interpreter when a null byte is present in the input.\r\n\r\nNot sure both new tests are necessary, happy to remove one or the other if it's better.\n\n<!-- gh-issue-number: gh-125666 -->\n* Issue: gh-125666\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-10-21T14:13:14Z",
+   "body": "Thank you very much! If you can, propose it as a code change and I'll accept it, so your contribution gets recorded in a commit. "
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-10-24T13:18:34Z",
+   "body": "> Thank you very much! If you can, propose it as a code change and I'll accept it, so your contribution gets recorded in a commit.\r\n\r\nThat person was a bot user, sorry!"
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-10-27T00:54:36Z",
+   "body": "Thanks for the contribution @devdanzin and thanks @ZeroIntensity for the review!"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2024-10-27T01:23:57Z",
+   "body": "Thanks @devdanzin for the PR, and @pablogsal for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-10-27T01:24:10Z",
+   "body": "[GH-126023](https://github.com/python/cpython/pull/126023) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/125666",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "44becb8cba677cbfdbcf2f7652277e5e1efc4f20",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1c52aa2ec90ea1d8bd32e36037411fa260bde193",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fd48d98df9c1b0cb36b38834cd1ce5020c0a60f3",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "29c5ffdd2899add98858d8dce63a624b1ce64fc5",
+   "actor": "ebonnal"
+  }
+ ]
+}

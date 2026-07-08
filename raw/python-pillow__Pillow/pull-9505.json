@@ -1,0 +1,36 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9505,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9505",
+ "title": "Catch struct.error",
+ "state": "closed",
+ "state_reason": null,
+ "author": "radarhere",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-26T12:44:30Z",
+ "closed_at": "2026-03-27T10:22:28Z",
+ "body": "Within TiffImageFile's `get_photoshop_blocks()`, and when reading an Exif MakerNote, truncated data may lead to a `struct.error`.\r\n\r\nThis catches it.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "9568bceeb825f9cf59f1996014e8d7eb8c9b59fd",
+   "actor": "radarhere"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "radarhere"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2825,
+ "type": "issue",
+ "url": "https://github.com/h5py/h5py/issues/2825",
+ "title": "Umbrella issue: h5py C Extension Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-25T08:44:26Z",
+ "closed_at": null,
+ "body": "Below is an analysis report containing some leaks, a couple unchecked malloc calls, etc. This is meant as an umbrella issue from which specific sub issues can be created. \n\n# h5py C Extension Analysis Report\n\n## Findings by Priority\n\n### FIX\n\n#### HDF5 Handle Leaks:\n\n- #2826\n- #2827 \n- #2828\n- #2829\n- #2830\n\n\n#### Unchecked malloc (segfault on OOM):\n\n- #2831 \n- #2832\n- #2833\n\n\n### CONSIDER\n\n- #2834 \n- #2835 \n- #2836 \n- #2837 \n- #2838 \n- #2839 \n- #2840\n",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T10:52:07Z",
+   "body": "disclosure: I asked @devdanzin privately to open fine grain issues that I'd mark as sub issues here.\n"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T19:09:01Z",
+   "body": "@devdanzin thank you very much for reporting these. I've edited your original report and converted what was now duplicated info into a list of all sub issues so it's easier to see at a glance the current state.\nCan you disclose the tool you used to find these ?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-25T19:27:45Z",
+   "body": "I used [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit), a Claude Code plugin I developed. It contains Python scripts and external tools like clang-tidy, and also agents that specialize in analyzing code facets.\n\nIt's been able to find real issues in many C extensions, and a similar approach worked for CPython too: https://github.com/python/cpython/issues/146102."
+  }
+ ],
+ "timeline_refs": []
+}

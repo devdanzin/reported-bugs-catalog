@@ -1,0 +1,36 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 522,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/522",
+ "title": "nonreducer_axis RUNTIME_ERR without return \u2014 falls through to NULL dereference",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:34:34Z",
+ "closed_at": "2026-03-31T07:44:05Z",
+ "body": "In the `else` branch of the `parse_type` dispatch in `nonreducer_axis`, `RUNTIME_ERR` sets a `RuntimeError` but does not return. Execution continues to `PyArray_Check(a_obj)` where `a_obj` is still NULL (its initial value) \u2014 dereference of NULL `ob_type`.\n\nCurrently unreachable (only 3 valid enum values exist), but a code change adding a new parse type without updating this function would trigger the crash.\n\n**File(s):** `nonreduce_axis_template.c:640-642`\n\n**Suggested fix:**\n\n```c\n// Before:\n} else {\n    RUNTIME_ERR(\"Unknown parse type; please report error.\");\n}\n\n// After:\n} else {\n    RUNTIME_ERR(\"Unknown parse type; please report error.\");\n    return NULL;\n}\n```\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/pull/535",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

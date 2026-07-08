@@ -1,0 +1,64 @@
+{
+ "repo": "python/cpython",
+ "number": 143183,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/143183",
+ "title": "JIT: Assertion failure in `stopiteration_error`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-12-26T03:47:17Z",
+ "closed_at": "2025-12-28T22:12:32Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort a JIT build by running the code below:\n\n\n```python\ndef f1():\n    class AsyncIter:\n        def __init__(self):\n            self.limit = 0\n            self.count = 0\n\n        def __aiter__(self):\n            return self\n\n        async def __anext__(self):\n            if self.count >= self.limit:\n                ...\n            self.count += 1j\n\n    class AsyncCtx:\n        async def async_for_driver():\n            try:\n                for _ in range(5000):\n                    try:\n                        async for _ in AsyncIter():\n                            ...\n                    except TypeError:\n                        ...\n            except Exception:\n                ...\n\n        c = async_for_driver()\n        while True:\n            try:\n                c.send(None)\n            except StopIteration:\n                break\n\n\nfor i in range(30):\n    f1()\n```\n\nBacktrace:\n```\npython: Python/intrinsics.c:145: PyObject *stopiteration_error(PyThreadState *, PyObject *): Assertion `PyExceptionInstance_Check(exc)' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555fe5142 in stopiteration_error (tstate=0x555556e6afb0 <_PyRuntime+359376>, exc=0x555556beeaa0 <_Py_TrueStruct>) at Python/intrinsics.c:145\n#8  0x0000555555e76230 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:2589\n#9  0x0000555555b4168b in _PyEval_EvalFrame (tstate=0x555556e6afb0 <_PyRuntime+359376>, frame=0x7d0ffd203528, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#10 gen_send_ex2 (gen=0x7d0ffd2034e0, arg=0x555556c0b4a0 <_Py_NoneStruct>, presult=0x7bfff5bad660, exc=0) at Objects/genobject.c:239\n#11 0x0000555555b420f5 in gen_send (op=0x7d0ffd2034e0, arg=0x555556c0b4a0 <_Py_NoneStruct>) at Objects/genobject.c:365\n#12 0x0000555555ea7bc7 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:3661\n#13 0x0000555555e6db18 in _PyEval_EvalFrame (tstate=0x555556e6afb0 <_PyRuntime+359376>, frame=0x7e8ff6fe5310, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#14 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2542\n#15 0x0000555555e5be84 in builtin___build_class__ (self=<optimized out>, args=<optimized out>, nargs=2, kwnames=<optimized out>) at Python/bltinmodule.c:205\n#16 0x0000555555e6ffcf in _Py_BuiltinCallFastWithKeywords_StackRefSteal (callable=..., arguments=<optimized out>, total_args=2) at Python/ceval.c:1181\n#17 0x0000555555e8ff48 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:2287\n#18 0x0000555555e6db18 in _PyEval_EvalFrame (tstate=0x555556e6afb0 <_PyRuntime+359376>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#19 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2542\n#20 0x0000555555e6d535 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff7086540) at Python/ceval.c:1008\n```\n\nOutput from running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`:\n[2492_abort_lltrace_opt_debug.txt](https://github.com/user-attachments/files/24342542/2492_abort_lltrace_opt_debug.txt)\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ (heads/main-dirty:cc48bf0fde8, Dec 24 2025, 22:16:25) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-143187\n* gh-143268\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143187",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "daa9aa4c0a8490f09b01339b6928434d7fe02843",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143268",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6cb245d26086369bb075858501405865fc255a10",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "872f04440ec1fbd25f489a1960a79be14cd62738",
+   "actor": "thunder-coding"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c199e7f9a1f1672afb7f6189c208b974c84fa870",
+   "actor": "thunder-coding"
+  }
+ ]
+}

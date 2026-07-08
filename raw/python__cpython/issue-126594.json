@@ -1,0 +1,107 @@
+{
+ "repo": "python/cpython",
+ "number": 126594,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126594",
+ "title": "Failed assertion in typeobject.c::wrap_buffer for `b\"\".__buffer__(-2**31 - 1)`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-08T17:19:49Z",
+ "closed_at": "2024-11-24T10:33:09Z",
+ "body": "# Crash report\r\n\r\n### What happened?\r\n\r\nCalling `bytes_object.__buffer__(large_negative_number)` in a debug build aborts with this message:\r\n\r\n```python\r\n>>> b\"\".__buffer__(-2**31 - 1)\r\npython: Objects/typeobject.c:9321: wrap_buffer: Assertion `_Py_STATIC_CAST(Py_ssize_t, _Py_STATIC_CAST(int, (flags))) == (flags)' failed.\r\nAborted\r\n```\r\n\r\nFound using fusil by @vstinner.\r\n\r\n### CPython versions tested on:\r\n\r\nCPython main branch\r\n\r\n### Operating systems tested on:\r\n\r\nLinux, Windows\r\n\r\n### Output from running 'python -VV' on the command line:\r\n\r\nPython 3.14.0a1+ (heads/main:4ea214ea982, Nov  6 2024, 00:52:15) [MSC v.1941 64 bit (AMD64)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126754\n* gh-127004\n* gh-127005\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-12T18:19:36Z",
+   "body": "I wrote PR gh-126754 to fix the issue."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-24T10:33:09Z",
+   "body": "Closing since the PRs have been merged, please reopen if there's anything left to do."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "019df146cfbf531d86c3324c1c43502cf7b14c09",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126754",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "84f07c3a4cbcfe488ccfb4030571be0bc4de7e45",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d97fc2042a0db4dc3d9a8142ea6101e1da10040d",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "49c46986d3e3be2c8c484b478810e542171a7e4a",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127004",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127005",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9345dc165c3389208da45d391bf5b2d146302e75",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fd276ad3287939ff6f0c6832d76eaeda520fc038",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "032c25a9cd8de73ccdc604672139ab105cf98eed",
+   "actor": "ebonnal"
+  }
+ ]
+}

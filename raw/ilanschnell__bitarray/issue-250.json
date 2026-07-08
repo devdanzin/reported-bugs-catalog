@@ -1,0 +1,59 @@
+{
+ "repo": "ilanschnell/bitarray",
+ "number": 250,
+ "type": "issue",
+ "url": "https://github.com/ilanschnell/bitarray/issues/250",
+ "title": "Umbrella issue: bitarray C Extension Analysis Report",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-04-01T00:28:12Z",
+ "closed_at": "2026-04-02T20:06:26Z",
+ "body": "This issue is meant to track the findings from the [bitarray C Extension Analysis Report](https://gist.github.com/devdanzin/191b87e2d03e806f1868eecfe844e406), created with [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).\n\nIt's possible that some of the following are false positives or intended behaviors, any feedback on those is appreciated.\n\n## Critical Findings (FIX)\n\n- [x] 1. Use-after-free in `bitarray_encode` \u2014 segfault  -- **FIXED in 291c987b88818365e2ff638624aa251252063b37**\n\n**File:** `_bitarray.c:2846-2852`\n\n`symbol` is `Py_DECREF`'d on line 2848, potentially freeing it. Line 2851 then uses `symbol` in `PyErr_Format` with `%A` format (calls `ascii(symbol)`) \u2014 accessing freed memory. Segfault when the iterator yields an object whose only reference is from `PyIter_Next`.\n\n\n\n- [x] 2. `PyDict_GetItem` swallows exceptions in `bitarray_encode`\n\n**File:** `_bitarray.c:2847`\n\n`PyDict_GetItem` silently clears exceptions from `__hash__`/`__eq__`. If a symbol's `__hash__` raises `MemoryError`, it's replaced with `ValueError(\"symbol not defined\")`. The project has `PyDict_GetItemRef` available via `pythoncapi_compat.h` but doesn't use it.\n\n\n\n- [x] 3. `Py_DECREF(NULL)` in `extend_fread` \u2014 segfault -- **FIXED in 84ba4c4**\n\n**File:** `_bitarray.c:1600-1604`\n\nWhen `bitarray_frombytes` returns NULL (e.g., buffer is exported), `ret` is NULL. Line 1604 unconditionally calls `Py_DECREF(ret)` \u2014 crash. Triggered by `fromfile()` on a bitarray with an exported buffer.\n\n\n\n- [x] 4. `Py_DECREF(NULL)` on unchecked `Py_BuildValue` in `buffer_info` -- **FIXED in 663a22028a718d37e6618f9886f92850290359f8**\n\n**File:** `_bitarray.c:1033-1046`\n\n`Py_BuildValue` can return NULL (OOM). The result `args` is not checked before `Py_DECREF(args)` on line 1046 \u2014 crash.\n\n\n\n- [x] 5. GC UnTrack after `Py_DECREF` in `decodeiter_dealloc` -- **FIXED in dba5f2870998eb8194bc44746b651558c242b669**\n\n**File:** `_bitarray.c:3321-3331`\n\n`Py_DECREF(it->decodetree)` is called on line 3325 *before* `PyObject_GC_UnTrack(it)` on line 3329. If the decref triggers GC, the partially-destroyed iterator may be visited. The other three iterator deallocs correctly untrack first.\n\n\n\n- [x] 6. Missing `Py_VISIT(it->sub)` in `searchiter_traverse` -- **FIXED in c4aa327499d732856a460de911bfd693fcf982df**\n\n**File:** `_bitarray.c:3465-3469`\n\n`searchiter_traverse` visits `it->self` but not `it->sub`, despite `sub` being an owned reference (INCREF'd at line 3412, DECREF'd in dealloc at line 3461). GC cannot see cycles through `sub`.\n\n\n\n- [x] 7. NULL dereference in `chdi_new` error path -- **FIXED in 0468bfbc2b69faea653675074ce799a9e0bdf8b9**\n\n**File:** `_util.c:1972-1997`\n\nIf `PyObject_GC_New` returns NULL (OOM), `goto error` jumps to line 1993 which writes `it->array = NULL` \u2014 dereferencing the NULL `it` pointer.\n\n\n\n- [x] 8. Unchecked `PyLong_FromLong` in `bits2bytes` (3 sites)\n\n**File:** `_bitarray.c:4047-4065`\n\nThree `PyLong_FromLong` calls (0, 7, 8) are not checked for NULL. Each result is immediately passed to a Python/C API function that dereferences it.\n\n\n\n- [x] 9-10. `PyMem_Realloc` overwrites pointer \u2014 leaks old buffer (2 sites) -- **FIXED in 664d3441fff908a01629d263fe4b43a7d115fc20**\n\n**File:** `_bitarray.c:97`, `_util.c:103`\n\nClassic `self->ob_item = PyMem_Realloc(self->ob_item, ...)` pattern. On failure, the old buffer is lost and can never be freed. The bitarray is left with `ob_item == NULL`, causing secondary crashes.\n\n\n\n- [x] 11. Memory leak in `binode_to_dict` when `resize` fails -- **FIXED in 98f4a325bf403954d4c9d9a37dae8d38776aa453**\n\n**File:** `_bitarray.c:3024-3027`\n\n`bitarray_cp(prefix)` creates a new bitarray `t`. If subsequent `resize(t, ...)` fails, the function returns -1 without `Py_DECREF(t)`.\n\n\n\n- [x] 12. Reference leak in `buffer_info` partial allocation failure -- **FIXED in cdaf10668bf9f86514fa1ca47c835954e3eef7a2**\n\n**File:** `_bitarray.c:1027-1031`\n\nThree objects allocated sequentially; if a later one fails, earlier ones leak. Fix: `Py_XDECREF` all before returning NULL.\n\n\n\n---\n\n## Important Findings (CONSIDER)\n\n| Finding | File | Description |\n|---------|------|-------------|\n| Unchecked `PyModule_AddObject` (2 sites) | `_bitarray.c:4246,4255` | `PyModule_AddObjectRef` available via pythoncapi_compat but not used |\n| Module `m` leaked on init error paths | `_bitarray.c:4235+`, `_util.c:2251+` | No `Py_DECREF(m)` on late init failures |\n| `PyErr_Clear` in `bitarray_reduce` | `_bitarray.c:1362` | Blanket clear may swallow non-AttributeError |\n| Exception clobbering in `extend_iter` cleanup | `_bitarray.c:806-810` | Cleanup `resize` failure overwrites original error |\n| Redundant `Py_SET_TYPE` calls (5 sites) | `_bitarray.c:4244+` | Dead code \u2014 `PyType_Ready` already sets ob_type |\n| `PyObject_CallObject` deprecated (2 sites) | `_bitarray.c:1045`, `_util.c:46` | Removed in Python 3.15 |\n| `ob_exports` counter not atomic | `_bitarray.c:3942+` | Race under free-threading |\n| `Py_MOD_GIL_NOT_USED` without internal locking | `_bitarray.c:4239`, `_util.c:2255` | Premature declaration |\n| GIL held during compute-heavy operations | `_bitarray.c` various | `count_span`, `find_sub`, `richcompare`, `sort` could release GIL |\n| No `tp_clear` on GC iterator types (4 types) | `_bitarray.c`, `_util.c` | GC can detect but not break cycles |\n| `PyObject_Del` in error path for subclassable type | `_bitarray.c:128` | Wrong free for GC-enabled subclasses |\n| `_PyBytes_Resize` private API (2 sites) | `_util.c:1568,1577` | No stable ABI equivalent |\n",
+ "comments": [
+  {
+   "author": "ilanschnell",
+   "created_at": "2026-04-01T01:31:01Z",
+   "body": "Thank you very much for this useful analysis.  I fixed all critical findings:\n\n1. in PR #249\n2. same PR as 1.\n3. in 84ba4c45977ca2afc0aff53d609aa10390ea3e1a\n4. in 663a22028a718d37e6618f9886f92850290359f8\n5. in dba5f2870998eb8194bc44746b651558c242b669\n6. in c4aa327499d732856a460de911bfd693fcf982df\n7. in 0468bfbc2b69faea653675074ce799a9e0bdf8b9\n8. in e1381ad7d03d15fdbd3f02b785445f222099fafe\n9. in 664d3441fff908a01629d263fe4b43a7d115fc20\n10. same commit as 9.\n11. in 98f4a325bf403954d4c9d9a37dae8d38776aa453\n12. in cdaf10668bf9f86514fa1ca47c835954e3eef7a2\n"
+  },
+  {
+   "author": "ilanschnell",
+   "created_at": "2026-04-02T20:06:26Z",
+   "body": "With bitarray 3.8.1 (which includes all these fixed) being released, I'm closing this issue."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cdaf10668bf9f86514fa1ca47c835954e3eef7a2",
+   "actor": "ilanschnell"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "98f4a325bf403954d4c9d9a37dae8d38776aa453",
+   "actor": "ilanschnell"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e1381ad7d03d15fdbd3f02b785445f222099fafe",
+   "actor": "ilanschnell"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/ilanschnell/bitarray/pull/249",
+   "commit": null,
+   "actor": "ilanschnell"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ilanschnell"
+  }
+ ]
+}

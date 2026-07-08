@@ -1,0 +1,142 @@
+{
+ "repo": "python/cpython",
+ "number": 135878,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/135878",
+ "title": "Segfault by calling `repr(SimpleNamespace)` with `typing.Union` attributes in threads on a free-threading build",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2025-06-24T10:01:11Z",
+ "closed_at": "2025-06-30T06:40:20Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault or abort the interpreter of a free-threading build by calling `repr(SimpleNamespace)` in threads when the instance has `typing.Union` attributes. This seems very similar to https://github.com/python/cpython/issues/132713.\n\nThe MRE will rarely hang and is non-deterministic, but is the best I was able to come up with.\n\nMRE:\n```python\nfrom functools import reduce\nfrom operator import or_\nfrom threading import Thread\n\nfrom types import SimpleNamespace\n\nall_types = []\nfor x in range(400):\n    class Dummy: pass\n    all_types.append(Dummy)\nbig_union = reduce(or_, all_types, int)\n\nfor x in range(500):\n    s = SimpleNamespace()\n\n    def stress_simplenamespace():\n        for x in range(20):\n            varying_union = big_union | tuple[int, ...] | list[str, ...] | dict[str, int]\n            repr(s)\n            attr_name = f\"t_attr_{x}\"\n            setattr(s, attr_name, varying_union)\n            repr(s)\n            repr(s)\n            repr(s)\n\n    alive = [Thread(target=stress_simplenamespace) for x in range(8)]\n    for t in alive:\n        t.start()\n    for t in alive:\n        t.join()\n```\n\nSegfault backtrace 1:\n```shell\nThread 7 \"Thread-6 (stres\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7ffff541b640 (LWP 348490)]\n0x000055555567cdcd in setup_ga (args=<unknown at remote 0x7ffff5c20640>, origin=<type at remote 0x555555b11d40>, alias=0x2276a0e0140) at Objects/genericaliasobject.c:837\n837         if (!PyTuple_Check(args)) {\n\n#0  0x000055555567cdcd in setup_ga (args=<unknown at remote 0x7ffff5c20640>, origin=<type at remote 0x555555b11d40>, alias=0x2276a0e0140)\n    at Objects/genericaliasobject.c:837\n#1  Py_GenericAlias (origin=<type at remote 0x555555b11d40>, args=<unknown at remote 0x7ffff5c20640>) at Objects/genericaliasobject.c:1015\n#2  0x0000555555658dd5 in _PyObject_VectorcallTstate (kwnames=0x0, nargsf=9223372036854775809, args=0x7ffff541a428,\n    callable=<built-in method __class_getitem__ of type object at remote 0x555555b11d40>, tstate=0x555555c3c6e0)\n    at ./Include/internal/pycore_call.h:169\n#3  PyObject_CallOneArg (func=<built-in method __class_getitem__ of type object at remote 0x555555b11d40>,\n    arg=arg@entry=<unknown at remote 0x7ffff5c20640>) at Objects/call.c:395\n#4  0x0000555555634781 in PyObject_GetItem (o=<type at remote 0x555555b11d40>, key=<unknown at remote 0x7ffff5c20640>) at Objects/abstract.c:193\n#5  0x00005555555e2f02 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>)\n    at Python/generated_cases.c.h:62\n#6  0x00005555557dd13e in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>, tstate=0x555555c3c6e0) at ./Include/internal/pycore_ceval.h:119\n#7  _PyEval_Vector (tstate=0x555555c3c6e0, func=0x2275e37fd80, locals=0x0, args=0x7ffff541a8a8, argcount=<optimized out>, kwnames=<optimized out>)\n    at Python/ceval.c:1975\n```\n\nSegfault backtrace 2:\n```shell\nThread 3 \"Thread-2 (stres\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7ffff742f640 (LWP 343364)]\nclear_freelist (dofree=<optimized out>, is_finalization=<optimized out>, freelist=<optimized out>) at Objects/object.c:904\n904             dofree(ptr);\n\n#0  clear_freelist (dofree=<optimized out>, is_finalization=<optimized out>, freelist=<optimized out>) at Objects/object.c:904\n#1  _PyObject_ClearFreeLists (freelists=0x555555c30948, is_finalization=is_finalization@entry=1) at Objects/object.c:929\n#2  0x000055555585c521 in PyThreadState_Clear (tstate=tstate@entry=0x555555c2cf60) at Python/pystate.c:1703\n#3  0x0000555555904a10 in thread_run (boot_raw=0x555555c194a0) at ./Modules/_threadmodule.c:390\n#4  0x000055555587e27b in pythread_wrapper (arg=<optimized out>) at Python/thread_pthread.h:232\n#5  0x00007ffff7d31ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442\n#6  0x00007ffff7dc3850 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81\n```\n\nA backtrace for a segfault I got with a variant of this code, seems more informative but I cannot repro with the MRE:\n```shell\nThread 185 \"asyncio_4\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0xffffe31ff060 (LWP 1527140)]\n0x0000000000867ce8 in _Py_TYPE (ob=<unknown at remote 0xdddddddddddddddd>) at ./Include/object.h:270\n270             return ob->ob_type;\n\n#0  0x0000000000867ce8 in _Py_TYPE (ob=<unknown at remote 0xdddddddddddddddd>) at ./Include/object.h:270\n#1  union_repr (self=<unknown at remote 0xffffa425a9d0>) at Objects/unionobject.c:296\n#2  0x00000000006e61a8 in PyObject_Repr (v=<unknown at remote 0xffffa425a9d0>) at Objects/object.c:779\n#3  0x000000000082ada0 in unicode_fromformat_arg (writer=writer@entry=0xffffe31fb4e0, f=0xd88224 \"R\", f@entry=0xd88223 \"%R\", vargs=vargs@entry=0xffffe31fb410)\n    at Objects/unicodeobject.c:3101\n#4  0x000000000082b33c in unicode_from_format (writer=writer@entry=0xffffe31fb4e0, format=format@entry=0xd88220 \"%U=%R\", \n    vargs=<error reading variable: Cannot access memory at address 0x1>) at Objects/unicodeobject.c:3220\n#5  0x000000000082b68c in PyUnicode_FromFormatV (format=format@entry=0xd88220 \"%U=%R\", vargs=...) at Objects/unicodeobject.c:3254\n#6  0x000000000082b828 in PyUnicode_FromFormat (format=format@entry=0xd88220 \"%U=%R\") at Objects/unicodeobject.c:3268\n#7  0x00000000006e1038 in namespace_repr (ns=<types.SimpleNamespace at remote 0xffffa48e3c60>) at Objects/namespaceobject.c:129\n#8  0x000000000075e894 in object_str (self=self@entry=<types.SimpleNamespace at remote 0xffffa48e3c60>) at Objects/typeobject.c:7152\n#9  0x0000000000768d18 in wrap_unaryfunc (self=<types.SimpleNamespace at remote 0xffffa48e3c60>, args=<optimized out>, wrapped=0x75e854 <object_str>)\n    at Objects/typeobject.c:9536\n#10 0x00000000005d8ee0 in wrapperdescr_raw_call (kwds=<optimized out>, args=<optimized out>, self=<optimized out>, descr=<optimized out>) at Objects/descrobject.c:532\n#11 wrapper_call (self=<optimized out>, args=<optimized out>, kwds=<optimized out>) at Objects/descrobject.c:1437\n#12 0x00000000005ab38c in _PyObject_MakeTpCall (tstate=tstate@entry=0xffff48937210, \n    callable=callable@entry=<method-wrapper '__str__' of types.SimpleNamespace object at 0xffffa48e3c60>, args=args@entry=0xffffe31fbe58, nargs=nargs@entry=0, \n    keywords=keywords@entry=0x0) at Objects/call.c:242\n#13 0x00000000005aba68 in _PyObject_VectorcallTstate (tstate=0xffff48937210, callable=<method-wrapper '__str__' of types.SimpleNamespace object at 0xffffa48e3c60>, \n    args=0xffffe31fbe58, nargsf=9223372036854775808, kwnames=0x0) at ./Include/internal/pycore_call.h:167\n#14 0x00000000005aba98 in PyObject_Vectorcall (callable=callable@entry=<method-wrapper '__str__' of types.SimpleNamespace object at 0xffffa48e3c60>, \n    args=args@entry=0x0, nargsf=nargsf@entry=9223372036854775808, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n```\n\nAbort backtrace:\n```shell\n*** stack smashing detected ***: terminated\n\nThread 7 \"Thread-6 (stres\" received signal SIGABRT, Aborted.\n[Switching to Thread 0x7ffff541b640 (LWP 351627)]\n__pthread_kill_implementation (no_tid=0, signo=6, threadid=0) at ./nptl/pthread_kill.c:44\n\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=0) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=0, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7cdf476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7cc57f3 in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7d26677 in __libc_message (action=action@entry=do_abort, fmt=fmt@entry=0x7ffff7e7892e \"*** %s ***: terminated\\n\")\n    at ../sysdeps/posix/libc_fatal.c:156\n#6  0x00007ffff7dd359a in __GI___fortify_fail (msg=msg@entry=0x7ffff7e78916 \"stack smashing detected\") at ./debug/fortify_fail.c:26\n#7  0x00007ffff7dd3566 in __stack_chk_fail () at ./debug/stack_chk_fail.c:24\n#8  0x000055555572321d in _Py_type_getattro_impl (type=<optimized out>, name=<optimized out>,\n    suppress_missing_attribute=suppress_missing_attribute@entry=0x7ffff541a194) at Objects/typeobject.c:6355\n#9  0x00005555556db432 in PyObject_GetOptionalAttr (v=v@entry=<type at remote 0x3b2b2e06800>, name=<optimized out>,\n    result=result@entry=0x7ffff541a1d0) at Objects/object.c:1345\n#10 0x000055555572ea38 in _Py_typing_type_repr (writer=writer@entry=0x3b2be090e80, p=<type at remote 0x3b2b2e06800>) at Objects/typevarobject.c:295\n#11 0x000055555577ad6e in union_repr (self=<typing.Union at remote 0x3b2c20e0820>) at Objects/unionobject.c:297\n#12 0x00005555556d80db in PyObject_Repr (v=<typing.Union at remote 0x3b2c20e0820>) at ./Include/object.h:277\n#13 PyObject_Repr (v=<typing.Union at remote 0x3b2c20e0820>) at Objects/object.c:754\n#14 0x0000555555765835 in unicode_fromformat_arg (vargs=0x7ffff541a278, f=0x555555937b12 \"R\", writer=0x7ffff541a300)\n    at Objects/unicodeobject.c:3101\n#15 unicode_from_format (writer=writer@entry=0x7ffff541a300, format=format@entry=0x555555937b0e \"%U=%R\", vargs=vargs@entry=0x7ffff541a340)\n    at Objects/unicodeobject.c:3220\n#16 0x000055555576fadf in PyUnicode_FromFormatV (vargs=0x7ffff541a340, format=0x555555937b0e \"%U=%R\") at Objects/unicodeobject.c:3254\n#17 PyUnicode_FromFormat (format=format@entry=0x555555937b0e \"%U=%R\") at Objects/unicodeobject.c:3268\n#18 0x00005555556d5802 in namespace_repr (ns=<types.SimpleNamespace at remote 0x3b2b2152310>) at Objects/namespaceobject.c:129\n#19 0x00005555556d80db in PyObject_Repr (v=<types.SimpleNamespace at remote 0x3b2b2152310>) at ./Include/object.h:277\n#20 PyObject_Repr (v=<types.SimpleNamespace at remote 0x3b2b2152310>) at Objects/object.c:754\n#21 0x00005555555e4883 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>)\n    at Python/generated_cases.c.h:2487\n#22 0x00005555557dd13e in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>, tstate=0x555555c3c6e0) at ./Include/internal/pycore_ceval.h:119\n#23 _PyEval_Vector (tstate=0x555555c3c6e0, func=0x3b2b237fd80, locals=0x0, args=0x7ffff541a8a8, argcount=<optimized out>, kwnames=<optimized out>)\n    at Python/ceval.c:1975\n```\n\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 experimental free-threading build (heads/main:b706ff003c5, Jun 11 2025, 19:34:04) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-135889\n* gh-135895\n* gh-135896\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-24T10:46:24Z",
+   "body": "There's an evil borrowed reference in `namespace_repr`: https://github.com/python/cpython/blob/15c6d63fe6fc62c6d78d2fad81965a8e6f7b7b98/Objects/namespaceobject.c#L127\n\nI think that's probably the culprit."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-06-24T10:55:56Z",
+   "body": "Yes, @ZeroIntensity, you are right! I've fixed this already by using `PyDict_GetItemRef`, but I can't find out the simplest test for this."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-24T11:06:57Z",
+   "body": "I think it's a combination of borrowed references here. I was able to shorten the repro down to this:\n```py\nfrom functools import reduce\nfrom operator import or_\nfrom threading import Thread\n\nfrom types import SimpleNamespace\n\nall_types = []\nfor x in range(100):\n    class Dummy: pass\n    all_types.append(Dummy)\nbig_union = reduce(or_, all_types)\n\ns = SimpleNamespace()\n\ndef stress_simplenamespace():\n    repr(s)\n    s.x = big_union | tuple[int]\n\nalive = [Thread(target=stress_simplenamespace) for _ in range(4)]\nfor t in alive:\n    t.start()\nfor t in alive:\n    t.join()\n```"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-06-24T11:31:26Z",
+   "body": "> I think it's a combination of borrowed references here.\n\nCan you please elaborate? I didn't see a single crash after this fix:\n\n```diff\ndiff --git Objects/namespaceobject.c Objects/namespaceobject.c\nindex caebe6bf543..871063b7a04 100644\n--- Objects/namespaceobject.c\n+++ Objects/namespaceobject.c\n@@ -124,8 +124,7 @@ namespace_repr(PyObject *ns)\n         if (PyUnicode_Check(key) && PyUnicode_GET_LENGTH(key) > 0) {\n             PyObject *value, *item;\n \n-            value = PyDict_GetItemWithError(d, key);\n-            if (value != NULL) {\n+            if (PyDict_GetItemRef(d, key, &value) == 1) {\n                 item = PyUnicode_FromFormat(\"%U=%R\", key, value);\n                 if (item == NULL) {\n                     loop_error = 1;\n@@ -135,7 +134,7 @@ namespace_repr(PyObject *ns)\n                     Py_DECREF(item);\n                 }\n             }\n-            else if (PyErr_Occurred()) {\n+            else {\n                 loop_error = 1;\n             }\n         }\n```\n\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-24T11:38:37Z",
+   "body": "`Union` has some borrowed references too, but they're protected because they're immutable. That fix looks correct, but I think most repros you could come up with won't work because something else is keeping a reference.\n\nAnyways, there's been some pushback on recent PRs for adding FT tests, because they might be a bit too specific to catch any future regressions. If coming up with a repro that works in a test here is too difficult, it's probably fine to not have one."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-06-24T16:34:42Z",
+   "body": "@devdanzin can you please verify that this no longer happens?"
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-06-30T06:40:20Z",
+   "body": "I think this is fixed now, closing"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a9a99c75741667772741aa13538b727ae3c89358",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135889",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3ab94acd308591bbdf264f1722fedc7ee25d6fa",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "39b56283b8a9fca1d77103bc4557d338312d7327",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8c05bc324a3892cbb7357354d20432f0f97dfddb",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135895",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135896",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "88c55528f5a694e8340f2541de7a11265589fbed",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "469f69d4e2cef433644564a7cf6b1eaf883feb32",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1bf008929bc84817e8aa1420d587f75ad096f566",
+   "actor": "AndPuQing"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1de537704b321520a234ed69598c16abad945c10",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7fba8139a53cd9fe6ddf6eb90c04086853b56a78",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "51832ec978abca40091222eb6eb6fa2b49d0dca5",
+   "actor": "Agent-Hellboy"
+  }
+ ]
+}

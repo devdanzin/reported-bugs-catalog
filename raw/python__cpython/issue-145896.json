@@ -1,0 +1,82 @@
+{
+ "repo": "python/cpython",
+ "number": 145896,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/145896",
+ "title": "Typos and stale docstrings in `Lib/traceback.py`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "docs",
+  "stdlib"
+ ],
+ "created_at": "2026-03-13T02:11:22Z",
+ "closed_at": "2026-05-25T09:49:03Z",
+ "body": "# Bug report\n\n### Bug description:\n\nTypos and stale docstrings in `Lib/traceback.py` found by Claude Code using [code-review-toolkit](https://github.com/devdanzin/code-review-toolkit):\n\n1. Comment typo \"exc_traceback, exc_value, exc_traceback\" \u2014 `exc_type` omitted, `exc_traceback` duplicated. `[traceback.py:1063]`\n2. `FrameSummary` class docstring has broken grammar: \"for the of code\" should be \"for the line of code\". `[traceback.py:296]`\n3. `extract_stack` docstring says items are \"quadruples\" \u2014 stale since Python 3.5, should reference `FrameSummary` objects. `[traceback.py:261-268]`\n4. `extract_tb` docstring lists only 4 attributes \u2014 omits `end_lineno`, `colno`, `end_colno` added in 3.11. `[traceback.py:78-89]`\n5. `_display_width` docstring says \"extra amount of width space\" \u2014 it returns total display width, not a delta. `[traceback.py:976-979]`\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-145897\n* gh-150382\n* gh-150383\n* gh-150384\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-05-25T09:49:03Z",
+   "body": "Thank you for your report and PR, @devdanzin."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145897",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "832afeddcea78e40d39c47cd1893f8137e588e72",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150382",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150383",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150384",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "effcfd725dce2cdce71d2ca7b3ebd32045466b53",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "28037c2d11be131588efcd22c17c6bafa824cc8d",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0bff1182d47b084fc2e87299cac53bb4878762e9",
+   "actor": "serhiy-storchaka"
+  }
+ ]
+}

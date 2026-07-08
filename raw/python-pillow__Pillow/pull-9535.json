@@ -1,0 +1,54 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9535,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9535",
+ "title": "Drop experimental Python 3.13 free-threaded wheels",
+ "state": "closed",
+ "state_reason": null,
+ "author": "radarhere",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-04-03T06:22:22Z",
+ "closed_at": "2026-04-03T12:54:14Z",
+ "body": "[cibuildwheel 3.4.1](https://github.com/pypa/cibuildwheel/releases/tag/v3.4.1) has just been released. In the release notes, it mentions\r\n\r\n> Building for the experimental CPython 3.13 free-threading variant is now deprecated. That functionality will be removed in the next minor release. The [enable](https://cibuildwheel.pypa.io/en/stable/options/#enable) option `cpython-freethreading` is therefore also deprecated. Builds specifying `enable = \"all\"` no longer select `cpython-freethreading`. CPython 3.14 free-threading support remains available without the `enable` flag. (https://github.com/pypa/cibuildwheel/pull/2787)\r\n\r\nWe are on cibuildwheel 3.4.0, but Renovate will upgrade us before the next Pillow release, so this PR suggests just dropping `cpython-freethreading` now.",
+ "comments": [
+  {
+   "author": "hugovk",
+   "created_at": "2026-04-03T09:49:29Z",
+   "body": "Let's also mention in our release notes that there's no more 3.13t wheels: free-threading was experimental in 3.13, 3.14 and later have official support."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e81acb8f7960cdd5b4ca800a695f67adc2d592a9",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python-pillow/Pillow/pull/9621",
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python-pillow/Pillow/pull/9625",
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "130540e1f1d412c2c88844349d8e8c3f2cf310c2",
+   "actor": "luketainton"
+  }
+ ]
+}

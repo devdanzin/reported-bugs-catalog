@@ -1,0 +1,60 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 358,
+ "type": "pull",
+ "url": "https://github.com/simplejson/simplejson/pull/358",
+ "title": "Fix reference leaks in dict encoder",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:41:08Z",
+ "closed_at": "2026-04-06T19:41:58Z",
+ "body": "Fixes #352 (part of #348).\n\n## Changes\n\n1. **skipkeys item leak**: When `kstr == Py_None` (skipkeys mode), `Py_DECREF(kstr)` then `continue` \u2014 but `item` from `PyIter_Next` was never decref'd. Added `Py_DECREF(item)` before `continue`. Matches the correct pattern at line 3044.\n\n2. **Variable shadowing**: Inner `PyObject *encoded` declaration in the while loop shadowed the outer declaration. Removed the inner declaration so the bail handler can clean up the variable.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "17814cbe7e3b6b5100b4778b1e1648510825ab8d",
+   "actor": "etrepum"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "189ca1cc4cd40ec36c7e0d6ec16084631267a998",
+   "actor": "etrepum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e2e5f0b2d3bae3fd9a56bbaab42f6d75fb980ad5",
+   "actor": "github-merge-queue[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dbf6f64fcea1b8b95ab5b9ad9502899a006990b9",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1621e6cc818b2a097e316a3f193b1458a8cb7c27",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae7cd18c2df9ba696fad92a31e2755ef468a1b25",
+   "actor": "netbsd-srcmastr"
+  }
+ ]
+}

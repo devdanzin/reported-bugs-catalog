@@ -1,0 +1,150 @@
+{
+ "repo": "python/cpython",
+ "number": 126455,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126455",
+ "title": "Calling many methods on `_ssl._SSLSocket()` segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-SSL",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-05T21:00:53Z",
+ "closed_at": "2024-11-06T11:06:20Z",
+ "body": "# Crash report\n\n### What happened?\n\nCalling many different methods on a `_ssl._SSLSocket()` instance causes a segfault, for example:\n```python\nimport _ssl\ns = _ssl._SSLSocket()\ns.shutdown()\n# Segmentation fault\n```\n\nOther methods known to segfault are `do_handshake`, `get_channel_binding`, `get_verified_chain` (but not `get_unverified_chain`), `getpeercert`, `read`, `verify_client_post_handshake`, `write`. Backtrace looks like:\n```gdb\n#0  0x00007ffff7b89129 in SSL_shutdown () from /lib/x86_64-linux-gnu/libssl.so.3\n#1  0x00007ffff7c287bc in _ssl__SSLSocket_shutdown_impl (self=self@entry=0x20000572510) at ./Modules/_ssl.c:2710\n#2  0x00007ffff7c28977 in _ssl__SSLSocket_shutdown (self=0x20000572510, _unused_ignored=<optimized out>)\n    at ./Modules/clinic/_ssl.c.h:557\n#3  0x0000555555694039 in method_vectorcall_NOARGS (func=<method_descriptor at remote 0x20000779380>, args=0x7fffffffd298,\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/descrobject.c:447\n#4  0x000055555567ccec in _PyObject_VectorcallTstate (tstate=0x555555d2c2a0 <_PyRuntime+359904>,\n    callable=<method_descriptor at remote 0x20000779380>, args=0x7fffffffd298, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:167\n#5  0x000055555567ce0b in PyObject_Vectorcall (callable=callable@entry=<method_descriptor at remote 0x20000779380>,\n    args=args@entry=0x7fffffffd298, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#6  0x0000555555841c09 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d2c2a0 <_PyRuntime+359904>, frame=<optimized out>,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:955\n#7  0x000055555586fb1f in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>, tstate=0x555555d2c2a0 <_PyRuntime+359904>)\n    at ./Include/internal/pycore_ceval.h:116\n#8  _PyEval_Vector (tstate=tstate@entry=0x555555d2c2a0 <_PyRuntime+359904>, func=func@entry=0x20000ad32d0,\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <type at remote 0x20000276e10>, '__spec__': None, '__builtins__': <module at remote 0x2000025c640>, '_ssl': <module at remote 0x20000778d60>, 's': <_ssl._SSLSocket at remote 0x20000572510>}, args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1886\n#9  0x000055555586fd6c in PyEval_EvalCode (co=co@entry=<code at remote 0x2000033f190>,\n    globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <type at remote 0x20000276e10>, '__spec__': None, '__builtins__': <module at remote 0x2000025c640>, '_ssl': <module at remote 0x20000778d60>, 's': <_ssl._SSLSocket at remote 0x20000572510>},\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <type at remote 0x20000276e10>, '__spec__': None, '__builtins__': <module at remote 0x2000025c640>, '_ssl': <module at remote 0x20000778d60>, 's': <_ssl._SSLSocket at remote 0x20000572510>}) at Python/ceval.c:662\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.10, 3.11, 3.12, 3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main-dirty:bfc1d2504c, Nov  4 2024, 07:55:58) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126481\n* gh-126486\n* gh-126487\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-05T21:04:30Z",
+   "body": "I can probably deal with this considering my [previous work](https://github.com/python/cpython/pull/124993) with `_ssl`, unless someone else *really* wants to."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-05T21:06:35Z",
+   "body": "Seems not to be related to free-threading, given being present in many previous versions."
+  },
+  {
+   "author": "rruuaanng",
+   "created_at": "2024-11-06T07:04:44Z",
+   "body": "> I can probably deal with this considering my [previous work](https://github.com/python/cpython/pull/124993) with `_ssl`, unless someone else *really* wants to.\n\nIf you don't mind, can you give it to me :)"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T07:21:47Z",
+   "body": "The problem is that it's possible to create an invalid SSLSocket:\r\n\r\n```\r\n$ ./python -c 'import _ssl; _ssl._SSLSocket().context'\r\nErreur de segmentation (core dumped)\r\n```\r\n\r\nIn the Python implementation, there is:\r\n\r\n```py\r\nclass SSLSocket(socket):\r\n    def __init__(self, *args, **kwargs):\r\n        raise TypeError(\r\n            f\"{self.__class__.__name__} does not have a public \"\r\n            f\"constructor. Instances are returned by \"\r\n            f\"SSLContext.wrap_socket().\"\r\n        )\r\n```\r\n\r\nMaybe the _ssl extension module needs a similar constructor."
+  },
+  {
+   "author": "erlend-aasland",
+   "created_at": "2024-11-06T08:38:59Z",
+   "body": "> If you don't mind, can you give it to me :)\r\n\r\n@rruuaanng: No, please do not. I suggest you instead focus on the many PRs you already have opened. Only when you're down to a handful of open PR, consider again to open a new PR."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T10:17:54Z",
+   "body": "I wrote https://github.com/python/cpython/pull/126481 to fix the issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T11:06:20Z",
+   "body": "Fixed. Thanks for the bug report."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-06T12:01:47Z",
+   "body": "Thanks for working on this!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "46bde1ed591158dfcb1a2d8b97553dad9c461270",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c70daa7f894b08b9253b3d1808943d80f473e8a8",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126481",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b1c4ffc20573befb4db66bbbdd569b9bd13bb127",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c5c4bd1ccf95640e63a327cc4c49b167ca171f68",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a873496b32588369c1c38d270f83bbd0cbd1ee3d",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126486",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126487",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e6fd40ba1883040224128cbb30fa002827f18392",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a084b9d60f7c6085a5f7ea28c83c6285451a8ea",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8abfb36d42f91d20e91c04bbf72e7ed2d8e3771a",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ecf4ced44f5759ea4a7a153ff8ac4498b135d771",
+   "actor": "ebonnal"
+  }
+ ]
+}

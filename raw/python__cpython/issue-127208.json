@@ -1,0 +1,119 @@
+{
+ "repo": "python/cpython",
+ "number": 127208,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127208",
+ "title": "`ExtensionFileLoader.load_module` aborts when initialized with a path containing null-bytes",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-importlib",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-24T00:05:17Z",
+ "closed_at": "2024-11-29T18:47:53Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort a debug build by initializing a `_frozen_importlib_external.ExtensionFileLoader` with a path containing null-bytes, then calling `load_module()`:\n\n```python\nimport _frozen_importlib_external\n\n_frozen_importlib_external.ExtensionFileLoader(\"a\", \"\\x00\").load_module(None)\n```\nAbort message:\n```\npython: Python/import.c:939: hashtable_key_from_2_strings: Assertion `strlen(key) == size - 1' failed.\nAborted\n```\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.12, 3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a2+ (heads/main:0af4ec3, Nov 20 2024, 21:45:19) [GCC 13.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-127400\n* gh-127418\n* gh-127419\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-24T00:13:53Z",
+   "body": "Another way to trigger:\r\n```python\r\n>>> import _imp\r\n>>> class n:\r\n...   name = \"A\"\r\n...   origin = \"\\x00\"\r\n...\r\n>>> _imp.create_dynamic(n, 1)\r\npython: Python/import.c:939: hashtable_key_from_2_strings: Assertion `strlen(key) == size - 1' failed.\r\nAborted\r\n```"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-29T10:44:08Z",
+   "body": "I wrote https://github.com/python/cpython/pull/127400 to fix the issue."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-29T18:47:53Z",
+   "body": "Closing since completed and backported."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a0672e06d967f1b0ccd8afa60bc7fdaa092c68d7",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127400",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b14fdadc6c620875a20b7ccc3c9b069e85d8557a",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "89b4ccea17ce152017faeaf10a16468c68befdc6",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127418",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127419",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c4a359dc426bcb1a5f16ef25b0e3110bb463bdad",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e7ab97862deb8ad69caccbc5c6e1f7b4e670afbd",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2979fa177b1daf26136d3c11029a91bb72672818",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1908728e164434e5318f70115122bcb92c1a83fd",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9db2d4ee3445bc6f07726136c064a4f49b49aac3",
+   "actor": "ebonnal"
+  }
+ ]
+}

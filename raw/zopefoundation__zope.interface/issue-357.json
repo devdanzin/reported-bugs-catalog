@@ -1,0 +1,48 @@
+{
+ "repo": "zopefoundation/zope.interface",
+ "number": 357,
+ "type": "issue",
+ "url": "https://github.com/zopefoundation/zope.interface/issues/357",
+ "title": "copt: PyDict_GetItem silently swallows exceptions in SB_extends and IB__adapt__",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "jensens",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-30T00:40:25Z",
+ "closed_at": "2026-04-30T13:36:19Z",
+ "body": "A detailed analysis of `_zope_interface_coptimizations.c` was published at\nhttps://gist.github.com/devdanzin/5afbad864934b165a2cc080f110aa720 by @devdanzin.\nWe reviewed the report with agent support and verified the findings against the\ncurrent source (zope.interface 8.2). This issue is one of several extracted from\nthat review.\n\n### Problem\n\n`PyDict_GetItem(implied, other)` at lines 335 (`SB_extends`) and 795\n(`IB__adapt__`) silently clears ALL exceptions raised during key lookup\n(`__hash__`, `__eq__`). This includes `TypeError` from unhashable objects,\n`MemoryError`, and `KeyboardInterrupt`.\n\nThe functions return `False` / skip adaptation instead of propagating the\nexception. CPython 3.14 now prints runtime warnings about this.\n\n### Reproducer\n\n```python\nfrom zope.interface import Interface\n\nclass IFoo(Interface):\n    pass\n\nclass Unhashable:\n    __hash__ = None\n\nresult = IFoo.isOrExtends(Unhashable())\n# Returns False (BUG) \u2014 should raise TypeError\n```\n\nCPython 3.14 output:\n\n```\nException ignored in PyDict_GetItem(); consider using PyDict_GetItemRef() or PyDict_GetItemWithError():\nTypeError: unhashable type: 'Unhashable'\n```\n\nSame with `MemoryError` from a metaclass `__hash__`:\n\n```python\nclass BrokenHashMeta(type):\n    def __hash__(cls):\n        raise MemoryError(\"hash bomb\")\n\nclass BadType(metaclass=BrokenHashMeta):\n    pass\n\nresult = IFoo.isOrExtends(BadType)\n# Returns False (BUG) \u2014 MemoryError silently swallowed\n```\n\n### Fix\n\nReplace `PyDict_GetItem` with `PyDict_Contains` (available since Python 2.4).\n`PyDict_Contains` returns -1 on error, 0 for not found, 1 for found.\n\n```c\n// Before (line 335):\nif (PyDict_GetItem(implied, other) != NULL)\n    Py_RETURN_TRUE;\nPy_RETURN_FALSE;\n\n// After:\nint contains = PyDict_Contains(implied, other);\nif (contains < 0)\n    return NULL;\nif (contains)\n    Py_RETURN_TRUE;\nPy_RETURN_FALSE;\n```\n\nSame pattern for line 795 in `IB__adapt__`.\n\n### Scope\n\n2 call sites (lines 335, 795).\n\nNote: 3 additional `PyDict_GetItem` calls elsewhere in the file are part of the\nincomplete free-threading migration and could be addressed separately.\n`PyDict_GetItem` is also unsafe under free-threading (no proper error handling),\nwhich is relevant to #330.\n\n### Tests\n\nAdd to `SpecificationBasePyTests` and `SpecificationBaseTests` in `test_interface.py`:\n\n```python\ndef test_isOrExtends_raises_TypeError_for_unhashable(self):\n    sb = self._makeOne()\n    sb._implied = {}\n\n    class Unhashable:\n        __hash__ = None\n\n    with self.assertRaises(TypeError):\n        sb.isOrExtends(Unhashable())\n\ndef test_isOrExtends_raises_MemoryError_from_hash(self):\n    sb = self._makeOne()\n    sb._implied = {}\n\n    class BadHash:\n        def __hash__(self):\n            raise MemoryError(\"hash bomb\")\n\n    with self.assertRaises(MemoryError):\n        sb.isOrExtends(BadHash())\n```\n\nAlso add a higher-level test using real interfaces in a suitable test class:\n\n```python\ndef test_isOrExtends_propagates_TypeError_for_unhashable(self):\n    from zope.interface import Interface\n\n    class IFoo(Interface):\n        pass\n\n    class Unhashable:\n        __hash__ = None\n\n    with self.assertRaises(TypeError):\n        IFoo.isOrExtends(Unhashable())\n```\n\nFits the existing test pattern. The `SpecificationBaseTests` subclass inherits the\ntests and runs them against the C implementation (via `OptimizationTestMixin`).\n\n### Performance impact\n\n`PyDict_GetItem` internally calls `PyErr_Fetch`/`PyErr_Restore` on every call \u2014\nsaving and restoring 3 thread-state pointers on entry and exit (~12 memory\noperations). `PyDict_Contains` does the same hash + probe but skips the error\nstate dance entirely. This is a **net speedup** on the hottest function in the\nextension (`SB_extends` / `isOrExtends`).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "42f2e403c48b2fe60db694e7666b3e923471e6a3",
+   "actor": "jensens"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/zopefoundation/zope.interface/pull/364",
+   "commit": null,
+   "actor": "jensens"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c2faec50d2905a24455d558fdaf2d5666384a1cb",
+   "actor": "jensens"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5e86bb29b7ee272333525b20e29111288cb2804d",
+   "actor": "jensens"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "jensens"
+  }
+ ]
+}

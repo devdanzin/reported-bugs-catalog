@@ -1,0 +1,17 @@
+{
+ "repo": "python-lz4/python-lz4",
+ "number": 333,
+ "type": "pull",
+ "url": "https://github.com/python-lz4/python-lz4/pull/333",
+ "title": "Fix module init error handling in block and stream modules",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-04-01T02:05:49Z",
+ "closed_at": null,
+ "body": "## Summary\n\n- Add `Py_DECREF(module)` before returning NULL when `PyErr_NewExceptionWithDoc` fails in both `_block` and `_stream` module init \u2014 previously leaked the module object\n- Check `PyModule_AddObject` return value when adding `LZ4BlockError` and `LZ4StreamError` \u2014 previously ignored failures, leaking the exception class reference\n\n## Context\n\n`PyModule_AddObject` steals a reference on success but not on failure. The previous code did not check its return value, so on failure the `Py_INCREF`'d exception class was leaked. The fix checks the return and decrefs both the exception and the module on failure.\n\nNote: `PyModule_AddObjectRef` (Python 3.10+) would simplify this, but the project supports Python 3.9 so we use `PyModule_AddObject` with proper error checking.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).\n\n> [!NOTE]\n> This PR was authored and submitted by [Claude Code](https://claude.ai/code) (Anthropic).\n> It was reviewed by a human before submission.\n\n## Test plan\n\n- [ ] Existing tests pass\n- [ ] Module init failure paths correctly clean up all references",
+ "comments": [],
+ "timeline_refs": []
+}

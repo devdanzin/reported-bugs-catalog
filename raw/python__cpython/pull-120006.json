@@ -1,0 +1,72 @@
+{
+ "repo": "python/cpython",
+ "number": 120006,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/120006",
+ "title": "gh-119574: Add some missing environment variables to '--help-env'.",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2024-06-03T22:03:03Z",
+ "closed_at": "2024-06-18T17:12:59Z",
+ "body": "Add some very basic descriptions of environment variables that were missing from `initconfig.c`.\n\n<!-- gh-issue-number: gh-119574 -->\n* Issue: gh-119574\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2024-06-03T22:03:07Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/core-developers/committing/#updating-news-and-what-s-new-in-python). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/119574",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/111499",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "c81a5e6b5b7749862d271e7a67f89976069ad2cd",
+   "actor": "encukou"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "encukou"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/120961",
+   "commit": null,
+   "actor": "zooba"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1854be748d0e5daa8c09d436e595d99950b8d896",
+   "actor": "mrahtz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2c7d9be5588df1332e1fb815588214fecb521795",
+   "actor": "noahbkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ef8dffea202505d387013b2f6c352964b75e5307",
+   "actor": "estyxx"
+  }
+ ]
+}

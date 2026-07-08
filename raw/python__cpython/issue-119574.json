@@ -1,0 +1,56 @@
+{
+ "repo": "python/cpython",
+ "number": 119574,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/119574",
+ "title": "Some environment variables are missing from `--help-env`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "docs"
+ ],
+ "created_at": "2024-05-26T11:06:00Z",
+ "closed_at": "2024-06-18T19:59:21Z",
+ "body": "# Documentation\r\n\r\nWhile looking for ways to control the new REPL, I found that `PYTHON_BASIC_REPL` influences it, but is not present in the output of `--help-env`.\r\n\r\nHere's a list of environment variables that are present in [the documentation](https://docs.python.org/3.14/using/cmdline.html#environment-variables) but missing from `--help-env` in `initconfig.c`:\r\n - `PYTHONASYNCIODEBUG`\r\n - `PYTHONDUMPREFS`\r\n - `PYTHONDUMPREFSFILE`\r\n - `PYTHONEXECUTABLE`\r\n - `PYTHONLEGACYWINDOWSFSENCODING`\r\n - `PYTHONLEGACYWINDOWSSTDIO`\r\n - `PYTHONMALLOCSTATS`\r\n - `PYTHONUSERBASE`\r\n - `PYTHON_BASIC_REPL`\r\n - `PYTHON_PERF_JIT_SUPPORT`\r\n\r\nThe environment variable `PYTHONSTATS` is present in `initconfig.c` but missing from the docs.\r\n\r\nHere's the part of `initconfig.c` with the content of `--help-env`:\r\nhttps://github.com/python/cpython/blob/d25954dff5409c8926d2a4053d3e892462f8b8b5/Python/initconfig.c#L234-L301\r\n\r\nI did a search to figure out if these are intentionally missing, but wasn't able to find out.\r\n\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-120006\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/120006",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c81a5e6b5b7749862d271e7a67f89976069ad2cd",
+   "actor": "encukou"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1854be748d0e5daa8c09d436e595d99950b8d896",
+   "actor": "mrahtz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2c7d9be5588df1332e1fb815588214fecb521795",
+   "actor": "noahbkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ef8dffea202505d387013b2f6c352964b75e5307",
+   "actor": "estyxx"
+  }
+ ]
+}

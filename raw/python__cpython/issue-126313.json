@@ -1,0 +1,103 @@
+{
+ "repo": "python/cpython",
+ "number": 126313,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126313",
+ "title": "`curses.napms()` aborts with a `SystemError`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-01T22:43:55Z",
+ "closed_at": "2024-11-04T09:47:24Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe abort happens on normal and no-gil debug builds, release builds also hit the `SystemError`.\n\n```python\nimport curses\ncurses.napms(37)\n```\n\nError is:\n```\nFatal Python error: _Py_CheckFunctionResult: a function returned a result with an exception set\nPython runtime state: initialized\n_curses.error: must call initscr() first\n\nThe above exception was the direct cause of the following exception:\n\nSystemError: <built-in function napms> returned a result with an exception set\n\nCurrent thread 0x00007fe41a8c3740 (most recent call first):\n  File \"/home/fusil/python-73/curses-fatal/source.py\", line 3 in <module>\nAborted\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main:d467d9246c, Nov  1 2024, 09:05:56) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126351\n* gh-126493\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-02T00:46:33Z",
+   "body": "Ah I can see what happened. The macro returns 0 so that it can be used as a substitute for NULL in most of the functions it's being used but `_curses.napms` returns an int. Instead, it should return -1. It's an easy fix (one should simply remove the macro usage for this one and do something like that:\r\n\r\n```C\r\n if (!_PyCursesStatefulCheckFunction(module,\r\n\t\t\t\t\t\t\t\t     curses_initscr_called,\r\n\t\t\t\t\t\t\t\t\t \"initscr\")) {\r\n\treturn -1;\r\n}\r\n```\r\n\r\nI think it should suffice. I won't make a PR on Saturday (UTC+2) but probably on Sunday."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-04T09:47:24Z",
+   "body": "Fixed by change https://github.com/python/cpython/commit/19d935843727fff93b2c0e09a63fd32c0d97098d."
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2024-11-04T18:17:28Z",
+   "body": "The fix was not backported yet."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-06T12:47:13Z",
+   "body": "Update: No need for a 3.12 backport because the implementation returns a `PyObject *` instead of an `int`. Only a 3.13 backport is needed (which I am taking care of now)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T13:33:53Z",
+   "body": "I merged the 3.13 backport."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126351",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "19d935843727fff93b2c0e09a63fd32c0d97098d",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b7d76c0305dd212ed8af624ad0a7ac1c2bdaabc7",
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126493",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6e9da38866e3990df440da63bbec39a90487e261",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ea47c70865c16bd7e958b0a1ff9d9a62f6be299",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "490cd3d7c44f996a4d49a349dd3e18e5fe112aaa",
+   "actor": "ebonnal"
+  }
+ ]
+}

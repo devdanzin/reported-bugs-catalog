@@ -1,0 +1,17 @@
+{
+ "repo": "zopefoundation/zope.interface",
+ "number": 363,
+ "type": "issue",
+ "url": "https://github.com/zopefoundation/zope.interface/issues/363",
+ "title": "copt: refcount leaks in declaration import and module init error paths",
+ "state": "open",
+ "state_reason": null,
+ "author": "jensens",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-30T00:42:22Z",
+ "closed_at": null,
+ "body": "A detailed analysis of `_zope_interface_coptimizations.c` was published at\nhttps://gist.github.com/devdanzin/5afbad864934b165a2cc080f110aa720 by @devdanzin.\nWe reviewed the report with agent support and verified the findings against the\ncurrent source (zope.interface 8.2). This issue is one of several extracted from\nthat review.\n\n### Problem\n\n**Declaration import leaks:**\nBoth `import_declarations` (static types, lines 213-238) and\n`_zic_state_load_declarations` (heap types, lines 2241-2275) leak the\n`declarations` module reference and intermediate attribute references on every\nearly-return error path. `Py_DECREF(declarations)` only executes on the success\npath.\n\n**Module init leaks:**\n`_zic_module_exec` at line 2652 does `Py_INCREF(rec->adapter_hooks)` to account\nfor a later `PyModule_AddObject` (which steals a ref). If the function fails\nbefore reaching `PyModule_AddObject`, the extra reference is never consumed.\nSame pattern for heap types created via `PyType_FromModuleAndSpec` \u2014 each gets\n`Py_INCREF` for a later `PyModule_AddObject` that may never execute.\n\n### Fix\n\n**Declaration imports** \u2014 use a `goto error` cleanup pattern:\n\n```c\ndeclarations = PyImport_ImportModule(\"zope.interface.declarations\");\nif (declarations == NULL) return -1;\n\nbuiltin_impl_specs = PyObject_GetAttrString(\n    declarations, \"BuiltinImplementationSpecifications\");\nif (builtin_impl_specs == NULL) goto error;\n\nempty = PyObject_GetAttrString(declarations, \"_empty\");\nif (empty == NULL) goto error;\n\n// ... success path ...\nPy_DECREF(declarations);\nreturn 0;\n\nerror:\n    Py_DECREF(declarations);\n    return -1;\n```\n\n**Module init** \u2014 either defer `Py_INCREF` until just before `PyModule_AddObject`,\nor switch to `PyModule_AddObjectRef` (available since 3.10, does not steal\nreferences) and remove the extra `Py_INCREF` calls entirely.\n\n### Scope\n\nLargest of the seven issues. Refactors error paths in `import_declarations`,\n`_zic_state_load_declarations`, and `_zic_module_exec`. Only affects error and\ninit-failure paths.\n\n### Tests\n\n**Not feasible from pure Python.** These leaks only occur when module\ninitialization or declaration import partially fails \u2014 conditions that require\ninternal C-level failures (e.g., `PyObject_GetAttrString` returning NULL for a\nvalid module attribute). Cannot be triggered from Python without monkeypatching\nthe import machinery in unsafe ways.\n\nCode review of the `goto error` pattern is the appropriate verification.\nThe existing test suite implicitly tests the success path of these functions on\nevery test run.\n\n### Performance impact\n\nZero. These functions run once at module import time. No runtime paths affected.",
+ "comments": [],
+ "timeline_refs": []
+}

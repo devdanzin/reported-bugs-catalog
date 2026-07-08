@@ -1,0 +1,65 @@
+{
+ "repo": "python/cpython",
+ "number": 131580,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/131580",
+ "title": "Faulthandler segfaults when called from threads",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2025-03-22T14:47:11Z",
+ "closed_at": "2025-03-25T17:25:51Z",
+ "body": "# Crash report\n\n### What happened?\n\nIn a GILfull build of main, it's rarely possible to get faulthandler to segfault when calling it from threads. ~~Since it's a rare crash and I'm on mobile, no reduced test case is available at the moment.~~\n\nHere's the traceback:\n```gdb\n#0  _PyFrame_GetCode (f=0xfffff7fea1f0) at ./Include/internal/pycore_frame.h:94\n#1  dump_frame (fd=fd@entry=2, frame=frame@entry=0xfffff7fea1f0)\n    at Python/traceback.c:914\n#2  0x000000000076254c in dump_traceback (fd=fd@entry=2,\n    tstate=tstate@entry=0xaeb528 <_PyRuntime+329832>,\n    write_header=write_header@entry=0) at Python/traceback.c:1007\n#3  0x0000000000762710 in _Py_DumpTracebackThreads (fd=2,\n    interp=<optimized out>, current_tstate=current_tstate@entry=0x0)\n    at Python/traceback.c:1114\n#4  0x00000000007773b4 in faulthandler_thread (unused=unused@entry=0x0)\n    at ./Modules/faulthandler.c:631\n#5  0x000000000075e77c in pythread_wrapper (arg=<optimized out>)\n    at Python/thread_pthread.h:242\n#6  0x0000fffff7def188 in start_thread () from /lib64/libc.so.6\n#7  0x0000fffff7e5971c in thread_start () from /lib64/libc.so.6\n```\nCrash happened on ARM, if that's important.\n\nHmm, might be a duplicate of #128421. \n\nEdit: reduced test case:\n```python\nimport faulthandler\nfrom threading import Thread\n\nfor x in range(20):\n    Thread(target=faulthandler.dump_traceback_later, args=(1e-10,)).start()\n```\n\nFound using [fusil ](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a6+ (heads/main:55815a6474c, Mar 15 2025, 14:05:03) [GCC 11.5.0 20240719 (Red Hat 11.5.0-5.0.1)]",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-03-24T11:29:44Z",
+   "body": "> Hmm, might be a duplicate of https://github.com/python/cpython/issues/128421.\n\nProbably not, that seems to be FT only. From what I know, faulthandler is notoriously buggy in multithreaded programs, and there's not much we can do to fix it."
+  },
+  {
+   "author": "dgrisby",
+   "created_at": "2025-03-24T23:03:35Z",
+   "body": "I think this is a duplicate of https://github.com/python/cpython/issues/116008"
+  },
+  {
+   "author": "tom-pytel",
+   "created_at": "2025-03-25T17:08:48Z",
+   "body": "> I think this is a duplicate of [#116008](https://github.com/python/cpython/issues/116008)\n\nNot EXACTLY same, but arises for the same reason yes, using python function `_Py_DumpTracebackThreads()` in multithreaded scenario without holding the GIL."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-03-25T17:25:44Z",
+   "body": "Closing in favor of #116008. "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-11-05T22:06:18Z",
+   "body": "faulthandler was made more resistant to crashes with commit a84181c31bfc45a1d6bcb1296bd298ad612c54d0. The problem is that writing the thread name in faulthandler is now more likely to crash if the thread completed.\n\nExample of pthread_getname_np() crash in gdb:\n\n```\nThread 11 \"Thread-5 (func)\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7fffe9ade6c0 (LWP 442877)]\n0x00007ffff7d31824 in pthread_getname_np@GLIBC_2.12 () from /lib64/libc.so.6\nMissing rpms, try: dnf --enablerepo='*debug*' install glibc-debuginfo-2.41-11.fc42.x86_64\n(gdb) \n```"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/116008",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151475",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

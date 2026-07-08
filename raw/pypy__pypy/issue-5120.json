@@ -1,0 +1,30 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5120,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5120",
+ "title": "`_ssl._test_decode_cert` with an invalid file segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-14T22:56:48Z",
+ "closed_at": "2024-11-16T16:20:28Z",
+ "body": "It's possible to segfault PyPy by passing an invalid filename to `_ssl._test_decode_cert`:\r\n```python\r\nPython 3.10.14 (39dc8d3c85a7, Aug 27 2024, 14:32:27)\r\n[PyPy 7.3.17 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>>> import _ssl\r\n>>>> _ssl._test_decode_cert(\"/dev/null\")\r\nSegmentation fault\r\n```\r\n\r\nFound using fusil by @vstinner.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-11-16T16:20:28Z",
+   "body": "fixed in fa75817de14"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

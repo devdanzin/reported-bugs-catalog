@@ -1,0 +1,41 @@
+{
+ "repo": "aio-libs/multidict",
+ "number": 1161,
+ "type": "issue",
+ "url": "https://github.com/aio-libs/multidict/issues/1161",
+ "title": "Segfault on repr of instances of `_ItemsView`, `_KeysView` or `_ValuesView`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2025-05-04T21:11:46Z",
+ "closed_at": "2025-05-19T13:07:48Z",
+ "body": "Directly building an instance of `_ItemsView`, `_KeysView` or `_ValuesView` and calling `repr` on it will lead to a segfault. Instances created by calling the corresponding methods(e.g. `MultiDict(a=1).keys()`) don't suffer from this.\n\n```python\n>>> import multidict\n>>> repr(multidict._ItemsView())\n\nProgram received signal SIGSEGV, Segmentation fault.\n\n0x00007ffff6d11494 in pair_list_repr (list=0x10, name=0x7ffff6aa5940, show_keys=true,\n    show_values=true) at multidict/_multilib/pair_list.h:1517\n```\n\n```console\n#0  0x00007ffff6d11494 in pair_list_repr (list=0x10, name=0x7ffff6aa5940, show_keys=true,\n    show_values=true) at multidict/_multilib/pair_list.h:1517\n#1  0x00007ffff6d11b4d in multidict_itemsview_repr (self=0x7ffff6c443d0)\n    at multidict/_multilib/views.h:187\n#2  0x00005555556cb1c9 in PyObject_Repr (v=v@entry=0x7ffff6c443d0) at Objects/object.c:765\n#3  0x0000555555691073 in PyFile_WriteObject (v=v@entry=0x7ffff6c443d0, f=f@entry=0x7ffff7475400,\n    flags=flags@entry=0) at Objects/fileobject.c:120\n#4  0x0000555555835aa0 in sys_displayhook (module=<optimized out>, o=o@entry=0x7ffff6c443d0)\n    at ./Python/sysmodule.c:825\n#5  0x00005555556c6490 in cfunction_vectorcall_O (func=0x7ffff75a24b0, args=<optimized out>,\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:512\n#6  0x00005555556746fa in _PyObject_VectorcallTstate (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    callable=callable@entry=0x7ffff75a24b0, args=args@entry=0x7fffffffcd68,\n    nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0)\n    at ./Include/internal/pycore_call.h:168\n#7  0x0000555555674826 in PyObject_CallOneArg (func=func@entry=0x7ffff75a24b0,\n    arg=arg@entry=0x7ffff6c443d0) at Objects/call.c:395\n#8  0x0000555555807788 in print_expr (_unused_ignored=<optimized out>, value=0x7ffff6c443d0)\n    at Python/intrinsics.c:33\n#9  0x00005555557a5098 in _PyEval_EvalFrameDefault (tstate=0x555555b604c0 <_PyRuntime+299040>,\n    frame=0x7ffff7fb05f0, throwflag=0) at Python/generated_cases.c.h:1376\n#10 0x00005555557b4b05 in _PyEval_EvalFrame (\n    tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>, frame=<optimized out>,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:119\n#11 0x00005555557b4c34 in _PyEval_Vector (tstate=tstate@entry=0x555555b604c0 <_PyRuntime+299040>,\n    func=func@entry=0x7ffff6fa9d90, locals=locals@entry=0x7ffff7463d70, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1816\n#12 0x00005555557b4cf7 in PyEval_EvalCode (co=co@entry=0x7ffff6bca460,\n    globals=globals@entry=0x7ffff7463d70, locals=locals@entry=0x7ffff7463d70)\n    at Python/ceval.c:604\n#13 0x00005555557988e1 in builtin_exec_impl (module=module@entry=0x7ffff75a6930,\n    source=0x7ffff6bca460, globals=0x7ffff7463d70, locals=0x7ffff7463d70, closure=0x0)\n    at Python/bltinmodule.c:1143\n#14 0x0000555555798a44 in builtin_exec (module=0x7ffff75a6930, args=<optimized out>,\n    args@entry=0x7ffff7fb05e0, nargs=nargs@entry=2, kwnames=kwnames@entry=0x0)\n    at Python/clinic/bltinmodule.c.h:556\n```\n\n\n`multidict.__version__`\n```\n'6.4.3'\n```\n\nPython versions:\n```\nPython 3.13.3+ (heads/3.13:fdcaaad1cc7, Apr 27 2025, 10:17:23) [GCC 14.2.0] on linux\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.",
+ "comments": [
+  {
+   "author": "bdraco",
+   "created_at": "2025-05-16T19:53:01Z",
+   "body": "creating these directly should likely be forbidden and raise"
+  },
+  {
+   "author": "bdraco",
+   "created_at": "2025-05-16T19:53:16Z",
+   "body": "Maybe make Py_tp_new raise"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/aio-libs/multidict/pull/1163",
+   "commit": null,
+   "actor": "bdraco"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "bdraco"
+  }
+ ]
+}

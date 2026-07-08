@@ -1,0 +1,61 @@
+{
+ "repo": "matplotlib/matplotlib",
+ "number": 31424,
+ "type": "issue",
+ "url": "https://github.com/matplotlib/matplotlib/issues/31424",
+ "title": "[Bug]: Umbrella issue: matplotlib C/C++ Extension Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "Maintenance",
+  "first-contribution"
+ ],
+ "created_at": "2026-03-29T22:43:33Z",
+ "closed_at": null,
+ "body": "### Bug summary\n\nThis is an umbrella issue meant to present the findings of an [analysis report](https://gist.github.com/devdanzin/2a79188c7a41a03b1476544c7dd775c1) so matplotlib developers and contributors can discuss them, figure out which are worth fixing, open individual issues and PRs, etc.\n\n## Findings by Priority\n\n### FIX\n\n1. **`std::string` constructed from NULL `ft_error_string`** \u2014 `ft_error_string()` returns NULL for unknown FreeType error codes. `THROW_FT_ERROR` constructs `std::string{nullptr}` \u2014 undefined behavior (typically crashes in `strlen`). Triggered when FreeType returns an error code not in the compiled-in list.\n   - `ft2font.h:39,52`\n\n2. **Inverted `PyErr_Occurred` logic in enum type caster** \u2014 `return !(ival == -1 && !PyErr_Occurred())` returns `true` (success) when `PyLong_AsLong` fails with an active exception. One-character fix: the `!` before `PyErr_Occurred()` should be removed.\n   - `_enums.h:83`\n\n3. **Unchecked `malloc` + leaked `Py_buffer` in `_copy_agg_buffer`** \u2014 `malloc(sizeof(Py_buffer))` not NULL-checked. If `PyObject_GetBuffer` fails, the buffer is leaked.\n   - `_macosx.m:1221-1225`\n\n4. **Unchecked `PyOS_double_to_string` \u2014 `strlen(NULL)` crash** \u2014 `PyOS_double_to_string()` can return NULL on OOM. `strlen(str)` follows without a NULL check. Crash confirmed under OOM injection.\n   - `_path.h:1070-1073`\n\n5. **`FigureCanvas_set_cursor` returns NULL without exception** \u2014 The `default:` case returns NULL without calling `PyErr_Set*`, causing `SystemError`.\n   - `_macosx.m:451`\n\n6. **`FigureManager__set_window_mode` returns NULL without exception** \u2014 When `self->window` is NULL (after `destroy()`), returns NULL without setting an exception.\n   - `_macosx.m:653-654`\n\n7. **NULL `char*` streamed to `std::stringstream` in `ft_glyph_warn`** \u2014 `face->family_name` can be NULL. When NULL is inserted into `std::set<FT_String*>` and later streamed via `ss << *it`, it's undefined behavior.\n   - `ft2font.cpp:457`, `ft2font_wrapper.cpp:410`\n\n8. **`NSFileHandle` leak in `wake_on_fd_write`** \u2014 `[[NSFileHandle alloc] initWithFileDescriptor: fd]` is never released.\n   - `_macosx.m:246-257`\n\n### CONSIDER\n\n9. **GIL not released during Agg rendering** \u2014 `draw_path`, `draw_markers`, `draw_path_collection`, etc. hold the GIL during software rasterization, blocking all threads. `_image_wrapper.cpp` already demonstrates the correct GIL-release pattern.\n   - `_backend_agg_wrapper.cpp:41-215`\n\n10. **GIL not released during Qhull triangulation** \u2014 500K-point triangulation holds the GIL for 3+ seconds, reducing background thread throughput to 0.6% of baseline.\n    - `_qhull_wrapper.cpp:138-253`\n\n11. **Global `FT_Library` not thread-safe** \u2014 `_ft2Library` is shared across all threads. FreeType is not thread-safe for shared library instances.\n    - `ft2font.cpp:44`\n\n12. **FreeType stream read callback lacks GIL guard for free-threading** \u2014 Calls Python I/O without GIL guard on free-threaded builds.\n    - `ft2font_wrapper.cpp:367-388`\n\n13. **`ft_glyph_warn` calls Python APIs without GIL guard for free-threading** \u2014 Module import/attr access without GIL on free-threaded builds.\n    - `ft2font_wrapper.cpp:405-418`\n\n14. **Global `p11x::enums` map lacks synchronization** \u2014 `std::unordered_map` with `py::object` values, no synchronization for free-threading.\n    - `_enums.h:37`\n\n15. **`NSTrackingArea` leak in `FigureCanvas_init`** \u2014 `alloc` without matching `release`.\n    - `_macosx.m:378-382`\n\n16. **`Window.close` double-decref risk** \u2014 `Py_DECREF(manager)` if `dealloc` runs without prior `destroy`.\n    - `_macosx.m:1177-1188`\n\n17. **`PyFT2Font_init` leaks on exception** \u2014 Raw `new` without `unique_ptr`. ~59 bytes leaked per failed font construction (corrupt font file), ~131 bytes per failed construction (failing file-like object).\n    - `ft2font_wrapper.cpp:457-505`\n\n18. **Timer NSTimer captures raw `self` pointer** \u2014 Block captures Python object without `Py_INCREF`.\n    - `_macosx.m:1807-1816`\n\n19. **View stores raw `canvas` pointer** \u2014 No `Py_INCREF`, potential dangling pointer.\n    - `_macosx.m:139`\n\n20. **Exception clobbering in ft2font catch-all** \u2014 `catch(std::exception&)` replaces meaningful errors (including `MemoryError`, `KeyboardInterrupt`) with generic `TypeError`.\n    - `ft2font_wrapper.cpp:492-494`\n\n21. **Unchecked `PyUnicode_EncodeFSDefault`** \u2014 NULL wrapped in `py::bytes`.\n    - `_tkagg.cpp:333-335`\n\n22. **`PyErr_Fetch`/`PyErr_Restore` deprecated since 3.12** \u2014 Should migrate to `PyErr_GetRaisedException`/`PyErr_SetRaisedException`.\n    - `ft2font_wrapper.cpp:394,402`\n\n23. **`PY_SSIZE_T_CLEAN` defines (\u00d73)** \u2014 No-op since 3.10, can be removed.\n    - `mplutils.h`, `py_adaptors.h`, `_macosx.m`\n\n24. **Solaris `_XPG4`/`_XPG3` undefs** \u2014 Likely dead code.\n    - `mplutils.h:22-28`\n\n25. **macOS SDK < 10.14 compat defines** \u2014 Likely dead code.\n    - `_macosx.m:11-16`\n\n\n\n### Code for reproduction\n\nSee https://gist.github.com/devdanzin/2a79188c7a41a03b1476544c7dd775c1#matplotlib-c-extension--reproducer-appendix for reproducers.\n\n### Actual outcome\n\n-\n\n### Expected outcome\n\n-\n\n### Additional information\n\nThe issue above is part of an analysis report created by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit), a Claude Code plugin for reviewing CPython C extensions. It covers the C/C++ source in `src/` (13 source files, 9 extension modules \u2014 8 pybind11 + 1 raw Python/C API in `_macosx.m`).\n\nSome findings may be false positives or low-priority issues not worth fixing. Feedback on any misclassified findings is welcome.\n\nThe full report (including a reproducers appendix) is available at https://gist.github.com/devdanzin/2a79188c7a41a03b1476544c7dd775c1.\n\n### Operating system\n\nLinux\n\n### Matplotlib Version\n\nmain\n\n### Matplotlib Backend\n\n_No response_\n\n### Python version\n\n_No response_\n\n### Jupyter version\n\n_No response_\n\n### Installation\n\ngit checkout",
+ "comments": [
+  {
+   "author": "scottshambaugh",
+   "created_at": "2026-03-30T00:21:54Z",
+   "body": "Paraphrasing my comment from discourse:\n\nThanks for running this!\n\nIt looks like most of these are low impact but also quick to implement, and a single PR could target several in a category at once. I don't see anything urgent to address at the moment, but the discussion here will help with visibility and keeping track of the conversation. We can always pick-and-choose as needed.\n\nSome are not worth doing - my take is that that OOM / pybind11 issues are fundamental architecture limitations and not really something for us to address, the GIL release items are potentially tricky to put boundaries around and of limited use for this as a primarily single-threaded tool, and the free-threading concerns are premature since we need to support legacy python versions for quite a while.\n\nI think we on the maintainers team all knew automated code auditing tools like this were coming, but haven't figured out how we're going to handle them / how much stock to put in them. This is one of the better executed audits I've seen so far, and I think will be a useful first case for us to talk through some of those considerations."
+  },
+  {
+   "author": "tacaswell",
+   "created_at": "2026-04-02T13:43:26Z",
+   "body": "Skimming this, I think one PR to handle the macos.m issues all together would make sense.\n\nI suspect that the freetype issues are going to be at least different very soon once the font refactor PR lands.\n\nAdding null checks is non-controversial and I don't see problems with those coming in in batches."
+  },
+  {
+   "author": "kx7m2qd",
+   "created_at": "2026-05-04T08:00:56Z",
+   "body": "I've opened a PR to address the `PyErr_Fetch`/`PyErr_Restore` deprecation item \nfrom this list: #[your PR number]\n\nThe fix updates `close_file_callback` in `src/ft2font_wrapper.cpp` to use \n`PyErr_GetRaisedException`/`PyErr_SetRaisedException` on Python 3.12+, guarded \nby `#if PY_VERSION_HEX >= 0x030c0000` for backward compatibility.\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/matplotlib/matplotlib/pull/31556",
+   "commit": null,
+   "actor": "beelauuu"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/matplotlib/matplotlib/pull/31610",
+   "commit": null,
+   "actor": "kx7m2qd"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "94738e5d3e7d62de17e4afa26046e17d2e45914c",
+   "actor": "kx7m2qd"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c1232d8bf2d8fc1bc00e27dc8c36887f918bc2ed",
+   "actor": "kx7m2qd"
+  }
+ ]
+}

@@ -1,0 +1,64 @@
+{
+ "repo": "python/cpython",
+ "number": 142961,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/142961",
+ "title": "JIT: Segfault at `binary_op1`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-12-19T00:14:28Z",
+ "closed_at": "2025-12-19T21:15:03Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault a JIT build by running the code below:\n\n```python\ndef f1():\n    t = (1,)\n    for x in range(50):\n        p = x % len(t)\n\nfor i in range(5000):\n    print(i)\n    f1()\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\nbinary_op1 (v=0x7ffff6c1bf40, w=0x6, op_slot=op_slot@entry=24) at Objects/abstract.c:947\n947         if (!Py_IS_TYPE(w, Py_TYPE(v)) && Py_TYPE(w)->tp_as_number != NULL) {\n\n#0  binary_op1 (v=0x7ffff6c1bf40, w=0x6, op_slot=op_slot@entry=24) at Objects/abstract.c:947\n#1  0x000055555562e6d4 in binary_op (v=0x7ffff6c1bf40, w=0x555555aec228 <PyList_Type>, op_slot=24, op_name=<optimized out>) at Objects/abstract.c:1005\n#2  PyNumber_Remainder (v=0x7ffff6c1bf40, w=0x555555aec228 <PyList_Type>) at Objects/abstract.c:1189\n#3  0x00007ffff7e4aeee in ?? ()\n#4  0x00007fffffffd560 in ?? ()\n#5  0x00007ffff7fa301f in ?? ()\n#6  0x0000555555a62210 in _PyEval_EvalFrameDefault.opcode_targets_table ()\n#7  0x0000555555b6e0f0 in _PyRuntime ()\n#8  0x00007ffff6d0f19c in ?? ()\n#9  0x0000555555a61a10 in _Py_SpecialMethods ()\n#10 0x0000555555a61a10 in _Py_SpecialMethods ()\n#11 0x000055555577cbbb in _PyEval_EvalFrameDefault (tstate=<error reading variable: Cannot access memory at address 0xffffffffffffffc0>, frame=<optimized out>, throwflag=<optimized out>)\n    at Python/generated_cases.c.h:5348\nBacktrace stopped: previous frame inner to this frame (corrupt stack?)\n```\n\nOutput from running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`:\n[166_segfault_lltrace_opt_debug.txt](https://github.com/user-attachments/files/24247629/166_segfault_lltrace_opt_debug.txt)\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ (heads/main:1391ee664c8, Dec 18 2025, 21:09:23) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-142962\n* gh-142963\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-19T21:15:03Z",
+   "body": "Thanks for the bug report as always!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142962",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142963",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "786f464c740a2f2bf60871feaf73df87b315877b",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/143020",
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4f2183b1f5f05a0dd4321b551c9822dfb2b1c3ba",
+   "actor": "cocolato"
+  }
+ ]
+}

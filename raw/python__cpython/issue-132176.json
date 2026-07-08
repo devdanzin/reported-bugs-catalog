@@ -1,0 +1,84 @@
+{
+ "repo": "python/cpython",
+ "number": 132176,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132176",
+ "title": "Abort when using a tuple subclass instance as the `bases` parameter for `type`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2025-04-06T21:56:42Z",
+ "closed_at": "2025-04-15T14:42:15Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe interpreter will abort when a new type is created using an instance of a subclass of `tuple` as the `bases` parameter due to a `PyTuple_CheckExact(bases)` assertion:\n```python\nclass weird_tuple(tuple): pass\n\nc = type(\"c\", weird_tuple((str,)), {})\npython: Objects/typeobject.c:500: set_tp_bases: Assertion `PyTuple_CheckExact(bases)' failed.\nAborted (core dumped)\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a6+ (heads/main:04bc681e7cf, Apr  4 2025, 12:38:19) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132212\n* gh-132548\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "xuantengh",
+   "created_at": "2025-04-07T07:34:54Z",
+   "body": "The [doc](https://docs.python.org/3/library/functions.html#type) states the 2nd arg when `type()` receives 3 arguments should be a `tuple`. Maybe we should raise an exception if `bases` cannot pass the `PyTuple_CheckExact` check?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-07T08:45:51Z",
+   "body": "> Maybe we should raise an exception if `bases` cannot pass the `PyTuple_CheckExact` check?\n\nMaybe, but it works in release builds, resulting in a class where `__bases__` is the instance of the tuple subclass we passed to `type`. So there's a chance somebody out there is using this in some way.\n\n"
+  },
+  {
+   "author": "xuantengh",
+   "created_at": "2025-04-07T09:22:05Z",
+   "body": "Otherwise we should relax the assert with `PyTuple_Check`."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-07T09:43:30Z",
+   "body": "I think that it should be an exact tuple for `_Py_SetImmortal` call and it can be a tuple subclass for regular classes. This problem exists since 3.12\n\nThanks for the report! \ud83e\udd1d "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "40bf263f18748df8865f55817fbc90c2517533d5",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132212",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b6c552f9e614bab4acf21584baed997f57e74114",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "667579543c6d886ead19710ca5a5d4aed771e785",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132548",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6d48194d9f14b7d6a5ee069a7bd269c124c17d59",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "repo": "zopefoundation/zope.interface",
+ "number": 360,
+ "type": "issue",
+ "url": "https://github.com/zopefoundation/zope.interface/issues/360",
+ "title": "copt: reference leaks in getObjectSpecification on error and fallthrough paths",
+ "state": "open",
+ "state_reason": null,
+ "author": "jensens",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-03-30T00:41:27Z",
+ "closed_at": null,
+ "body": "A detailed analysis of `_zope_interface_coptimizations.c` was published at\nhttps://gist.github.com/devdanzin/5afbad864934b165a2cc080f110aa720 by @devdanzin.\nWe reviewed the report with agent support and verified the findings against the\ncurrent source (zope.interface 8.2). This issue is one of several extracted from\nthat review.\n\n### Problem\n\n`getObjectSpecification` leaks the `result` reference from\n`PyObject_GetAttr(ob, \"__provides__\")` on two paths:\n\n1. **Line 2507**: When `PyObject_IsInstance` returns -1 (error), the function\n   returns NULL without decrementing `result`.\n2. **Line 2512**: When `__provides__` exists but is not a `SpecificationBase`\n   (`is_instance == 0`), `result` is not decremented before falling through to\n   the `cls` lookup path where it gets overwritten.\n\nThese leaks were introduced during the `PyObject_TypeCheck` to\n`PyObject_IsInstance` migration (commit `84872a8`).\n\n### Fix\n\n```c\nif (is_instance < 0) {\n    Py_DECREF(result);\n    return NULL;\n}\nif (is_instance) {\n    return result;\n}\nPy_DECREF(result);\n// fall through to cls lookup\n```\n\n### Scope\n\n2 lines added. Error and fallthrough paths only.\n\n### Tests\n\n**Hard to test directly from Python.** Reference leaks are not observable as\nwrong behavior \u2014 they only waste memory. Two approaches:\n\n1. **Indirect**: The existing `test_existing_provides_is_not_spec` in\n   `Test_getObjectSpecificationFallback` already exercises the `is_instance == 0`\n   path (sets `__provides__` to a non-spec object). It verifies correct return\n   value but cannot detect the leak. After the fix, this test still passes \u2014\n   it serves as a regression guard for the control flow.\n\n2. **With `sys.getrefcount`** (optional, fragile):\n\n```python\ndef test_getObjectSpecification_no_leak_on_non_spec_provides(self):\n    import sys\n    marker = object()\n\n    class Foo:\n        __provides__ = marker\n\n    before = sys.getrefcount(marker)\n    self._callFUT(Foo())\n    after = sys.getrefcount(marker)\n    self.assertEqual(before, after)\n```\n\nThis works because `marker` should be borrowed and returned \u2014 if the leak\nexists, `after > before`. Fragile across implementations but valid for\nthe C extension.\n\nRecommendation: include the `sys.getrefcount` test. It directly proves the fix.\n\n### Performance impact\n\nZero on the happy path. `Py_DECREF` is only added to paths that currently leak\n(error return and non-SpecificationBase fallthrough). The normal case\n(`is_instance == 1`, returns `result`) is unchanged.",
+ "comments": [],
+ "timeline_refs": []
+}

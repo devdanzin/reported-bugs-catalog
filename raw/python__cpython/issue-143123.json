@@ -1,0 +1,103 @@
+{
+ "repo": "python/cpython",
+ "number": 143123,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/143123",
+ "title": "JIT: Assertion failure in `_PyOptimizer_Optimize`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-12-23T22:43:40Z",
+ "closed_at": "2026-01-14T12:23:15Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort a patched debug JIT build by running the code below. The interpreter must be called from a venv in which lafleur is installed as editable, likely due to that priming the GC into a state suitable for the crash.\n\nSorry about the convoluted reproduction steps.\n\nThe necessary patch is:\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex 23ca7299e0d..0289b5fee7c 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -124,7 +124,7 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n #define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n@@ -137,7 +137,7 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n+#define SIDE_EXIT_INITIAL_VALUE 63\n #define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n```\n\nTo install lafleur as editable, first create a venv and activate it, then clone the [lafleur repo](https://github.com/devdanzin/lafleur/) and run `pip install -e /path/to/lafleur/clone`.\n\n\nThis MRE must be invoked like this:\n\n```\n/path/to/venv/with/editable/lafleur/install/bin/python mre.py\n```\n\nMRE:\n```python\nimport asyncio\nany_v2 = None\ntuple_v4 = (1, \"\")\n\ndef f1():\n    class A:\n        def _():...\n        def __(): ...\n        def ___():...\n\n    class B: ...\n    class C:\n        def _(): ...    \n    class D:\n        def _(): ...    \n    class E:\n        def _(): ...    \n    class F:\n        def _(): ...    \n    class G:\n        def _(): ...    \n    class H:\n        def _(): ...    \n    \n    l = []\n    for i in range(5):\n        def _(): ...\n    class I:\n        async def _(): ...\n        try:\n            c = _()\n        except Exception: ...\n\n    def __(): ...\n    class J:\n        def _(): ...\n\n    for _ in range(300):\n        try:\n            try: ValueError(\"\")\n            except E: ...\n        except Exception: ...\n    (\n        any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2,\n        any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2,\n        any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2,\n        any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2,\n        any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2,\n        any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2,\n        any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2, any_v2,\n        any_v2, any_v2, \n    )\n    class K:\n        def _():...\n        def __(): ...\n        def ___():...\n    class AsyncCtx_9078:\n        def _(self): ...\n        async def __():\n            try:\n                for _ in K(10): ...\n            except Exception: ...\n        try:\n            c = __()\n        except Exception: ...\n    x, *y = tuple_v4\n    class L:\n        def _():...\n        def __(): ...\n        def ___():...\n    class M:\n        def _(self): ...\n        async def __():\n            try:\n                for _ in L(10): ...\n            except Exception: ...\n        try:\n            c = __()\n        except Exception: ...\n\n    x, *y = x, *y = tuple_v4\n    class M:\n        def _():...\n        def __(): ...\n        def ___():...\n    class N:\n        def _():...\n        def __(): ...\n        def ___():...\n    class O:\n        def _(self): ...\n        async def __():\n            try:\n                for _ in N(10): ...\n            except Exception: ...\n        try:\n            c = __()\n        except Exception: ...\n    class P:\n        def _():...\n        def __(): ...\n        def ___():...\n    class Q:\n        def _(self): ...\n        async def __():\n            try:\n                with Q(): ...\n            except Exception: ...\n        try:\n            c = __()\n        except Exception: ...\n    class R:\n        def _(self): ...\n        async def __():\n            try:\n                with R(): ...\n            except Exception: ...\n        try:\n            c = __()\n        except Exception: ...\n\n    x, *y = x, *y = tuple_v4\n    class S:\n        def __init__(self, lit):\n            selit = self.count = 0\n        def __aiter__(self):return self\n        async def __anext__(self):\n            if self.count: n\n            self.count += 1\n    class T:\n        def _(self): ...\n        async def __():\n            try:\n                async for _ in S(10): ...\n            except Exception: ...\n        try:\n            c = __()\n            while True:\n                try: c.send(None)\n                except Exception: break\n        except Exception: ...\n\nfor i in range(300):\n    print(i)\n    f1()\n```\n\nTraceback:\n```\n1\n[...]\n200\n201\npython: Python/optimizer.c:144: int _PyOptimizer_Optimize(_PyInterpreterFrame *, PyThreadState *): Assertion `_tstate->jit_tracer_state.initial_state.func != NULL' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x00005555563c0bd0 in _PyOptimizer_Optimize (frame=frame@entry=0x7e8ff6de5298, tstate=tstate@entry=0x555556e62830 <_PyRuntime+358864>) at Python/optimizer.c:144\n#8  0x0000555555ed2e64 in stop_tracing_and_jit (tstate=0x555556e62830 <_PyRuntime+358864>, frame=frame@entry=0x7e8ff6de5298) at Python/ceval.c:1405\n#9  0x0000555555e8eeed in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:11628\n#10 0x0000555555e6bf98 in _PyEval_EvalFrame (tstate=0x555556e62830 <_PyRuntime+358864>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#11 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2483\n#12 0x0000555555e6b9b5 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff6e86440) at Python/ceval.c:1008\n```\n\nOutput from running with `PYTHON_LLTRACE=4 PYTHON_OPT_DEBUG=4`:\n[830_abort_lltrace_opt_debug.txt](https://github.com/user-attachments/files/24319421/830_abort_lltrace_opt_debug.txt)\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ (heads/main-dirty:3cc57505e53, Dec 23 2025, 19:04:15) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-143126\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-23T23:13:48Z",
+   "body": "Can you try on current main please? Mark just fixed a GC problem with the executors a few hours ago."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-12-23T23:22:06Z",
+   "body": "~~Yup, it's fixed on current main.~~"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-12-23T23:26:05Z",
+   "body": "Nope, I tested an unpatched build. It still aborts on current main with a correctly patched build."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-23T23:35:58Z",
+   "body": "@devdanzin can you see if it's fixed by this https://github.com/python/cpython/pull/143126  please ?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-12-23T23:57:32Z",
+   "body": "Yes, that fixes it. I've double checked that I ran the right build this time and confirmed the fix."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-12-25T00:31:44Z",
+   "body": "@devdanzin sorry to bother you, could you please check again on the branch of the latest fix? I updated the PR to try a slightly different approach. Thanks!"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-12-25T01:18:30Z",
+   "body": "No bother at all, happy to help :)\n\nThe new approach works too, no assertion failure with the PR applied."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-01-09T14:55:35Z",
+   "body": "#143126 also fixes the same issue with the MRE from  #143610, an obvious duplicate I reported by mistake."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-09T16:05:59Z",
+   "body": "@devdanzin i just updated the PR, could you please try again?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-01-09T16:26:02Z",
+   "body": "@Fidget-Spinner: It fixes the assertion failure after you update too."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143126",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e370c8db52d8b0983158ba6261ab227d8158b8b4",
+   "actor": "markshannon"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1bc8e9688da98fd7aa25c94c31bbd34a40fe5de8",
+   "actor": "thunder-coding"
+  }
+ ]
+}

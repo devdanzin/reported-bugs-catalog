@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/atom",
+ "number": 256,
+ "type": "issue",
+ "url": "https://github.com/nucleic/atom/issues/256",
+ "title": "PyObject_RichCompareBool error treated as truthy in range_handler + safe_richcompare swallows KeyboardInterrupt",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:28:03Z",
+ "closed_at": null,
+ "body": "Two related comparison error-handling bugs:\n\n### 1. `range_handler` error-as-truthy (`validatebehavior.cpp:884,894`)\n\n`PyObject_RichCompareBool` returns -1 on error, 0 for false, 1 for true. The code uses `if(PyObject_RichCompareBool(...))` which treats -1 (error) as truthy, entering the branch and calling `PyErr_Format` which clobbers the original exception with a misleading `ValueError`.\n\n**Reproducer**:\n```python\nimport gc; gc.disable()\nimport os\nfrom atom.api import Atom, Range\n\nclass BadInt(int):\n    def __gt__(self, other):\n        raise TypeError(\"comparison bomb\")\n    def __lt__(self, other):\n        raise TypeError(\"comparison bomb\")\n\nclass MyAtom(Atom):\n    y = Range(low=0, high=100)\n\na = MyAtom()\na.y = 50  # works\ntry:\n    a.y = BadInt(50)\nexcept TypeError as e:\n    print(f\"TypeError (correct): {e}\")\nexcept ValueError as e:\n    print(f\"ValueError (CLOBBERED - BUG): {e}\")\nos._exit(0)\n# Output: ValueError (CLOBBERED): range value for 'y' of 'MyAtom' too small\n```\n\n**Fix**: check `< 0` for error before checking truthy:\n```cpp\nint cmp = PyObject_RichCompareBool( low, newvalue, Py_GT );\nif( cmp < 0 )\n    return 0;  // propagate the exception\nif( cmp )\n    return PyErr_Format(...);\n```\n\n### 2. `safe_richcompare` unguarded `PyErr_Clear` (`utils.h:112-113`)\n\n`safe_richcompare` is used as an STL comparator in `SortedMap`. When `PyObject_RichCompareBool` fails, it clears ALL pending exceptions without checking the type \u2014 `MemoryError` and `KeyboardInterrupt` are silently swallowed.\n\n**Reproducer**:\n```python\nimport gc; gc.disable()\nimport os\nfrom atom.datastructures.sortedmap import sortedmap\n\nclass ComparisonBomb:\n    def __lt__(self, other):\n        raise KeyboardInterrupt(\"Ctrl-C during comparison\")\n    def __gt__(self, other):\n        raise KeyboardInterrupt(\"Ctrl-C during comparison\")\n    def __eq__(self, other):\n        raise KeyboardInterrupt(\"Ctrl-C during comparison\")\n\nm = sortedmap()\nm[ComparisonBomb()] = \"first\"\ntry:\n    m[ComparisonBomb()] = \"second\"\n    print(f\"KeyboardInterrupt SWALLOWED (BUG) - len={len(m)}\")\nexcept KeyboardInterrupt:\n    print(\"KeyboardInterrupt propagated (correct)\")\nos._exit(0)\n# Output: KeyboardInterrupt SWALLOWED (BUG) - len=2\n```\n\n**Fix**: guard the clear with `PyErr_ExceptionMatches(PyExc_TypeError)`:\n```cpp\nif( PyErr_Occurred() )\n{\n    if( !PyErr_ExceptionMatches( PyExc_TypeError ) )\n        return false;  // or propagate somehow\n    PyErr_Clear();\n}\n```\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

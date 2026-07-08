@@ -1,0 +1,19 @@
+{
+ "repo": "duckdb/duckdb-python",
+ "number": 408,
+ "type": "issue",
+ "url": "https://github.com/duckdb/duckdb-python/issues/408",
+ "title": "duckdb Python Extension Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "needs triage"
+ ],
+ "created_at": "2026-03-29T03:01:00Z",
+ "closed_at": null,
+ "body": "### What happens?\n\nI ran [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit) on duckdb-python and got a report with some issues:\n\n> The primary risks are: (1) **Python API calls without GIL in the parallel numpy scan path** (data corruption/crash), (2) **`PyTuple_Pack` reference leak** in `map.cpp` (~11 KB/call), (3) **unchecked `PyNumber_Rshift` NULL** in 128-bit integer conversion (segfault), (4) **`PyErr_PrintEx` clobbering exceptions** in map and filesystem, and (5) **UDF exception handling** that optionally swallows `MemoryError`/`KeyboardInterrupt`.\n\nThe full report is available at https://gist.github.com/devdanzin/5c7600153c8e76afee3ef1a2d516ad70\n\n### To Reproduce\n\nSome reproducers are available in the [Reproducers Appencix](https://gist.github.com/devdanzin/5c7600153c8e76afee3ef1a2d516ad70#duckdb-python-extension--reproducer-appendix).\n\n### OS:\n\nLinux x86_64\n\n### DuckDB Package Version:\n\n1.5.1\n\n### Python Version:\n\n3.14.3+ debug build\n\n### Full Name:\n\nDaniel Silva Diniz\n\n### Affiliation:\n\nNone\n\n### What is the latest build you tested with? If possible, we recommend testing with the latest nightly build.\n\nI have tested with a stable release\n\n### Did you include all relevant data sets for reproducing the issue?\n\nNot applicable - the reproduction does not require a data set\n\n### Did you include all code required to reproduce the issue?\n\n- [x] Yes, I have\n\n### Did you include all relevant configuration to reproduce the issue?\n\n- [x] Yes, I have",
+ "comments": [],
+ "timeline_refs": []
+}

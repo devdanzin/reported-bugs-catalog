@@ -1,0 +1,66 @@
+{
+ "repo": "python/cpython",
+ "number": 129766,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/129766",
+ "title": "Fatal Python error from `warnings._release_lock()`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-crash"
+ ],
+ "created_at": "2025-02-07T03:31:38Z",
+ "closed_at": "2025-02-07T10:00:14Z",
+ "body": "# Crash report\n\n### What happened?\n\nExposing the mutex  used by the `_warnings` module in https://github.com/python/cpython/pull/128386 has made it possible to abort the interpreter by calling `warnings._release_lock()`:\n\n```python\nimport warnings\nwarnings._release_lock()\n```\n\nError message:\n```\nFatal Python error: _PyRecursiveMutex_Unlock: unlocking a recursive mutex that is not owned by the current thread\nPython runtime state: initialized\n\nCurrent thread 0x0000718eb9295740 (most recent call first):\n  File \"<string>\", line 1 in <module>\nAborted (core dumped)\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch, 3.14\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a4+ (heads/main:e1006ce1de, Feb  6 2025, 17:22:01) [GCC 13.3.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-129771\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-07T03:33:41Z",
+   "body": "cc @nascheme and @kumaraditya303 "
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-02-07T07:31:15Z",
+   "body": "We should use `_PyRecursiveMutex_TryUnlock` and raise `RuntimeError` instead, like in many other places."
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2025-02-07T10:00:14Z",
+   "body": "Fixed! Thanks for the report."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2f6e91306d82ac728883561b6eb69934ffc2c312",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e6f65a9e89f8383128065ba9767a6a6fd1b76a1f",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/129771",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae132edc296d27c6ed04fe4d400c67e3cfb622e8",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ]
+}

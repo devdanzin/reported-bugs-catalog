@@ -1,0 +1,205 @@
+{
+ "total": 403,
+ "by_repo": {
+  "numpy/numpy": 10,
+  "dpdani/cereggii": 15,
+  "zhuyifei1999/guppy3": 2,
+  "python/cpython": 175,
+  "pydata/bottleneck": 24,
+  "rogerbinns/apsw": 1,
+  "nucleic/enaml": 8,
+  "igraph/python-igraph": 1,
+  "bloomberg/memray": 2,
+  "zopefoundation/zope.interface": 9,
+  "pycurl/pycurl": 1,
+  "nucleic/kiwi": 9,
+  "aio-libs/multidict": 5,
+  "matplotlib/matplotlib": 1,
+  "enthought/traits": 1,
+  "ilanschnell/bitarray": 2,
+  "nucleic/atom": 9,
+  "python-pillow/Pillow": 24,
+  "simplejson/simplejson": 17,
+  "indygreg/python-zstandard": 12,
+  "python-lz4/python-lz4": 6,
+  "h5py/h5py": 25,
+  "pypy/pypy": 31,
+  "giampaolo/psutil": 1,
+  "duckdb/duckdb-python": 1,
+  "python-greenlet/greenlet": 1,
+  "cython/cython": 4,
+  "pygame-community/pygame-ce": 2,
+  "protocolbuffers/protobuf": 1,
+  "scipy/scipy": 3
+ },
+ "by_type": {
+  "issue": 300,
+  "pull": 103
+ },
+ "by_state": {
+  "closed": 296,
+  "open": 107
+ },
+ "authorship": {
+  "self": 343,
+  "other": 60
+ },
+ "repo_author": {
+  "numpy/numpy": {
+   "self": 10
+  },
+  "dpdani/cereggii": {
+   "self": 15
+  },
+  "zhuyifei1999/guppy3": {
+   "self": 2
+  },
+  "python/cpython": {
+   "self": 175
+  },
+  "pydata/bottleneck": {
+   "self": 15,
+   "other": 9
+  },
+  "rogerbinns/apsw": {
+   "other": 1
+  },
+  "nucleic/enaml": {
+   "self": 8
+  },
+  "igraph/python-igraph": {
+   "other": 1
+  },
+  "bloomberg/memray": {
+   "self": 2
+  },
+  "zopefoundation/zope.interface": {
+   "other": 9
+  },
+  "pycurl/pycurl": {
+   "self": 1
+  },
+  "nucleic/kiwi": {
+   "self": 9
+  },
+  "aio-libs/multidict": {
+   "other": 1,
+   "self": 4
+  },
+  "matplotlib/matplotlib": {
+   "self": 1
+  },
+  "enthought/traits": {
+   "self": 1
+  },
+  "ilanschnell/bitarray": {
+   "other": 1,
+   "self": 1
+  },
+  "nucleic/atom": {
+   "self": 9
+  },
+  "python-pillow/Pillow": {
+   "other": 24
+  },
+  "simplejson/simplejson": {
+   "self": 17
+  },
+  "indygreg/python-zstandard": {
+   "self": 12
+  },
+  "python-lz4/python-lz4": {
+   "self": 6
+  },
+  "h5py/h5py": {
+   "self": 16,
+   "other": 9
+  },
+  "pypy/pypy": {
+   "self": 31
+  },
+  "giampaolo/psutil": {
+   "self": 1
+  },
+  "duckdb/duckdb-python": {
+   "self": 1
+  },
+  "python-greenlet/greenlet": {
+   "other": 1
+  },
+  "cython/cython": {
+   "other": 4
+  },
+  "pygame-community/pygame-ce": {
+   "self": 2
+  },
+  "protocolbuffers/protobuf": {
+   "self": 1
+  },
+  "scipy/scipy": {
+   "self": 3
+  }
+ },
+ "top_labels": {
+  "type-crash": 133,
+  "interpreter-core": 80,
+  "extension-modules": 57,
+  "3.14": 55,
+  "3.13": 49,
+  "topic-JIT": 34,
+  "topic-free-threading": 31,
+  "bug": 20,
+  "type-bug": 19,
+  "3.12": 15,
+  "3.15": 15,
+  "topic-repl": 12,
+  "stdlib": 11,
+  "00 - Bug": 9,
+  "fusil-fuzzer": 8,
+  "topic-subinterpreters": 8,
+  "docs": 8,
+  "awaiting review": 7,
+  "skip news": 6,
+  "type-feature": 5,
+  "OS-windows": 5,
+  "topic-importlib": 4,
+  "defect": 4,
+  "AtomicDict": 3,
+  "performance": 3,
+  "needs backport to 3.13": 3,
+  "needs backport to 3.14": 3,
+  "needs backport to 3.15": 3,
+  "reproducer: present": 3,
+  "Priority: low": 2,
+  "component: numpy.random": 2,
+  "topic-typing": 2,
+  "topic-C-API": 2,
+  "easy": 2,
+  "release-blocker": 2,
+  "topic-ctypes": 2,
+  "topic-SSL": 2,
+  "topic-asyncio": 2,
+  "topic-XML": 2,
+  "Memory": 2,
+  "Testing": 2,
+  "C/C++": 2,
+  "57 - Close?": 1,
+  "sprintable - C": 1,
+  "component: numpy.strings": 1,
+  "topic-multiprocessing": 1,
+  "DO-NOT-MERGE": 1,
+  "stale": 1,
+  "tests": 1,
+  "build": 1,
+  "topic-sqlite3": 1,
+  "topic-tkinter": 1,
+  "bot:chronographer:provided": 1,
+  "Maintenance": 1,
+  "first-contribution": 1,
+  "\ud83e\udd16-assisted": 1,
+  "Bug": 1,
+  "Performance": 1,
+  "automerge": 1,
+  "Free-threading": 1
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5111,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5111",
+ "title": "`SystemError` with `_string.formatter_field_name_split`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-11T11:36:07Z",
+ "closed_at": "2024-11-11T15:56:31Z",
+ "body": "It's possible to cause a `SystemError` by calling `_string.formatter_field_name_split` with an invalid value:\r\n\r\n```python\r\nimport _string\r\n_string.formatter_field_name_split(b'\\xe1')\r\nRPython traceback:\r\n  File \"pypy_interpreter.c\", line 51609, in BuiltinCode1_fastcall_1\r\n  File \"pypy_module__string.c\", line 449, in formatter_field_name_split\r\n  File \"pypy_objspace_std_10.c\", line 13805, in TemplateFormatter_formatter_field_name_split\r\nTraceback (most recent call last):\r\n  File \"<python-input-5>\", line 1, in <module>\r\n    _string.formatter_field_name_split(b'\\xe1')\r\nSystemError: unexpected internal exception (please report a bug): <CheckError object at 0x7b8708144ea0>; internal traceback was dumped to stderr\r\n```\r\n\r\n```\r\nPython 3.10.14 (39dc8d3c85a7, Aug 27 2024, 14:32:27)\r\n[PyPy 7.3.17 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\n```\r\n\r\nFound using fusil by @vstinner.",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-11T11:47:38Z",
+   "body": "Also happens for `_string.formatter_parser`:\r\n\r\n```python\r\n>>>> import _string\r\n>>>> _string.formatter_parser(b\"\\xa1\\xf2\")\r\nRPython traceback:\r\n  File \"pypy_interpreter.c\", line 51609, in BuiltinCode1_fastcall_1\r\n  File \"pypy_objspace_std_8.c\", line 41106, in TemplateFormatter_formatter_parser\r\nTraceback (most recent call last):\r\n  File \"<python-input-4>\", line 1, in <module>\r\n    _string.formatter_parser(b\"\\xa1\\xf2\")\r\nSystemError: unexpected internal exception (please report a bug): <CheckError object at 0x7936c1b2cf20>; internal traceback was dumped to stderr\r\n```"
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-11-11T15:56:31Z",
+   "body": "Fixed in a608a540070, now raises an error. thanks for the report."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "42d36a6182d8a614049b067855e0153c52978828",
+   "actor": "cfbolz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

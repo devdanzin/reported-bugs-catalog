@@ -1,0 +1,17 @@
+{
+ "repo": "python-lz4/python-lz4",
+ "number": 330,
+ "type": "pull",
+ "url": "https://github.com/python-lz4/python-lz4/pull/330",
+ "title": "Fix memory and buffer leaks on error paths",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-04-01T01:56:02Z",
+ "closed_at": null,
+ "body": "## Summary\n\n- Fix `Py_buffer` leak in `block.compress()` and `block.decompress()` when `PyMem_Malloc` fails \u2014 `source` and `dict` buffers not released before returning `PyErr_NoMemory()`\n- Fix `Py_buffer` leak in `frame.compress()` when `block_checksum` is requested on LZ4 < 1.8.0 \u2014 `source` buffer not released before error return\n- Fix `destination` memory leak in `frame.compress_begin()` when `LZ4F_compressBegin` fails \u2014 allocated buffer not freed before error return (same pattern as the bug fixed in commit 43fe65d, not propagated to this site)\n- Fix `destination` memory leak in `frame.__decompress()` when `PyMem_Realloc` fails \u2014 original buffer pointer lost on realloc failure\n\n## Context\n\nThese are the same class of bug that was partially fixed in commit 43fe65d. That fix addressed one error path in `__decompress` but missed the `PyMem_Realloc` failure path in the same function and the identical pattern in `compress_begin`.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).\n\n> [!NOTE]\n> This PR was authored and submitted by [Claude Code](https://claude.ai/code) (Anthropic).\n> It was reviewed by a human before submission.\n\n## Test plan\n\n- [ ] Existing tests pass\n- [ ] Code review confirms each error path now releases all acquired resources",
+ "comments": [],
+ "timeline_refs": []
+}

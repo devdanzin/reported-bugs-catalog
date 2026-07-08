@@ -1,0 +1,95 @@
+{
+ "repo": "scipy/scipy",
+ "number": 24929,
+ "type": "pull",
+ "url": "https://github.com/scipy/scipy/pull/24929",
+ "title": "BUG: use `CMPLX()`/`CMPLXF()` instead of `real + imag * I`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "defect",
+  "scipy.sparse.linalg",
+  "scipy.linalg",
+  "scipy.integrate",
+  "C/C++"
+ ],
+ "created_at": "2026-03-28T20:47:33Z",
+ "closed_at": "2026-04-21T09:17:02Z",
+ "body": "#### Reference issue\r\n\r\nSee gh-24927. Follow-up to gh-24826 which fixed the same bug in `_complexstuff.h`.\r\n\r\n#### What does this implement/fix?\r\n\r\nThe `real + imag * I` pattern corrupts the real part when the imaginary part is NaN, because `NaN * I` (i.e., `NaN * (0.0 + 1.0i)`) produces `NaN + NaN*i` \u2014 the multiplication by the real component of `I` (which is 0.0) turns `NaN * 0.0` into NaN, destroying the original real part. The C11 `CMPLX`/`CMPLXF` macros construct the complex number directly without multiplication, correctly handling NaN/Inf.\r\n\r\ngh-24826 fixed this in `_complexstuff.h`. These four remaining sites use the identical pattern but were not addressed:\r\n\r\n- `ARNAUD_cplx`/`ARNAUD_cplxf` in `arnaud/types.h` (ARPACK eigenvalue solver)\r\n- `PROPACK_cplx`/`PROPACK_cplxf` in `PROPACK/types.h` (SVD solver)\r\n- `ZVODE_cplx` in `blaslapack_declarations.h` (ODE integrator)\r\n- `CPLX_Z`/`CPLX_C` in `_common_array_utils.h` (linalg utilities)\r\n\r\nNaN intermediates are normal during eigenvalue/SVD convergence iterations, so these macros can be reached with NaN arguments in production use. The MSVC paths already used `_Cbuild`/`_FCbuild`/`_Dcomplex{...}` which handle special values correctly \u2014 this change makes the non-MSVC paths match.\r\n\r\n#### Additional information\r\n\r\nSeven lines changed across four files. All four files already `#include <complex.h>` which provides `CMPLX`/`CMPLXF` on C11 compilers.\r\n\r\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).\r\n\r\n#### AI Generation Disclosure\r\n\r\nClaude Opus 4.6 was used to identify these remaining sites during a systematic C extension analysis using the cext-review-toolkit plugin (the same analysis that led to gh-24826), and to prepare this PR. The fix was confirmed correct by human review.",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-31T01:08:36Z",
+   "body": "Thanks for the review!\r\n\r\nI've extracted the `#ifdef` fallbacks into the suggested shared header at `scipy/_build_utils/src/scipy_complex_support.h` and updated the five files to use it.\r\n\r\nThe shared header provides both `CMPLX` and `CMPLXF` with the same fallback chain from gh-24826:\r\n1. Compiler-provided C11 `CMPLX`/`CMPLXF` (if already defined)\r\n2. MSVC `_Cbuild`/`_FCbuild`\r\n3. `__builtin_complex` (GCC/Clang)\r\n4. Union type-pun (portable last resort)\r\n\r\n`CMPLXF` is needed by 3 of the 4 files for their single-precision complex macros. gh-24826 didn't need it since `_complexstuff.h` only uses double.\r\n\r\n`_complexstuff.h` now includes this header, and the 4 previously modified files had their `#include <complex.h>` replaced with `#include \"scipy_complex_support.h\"` (which includes `<complex.h>`). The MSVC branches in each file are left as before since they already handle NaN/Inf correctly IIUC.\r\n\r\nDoes this seem reasonable?"
+  },
+  {
+   "author": "ev-br",
+   "created_at": "2026-04-07T08:46:42Z",
+   "body": "CI errors look related:\r\n\r\n```\r\n../scipy/sparse/linalg/_eigen/arpack/_arpackmodule.c:14:13: error: 'ARNAUD_cplx' macro redefined [-Werror,-Wmacro-redefined]\r\n   14 |     #define ARNAUD_cplx(real, imag) ((real) + (imag)*I)\r\n      |             ^\r\n../scipy/sparse/linalg/_eigen/arpack/arnaud/include/arnaud/types.h:27:13: note: previous definition is here\r\n   27 |     #define ARNAUD_cplx(real, imag) CMPLX(real, imag)\r\n      |             ^\r\n../scipy/sparse/linalg/_eigen/arpack/_arpackmodule.c:15:13: error: 'ARNAUD_cplxf' macro redefined [-Werror,-Wmacro-redefined]\r\n   15 |     #define ARNAUD_cplxf(real, imag) ((real) + (imag)*I)\r\n      |             ^\r\n../scipy/sparse/linalg/_eigen/arpack/arnaud/include/arnaud/types.h:26:13: note: previous definition is here\r\n   26 |     #define ARNAUD_cplxf(real, imag) CMPLXF(real, imag)\r\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-07T09:06:19Z",
+   "body": "I missed that, thank you!\r\n\r\n`_arpackmodule.c` had its own copy of the `ARNAUD_cplx`/`ARNAUD_cplxf` macro definitions with the old buggy `(real) + (imag)*I` pattern. This PR fixed `types.h` to use `CMPLX`/`CMPLXF`, but since `_arpackmodule.c` includes `arnaud.h` -> `types.h`, both definitions were now active, causing the macro redefinition error. The fix removes the redundant definitions from `_arpackmodule.c`.\r\n\r\nDoes that look correct?"
+  },
+  {
+   "author": "rgommers",
+   "created_at": "2026-04-07T11:37:51Z",
+   "body": "Not quite - the `arnoud` sources are meant to be usable independent of SciPy. So rather than include a scipy header, can you add the plain C `CMPLX` definition right inside `arnaud/types.h`? The duplication is fine here."
+  },
+  {
+   "author": "lucascolley",
+   "created_at": "2026-04-07T11:44:49Z",
+   "body": "> Not quite - the `arnoud` sources are meant to be usable independent of SciPy. So rather than include a scipy header, can you add the plain C `CMPLX` definition right inside `arnaud/types.h`? The duplication is fine here.\n\nIt sounds silly because the file is so small, but in an ideal world, would `scipy_complex_stuff.h` be a separate tiny header-only library that could be packaged and distributed independently? I would imagine this is something that is useful much more broadly than just for SciPy?"
+  },
+  {
+   "author": "ilayn",
+   "created_at": "2026-04-07T13:29:47Z",
+   "body": "That would be a bit like the [`isEven.js`](https://www.npmjs.com/package/is-even). This is just dealing with different compilers not every project needs it unless they want to distribute code. And resolves back to a single line. It is an unfortunate state of affairs with the C99 compatibility mostly Microsoft (surprise)."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-07T23:18:12Z",
+   "body": "Is this better @rgommers? Should we also consider PROPACK to be usable independent of SciPy?"
+  },
+  {
+   "author": "lucascolley",
+   "created_at": "2026-04-08T11:34:36Z",
+   "body": "> Should we also consider PROPACK to be usable independent of SciPy?\r\n\r\nI believe the answer is no given https://github.com/scipy/scipy/pull/24844#issuecomment-4068970981, although not sure if @ilayn responded with thoughts on that anywhere."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24935",
+   "commit": null,
+   "actor": "nickodell"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/scipy/scipy/pull/24913",
+   "commit": null,
+   "actor": "ev-br"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "50669a01da77ae335042a45b4cea628d935472cf",
+   "actor": "lucascolley"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "lucascolley"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "caf8a8158459375ab3221824f352c5c0486f7262",
+   "actor": "MilaGolomozin"
+  }
+ ]
+}

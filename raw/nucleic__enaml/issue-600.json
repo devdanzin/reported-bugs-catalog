@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/enaml",
+ "number": 600,
+ "type": "issue",
+ "url": "https://github.com/nucleic/enaml/issues/600",
+ "title": "PyObject_RichCompareBool and PyObject_IsTrue error-as-truthy in signal disconnect, compare, and observer call",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:34:13Z",
+ "closed_at": null,
+ "body": "Several functions use the return value of `PyObject_RichCompareBool` or `PyObject_IsTrue` in a boolean `if(...)` context. Both APIs return -1 on error, which is truthy in C/C++ \u2014 comparison errors are silently treated as \"true\" matches.\n\n### 1. `_Disconnector_call` \u2014 wrong slot disconnected (`signaling.cpp:444-450`)\n\n`slot.richcmp(other, Py_EQ)` returns -1 on error, treated as truthy \u2192 the first slot in the list matches on comparison error, causing the wrong slot to be disconnected.\n\n**Reproducer**:\n```python\nimport gc; gc.disable()\nimport os\nfrom enaml.signaling import Signal\n\nclass BadSlot:\n    def __eq__(self, other):\n        raise TypeError(\"comparison bomb\")\n    def __hash__(self):\n        return id(self)\n    def __call__(self): pass\n\nclass Host: pass\nhost = Host()\nsig = Signal()\nbound = sig.__get__(host, type(host))\n\nbound.connect(lambda: None)\nbound.connect(BadSlot())\ntry:\n    bound.disconnect(BadSlot())\nexcept SystemError as e:\n    print(f\"SystemError (BUG - error-as-truthy): {e}\")\nexcept TypeError as e:\n    print(f\"TypeError propagated (correct): {e}\")\nos._exit(0)\n# SystemError: <enaml.signaling._Disconnector object ...> returned a result with an exception set\n```\n\n### 2. `BoundSignal_richcompare` (`signaling.cpp:622`)\n\nSame pattern \u2014 error during `__eq__` treated as truthy.\n\n### 3. `CallableRef_richcompare` (`callableref.cpp:123,132`)\n\nSame pattern in both `Py_EQ` and `Py_NE` branches.\n\n### 4. `PyObject_IsTrue` in `SubscriptionObserver_call` (`subscription_observer.cpp:122`)\n\n`PyObject_IsTrue(self->ref)` returns -1 on error. Used in `if(...)` where -1 is truthy \u2192 proceeds with active exception.\n\n**Fix** for all sites \u2014 check for error before branching:\n```cpp\nint cmp = slot.richcmp( other, Py_EQ );\nif( cmp < 0 )\n    return 0;  // propagate exception\nif( cmp ) { ... }\n```\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

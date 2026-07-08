@@ -1,0 +1,195 @@
+{
+ "repo": "python/cpython",
+ "number": 131878,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/131878",
+ "title": "New REPL on Windows exits when accented character is pasted/typed",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "OS-windows",
+  "stdlib",
+  "release-blocker",
+  "3.13",
+  "3.14",
+  "topic-repl"
+ ],
+ "created_at": "2025-03-29T12:57:39Z",
+ "closed_at": "2025-05-05T16:30:26Z",
+ "body": "# Crash report\n\n### What happened?\n\nWhen pasting an accented character like \u00f1 or \u00e9, or typing one such as \u00b4p and pressing Enter, then up arrow, the new REPL on Windows will exit with the following error:\n\n```python\nPython 3.14.0a6+ (heads/fix_non_string_candidates_exit_repl-dirty:8008a588342, Mar 29 2025, 08:15:) [MSC v.1943 64 bit (AMD64)] on win32\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n>>> Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"C:\\Users\\ddini\\PycharmProjects\\cpython\\Lib\\_pyrepl\\__main__.py\", line 6, in <module>\n    __pyrepl_interactive_console()\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"C:\\Users\\ddini\\PycharmProjects\\cpython\\Lib\\_pyrepl\\main.py\", line 59, in interactive_console\n    run_multiline_interactive_console(console)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^\n  File \"C:\\Users\\ddini\\PycharmProjects\\cpython\\Lib\\_pyrepl\\simple_interact.py\", line 137, in run_multiline_interactive_console\n    statement = multiline_input(more_lines, ps1, ps2)\n  File \"C:\\Users\\ddini\\PycharmProjects\\cpython\\Lib\\_pyrepl\\readline.py\", line 389, in multiline_input\n    return reader.readline()\n           ~~~~~~~~~~~~~~~^^\n  File \"C:\\Users\\ddini\\PycharmProjects\\cpython\\Lib\\_pyrepl\\reader.py\", line 750, in readline\n    self.handle1()\n    ~~~~~~~~~~~~^^\n  File \"C:\\Users\\ddini\\PycharmProjects\\cpython\\Lib\\_pyrepl\\reader.py\", line 706, in handle1\n    event = self.console.get_event(block=False)\n  File \"C:\\Users\\ddini\\PycharmProjects\\cpython\\Lib\\_pyrepl\\windows_console.py\", line 471, in get_event\n    self.event_queue.push(rec.Event.KeyEvent.uChar.UnicodeChar)\n    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ddini\\PycharmProjects\\cpython\\Lib\\_pyrepl\\base_eventqueue.py\", line 88, in push\n    assert len(self.buf) == 1\n           ^^^^^^^^^^^^^^^^^^\nAssertionError\n```\nIn these cases, `len(self.buf)` is 3 instead of 1.\n\nI'm running Python in Windows Terminal, `chcp` gives 850, changing it to 65001 (UTF-8) makes no difference.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nWindows\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a6+ (heads/main-dirty:7c3692fe275, Mar 24 2025, 19:20:37) [MSC v.1942 64 bit (AMD64)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-131901\n* gh-131910\n* gh-133030\n* gh-133445\n* gh-133468\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "StanFromIreland",
+   "created_at": "2025-03-29T13:03:05Z",
+   "body": "Related? https://github.com/python/cpython/issues/130273\n\nThis is a bug and not a crash."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-03-29T13:11:09Z",
+   "body": "> This is a bug and not a crash.\n\nCorrect, sorry about that.\n\ncc @DinoV, @y5c4l3, @encukou "
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2025-03-29T14:17:10Z",
+   "body": "This is *os-windows* specific. IIRC there was recently an issue about this, it was closed."
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2025-03-29T14:18:39Z",
+   "body": "Yes looking at https://github.com/python/cpython/issues/130804 it seems it was not fully resolved, and it is presumably a side effect of the merged pr, do we want to reopen that?"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-03-29T14:56:36Z",
+   "body": "@StanFromIreland \nIt is in another execution path, so I think this should be a new issue (despite it looks similar)."
+  },
+  {
+   "author": "StanFromIreland",
+   "created_at": "2025-03-29T15:18:09Z",
+   "body": "@sergey-miryanov \n\nhttps://github.com/python/cpython/blob/fccf9ab33d0b16e6171c533d139b6118503197c1/Lib/_pyrepl/base_eventqueue.py#L72-L89\n\nIt is in the same path you modified, your changes are the last ones to modify the buffer before the check?"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-03-29T15:54:18Z",
+   "body": "@StanFromIreland Oh, I get what you mean. Yes, it is related, but I think it is related to `keymap` and `compiled_keymap` also, so it extends my previous patch a bit. I will test and fix. Can you assign it to me?"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-03-29T15:56:28Z",
+   "body": "Also, I should mention that it is not backported to 3.13 due conflicts - https://github.com/python/cpython/pull/130805#issuecomment-2714112074"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-03-30T12:08:35Z",
+   "body": "@StanFromIreland As I said it was a bit different issue and consist of following parts:\n1. First - related to previous patch - we should encode `key_event.uChar.UnicodeChar` to bytes before passing it to `eventqueue.push`, cause unicode with two code points cannot be well described by one int.\n2. Second - if we don't encode passed UnicodeChar then it cannot be decoded in `decoded = bytes(self.buf).decode(self.encoding)` and raises exception that we swallow.\n3. Third - in the exception handler we should flush buffer, if we don't do it then it mixes with \"control\" command - in our case with \"\\x1b[201\" and thus we get assert."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-03-30T14:57:09Z",
+   "body": "I have also added another PR that handles uncaught exceptions in the main repl loop."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2025-04-14T16:26:07Z",
+   "body": "For reproducer/testers/reviewers: this only happens in Windows terminals, where the virtual terminal mode is enabled:  there I can confirm that I can no longer enter `\u00e4\u00c4\u00f6\u00d6\u00fc\u00dc`. etc. The PR fixes that for me, too.\n\nLegacy terminals (`cmd.exe`) are not affected."
+  },
+  {
+   "author": "ambv",
+   "created_at": "2025-05-05T16:30:26Z",
+   "body": "Fixed, thank you all!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130804",
+   "commit": null,
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131901",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131910",
+   "commit": null,
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132439",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132440",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a2fb7eed63704655ffec141dc0a6d523effa7606",
+   "actor": "sergey-miryanov"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/133030",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "99a0d7e5b3c6e80f5b9b0ec88ae439d6d620253c",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b75310db3b11b777ace2fff117539ab4e8052809",
+   "actor": "ambv"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/133445",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "87b14c8f21bbd675a98f0ae02149d8376e8f8d3d",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0c5151bc81ec8e8588bef4389df12a9ab50e9fa0",
+   "actor": "ambv"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1fcec66d59a262591e169f4cc9aa8c32b456dd78",
+   "actor": "ambv"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/133468",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "891232f3386dd8b20a216a473954c1b01cede7ec",
+   "actor": "ambv"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dce813ccb6983dcb1753b8397d606a1414909f54",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ac6b1518f1454ffc7de0b6381ac29a665137cd13",
+   "actor": "Pranjal095"
+  }
+ ]
+}

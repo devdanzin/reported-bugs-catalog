@@ -1,0 +1,174 @@
+{
+ "repo": "python/cpython",
+ "number": 146076,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146076",
+ "title": "Segfault from `NULL` dereference in `_zoneinfo.get_weak_cache`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2026-03-17T18:52:15Z",
+ "closed_at": "2026-03-18T14:48:09Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to cause a segfault by deleting the `_weak_cache` of a `ZoneInfo` subclass, then trying to access the removed cache.\n\n### Automated diagnosis:\n\nBug: `NULL` dereference via unchecked `get_weak_cache` return. `get_weak_cache()` can return `NULL` for `ZoneInfo` subclasses that lack a `_weak_cache` attribute. The return value is used at lines 323 and 498 without `NULL` checks, passing `NULL` to `PyObject_CallMethod` -> segfault.\n\nFile: `Modules/_zoneinfo.c`, lines 323 and 498\n\nMRE:\n\n```python\nfrom zoneinfo import ZoneInfo\n\nclass BadZoneInfo(ZoneInfo):\n    pass\n\ndelattr(BadZoneInfo, '_weak_cache')\nBadZoneInfo(\"UTC\")\nBadZoneInfo.clear_cache()\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x00007bfff598d1ec in Py_DECREF (lineno=326, op=0x0, filename=<optimized out>) at ./Include/refcount.h:390\n390         if (op->ob_refcnt_full <= 0 || op->ob_refcnt > (((PY_UINT32_T)-1) - (1<<20))) {\n\n#0  0x00007bfff598d1ec in Py_DECREF (lineno=326, op=0x0, filename=<optimized out>) at ./Include/refcount.h:390\n#1  zoneinfo_ZoneInfo_impl (type=type@entry=0x7d8ff702dda0, key=key@entry=0x7c6ff70e7a20) at ./Modules/_zoneinfo.c:326\n#2  0x00007bfff5982b63 in zoneinfo_ZoneInfo (type=<optimized out>, args=0x7c6ff70409f0, kwargs=<optimized out>) at ./Modules/clinic/_zoneinfo.c.h:64\n#3  0x0000555555c7beb3 in type_call (self=<optimized out>, args=<optimized out>, kwds=<optimized out>) at Objects/typeobject.c:2441\n#4  0x0000555555aba90b in _PyObject_MakeTpCall (tstate=0x5555568f7b18 <_PyRuntime+360664>, callable=0x7d8ff702dda0, args=0x7bfff5d1af28, nargs=1, keywords=0x0) at Objects/call.c:242\n#5  0x0000555555e588dd in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=<optimized out>, total_args=1, kwnames=..., call_instrumentation=<optimized out>,\n    frame=<optimized out>, this_instr=<optimized out>, tstate=<optimized out>) at Python/ceval.c:770\n#6  0x0000555555e94263 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1838\n#7  0x0000555555e57778 in _PyEval_EvalFrame (tstate=0x5555568f7b18 <_PyRuntime+360664>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#8  _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2134\n#9  0x0000555555e57195 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff70884c0) at Python/ceval.c:681\n#10 0x0000555556061fb0 in run_eval_code_obj (tstate=tstate@entry=0x5555568f7b18 <_PyRuntime+360664>, co=co@entry=0x7d2ff6ffde10, globals=globals@entry=0x7c7ff70884c0,\n    locals=locals@entry=0x7c7ff70884c0) at Python/pythonrun.c:1368\n#11 0x000055555606117c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1471\n#12 0x000055555605b69d in pyrun_file (fp=fp@entry=0x7d4ff6fefd00, filename=filename@entry=0x7cbff6ffc490, start=start@entry=257, globals=globals@entry=0x7c7ff70884c0,\n    locals=locals@entry=0x7c7ff70884c0, closeit=closeit@entry=1, flags=0x7bfff5e1ef10) at Python/pythonrun.c:1295\n#13 0x00005555560591fd in _PyRun_SimpleFileObject (fp=<optimized out>, filename=<optimized out>, closeit=<optimized out>, flags=<optimized out>) at Python/pythonrun.c:518\n#14 0x000055555605856e in _PyRun_AnyFileObject (fp=fp@entry=0x7d4ff6fefd00, filename=filename@entry=0x7cbff6ffc490, closeit=closeit@entry=1, flags=flags@entry=0x7bfff5e1ef10)\n    at Python/pythonrun.c:81\n#15 0x00005555560d721b in pymain_run_file_obj (program_name=0x7caff7024fc0, filename=0x7cbff6ffc490, skip_source_first_line=0) at Modules/main.c:410\n#16 pymain_run_file (config=0x5555568c2b50 <_PyRuntime+143632>) at Modules/main.c:429\n#17 0x00005555560d54b2 in pymain_run_python (exitcode=0x7bfff5e1eb00) at Modules/main.c:714\n#18 Py_RunMain () at Modules/main.c:795\n```\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/_zoneinfo.c all deep` command.\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:99e2c5eccd2, Mar 17 2026, 08:26:50) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146082\n* gh-146115\n* gh-146116\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T14:48:09Z",
+   "body": "Fixed by https://github.com/python/cpython/pull/146082. Thank you for your report!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146082",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3b06d68d8a3cc1f37359af1d7ebb3d09e1222296",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "31b2e5065e0ec4397087c7499af8ccaf45985b80",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c9ac70fc456f5a8b7e8d217c27f3f6f6f782c967",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146115",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146116",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "450e9eaf735dc40faf536b337e6c784e2f9050e3",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6980b94c3a25a69278ef9b348fabec7831651e8e",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/deep-learnings/pull/11",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/botpress-accuracy-reporters/pull/83",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/coding-tests/pull/43",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-cleaners/pull/32",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-extension-converters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/github-wiki-organisers/pull/30",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/itunes-file-delimiter-replacers/pull/28",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/json-data-sorters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/natural-language-processing/pull/10",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/pr-title-printers/pull/17",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/template-creators/pull/16",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/tutorials/pull/219",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/web-scrapers/pull/14",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a597827085b6131c2984dfac4060c70e5b37ff22",
+   "actor": "ljfp"
+  }
+ ]
+}

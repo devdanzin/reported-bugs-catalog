@@ -1,0 +1,36 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2835,
+ "type": "issue",
+ "url": "https://github.com/h5py/h5py/issues/2835",
+ "title": "`readinto` return value unchecked in VFD driver",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-25T10:10:48Z",
+ "closed_at": null,
+ "body": "Partial reads leave buffer uninitialized (data corruption)\n- `h5fd.templ.pyx:156-168`\n",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-25T15:35:28Z",
+   "body": "I'm confused by this one.\nIt looks to me that the problematic path is `return 1`, which *might* be how the function signals failure (although I'm being pretty liberal with my interpretation of [`herr_t`'s docs](https://portal.hdfgroup.org/documentation/hdf5/latest/_h5public_8h.html#a3b079ecf932a5c599499cf7e298af160)), so I think the *caller* would be expected to check the return value before using the buffer ?\nIt would seem more in line with `herr_t`'s conventions to return -1 instead, or possibly some other negative value.\nBesides, the function  uses [`except -1`](https://docs.cython.org/en/latest/src/userguide/language_basics.html#error-return-values) which is unsettling since it never returns this value... maybe the original intention was for this path to raise (`return 1`), which would have avoided the defect entirely\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2825",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/pull/2887",
+   "commit": null,
+   "actor": "dfgvaetyj3456356-hash"
+  }
+ ]
+}

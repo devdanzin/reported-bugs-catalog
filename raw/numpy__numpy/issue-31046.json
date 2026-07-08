@@ -1,0 +1,44 @@
+{
+ "repo": "numpy/numpy",
+ "number": 31046,
+ "type": "issue",
+ "url": "https://github.com/numpy/numpy/issues/31046",
+ "title": "BUG: NumPy C Extension Analysis Report",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [
+  "00 - Bug"
+ ],
+ "created_at": "2026-03-22T11:55:31Z",
+ "closed_at": null,
+ "body": "### Describe the issue:\n\nI have generated a report of issues found by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit) in the NumPy codebase. Here's the summary:\n\n>  The most critical findings are: 3 use-after-free bugs in the ufunc dispatch path (`dispatching.cpp`), 2 user-triggerable crashes from non-ASCII input, 2 heap corruption bugs in timsort, and an unfixed empty-vector bug in `OBJECT_dot` identical to a recently fixed bug in `OBJECT_dotc`.\n\nThe full report is at https://gist.github.com/devdanzin/ccc2d9553ca1c90ab1835362ee21a40a#file-numpy_report-md\n\n### Reproduce the code example:\n\nThe reproducers for 5 crashes are at https://gist.github.com/devdanzin/ccc2d9553ca1c90ab1835362ee21a40a#file-numpy_report_appendix-md\n\n### Error message:\n\n```shell\n\n```\n\n### Python and NumPy Versions:\n\nAll tested with NumPy 2.4.3 on Python 3.14.\n\n### Runtime Environment:\n\n[{'numpy_version': '2.4.3',\n  'python': '3.14.3+ (heads/3.14:6080c866096, Mar 16 2026, 00:17:17) [Clang '\n            '21.1.2 (2ubuntu6)]',\n  'uname': uname_result(system='Linux', node='gmknees', release='6.17.0-19-generic', version='#19-Ubuntu SMP PREEMPT_DYNAMIC Fri Mar  6 14:02:58 UTC 2026', machine='x86_64')},\n {'simd_extensions': {'baseline': ['X86_V2'],\n                      'found': ['X86_V3', 'X86_V4', 'AVX512_ICL'],\n                      'not_found': ['AVX512_SPR']}},\n {'ignore_floating_point_errors_in_matmul': False},\n {'architecture': 'SkylakeX',\n  'filepath': '/home/danzin/venvs/cext-review-toolkit/lib/python3.14/site-packages/numpy.libs/libscipy_openblas64_-ff84a88b.so',\n  'internal_api': 'openblas',\n  'num_threads': 16,\n  'prefix': 'libscipy_openblas',\n  'threading_layer': 'pthreads',\n  'user_api': 'blas',\n  'version': '0.3.31.dev'}]\n\n\n### How does this issue affect you or how did you find it:\n\nI'm developing  [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit) and NumPy was one of the C extensions I chose to analyze.",
+ "comments": [
+  {
+   "author": "mohammedsalman06112-blip",
+   "created_at": "2026-03-23T10:53:04Z",
+   "body": "Appreciate the detailed report\r\n\r\nOn Sun, Mar 22, 2026, 6:55 AM devdanzin ***@***.***> wrote:\r\n\r\n> *devdanzin* created an issue (numpy/numpy#31046)\r\n> <https://github.com/numpy/numpy/issues/31046>\r\n> Describe the issue:\r\n>\r\n> I have generated a report of issues found by cext-review-toolkit\r\n> <https://github.com/devdanzin/cext-review-toolkit> in the NumPy codebase.\r\n> Here's the summary:\r\n>\r\n> The most critical findings are: 3 use-after-free bugs in the ufunc\r\n> dispatch path (dispatching.cpp), 2 user-triggerable crashes from\r\n> non-ASCII input, 2 heap corruption bugs in timsort, and an unfixed\r\n> empty-vector bug in OBJECT_dot identical to a recently fixed bug in\r\n> OBJECT_dotc.\r\n>\r\n> The full report is at\r\n> https://gist.github.com/devdanzin/ccc2d9553ca1c90ab1835362ee21a40a#file-numpy_report-md\r\n> Reproduce the code example:\r\n>\r\n> The reproducers for 5 crashes are at https://gist.github.com/devdanzin/ccc2d9553ca1c90ab1835362ee21a40a#file-numpy_report_appendix-md\r\n>\r\n> Error message:\r\n>\r\n> Python and NumPy Versions:\r\n>\r\n> All tested with NumPy 2.4.3 on Python 3.14.\r\n> Runtime Environment:\r\n>\r\n> [{'numpy_version': '2.4.3',\r\n> 'python': '3.14.3+ (heads/3.14:6080c866096, Mar 16 2026, 00:17:17) [Clang '\r\n> '21.1.2 (2ubuntu6)]',\r\n> 'uname': uname_result(system='Linux', node='gmknees',\r\n> release='6.17.0-19-generic', version='#19\r\n> <https://github.com/numpy/numpy/pull/19>-Ubuntu SMP PREEMPT_DYNAMIC Fri\r\n> Mar 6 14:02:58 UTC 2026', machine='x86_64')},\r\n> {'simd_extensions': {'baseline': ['X86_V2'],\r\n> 'found': ['X86_V3', 'X86_V4', 'AVX512_ICL'],\r\n> 'not_found': ['AVX512_SPR']}},\r\n> {'ignore_floating_point_errors_in_matmul': False},\r\n> {'architecture': 'SkylakeX',\r\n> 'filepath':\r\n> '/home/danzin/venvs/cext-review-toolkit/lib/python3.14/site-packages/numpy.libs/libscipy_openblas64_-ff84a88b.so',\r\n> 'internal_api': 'openblas',\r\n> 'num_threads': 16,\r\n> 'prefix': 'libscipy_openblas',\r\n> 'threading_layer': 'pthreads',\r\n> 'user_api': 'blas',\r\n> 'version': '0.3.31.dev'}]\r\n> How does this issue affect you or how did you find it:\r\n>\r\n> I'm developing cext-review-toolkit\r\n> <https://github.com/devdanzin/cext-review-toolkit> and NumPy was one of\r\n> the C extensions I chose to analyze.\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/numpy/numpy/issues/31046?email_source=notifications&email_token=CABGL7DYTQPLBI3EC4T7K534R7IEVA5CNFSL4Z3JMQ5C6L3HNF2C22DVMIXUS43TOVSS6NBRGE2TQMJTGMZDNJTSMVQXG33OVJZXKYTTMNZGSYTFMSSWK5TFNZ2KYZTPN52GK4S7MNWGSY3L>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/CABGL7BTOX45NCN4YB3QNUT4R7IEVAVCNFSM6AAAAACW2VBQJCVHI2DSMVQWIX3LMV43ASLTON2WKOZUGEYTKOBRGMZTENQ>\r\n> .\r\n> You are receiving this because you are subscribed to this thread.Message\r\n> ID: ***@***.***>\r\n>\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/31297",
+   "commit": null,
+   "actor": "Breno-Favaretto"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/31314",
+   "commit": null,
+   "actor": "Breno-Favaretto"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/31336",
+   "commit": null,
+   "actor": "charris"
+  }
+ ]
+}

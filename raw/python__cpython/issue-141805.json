@@ -1,0 +1,150 @@
+{
+ "repo": "python/cpython",
+ "number": 141805,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/141805",
+ "title": "Segfault from `repr()` of a corrupted set",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.13",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2025-11-20T21:04:54Z",
+ "closed_at": "2026-01-15T07:32:05Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter by corrupting a set, then calling `repr()` on it.\n\nMRE:\n```python\ntasks = set()\n\nclass Dummy(object):\n    def __hash__(self):\n        return 0\n\nclass CorrupTrigger():\n    counter = 0\n    def __hash__(self):\n        return 0\n    def __eq__(self,other):\n        if self.counter < 1:\n            self.counter += 1\n            tasks.add(self)\n        return False\n\ntasks.add(Dummy())\ntasks.add(Dummy())\ntasks.pop()\ntasks.add(CorrupTrigger())\nrepr(tasks)\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555555b5b1e7 in Py_INCREF (op=0x0) at ./Include/refcount.h:281\n281         PY_UINT32_T cur_refcnt = op->ob_refcnt;\n(gdb) bt\n#0  0x0000555555b5b1e7 in Py_INCREF (op=0x0) at ./Include/refcount.h:281\n#1  _Py_NewRef (obj=0x0) at ./Include/refcount.h:529\n#2  list_repr_impl (v=0x7c6ff6e72f60) at Objects/listobject.c:598\n#3  list_repr (self=0x7c6ff6e72f60) at Objects/listobject.c:638\n#4  0x0000555555bea219 in PyObject_Repr (v=v@entry=0x7c6ff6e72f60) at Objects/object.c:779\n#5  0x0000555555c3c4b7 in set_repr_lock_held (so=0x7d0ff6eb17a0) at Objects/setobject.c:594\n#6  set_repr (self=0x7d0ff6eb17a0) at Objects/setobject.c:622\n#7  0x0000555555bea219 in PyObject_Repr (v=0x7d0ff6eb17a0) at Objects/object.c:779\n#8  0x0000555555bd9b13 in cfunction_vectorcall_O (func=func@entry=0x7c7ff6e35d40, args=args@entry=0x7bfff5f70208, nargsf=nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0)\n    at Objects/methodobject.c:536\n#9  0x0000555555aba6a0 in _PyObject_VectorcallTstate (tstate=0x555556aebf00 <_PyRuntime+358560>, callable=0x7c7ff6e35d40, args=0x7bfff5f70208, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:169\n#10 0x0000555555e8cf61 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1620\n#11 0x0000555555e4a67b in _PyEval_EvalFrame (tstate=0x555556aebf00 <_PyRuntime+358560>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:121\n```\n\nIt's also possible to get `set_pop_impl` into an infinite loop by changing the last code block to:\n```python\ntasks.add(Dummy())\ntasks.add(Dummy())\ntasks.pop()\ntasks.add(CorrupTrigger())\ntasks.pop()\ntasks.pop()\ntasks.pop()\n```\n\n\nFound when trying to simplify the MRE in https://github.com/python/cpython/issues/139071. \n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a2+ (heads/main-dirty:41b9ad5b38e, Nov 20 2025, 11:03:41) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-142007\n* gh-143815\n* gh-143849\n* gh-143853\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-20T21:12:32Z",
+   "body": "I guess all sorts of shenanigans are possible with the corrupted set. Here's a heap-buffer-overflow:\n\n```python\ntasks = set()\n\nclass Dummy(object):\n    def __hash__(self):\n        return 0\n\nclass CorrupTrigger():\n    counter = 0\n    def __hash__(self):\n        return 0\n    def __eq__(self,other):\n        if self.counter < 1:\n            self.counter += 1\n            tasks.add(self)\n        return False\n\ntasks.add(Dummy())\ntasks.add(Dummy())\ntasks.pop()\ntasks.add(CorrupTrigger())\ntasks | set()\n```\n\nASan output:\n```\n=================================================================\n==409426==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x786f9beb0d30 at pc 0x5d5c440a00f3 bp 0x7ffd088428d0 sp 0x7ffd088428c8\nREAD of size 8 at 0x786f9beb0d30 thread T0\n    #0 0x5d5c440a00f2 in set_dealloc /home/danzin/projects/jit_cpython/Objects/setobject.c:552:20\n    #1 0x5d5c4405b2c3 in _Py_Dealloc /home/danzin/projects/jit_cpython/Objects/object.c:3200:5\n    #2 0x5d5c442b452d in Py_DECREF_MORTAL /home/danzin/projects/jit_cpython/./Include/internal/pycore_object.h:450:9\n    #3 0x5d5c442b452d in PyStackRef_XCLOSE /home/danzin/projects/jit_cpython/./Include/internal/pycore_stackref.h:849:9\n    #4 0x5d5c442b452d in _PyEval_EvalFrameDefault /home/danzin/projects/jit_cpython/Python/generated_cases.c.h:10099:13\n    #5 0x5d5c442ae67a in _PyEval_EvalFrame /home/danzin/projects/jit_cpython/./Include/internal/pycore_ceval.h:121:16\n    #6 0x5d5c442ae67a in _PyEval_Vector /home/danzin/projects/jit_cpython/Python/ceval.c:2159:12\n    #7 0x5d5c442ae094 in PyEval_EvalCode /home/danzin/projects/jit_cpython/Python/ceval.c:995:21\n    #8 0x5d5c4461fc2e in run_eval_code_obj /home/danzin/projects/jit_cpython/Python/pythonrun.c:1372:12\n    #9 0x5d5c4461edfb in run_mod /home/danzin/projects/jit_cpython/Python/pythonrun.c:1475:19\n    #10 0x5d5c446193fc in pyrun_file /home/danzin/projects/jit_cpython/Python/pythonrun.c:1300:15\n    #11 0x5d5c44616f92 in _PyRun_SimpleFileObject /home/danzin/projects/jit_cpython/Python/pythonrun.c:521:13\n    #12 0x5d5c4461630d in _PyRun_AnyFileObject /home/danzin/projects/jit_cpython/Python/pythonrun.c:81:15\n    #13 0x5d5c446910aa in pymain_run_file_obj /home/danzin/projects/jit_cpython/Modules/main.c:410:15\n    #14 0x5d5c446910aa in pymain_run_file /home/danzin/projects/jit_cpython/Modules/main.c:429:15\n    #15 0x5d5c4468f173 in pymain_run_python /home/danzin/projects/jit_cpython/Modules/main.c:691:21\n    #16 0x5d5c4468f173 in Py_RunMain /home/danzin/projects/jit_cpython/Modules/main.c:772:5\n    #17 0x5d5c44690076 in pymain_main /home/danzin/projects/jit_cpython/Modules/main.c:802:12\n    #18 0x5d5c446901e7 in Py_BytesMain /home/danzin/projects/jit_cpython/Modules/main.c:826:12\n    #19 0x7b5f9ca2a574 in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16\n    #20 0x7b5f9ca2a627 in __libc_start_main csu/../csu/libc-start.c:360:3\n    #21 0x5d5c43c734f4 in _start (/home/danzin/projects/jit_cpython/python+0x2bb4f4) (BuildId: 768911764b07158e8e5e5c253a7b8c560417792d)\n\n0x786f9beb0d30 is located 0 bytes after 240-byte region [0x786f9beb0c40,0x786f9beb0d30)\nallocated by thread T0 here:\n    #0 0x5d5c43d18a98 in malloc (/home/danzin/projects/jit_cpython/python+0x360a98) (BuildId: 768911764b07158e8e5e5c253a7b8c560417792d)\n    #1 0x5d5c4408b581 in _PyMem_DebugRawAlloc /home/danzin/projects/jit_cpython/Objects/obmalloc.c:2887:24\n    #2 0x5d5c4408b581 in _PyMem_DebugRawMalloc /home/danzin/projects/jit_cpython/Objects/obmalloc.c:2920:12\n    #3 0x5d5c4408b581 in _PyMem_DebugMalloc /home/danzin/projects/jit_cpython/Objects/obmalloc.c:3085:12\n    #4 0x5d5c440c96eb in _PyObject_MallocWithType /home/danzin/projects/jit_cpython/./Include/internal/pycore_object_alloc.h:46:17\n    #5 0x5d5c440c96eb in _PyType_AllocNoTrack /home/danzin/projects/jit_cpython/Objects/typeobject.c:2515:19\n    #6 0x5d5c440c9544 in PyType_GenericAlloc /home/danzin/projects/jit_cpython/Objects/typeobject.c:2546:21\n    #7 0x5d5c440a7eb2 in make_new_set /home/danzin/projects/jit_cpython/Objects/setobject.c:1143:25\n    #8 0x5d5c440a7eb2 in make_new_set_basetype /home/danzin/projects/jit_cpython/Objects/setobject.c:1174:12\n    #9 0x5d5c440a7eb2 in set_copy_impl /home/danzin/projects/jit_cpython/Objects/setobject.c:1295:22\n    #10 0x5d5c440a60a9 in set_copy /home/danzin/projects/jit_cpython/Objects/clinic/setobject.c.h:78:20\n    #11 0x5d5c440a60a9 in set_or /home/danzin/projects/jit_cpython/Objects/setobject.c:1381:29\n    #12 0x5d5c43ec6dc7 in binary_op1 /home/danzin/projects/jit_cpython/Objects/abstract.c:966:13\n    #13 0x5d5c43ec66d0 in binary_op /home/danzin/projects/jit_cpython/Objects/abstract.c:1005:24\n    #14 0x5d5c442e9cc7 in _PyEval_EvalFrameDefault /home/danzin/projects/jit_cpython/Python/generated_cases.c.h:62:35\n    #15 0x5d5c442ae67a in _PyEval_EvalFrame /home/danzin/projects/jit_cpython/./Include/internal/pycore_ceval.h:121:16\n    #16 0x5d5c442ae67a in _PyEval_Vector /home/danzin/projects/jit_cpython/Python/ceval.c:2159:12\n    #17 0x5d5c442ae094 in PyEval_EvalCode /home/danzin/projects/jit_cpython/Python/ceval.c:995:21\n    #18 0x5d5c4461fc2e in run_eval_code_obj /home/danzin/projects/jit_cpython/Python/pythonrun.c:1372:12\n    #19 0x5d5c4461edfb in run_mod /home/danzin/projects/jit_cpython/Python/pythonrun.c:1475:19\n    #20 0x5d5c446193fc in pyrun_file /home/danzin/projects/jit_cpython/Python/pythonrun.c:1300:15\n    #21 0x5d5c44616f92 in _PyRun_SimpleFileObject /home/danzin/projects/jit_cpython/Python/pythonrun.c:521:13\n    #22 0x5d5c4461630d in _PyRun_AnyFileObject /home/danzin/projects/jit_cpython/Python/pythonrun.c:81:15\n    #23 0x5d5c446910aa in pymain_run_file_obj /home/danzin/projects/jit_cpython/Modules/main.c:410:15\n    #24 0x5d5c446910aa in pymain_run_file /home/danzin/projects/jit_cpython/Modules/main.c:429:15\n    #25 0x5d5c4468f173 in pymain_run_python /home/danzin/projects/jit_cpython/Modules/main.c:691:21\n    #26 0x5d5c4468f173 in Py_RunMain /home/danzin/projects/jit_cpython/Modules/main.c:772:5\n    #27 0x5d5c44690076 in pymain_main /home/danzin/projects/jit_cpython/Modules/main.c:802:12\n    #28 0x5d5c446901e7 in Py_BytesMain /home/danzin/projects/jit_cpython/Modules/main.c:826:12\n    #29 0x7b5f9ca2a574 in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16\n    #30 0x7b5f9ca2a627 in __libc_start_main csu/../csu/libc-start.c:360:3\n    #31 0x5d5c43c734f4 in _start (/home/danzin/projects/jit_cpython/python+0x2bb4f4) (BuildId: 768911764b07158e8e5e5c253a7b8c560417792d)\n\nSUMMARY: AddressSanitizer: heap-buffer-overflow /home/danzin/projects/jit_cpython/Objects/setobject.c:552:20 in set_dealloc\nShadow bytes around the buggy address:\n  0x786f9beb0a80: fd fd fd fd fd fa fa fa fa fa fa fa fa fa fa fa\n  0x786f9beb0b00: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd\n  0x786f9beb0b80: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fa fa\n  0x786f9beb0c00: fa fa fa fa fa fa fa fa 00 00 00 00 00 00 00 00\n  0x786f9beb0c80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\n=>0x786f9beb0d00: 00 00 00 00 00 00[fa]fa fa fa fa fa fa fa fa fa\n  0x786f9beb0d80: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x786f9beb0e00: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x786f9beb0e80: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x786f9beb0f00: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\n  0x786f9beb0f80: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa\nShadow byte legend (one shadow byte represents 8 application bytes):\n  Addressable:           00\n  Partially addressable: 01 02 03 04 05 06 07\n  Heap left redzone:       fa\n  Freed heap region:       fd\n  Stack left redzone:      f1\n  Stack mid redzone:       f2\n  Stack right redzone:     f3\n  Stack after return:      f5\n  Stack use after scope:   f8\n  Global redzone:          f9\n  Global init order:       f6\n  Poisoned by user:        f7\n  Container overflow:      fc\n  Array cookie:            ac\n  Intra object redzone:    bb\n  ASan internal:           fe\n  Left alloca redzone:     ca\n  Right alloca redzone:    cb\n==409426==ABORTING\n```"
+  },
+  {
+   "author": "rhettinger",
+   "created_at": "2025-11-21T01:25:01Z",
+   "body": "Confirmed that this crashes on Py3.13 and later but worked fine on Py3.12 and prior."
+  },
+  {
+   "author": "yihong0618",
+   "created_at": "2025-11-21T03:01:45Z",
+   "body": "the first segment fault commit 3de0f55f3410ae835923d10ae098558900a9a121\n\nbut its not the root cause\n\nthe root cause is we count the so->old wrong in the first 3.13\n\ncat ttt.py\n\n```py\n{<__main__.CorrupTrigger object at 0x105956900>, <__main__.Dummy object at 0x105a94b90>, <NULL>}\n\u279c  cpython git:(3a130c1786) \u2717 cat ttt.py \ntasks = set()\n\nclass Dummy(object):\n    def __hash__(self):\n        return 0\n\nclass CorrupTrigger():\n    counter = 0\n    def __hash__(self):\n        return 0\n    def __eq__(self,other):\n        if self.counter < 1:\n            self.counter += 1\n            tasks.add(self)\n        return False\n\ntasks.add(Dummy())\ntasks.add(Dummy())\ntasks.pop()\ntasks.add(CorrupTrigger())\nprint(repr(tasks))\n```\n\nthe third one is NULL in the good commit \n```cli\n{<__main__.CorrupTrigger object at 0x105956900>, <__main__.Dummy object at 0x105a94b90>, <NULL>} \n```\n\nbut for 3.12\n\n\u279c  cpython git:(3a130c1786) \u2717 python3.12 ttt.py\n{<__main__.CorrupTrigger object at 0x1007336e0>, <__main__.Dummy object at 0x100733680>}"
+  },
+  {
+   "author": "yihong0618",
+   "created_at": "2025-11-21T03:30:44Z",
+   "body": "\nthis is the source cause the issue commit 3325699ffa3c633084f3e3fd94c4f3843066db85\n\nfrom\n\n```cli\n\u279c  cpython git:(v3.12.9) \u2717 ./python.exe ttt.py\n{<__main__.CorrupTrigger object at 0x105972e70>, <__main__.Dummy object at 0x105972e10>}\n\n```\n\nto\n\n```cli\n\u279c  cpython git:(3325699ffa) \u2717 ./python.exe ttt.py\n{<__main__.CorrupTrigger object at 0x105987b60>, <__main__.Dummy object at 0x105987c50>, <NULL>}\n```\n\nsome dig\n\n\n```cli\n\n```text\n+-----------+           +-----------------+       +-----------------+       +------------+\n| User Code |           | set.add (Outer) |       | set.add (Inner) |       | Hash Table |\n+-----------+           +-----------------+       +-----------------+       +------------+\n      |                          |                         |                      |\n      | 1. tasks.add(X)          |                         |                      |\n      |------------------------->|                         |                      |\n      |                          |                         |                      |\n      |                          | 2. Find empty slot      |                      |\n      |                          |----------------------------------------------->|\n      |                          | (Found Slot #5, remembers it's FREE)           |\n      |                          |                         |                      |\n      | 3. Check equality?       |                         |                      |\n      |<-------------------------|                         |                      |\n      |                          |                         |                      |\n      | 4. __eq__ calls add(X)   |                         |                      |\n      |--------------------------------------------------->|                      |\n      |                          |                         |                      |\n      |                          |                         | 5. Find empty slot   |\n      |                          |                         |--------------------->|\n      |                          |                         | (Found Slot #5)      |\n      |                          |                         |                      |\n      |                          |                         | 6. Write X to Slot #5|\n      |                          |                         |--------------------->|\n      |                          |                         |                      |\n      |                          |                         | 7. Count++           |\n      |                          |                         | (Count = N+1)        |\n      |                          |                         |                      |\n      | 8. Return                |                         |                      |\n      |<---------------------------------------------------|                      |\n      |                          |                         |                      |\n      | 9. Return False          |                         |                      |\n      |------------------------->|                         |                      |\n      |                          |                         |                      |\n      |                          | (Resumes. Thinks Slot #5 is still FREE)        |\n      |                          |                         |                      |\n      |                          | 10. Overwrite Slot #5   |                      |\n      |                          |----------------------------------------------->|\n      |                          | (Previous X is overwritten)                    |\n      |                          |                         |                      |\n      |                          | 11. Count++             |                      |\n      |                          | (Count = N+2)           |                      |\n      |                          |                         |                      |\n      v                          v                         v                      v\n\n      RESULT: Count is N+2, but only N+1 items exist.\n              Slot #5 was written twice.\n```\n```\n"
+  },
+  {
+   "author": "yihong0618",
+   "created_at": "2025-11-22T10:59:33Z",
+   "body": "try to solve with the root cause \n\nthis diff can fix the problem but I am not sure the fix is good enough and maybe lower the performance\n\nso left comment here\n\n```diff\ndiff --git a/Objects/setobject.c b/Objects/setobject.c\nindex 85f4d7d403..f545ea958e 100644\n--- a/Objects/setobject.c\n+++ b/Objects/setobject.c\n@@ -175,6 +175,8 @@ set_add_entry_takeref(PySetObject *so, PyObject *key, Py_hash_t hash)\n                     goto comparison_error;\n                 if (table != so->table || entry->key != startkey)\n                     goto restart;\n+                if (freeslot != NULL && freeslot->key != dummy)\n+                    goto restart;\n                 mask = so->mask;\n             }\n             else if (entry->hash == -1) {\n\n```\n\n---\n\nupdate\nthe latest comment is the real root cause fix!"
+  },
+  {
+   "author": "kemingy",
+   "created_at": "2025-11-27T09:51:21Z",
+   "body": "By using the GDB, I found that this is caused by the improper handled freeslot in `set_add_entry_takeref`.\n\n1. `tasks.pop()` this leave a dummy slot in the 0-index\n2. `tasks.add(Corrupt())` this found this freeslot, but the logic goes into next iteration, and trigger the `__eq__` by `PyObject_RichCompareBool`\n3. `__eq__` trigger another `tasks.add(self)` defined inside the `Corrupt`\n4. the new insert also found the freeslot, goes into the next iteration, then fill the freeslot, increase the `so->used`, return `False` to the `__eq__`\n5. the original insert continue, still hold the freeslot, **but it's already taken**, override the freeslot and increase the `so->used` (twice for this elem)\n\n"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2026-01-13T20:41:01Z",
+   "body": "Unfortunately, solution in #142007 is not correct. Surprisingly, there was no test for this case. #143781 adds a test which will fail with such change.\n\nThe right solution is to check if `freeslot` still points to a dummy entry before replacing it.  #143815 implements this."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142007",
+   "commit": null,
+   "actor": "kemingy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cf1400fd0897b4bfcf90ea4cd93b69f9e99d709b",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "de4dbb4b7bebda23d43e0d68fcdabcd79e501c7d",
+   "actor": "efimov-mikhail"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7264d66e59cde812e7958fb348e6b7b77d382d2c",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143815",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b8e925b4f8f6c5e28fbebc4f3965bf77610698b3",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "72851c432495483ec91d1962c72694d015f23c8e",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143849",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fd4b336b9fd9b0c2f1cb0016a3d0c8611312232d",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143853",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "601ccb7f89dc4b6b1da9c5322f0c3abd875fcf2b",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5c028df404b0d8453a4ecb8b938122f3d3c62a30",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pymmcore-plus/ome-writers/pull/102",
+   "commit": null,
+   "actor": "tlambert03"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "21f25a9f791fe6c96d561ed69475398f8a43708a",
+   "actor": "thunder-coding"
+  }
+ ]
+}

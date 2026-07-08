@@ -1,0 +1,196 @@
+{
+ "repo": "python/cpython",
+ "number": 119118,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/119118",
+ "title": "`tokenize.generate_tokens()` performance regression in 3.12",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "performance"
+ ],
+ "created_at": "2024-05-17T11:49:37Z",
+ "closed_at": "2024-05-28T20:49:50Z",
+ "body": "# Bug report\r\n\r\n### Bug description:\r\n\r\nThere seems to be a significant performance regression in `tokenize.generate_tokens()` between 3.11 and 3.12 when tokenizing a (very) large dict on a single line. I searched the existing issues but couldn't find anything about this.\r\n\r\nTo reproduce, rename the file [largedict.py.txt](https://github.com/python/cpython/files/15348502/largedict.py.txt) to `largedict.py` in the same directory as the script below, then run the script. That file comes from https://github.com/nedbat/coveragepy/issues/1785.\r\n\r\n```python\r\nimport io, time, sys, tokenize\r\nimport largedict\r\n\r\ntext = largedict.d\r\nreadline = io.StringIO(text).readline\r\nglob_start = start = time.time()\r\nprint(f\"{sys.implementation.name} {sys.platform} {sys.version}\")\r\n\r\nfor i, (ttype, ttext, (sline, scol), (_, ecol), _) in enumerate(tokenize.generate_tokens(readline)):\r\n    if i % 500 == 0:\r\n        print(i, ttype, ttext, sline, scol, time.time() - start)\r\n        start = time.time()\r\n    if i % 5000 == 0:\r\n        print(time.time() - glob_start)\r\n\r\nprint(f\"Time taken: {time.time() - glob_start}\")\r\n```\r\n\r\nFor Python 3.12, this results in:\r\n```\r\ncpython linux 3.12.3 (main, May 17 2024, 07:19:22) [GCC 11.4.0]\r\n0 1 a_large_dict_literal 1 0 0.04641866683959961\r\n0.046633005142211914\r\n500 3 ':tombol_a_(golongan_darah):' 1 2675 9.689745903015137\r\n1000 3 ':flagge_anguilla:' 1 5261 9.767053604125977\r\n1500 3 ':\u0444\u043b\u0430\u0433_\u0410\u0440\u043c\u0435\u043d\u0438\u044f:' 1 7879 9.258271932601929\r\n[...]\r\n```\r\n\r\nFor Python 3.11, this results in:\r\n```\r\ncpython linux 3.11.0rc1 (main, Aug 12 2022, 10:02:14) [GCC 11.2.0]\r\n0 1 a_large_dict_literal 1 0 0.013637304306030273\r\n0.013663768768310547\r\n500 3 ':tombol_a_(golongan_darah):' 1 2675 0.002939462661743164\r\n1000 3 ':flagge_anguilla:' 1 5261 0.0028715133666992188\r\n1500 3 ':\u0444\u043b\u0430\u0433_\u0410\u0440\u043c\u0435\u043d\u0438\u044f:' 1 7879 0.002806425094604492\r\n[...]\r\n352500 3 'pt' 1 2589077 0.003370046615600586\r\nTime taken: 2.1244866847991943\r\n```\r\n\r\nThat is, each 500 tokens in Python 3.12 is taking over 9 seconds to process, while the 352500 tokens in Python 3.11 is taking a bit over 2 seconds to process. \r\n\r\nI can reproduce this on Linux (WSL) and Windows. Also seems to affect 3.13.\r\n\r\n### CPython versions tested on:\r\n\r\n3.9, 3.10, 3.11, 3.12\r\n\r\n### Operating systems tested on:\r\n\r\nLinux, Windows\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-119615\n* gh-119682\n* gh-119683\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "erlend-aasland",
+   "created_at": "2024-05-17T13:56:28Z",
+   "body": "Suspecting it could be related to the work done on PEP-701, which landed in 3.12."
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-05-17T14:05:46Z",
+   "body": "Yeah we are now using a completely different backend (the actual parser) so we need to investigate a bit what's going on here."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-05-17T16:51:05Z",
+   "body": "A data point that might help: when calling `list(tokenize.generate_tokens(readline))` (or `tuple()`, memory blows out very fast with a large single line dict, while the same dict broken into lines doesn't cause memory issues.\r\n\r\n"
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-05-17T16:54:29Z",
+   "body": "Oh wow that's very intriguing. I may be able to investigate this next week after PyCon but thanks for the hint!"
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-05-17T18:42:34Z",
+   "body": "Ok, I think I have a guess (i need time to test my theory) but I am 99% sure I know the problem. The problem is this line:\r\n\r\nhttps://github.com/python/cpython/blob/31a28cbae0989f57ad01b428c007dade24d9593a/Python/Python-tokenize.c#L213\r\n\r\nWe are creating unique strings per token with the entire line. If the dict spans the entire line this is a **very** expensive operation that we are doing over and over and over with the same result. The fix is to  keep reusing the same result until there is a new line."
+  },
+  {
+   "author": "erlend-aasland",
+   "created_at": "2024-05-17T19:03:04Z",
+   "body": "~~Confirming that, Pablo; if I cache the line[^1] on the tokenizer iter object instance, I no longer see the performance penalty.~~ Forget that, it's not that simple.\r\n\r\n[^1]: the `PyObject *line` object"
+  },
+  {
+   "author": "lysnikolaou",
+   "created_at": "2024-05-17T20:32:15Z",
+   "body": "Well, yeah, it's not that simple. Doing some scrappy caching seems to have brought down the performance penalty, but it's much worse than 3.11.\r\n\r\n```\r\ncpython on \ue0a0 main +16 -1 [!] via C v15.0.0-clang via \ud83d\udc0d v3.11.3 \r\n\u276f ./python.exe tmp/t.py\r\ncpython darwin 3.14.0a0 (heads/main-dirty:65de194dd80, May 17 2024, 15:17:08) [Clang 15.0.0 (clang-1500.3.9.4)]\r\n0 1 a_large_dict_literal 1 0 0.07759904861450195\r\n0.07767128944396973\r\n500 3 ':tombol_a_(golongan_darah):' 1 2675 0.08086895942687988\r\n1000 3 ':flagge_anguilla:' 1 5261 0.10818815231323242\r\n1500 3 ':\u0444\u043b\u0430\u0433_\u0410\u0440\u043c\u0435\u043d\u0438\u044f:' 1 7879 0.1338660717010498\r\n2000 3 ':grupo_sangu\u00edneo_b:' 1 10470 0.1593310832977295\r\n2500 3 ':bayrak_belarus:' 1 13074 0.18597793579101562\r\n3000 3 ':\u65d7_\u30dc\u30b9\u30cb\u30a2\u30fb\u30d8\u30eb\u30c4\u30a7\u30b4\u30d3\u30ca:' 1 15514 0.2100069522857666\r\n3500 3 ':Bulgaria:' 1 18735 0.23893284797668457\r\n4000 3 ':bandiera_camerun:' 1 21240 0.2700800895690918\r\n4500 2 2 1 23919 0.2944760322570801\r\n5000 3 ':bendera_pulau_natal:' 1 26767 0.32537102699279785\r\n2.0853629112243652\r\n5500 3 'es' 1 29643 0.3519558906555176\r\n6000 3 'ar' 1 32240 0.38205909729003906\r\n6500 3 'ko' 1 34917 0.411639928817749\r\n7000 2 2 1 37580 0.45705175399780273\r\n7500 3 'fa' 1 40214 0.4636220932006836\r\n8000 55 , 1 43013 0.49083518981933594\r\n8500 3 ':\u52a0\u7eb3:' 1 45615 0.5203256607055664\r\n9000 3 ':bandera_guatemala:' 1 48073 0.5623579025268555\r\n...\r\n```\r\n\r\nSo we get about 0.1-0.5 seconds per 500 tokens, instead of the original ~9 seconds, but it's still very far away."
+  },
+  {
+   "author": "lysnikolaou",
+   "created_at": "2024-05-17T20:39:44Z",
+   "body": "Oh found it, it's not just that line, but the calls to `_PyPegen_byte_offset_to_character_offset` that are made a bit further below that eventually call `PyUnicode_*` APIs as well. After additionally caching those, I get:\r\n\r\n```\r\ncpython darwin 3.14.0a0 (heads/main-dirty:65de194dd80, May 17 2024, 16:37:58) [Clang 15.0.0 (clang-1500.3.9.4)]\r\n0 1 a_large_dict_literal 1 0 0.08269691467285156\r\n0.08281183242797852\r\n500 3 ':tombol_a_(golongan_darah):' 1 0 0.004801034927368164\r\n1000 3 ':flagge_anguilla:' 1 0 0.003465890884399414\r\n1500 3 ':\u0444\u043b\u0430\u0433_\u0410\u0440\u043c\u0435\u043d\u0438\u044f:' 1 0 0.004238128662109375\r\n2000 3 ':grupo_sangu\u00edneo_b:' 1 0 0.0038290023803710938\r\n2500 3 ':bayrak_belarus:' 1 0 0.005483865737915039\r\n3000 3 ':\u65d7_\u30dc\u30b9\u30cb\u30a2\u30fb\u30d8\u30eb\u30c4\u30a7\u30b4\u30d3\u30ca:' 1 0 0.005335807800292969\r\n3500 3 ':Bulgaria:' 1 0 0.0034456253051757812\r\n4000 3 ':bandiera_camerun:' 1 0 0.0051038265228271484\r\n4500 2 2 1 0 0.003175020217895508\r\n5000 3 ':bendera_pulau_natal:' 1 0 0.0032072067260742188\r\n0.1256239414215088\r\n5500 3 'es' 1 0 0.003175973892211914\r\n[...]\r\n351500 3 'es' 1 0 0.0032269954681396484\r\n352000 3 'ko' 1 0 0.003362894058227539\r\n352500 3 'pt' 1 0 0.003036022186279297\r\nTime taken: 2.6852049827575684\r\n```\r\n\r\nI'll push a PR shortly."
+  },
+  {
+   "author": "nedbat",
+   "created_at": "2024-05-25T19:37:40Z",
+   "body": "@lysnikolaou any news on this? We have other people reporting a problem like this in 3.12."
+  },
+  {
+   "author": "lysnikolaou",
+   "created_at": "2024-05-25T19:44:06Z",
+   "body": "Thanks for the reminder @nedbat! Turns out that this was even trickier than I though and the fix I showed in https://github.com/python/cpython/issues/119118#issuecomment-2118355032 was buggy. My patch is almost there, but I didn't get the time to fix some final details. I'll have a PR up by early next week."
+  },
+  {
+   "author": "pablogsal",
+   "created_at": "2024-05-25T19:56:50Z",
+   "body": "Tell me if you want me to help or pick it up if you done have time @lysnikolaou "
+  },
+  {
+   "author": "lysnikolaou",
+   "created_at": "2024-05-28T20:49:50Z",
+   "body": "Fixed in https://github.com/python/cpython/pull/119615."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/coveragepy/coveragepy/issues/1785",
+   "commit": null,
+   "actor": "nedbat"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/coveragepy/coveragepy/issues/1791",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "66f9385f692bbd75ceb35e6278b906123aa4e3ba",
+   "actor": "lysnikolaou"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/119615",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/119654",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d87b0151062e36e67f9e42e1595fba5bf23a485c",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "64be1b7aee2d42e44b568a3ee93260e3ddca9651",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/119682",
+   "commit": null,
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8e935c9e388c8dbd53f8e9e4ad3189b9fdf890eb",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/119683",
+   "commit": null,
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0d0be6b3efeace4743329f81c08f9720cc221207",
+   "actor": "lysnikolaou"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4a0af0cfdcc0b81da5d78dc219df4985c4403f9c",
+   "actor": "lysnikolaou"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "lysnikolaou"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/firedrakeproject/firedrake/pull/3546",
+   "commit": null,
+   "actor": "JDBetteridge"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/microsoft/debugpy/issues/1496",
+   "commit": null,
+   "actor": "bersbersbers"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/dedupeio/dedupe/issues/1192",
+   "commit": null,
+   "actor": "fgregg"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e530584527acdcad01dba886ac391bf559174f8d",
+   "actor": "noahbkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2b2bd1146f2e18ae67e863cf824aa71fc6336dd5",
+   "actor": "estyxx"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/illinois-ceesd/mirgecom/pull/1072",
+   "commit": null,
+   "actor": "matthiasdiener"
+  }
+ ]
+}

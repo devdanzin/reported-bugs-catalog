@@ -1,0 +1,52 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2826,
+ "type": "issue",
+ "url": "https://github.com/h5py/h5py/issues/2826",
+ "title": "`check_compound_complex` leaks 4 HDF5 type handles per call",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-25T10:05:40Z",
+ "closed_at": "2026-03-28T16:02:37Z",
+ "body": "`H5Tget_member_type()` results are used inline in a boolean expression and discarded without `H5Tclose`. Each call leaks 4 type handles.\n- `_conv.templ.pyx:915-927`\n",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-26T11:41:38Z",
+   "body": "The fix isn't clear to me: \n[`H5Tget_member_type`'s documentation](https://support.hdfgroup.org/documentation/hdf5/latest/group___c_o_m_p_o_u_n_d.html#gaf5de0eabe28246f040342e275b9a63eb) clearly mentions that\n> The caller should invoke [H5Tclose()](https://support.hdfgroup.org/documentation/hdf5/latest/group___h5_t.html#gafcba4db244f6a4d71e99c6e72b8678f0) to release resources associated with the type.\n\nand following this thread:\n> Further access through this datatype identifier is illegal. \n\nThe problem is that `check_compound_complex` never owns the datatype it's calling `H5Tget_member_type` on, so I'm not sure if it should call `H5Tclose` directly or differ to *its* callers... and then I find that\n`complex2compound` and `compound2complex` contain the only call sites, but they *also* don't own the datatype they're passing. This may be just be confusing to *me* as I'm discovering most of the API I'm trying to exploring here, but I think I reached the point where I need a hand. @takluyver would be the obvious person to ask as he wrote this code a couple months back."
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-28T13:03:06Z",
+   "body": "My reading of that is that `check_compound_complex` itself should close the member type IDs that it gets, but not the main type ID that it's called with. I'll have a go at a fix."
+  },
+  {
+   "author": "takluyver",
+   "created_at": "2026-03-28T13:19:09Z",
+   "body": "I've opened #2852 for this"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2825",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/pull/2852",
+   "commit": null,
+   "actor": "takluyver"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

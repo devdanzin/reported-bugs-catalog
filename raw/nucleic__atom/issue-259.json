@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/atom",
+ "number": 259,
+ "type": "issue",
+ "url": "https://github.com/nucleic/atom/issues/259",
+ "title": "SortedMap_new: 4 bugs \u2014 double-incref leak, PyDict_Items leak, self leak on error, unchecked PySequence_GetItem segfault",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:29:04Z",
+ "closed_at": null,
+ "body": "`SortedMap_new` (`sortedmap.cpp:284-331`) has four interrelated bugs:\n\n### 1. Double reference leak from PySequence_GetItem (line 325-326)\n\n`PySequence_GetItem` returns a **new reference**. These raw `PyObject*` are passed to `setitem()` which calls `MapItem(key, value)` constructor (line 36) that does `cppy::incref(key)` and `cppy::incref(value)` \u2014 a second incref. Every key and value stored via this path leaks one reference.\n\n**Reproducer**:\n```python\nimport gc; gc.disable()\nimport os\nfrom atom.datastructures.sortedmap import sortedmap\n\nclass Trackable:\n    live = 0\n    def __init__(self, val):\n        Trackable.live += 1; self.val = val\n    def __del__(self):\n        Trackable.live -= 1\n    def __lt__(self, other): return self.val < other.val\n    def __eq__(self, other): return self.val == other.val\n\npairs = [(Trackable(i), Trackable(i*10)) for i in range(50)]\nm = sortedmap(pairs)\ndel pairs, m\nprint(f\"After del: {Trackable.live} live (should be 0)\")\n# After del: 100 live (should be 0) \u2014 all 100 objects leaked\nos._exit(0)\n```\n\n**Fix**: use `cppy::ptr` to capture the new references and pass via the `MapItem(cppy::ptr&, cppy::ptr&)` overload (line 38):\n```cpp\ncppy::ptr key( PySequence_GetItem( item.get(), 0 ) );\ncppy::ptr val( PySequence_GetItem( item.get(), 1 ) );\nif( !key || !val ) { Py_DECREF(self); return 0; }\ncself->setitem( key.get(), val.get() );\n```\n\n### 2. Unchecked PySequence_GetItem \u2014 segfault (same lines)\n\n`PySequence_GetItem` can return NULL if `__getitem__` raises. The NULL is passed directly to `setitem()` \u2192 `cppy::incref(NULL)` \u2192 segfault.\n\n**Reproducer**:\n```python\nimport gc; gc.disable()\nimport os\nfrom atom.datastructures.sortedmap import sortedmap\n\nclass BrokenPair:\n    def __len__(self): return 2\n    def __getitem__(self, idx):\n        if idx == 0: return \"key\"\n        raise RuntimeError(\"getitem bomb\")\n\nsortedmap([BrokenPair()])  # Segmentation fault\nos._exit(0)\n```\n\n### 3. PyDict_Items return value leaked (line 304)\n\n`PyDict_Items(map)` returns a new reference. It is passed directly to `PyObject_GetIter()` without being stored \u2014 leaked every time a SortedMap is constructed from a dict.\n\n**Fix**: wrap in `cppy::ptr`:\n```cpp\ncppy::ptr items( PyDict_Items( map ) );\nif( !items ) { Py_DECREF(self); return 0; }\nseq = PyObject_GetIter( items.get() );\n```\n\n### 4. `self` leaked on all error paths (lines 306, 313, 323)\n\n`PyType_GenericNew` returns a new reference stored in raw `PyObject* self`. Every early return leaks it.\n\n**Fix**: add `Py_DECREF(self)` before each error return, or wrap `self` in a `cppy::ptr`.\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

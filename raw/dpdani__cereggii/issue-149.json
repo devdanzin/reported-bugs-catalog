@@ -1,0 +1,27 @@
+{
+ "repo": "dpdani/cereggii",
+ "number": 149,
+ "type": "issue",
+ "url": "https://github.com/dpdani/cereggii/issues/149",
+ "title": "Four bugs from allocation-failure fuzzing (get_handle, reduce, __setitem__, concurrent resize)",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "COLLABORATOR",
+ "labels": [
+  "bug",
+  "AtomicDict",
+  "fusil-fuzzer"
+ ],
+ "created_at": "2026-07-07T22:24:56Z",
+ "closed_at": null,
+ "body": "\nI've run fusil in allocation-failure mode on cereggii and four bugs surfaced. Full write-ups (root cause + inline reproducer + proposed fix for each) are in this gist:\n\nhttps://gist.github.com/devdanzin/10536845b9ec874be0b9471258879b55\n\nAll reproduce on a **free-threaded** CPython 3.14 debug + ASan build (`Py_GIL_DISABLED`), on current `main`; run the reproducers with `PYTHON_GIL=0`. One is a reference-counting bug, one is a cyclic-GC accounting bug, and two are NULL-dereferences.\n\nAs discussed, here are PRs for review/merge. Each fix was built and verified on a debug free-threaded ASan build (reproducer flips from crash to clean, full test suite green), and each PR adds a regression test that crashes/fails on the unfixed build and passes with the fix. I also grepped for the same mistake elsewhere in the tree; the audit notes are in each PR.\n\n| # | Bug | PR | Status |\n|---|-----|----|--------|\n| 1 | `AtomicDict` double-`DECREF`s a key when a colliding key's `__eq__` raises | #145 | ready |\n| 3 | `AtomicDict.reduce`/`reduce_count` NULL-deref when a key's `__eq__` raises | #146 | ready |\n| 4 | `get_handle()` dereferences an unchecked allocation under memory pressure (3 sites) | #147 | ready |\n| 2 | Cyclic GC double-counts keys in pages shared across a resize (surfaces as the gist's \"deferred-refcount key\" abort) | #148 | ready |\n\nOn #2 (the one you wanted to think about): the gist framed it as a deferred-refcount corruption, but after pinning it under rr I found the reference count is actually correct \u2014 the bug is a **cyclic-GC double-count of shared pages**. On a resize, `meta_copy_pages` shares page objects between the old and new meta, and a stale per-accessor `storage->meta` keeps the old meta alive. `AtomicDictMeta_traverse` walks its pages inline (`AtomicDictPage_traverse(...)`), so a shared page's keys are reported to the GC once per meta; the collector then subtracts more internal references than the object's refcount, drives `gc_get_refs` negative, and aborts (`validate_gc_objects`: \"refcount is too small\"). It needs enough concurrent inserters to force a resize (8 threads reproduce, 2 don't), and it's fatal with deferred-refcount keys because their `gc_refs` seed (`Py_REFCNT \u2212 _Py_REF_DEFERRED`) is small. rr made this concrete: two different meta objects traversing the same page object.\n\nThe fix makes `AtomicDictPage` a first-class GC node (`Py_TPFLAGS_HAVE_GC` + `tp_traverse`, `PyObject_GC_New`/`Track`/`UnTrack`) and has the meta `Py_VISIT` its pages instead of recursing, so a shared page is traversed once regardless of how many metas reference it \u2014 11 lines, no reference-counting changes, no vendored internals. The gist's proposed `_Py_SetWeakrefAndIncref` guard is therefore not needed. This supersedes it; I've dropped that draft.\n\nSeparately, while running the suite I noticed `test_racy_deletes` crashes intermittently (~1/20) on pristine `main` as well \u2014 a lock-free-read use-after-free in the concurrent delete+insert path (SEGV reading `entry.key` in `expected_update_entry` during a compare). It's unrelated to these four fixes; flagging it in case it isn't already on your radar.\n\n*Investigation, fixes and issue draft by Claude Code (Opus 4.8).*\n",
+ "comments": [
+  {
+   "author": "dpdani",
+   "created_at": "2026-07-08T10:16:32Z",
+   "body": "Thank you so much for reporting and pushing fixes! \u2764\ufe0f\n\nThe PRs mostly look good, I've pointed out some comments that may be overly verbose and sometimes misleading. The GC-related PR unfortunately would be a performance regression, and it needs to be reworked."
+  }
+ ],
+ "timeline_refs": []
+}

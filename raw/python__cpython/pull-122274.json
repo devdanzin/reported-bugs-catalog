@@ -1,0 +1,59 @@
+{
+ "repo": "python/cpython",
+ "number": 122274,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/122274",
+ "title": "gh-122273: Support PyREPL history in Windows",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2024-07-25T10:44:04Z",
+ "closed_at": "2024-11-24T10:28:01Z",
+ "body": "This PR aims to add support for recording and loading command history in Windows, using `_pyrepl.readline` to support handling the history file.\r\n\r\n<!-- gh-issue-number: gh-122273 -->\r\n* Issue: gh-122273\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [
+  {
+   "author": "JeffersGlass",
+   "created_at": "2024-07-29T16:35:41Z",
+   "body": "Gave this a try, and it does appear to work as expected, at least on a stock Windows 10 build:\r\n\r\n![image](https://github.com/user-attachments/assets/c2f0d9f9-d778-46fe-9f4d-929bea006bcb)\r\n\r\n\r\n"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-10-09T07:52:14Z",
+   "body": "@devdanzin: There is now a merge conflict after my latest site change. Would you mind to update your PR?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-22T08:45:12Z",
+   "body": "I'm not fully satisfied by proposed change, so I proposed a PR based somehow on this one: PR gh-127141."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-24T10:28:01Z",
+   "body": "Closing in favor of PR https://github.com/python/cpython/pull/127141, which does it better."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122273",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/125154",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

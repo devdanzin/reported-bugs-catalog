@@ -1,0 +1,52 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2831,
+ "type": "issue",
+ "url": "https://github.com/h5py/h5py/issues/2831",
+ "title": "`H5FD_fileobj_open` has unchecked malloc + immediate deref",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-25T10:09:39Z",
+ "closed_at": "2026-03-28T18:02:10Z",
+ "body": "`stdlib_malloc(sizeof(H5FD_fileobj_t))` result used on the next line without NULL check. Segfault on OOM during file-object open.\n- `h5fd.pyx:132-135`",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-26T11:47:56Z",
+   "body": "The first part (checking malloc's return value) is addressed in #2843 \nthe other part I don't get yet:\n- I don't see what \"immediate deref\" refers to\n- I don't know what you mean by \"OOM\"\n\nCould you clarify these ?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-26T20:01:59Z",
+   "body": "https://github.com/h5py/h5py/pull/2843 fixes the full issue. Immediate deref just means that in the line right after malloc we have a write to a pointer member (`f.fileobj = fileobj`). OOM is an Out of Memory condition, the situation where malloc would return NULL. So the issue is just that malloc may return NULL when there's no memory left and the PR fixes it."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-28T18:02:10Z",
+   "body": "thanks ! in that case we case just close it now !"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/pull/2843",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2825",
+   "commit": null,
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+{
+ "repo": "h5py/h5py",
+ "number": 2852,
+ "type": "pull",
+ "url": "https://github.com/h5py/h5py/pull/2852",
+ "title": "Fix type handles leaking in check_compound_complex",
+ "state": "closed",
+ "state_reason": null,
+ "author": "takluyver",
+ "author_association": "MEMBER",
+ "labels": [
+  "bug"
+ ],
+ "created_at": "2026-03-28T13:18:47Z",
+ "closed_at": "2026-03-28T16:02:36Z",
+ "body": "Check the information from the main type ID first, and if that all matches, get the member types and check their details in turn.\r\n\r\nMy mistake, I'm too used to writing in a language with automatic memory management.\r\n\r\nCloses #2826",
+ "comments": [
+  {
+   "author": "codecov[bot]",
+   "created_at": "2026-03-28T13:29:37Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/h5py/h5py/pull/2852?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py) Report\n:white_check_mark: All modified and coverable lines are covered by tests.\n:white_check_mark: Project coverage is 90.39%. Comparing base ([`e9abe03`](https://app.codecov.io/gh/h5py/h5py/commit/e9abe034a209b4c57b76d6eb780cde9542776e8e?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)) to head ([`90734ec`](https://app.codecov.io/gh/h5py/h5py/commit/90734ec5966ad713c8bbc2326639911e66347382?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py)).\n:warning: Report is 69 commits behind head on master.\n\n<details><summary>Additional details and impacted files</summary>\n\n\n\n```diff\n@@           Coverage Diff           @@\n##           master    #2852   +/-   ##\n=======================================\n  Coverage   90.39%   90.39%           \n=======================================\n  Files          16       16           \n  Lines        2509     2509           \n=======================================\n  Hits         2268     2268           \n  Misses        241      241           \n```\n</details>\n\n[:umbrella: View full report in Codecov by Harness](https://app.codecov.io/gh/h5py/h5py/pull/2852?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=h5py).\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/h5py/h5py/issues/2826",
+   "commit": null,
+   "actor": "takluyver"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "bc1b388e2a563db4366c429e3984391f5e3faa31",
+   "actor": "neutrinoceros"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "neutrinoceros"
+  }
+ ]
+}

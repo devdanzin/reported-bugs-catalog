@@ -1,0 +1,38 @@
+{
+ "repo": "python-pillow/Pillow",
+ "number": 9525,
+ "type": "pull",
+ "url": "https://github.com/python-pillow/Pillow/pull/9525",
+ "title": "Move variable declaration inside define",
+ "state": "closed",
+ "state_reason": null,
+ "author": "radarhere",
+ "author_association": "MEMBER",
+ "labels": [
+  "Cleanup"
+ ],
+ "created_at": "2026-03-31T23:40:13Z",
+ "closed_at": "2026-04-01T03:35:33Z",
+ "body": "Sequel to #9492\r\n\r\nThe `i` variable added in that PR is only used within `#if defined _WIN32 && !defined _WIN64`. This can lead to `warning: unused variable 'i'` on other platforms.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "22cdb5f2e4b15250c06563b1124ac1667342712f",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a5dedfd32aa64ab8ccbc5b90fd456ee2866001fd",
+   "actor": "luketainton"
+  }
+ ]
+}

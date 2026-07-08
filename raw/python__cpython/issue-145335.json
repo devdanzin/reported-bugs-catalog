@@ -1,0 +1,261 @@
+{
+ "repo": "python/cpython",
+ "number": 145335,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/145335",
+ "title": "Segfault from running `os.pathconf(-1, 1)`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2026-02-27T23:17:24Z",
+ "closed_at": "2026-03-03T13:23:52Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe following code will segfault on Python 3.13, 3.14 and main (3.15).\n\n```python\nimport os\nos.pathconf(-1, 1)\n```\n\n<details><summary>Backtrace</summary>\n<p>\n\n\n```\nProgram received signal SIGSEGV, Segmentation fault.\n\n#0  __pathconf (file=0x0, name=name@entry=1) at ../sysdeps/unix/sysv/linux/pathconf.c:58\n#1  0x00005555561fd98d in os_pathconf_impl (module=0x7ccff6fecd20, path=0x7bfff5d00040, name=1) at ./Modules/posixmodule.c:14335\n#2  os_pathconf (module=<optimized out>, args=0x7bfff5dfff28, nargs=<optimized out>, kwnames=<optimized out>) at ./Modules/clinic/posixmodule.c.h:10539\n#3  0x0000555555bfa45c in cfunction_vectorcall_FASTCALL_KEYWORDS (func=func@entry=0x7c7ff7065bc0, args=args@entry=0x7bfff5dfff28, nargsf=nargsf@entry=9223372036854775810,\n    kwnames=kwnames@entry=0x0) at Objects/methodobject.c:465\n#4  0x0000555555ad5f80 in _PyObject_VectorcallTstate (tstate=0x555556a159c8 <_PyRuntime+360584>, callable=0x7c7ff7065bc0, args=0x7bfff5dfff28, nargsf=9223372036854775810, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:136\n#5  0x0000555555e7399d in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., arguments=<optimized out>, total_args=2, kwnames=..., call_instrumentation=<optimized out>,\n    frame=<optimized out>, this_instr=<optimized out>, tstate=<optimized out>) at Python/ceval.c:769\n#6  0x0000555555eaf560 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1817\n#7  0x0000555555e72838 in _PyEval_EvalFrame (tstate=0x555556a159c8 <_PyRuntime+360584>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#8  _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2132\n#9  0x0000555555e72255 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff70893c0) at Python/ceval.c:680\n#10 0x000055555613d66f in run_eval_code_obj (tstate=tstate@entry=0x555556a159c8 <_PyRuntime+360584>, co=co@entry=0x7d1ff7019650, globals=globals@entry=0x7c7ff70893c0,\n    locals=locals@entry=0x7c7ff70893c0) at Python/pythonrun.c:1366\n#11 0x000055555613c83c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1469\n#12 0x0000555556136e3d in pyrun_file (fp=fp@entry=0x7d4ff6fef800, filename=filename@entry=0x7ccff6ffbbf0, start=start@entry=257, globals=globals@entry=0x7c7ff70893c0,\n    locals=locals@entry=0x7c7ff70893c0, closeit=closeit@entry=1, flags=0x7bfff5e1eb10) at Python/pythonrun.c:1294\n#13 0x000055555613499d in _PyRun_SimpleFileObject (fp=<optimized out>, filename=<optimized out>, closeit=<optimized out>, flags=<optimized out>) at Python/pythonrun.c:518\n#14 0x0000555556133d0e in _PyRun_AnyFileObject (fp=fp@entry=0x7d4ff6fef800, filename=filename@entry=0x7ccff6ffbbf0, closeit=closeit@entry=1, flags=flags@entry=0x7bfff5e1eb10)\n    at Python/pythonrun.c:81\n#15 0x00005555561b215b in pymain_run_file_obj (program_name=0x7caff7027bc0, filename=0x7ccff6ffbbf0, skip_source_first_line=0) at Modules/main.c:410\n#16 pymain_run_file (config=0x5555569e0a48 <_PyRuntime+143624>) at Modules/main.c:429\n#17 0x00005555561b0224 in pymain_run_python (exitcode=0x7bfff5e1e700) at Modules/main.c:691\n#18 Py_RunMain () at Modules/main.c:772\n#19 0x00005555561b1127 in pymain_main (args=<optimized out>) at Modules/main.c:802\n#20 0x00005555561b1298 in Py_BytesMain (argc=<optimized out>, argv=0x7fffffffdb48) at Modules/main.c:826\n#21 0x00007ffff7c2a575 in __libc_start_call_main (main=main@entry=0x55555590bc40 <main>, argc=argc@entry=2, argv=argv@entry=0x7fffffffdb48) at ../sysdeps/nptl/libc_start_call_main.h:58\n#22 0x00007ffff7c2a628 in __libc_start_main_impl (main=0x55555590bc40 <main>, argc=2, argv=0x7fffffffdb48, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\n    stack_end=0x7fffffffdb38) at ../csu/libc-start.c:360\n#23 0x00005555558224f5 in _start ()\n```\n\n</p>\n</details>\n\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n\n### CPython versions tested on:\n\nCPython main branch, 3.14, 3.13\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a6+ (heads/main-dirty:5e61a16c105, Feb 24 2026, 19:33:58) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-145341\n* gh-145390\n* gh-145432\n* gh-145433\n* gh-145439\n* gh-145528\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-03T13:23:52Z",
+   "body": "Thanks for the bug report @devdanzin, it's now fixed!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1af1e729180902a4551e9426434fcddd3f196dde",
+   "actor": "gourijain029-del"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/gourijain029-del/cpython/pull/1",
+   "commit": null,
+   "actor": "gourijain029-del"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "14a8e9229028a5f68c0d8a5c8fb3d8b43fcafd21",
+   "actor": "gourijain029-del"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145341",
+   "commit": null,
+   "actor": "gourijain029-del"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145390",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5c3a47b94a39f87c36b1f36704d80775802ad034",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e5a8b0548f14669f5cae7011ef5cd7c6eae10c33",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3a159dffe693520a3ac15fb2c153913f55cade81",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145432",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145433",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d305326458a3d78409bc7721ce4245a5bfbc0a6c",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "504436870b7dacc18a4f88a4beaf0ee80163e4b4",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "12ee4e83aadd7be02b2a1d0a825217703aa36d64",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2e7ed964a56beae32fd419781d90bad2fd017e30",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8fdd7a5ff5d15d002f17b416c9d8a22af29b9f88",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4a115692c5dfa847f7712dcec69db4fdee4732e6",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d57be548267cd5a002c317e446f5909ff768999d",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145439",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "52c8efa87d028e57895d6a44f22caeb99a589711",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8c1b9f422b0149876481b54403eec5426a36af4c",
+   "actor": "hoodmane"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145528",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "23a4e3ba3c44b423eff635672c56d614f5ea3899",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/deep-learnings/pull/11",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/botpress-accuracy-reporters/pull/83",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/coding-tests/pull/43",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-cleaners/pull/32",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/file-extension-converters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/github-wiki-organisers/pull/30",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/itunes-file-delimiter-replacers/pull/28",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/json-data-sorters/pull/21",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/natural-language-processing/pull/10",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/pr-title-printers/pull/17",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/template-creators/pull/16",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/tutorials/pull/219",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hayat01sh1da/web-scrapers/pull/14",
+   "commit": null,
+   "actor": "hayat01sh1da"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7e5a8afd72664dff279961ce691c56a9d182d6e9",
+   "actor": "ljfp"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a70bbfe3b5f8a128d1bc963f2e8f4c25f7ac3575",
+   "actor": "ljfp"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9d93f19d6b4e0271e30a699f3349cfe7a682b123",
+   "actor": "ljfp"
+  }
+ ]
+}

@@ -1,0 +1,134 @@
+{
+ "repo": "python/cpython",
+ "number": 127190,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127190",
+ "title": "Segfault from `asyncio.events._running_loop.__setattr__` with invalid name",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-23T10:38:39Z",
+ "closed_at": "2024-11-28T16:37:43Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter by calling `asyncio.events._running_loop.__setattr__` with a special class as `name`, as in this example:\n\n```python\nimport asyncio.events\n\nclass Liar1:\n    def __eq__(self, other):\n        return True\n\nasyncio.events._running_loop.__setattr__(Liar1(), type)\n\n```\n\nThe backtrace is:\n```gdb\n#0  _copy_characters (to=<optimized out>, to_start=<optimized out>, from=<optimized out>,\n    from_start=<optimized out>, how_many=<optimized out>, check_maxchar=0) at Objects/unicodeobject.c:1530\n#1  0x000055555573497b in _copy_characters (check_maxchar=0, how_many=16842781, from_start=0,\n    from=0x7ffff71a3cb0, to_start=<optimized out>, to=<optimized out>) at Objects/unicodeobject.c:1435\n#2  _PyUnicode_FastCopyCharacters (how_many=16842781, from_start=0, from=0x7ffff71a3cb0,\n    to_start=<optimized out>, to=<optimized out>) at Objects/unicodeobject.c:1562\n#3  _PyUnicodeWriter_WriteStr (writer=0x7fffffffd660, str=0x7ffff71a3cb0) at Objects/unicodeobject.c:13635\n#4  0x0000555555738abd in unicode_fromformat_arg (vargs=0x7fffffffd5d8,\n    f=0x5555558d2a04 \"U' is read-only\", writer=0x7fffffffd660) at Objects/unicodeobject.c:2993\n#5  unicode_from_format (writer=writer@entry=0x7fffffffd660,\n    format=format@entry=0x5555558d29e8 \"'%.100s' object attribute '%U' is read-only\",\n    vargs=vargs@entry=0x7fffffffd6c0) at Objects/unicodeobject.c:3167\n#6  0x0000555555739a1f in PyUnicode_FromFormatV (\n    format=format@entry=0x5555558d29e8 \"'%.100s' object attribute '%U' is read-only\",\n    vargs=vargs@entry=0x7fffffffd6c0) at Objects/unicodeobject.c:3201\n#7  0x00005555557c7770 in _PyErr_FormatV (vargs=0x7fffffffd6c0,\n    format=0x5555558d29e8 \"'%.100s' object attribute '%U' is read-only\",\n    exception=0x555555a89960 <_PyExc_AttributeError>, tstate=0x555555b08c10 <_PyRuntime+313456>)\n    at Python/errors.c:1163\n#8  PyErr_Format (exception=0x555555a89960 <_PyExc_AttributeError>,\n    format=format@entry=0x5555558d29e8 \"'%.100s' object attribute '%U' is read-only\")\n    at Python/errors.c:1198\n#9  0x00005555558a613d in local_setattro (self=0x7ffff718d020, name=0x7ffff71a3cb0,\n    v=0x555555a9c6e0 <PyType_Type>) at ./Modules/_threadmodule.c:1625\n#10 0x00005555556dff7d in wrap_setattr (self=0x7ffff718d020, args=<optimized out>,\n    wrapped=0x5555558a6070 <local_setattro>) at Objects/typeobject.c:9172\n```\nNo threads, free-threading or JIT necessary for this to work.\n\nIn a debug built, an assertion fails instead:\n```\nObjects/unicodeobject.c:640: _PyUnicode_CheckConsistency: Assertion failed: PyType_HasFeature((_Py_TYPE(((PyObject*)((op))))), ((1UL << 28)))\nEnable tracemalloc to get the memory block allocation traceback\n\nobject address  : 0x20000549920\nobject refcount : 2\nobject type     : 0x200011e2810\nobject type name: Liar1\nobject repr     : <__main__.Liar1 object at 0x20000549920>\n\nFatal Python error: _PyObject_AssertFailed: _PyObject_AssertFailed\nPython runtime state: initialized\nAborted\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a2+ experimental free-threading build (heads/main-dirty:a13e94d84bf, Nov 23 2024, 07:16:19) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-127366\n* gh-127367\n* gh-127368\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-23T17:32:45Z",
+   "body": "The report says it's *not* specific to the JIT or free-threading :)\r\n\r\n@devdanzin - if you're able to reproduce an issue on both the default (with GIL) build and free threading, it's probably more helpful to report the `python -VV` output from the main build (instead of free threading)."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-28T14:16:29Z",
+   "body": "The bug is unrelated to asyncio, it's a bug in `threading.local`:\r\n\r\n```py\r\nimport threading\r\n\r\nclass Loop(threading.local):\r\n    attr = 1\r\n\r\nclass Liar1:\r\n    def __eq__(self, other):\r\n        return True\r\n\r\nloop = Loop()\r\nloop.__setattr__(Liar1(), 2)\r\n```\r\n\r\nIt's a minor bug in the error handling of `local_setattro()`. I'm working on a fix."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-28T14:51:09Z",
+   "body": "I wrote PR https://github.com/python/cpython/pull/127366 to fix the issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-28T16:37:44Z",
+   "body": "Fixed by https://github.com/python/cpython/commit/20657fbdb14d50ca4ec115da0cbef155871d8d33. Thanks for your report @devdanzin."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "21065c8c0456cc8f8cc7334b86952cdf3193e0d2",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3aed959e2b155028688984be52a7174728aaa171",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "77a860aa8d568eb94b7dd40adbc693b151119140",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127366",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "20657fbdb14d50ca4ec115da0cbef155871d8d33",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9c60d6804b5bc295b968fa4c3a4c9fffd07c42a5",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d34e204cd772106d6bb030a54c60ea09f4245964",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127367",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127368",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7d175caf212565b3b89cf3c537c38adab52306a5",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5017c81824724f1bd217ac02d5e89874cc4b162c",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c68be6bdb3a96999483632470228018b5b583621",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "73feeee1bc8c2a9e439a569c4bde079908d264e3",
+   "actor": "ebonnal"
+  }
+ ]
+}

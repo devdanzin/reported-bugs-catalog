@@ -1,0 +1,45 @@
+{
+ "repo": "python/cpython",
+ "number": 141797,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/141797",
+ "title": "JIT: assertion failure in `_PyJit_translate_single_bytecode_to_trace`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-11-20T16:16:15Z",
+ "closed_at": "2026-03-10T09:37:30Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to trigger an assertion failure in a JIT build by running the code below:\n\n```python\ndef f1():\n\n    class C:\n        def __init__(self):\n            self._items = [0, 1]\n            self._index = 0\n\n        def __iter__(self):\n            return self\n\n        def __next__(self):\n            if self._index > len(self._items):\n                raise StopIteration\n            self._index += 1\n\n    it = C()\n    _ = [x for x in it if it._items.append(x) or True]\n    \nf1()\n```\n\nBacktrace:\n```\npython: Python/optimizer.c:759: int _PyJit_translate_single_bytecode_to_trace(PyThreadState *, _PyInterpreterFrame *, _Py_CODEUNIT *, int): Assertion `jump_happened == (target_instr[1].cache & 1)' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555556129d8a in _PyJit_translate_single_bytecode_to_trace (tstate=0x555556aead00 <_PyRuntime+358304>, frame=frame@entry=0x7e8ff6de5280, next_instr=next_instr@entry=0x7d2ff6dfd4d6,\n    stop_tracing_opcode=0) at Python/optimizer.c:759\n#8  0x0000555555e5d06d in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:12266\n#9  0x0000555555e49d1b in _PyEval_EvalFrame (tstate=0x555556aead00 <_PyRuntime+358304>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:121\n#10 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:2104\n#11 0x0000555555e49735 in PyEval_EvalCode (co=<optimized out>, globals=<optimized out>, locals=0x7c7ff6e872c0) at Python/ceval.c:944\n#12 0x00005555561bb04f in run_eval_code_obj (tstate=tstate@entry=0x555556aead00 <_PyRuntime+358304>, co=co@entry=0x7d1ff6e1bbd0, globals=globals@entry=0x7c7ff6e872c0,\n    locals=locals@entry=0x7c7ff6e872c0) at Python/pythonrun.c:1372\n#13 0x00005555561ba21c in run_mod (mod=<optimized out>, filename=<optimized out>, globals=<optimized out>, locals=<optimized out>, flags=<optimized out>, arena=<optimized out>,\n    interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1475\n```\n\nOutput from running with `PYTHON_LLTRACE=4`:\n[6_abort_lltrace.txt](https://github.com/user-attachments/files/23658402/6_abort_lltrace.txt)\n\nRunning with `PYTHON_OPT_DEBUG=4` generates no output.\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a2+ (heads/main:b1558b6d3e2, Nov 20 2025, 13:04:18) [Clang 21.1.2 (2ubuntu6)]",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2025-11-20T16:23:13Z",
+   "body": "Simpler MRE:\n```python\nclass BadIterator:\n    def __iter__(self):\n        return self\n    def __next__(self):\n        return 0\n    def __bool__(self):\n        return False\n\nit = BadIterator()\n_ = [x for x in it if it or True]\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-20T17:20:07Z",
+   "body": "I think the assertion at that point is just wrong. We should remove it."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/144742",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "cocolato"
+  }
+ ]
+}

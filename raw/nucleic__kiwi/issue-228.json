@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/kiwi",
+ "number": 228,
+ "type": "issue",
+ "url": "https://github.com/nucleic/kiwi/issues/228",
+ "title": "Solver and strength types missing tp_traverse for heap type; repr methods vulnerable to GC-clear",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T09:01:51Z",
+ "closed_at": null,
+ "body": "Two related type-correctness issues, both primarily relevant under free-threaded Python:\n\n### 1. Solver and strength missing `tp_traverse` visiting `Py_TYPE(self)`\n\nSince Python 3.9, heap types (created via `PyType_FromSpec`) must visit `Py_TYPE(self)` in `tp_traverse` to prevent the type object from being prematurely collected by the GC. The other 4 types in kiwisolver (`Variable`, `Term`, `Expression`, `Constraint`) correctly do this. `Solver` and `strength` do not have `tp_traverse` at all.\n\nSince neither type holds `PyObject*` members, adding GC support requires:\n- Adding `Py_TPFLAGS_HAVE_GC` to the type spec flags\n- Adding a `tp_traverse` that visits `Py_TYPE(self)`\n- Changing `tp_free` to `PyObject_GC_Del`\n- Adding `PyObject_GC_UnTrack` at the top of `tp_dealloc`\n\n### 2. Repr/accessor methods access possibly-cleared members under free-threading\n\n`Constraint_repr`, `Expression_repr`/`Expression_terms`/`Expression_value`, and `Term_repr`/`Term_variable`/`Term_value` access their `PyObject*` members (`self->expression`, `self->terms`, `self->variable`) without NULL checks. These members are set to NULL by `tp_clear` during GC cycle breaking.\n\nUnder the GIL this is safe (GC and method calls are serialized). Under free-threading, if GC clears the object while a repr/accessor is running concurrently, the NULL dereference would crash. Adding `Py_BEGIN_CRITICAL_SECTION` (already used for `Variable.context`) would protect these accesses.\n\nLow priority \u2014 the GC-clear-during-method scenario is very unlikely even under free-threading, but worth noting for completeness.\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}

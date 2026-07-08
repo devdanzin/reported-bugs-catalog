@@ -1,0 +1,83 @@
+{
+ "repo": "python/cpython",
+ "number": 134119,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/134119",
+ "title": "Segfault from template string iterator",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2025-05-17T03:51:04Z",
+ "closed_at": "2025-05-17T20:47:28Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter by repeatedly calling `next()` on an exhausted template string iterator:\n\n```python\ntemplate_iter = iter(t\"{1}\")\nnext(template_iter)\ntry:\n    next(template_iter)\nexcept StopIteration:\n    pass\nnext(template_iter)\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555555b5bf79 in _Py_TYPE (ob=0x0) at ./Include/object.h:270\n270             return ob->ob_type;\n\n#0  0x0000555555b5bf79 in _Py_TYPE (ob=0x0) at ./Include/object.h:270\n#1  PyUnicode_GET_LENGTH (op=0x0) at ./Include/cpython/unicodeobject.h:299\n#2  templateiter_next (op=<string.templatelib.TemplateIter at remote 0x7fffb5084ed0>) at Objects/templateobject.c:26\n#3  0x0000555555d4a21d in builtin_next (self=<optimized out>, args=0x7fffffffafc8, nargs=1) at Python/bltinmodule.c:1644\n#4  0x0000555555ad51e6 in cfunction_vectorcall_FASTCALL (func=<built-in method next of module object at remote 0x7fffb425c8e0>,\n    args=0x7fffffffafc8, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:450\n#5  0x00005555559956f0 in _PyObject_VectorcallTstate (tstate=0x555556755e40 <_PyRuntime+362048>,\n    callable=<built-in method next of module object at remote 0x7fffb425c8e0>, args=0x7fffffffafc8, nargsf=9223372036854775809, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:169\n#6  0x000055555599584b in PyObject_Vectorcall (callable=callable@entry=<built-in method next of module object at remote 0x7fffb425c8e0>,\n    args=args@entry=0x7fffffffafc8, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#7  0x0000555555d870fb in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555556755e40 <_PyRuntime+362048>, frame=frame@entry=0x629000005840,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:1619\n#8  0x0000555555de915d in _PyEval_EvalFrame (throwflag=0, frame=0x629000005840, tstate=0x555556755e40 <_PyRuntime+362048>)\n    at ./Include/internal/pycore_ceval.h:119\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 (heads/main-dirty:fe9f6e829a5, May 13 2025, 11:40:11) [GCC 11.4.0] on linux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-134120\n* gh-134153\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "JelleZijlstra",
+   "created_at": "2025-05-17T20:47:28Z",
+   "body": "Thanks for the report!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2c44d030b610d022ccc9fe5b9f24e3403b36dba5",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134120",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fc7f4c36664314393bd4c30355e21bd7aeac524d",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "519a795677b4c75bf76ce4b0ce5e47f41dce70a8",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/134153",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1ba5e65b76eb0d745e63691bda7206e66f72a961",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "873a0aab3bb0059ea14b4b28fcb0227e7f93119a",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1f0221b96c3cc9face6a10f8b5028c0fe1cfa542",
+   "actor": "taegyunkim"
+  }
+ ]
+}

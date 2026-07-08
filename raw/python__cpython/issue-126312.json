@@ -1,0 +1,120 @@
+{
+ "repo": "python/cpython",
+ "number": 126312,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126312",
+ "title": "GC aborts in debug no-gil build",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-01T21:55:23Z",
+ "closed_at": "2024-11-15T13:48:06Z",
+ "body": "# Crash report\n\n### What happened?\n\nIn debug no-gil builds with `PYTHON_GIL=0`, it's possible to trigger the three assertions here with simple code:\nhttps://github.com/python/cpython/blob/c84a136511c673f495f466887716b55c13b7e3ac/Python/gc_free_threading.c#L550-L558\n\nFor this code:\n```python\nimport gc\ngc.freeze()\ngc.is_finalized(lambda: None)\ngc.collect()\ngc.unfreeze()\ngc.collect()\n```\nWe get:\n```\nPython/gc_free_threading.c:550: validate_refcounts: Assertion \"!gc_is_unreachable(op)\" failed: object should not be marked as unreachable yet\nEnable tracemalloc to get the memory block allocation traceback\n\nobject address  : 0x200007373f0\nobject refcount : 1152921504606846977\nobject type     : 0x55adadc26660\nobject type name: dict\nobject repr     : {'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <_frozen_importlib_external.SourceFileLoader object at 0x20000330a20>, '__spec__': None, '__builtins__': <module 'builtins' (built-in)>, '__file__': '/home/fusil/python-61/gc-assertion-abort-2/source.py', '__cached__': None, 'gc': <module 'gc' (built-in)>}\n\nFatal Python error: _PyObject_AssertFailed: _PyObject_AssertFailed\nPython runtime state: initialized\n\nCurrent thread 0x00007f1b47a64740 (most recent call first):\n  Garbage-collecting\n  File \"/home/fusil/python-61/gc-assertion-abort-2/source.py\", line 6 in <module>\nAborted\n```\n\nFor this code:\n```python\nfrom threading import Thread\nimport gc\n\ngc.freeze()\nalive = [Thread(target=gc.freeze, args=())]\ngc.collect()\ngc.unfreeze()\ngc.collect()\n```\nWe get:\n```\nPython/gc_free_threading.c:554: validate_refcounts: Assertion \"op->ob_tid == 0\" failed: merged objects should have ob_tid == 0\nEnable tracemalloc to get the memory block allocation traceback\n\nobject address  : 0x20000278210\nobject refcount : 1152921504606846994\nobject type     : 0x5616274befc0\nobject type name: type\nobject repr     : <class '_thread.lock'>\n\nFatal Python error: _PyObject_AssertFailed: _PyObject_AssertFailed\nPython runtime state: initialized\n\nCurrent thread 0x00007f34ed160740 (most recent call first):\n  Garbage-collecting\n  File \"/home/fusil/python-104/gc-abort-assertion/source.py\", line 8 in <module>\nAborted\n```\n\nLastly, for code I haven't minimized yet (but can, if it helps), we get:\n```\nPython/gc_free_threading.c:558: validate_refcounts: Assertion \"op->ob_tid != 0\" failed: unmerged objects should have ob_tid != 0\nEnable tracemalloc to get the memory block allocation traceback\n\nobject address  : 0x200007980b0\nobject refcount : 1152921504606846980\nobject type     : 0x5637720b4f40\nobject type name: builtin_function_or_method\nobject repr     : <built-in function collect>\n\nFatal Python error: _PyObject_AssertFailed: _PyObject_AssertFailed\nPython runtime state: initialized\n\nCurrent thread 0x00007f63aef4c740 (most recent call first):\n  Garbage-collecting\n  File \"/home/fusil/python-106/gc-abort-assertion-sigabrt-37/source.py\", line 38 in callMethod\n  File \"/home/fusil/python-106/gc-abort-assertion-sigabrt-37/source.py\", line 42 in callFunc\n  File \"/home/fusil/python-106/gc-abort-assertion-sigabrt-37/source.py\", line 247 in <module>\nAborted\n```\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main:d467d9246c, Nov  1 2024, 09:05:56) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126338\n* gh-126866\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-01T22:01:01Z",
+   "body": "Confirmed on the main branch and 3.13. Interestingly, this doesn't seem to happen on any other objects passed to `is_finalized`, and not even objects of the same type--only lambdas cause this. I did see that the reference count of a lambda is significantly high, but I'm guessing that's just a result of the DRC bits. I'm investigating to see what's going on."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-02T00:58:53Z",
+   "body": "The easiest fix would be to disallow `gc.freeze()` while a GC is in progress."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-02T01:16:19Z",
+   "body": "That doesn't seem to fix it on my end. It looks like freezing is entirely broken on the free-threaded builds:\r\n\r\n```py\r\nimport gc\r\ngc.freeze()\r\n0/0  # Abort\r\n```"
+  },
+  {
+   "author": "rruuaanng",
+   "created_at": "2024-11-02T12:37:28Z",
+   "body": "I will test it and try to fix it when I have time. (This does not affect other people to fix it.)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-02T18:52:31Z",
+   "body": "Ah, I found the problem. The free-threaded GC only ignores a block if that object itself is frozen, but triggering the `tp_traverse` of a non-frozen object can traverse over a frozen one, and that breaks its reference count. I've created #126338 as a fix."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-02T21:37:08Z",
+   "body": "So, there are actually two bugs at play here. One is the problem that I described above, but then another is that objects that have deferred reference counting enabled seem to have some weird issues when getting frozen. A small reproducer for that:\r\n\r\n```py\r\nimport gc\r\nimport unittest\r\n\r\n\r\nclass Test(unittest.TestCase):\r\n    def test_something(self):\r\n        gc.freeze()\r\n        gc.collect()\r\n        gc.unfreeze()\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    unittest.main()\r\n```\r\n\r\n~I'd like my PR to land first before fixing that.~\r\n\r\nEdit: OK, nevermind. As it turns out, the fix was easy. My PR now fixes freezing for DRC as well."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-15T13:48:06Z",
+   "body": "The two reproducer scripts of the first message no longer crash Python. I close the issue.\r\n\r\nThanks @devdanzin for the bug report and @ZeroIntensity for the fix."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126338",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d4c72fed8cba8e15ab7bb6c30a92bc9f2c8f0a2c",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "780e19dd578bf197f074b563fdc5561efc4a8709",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126866",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ecda3ae2a51cdec65996005690391172bc25ca4b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "79813c47aded7a6e5e54a5bc8ab678a8faa1ccfd",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c30d166341ea5a88908d24bc231a6023e7b354b1",
+   "actor": "ebonnal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/142975",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

@@ -1,0 +1,69 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 356,
+ "type": "pull",
+ "url": "https://github.com/simplejson/simplejson/pull/356",
+ "title": "Fix error-as-truthy bugs in maybe_quote_bigint and is_raw_json",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:39:31Z",
+ "closed_at": "2026-04-07T03:10:47Z",
+ "body": "Fixes #350 (part of #348).\n\n## Changes\n\n1. **`maybe_quote_bigint`**: `PyObject_RichCompareBool` returns -1 on error, which is truthy in C. Now checks each comparison for -1 before using as boolean. Previously, a custom `__ge__`/`__le__` raising an exception would abort on debug builds or silently produce wrong output on release builds.\n\n2. **`is_raw_json`**: `PyObject_IsInstance` returns -1 on error. The ternary `? 1 : 0` mapped -1 to 0 (false). Now propagates -1, and the caller in `encoder_listencode_obj` breaks on error.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [
+  {
+   "author": "etrepum",
+   "created_at": "2026-04-06T17:48:13Z",
+   "body": "This one doesn't seem to pass its own test"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-06T18:18:05Z",
+   "body": "Sorry, I hadn't tested in all supported versions. I think it should work now."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-06T18:21:42Z",
+   "body": "While fixing this, I noticed a minor C/Python parity gap in which comparison operators `maybe_quote_bigint` uses:\r\n\r\n- C: `PyObject_RichCompareBool(obj, max, Py_GE)` / `Py_LE` \u2014 calls `__ge__` / `__le__`\r\n- Python: `(-1 << bits) < value < (1 << bits)` \u2014 calls `__lt__` / `__gt__`\r\n\r\nFor plain `int` the results are identical. But for an int subclass that overrides comparison operators inconsistently, the backends could produce different JSON output. For example, an int subclass overriding `__ge__` to return `False` would not be quoted by the C backend but would be quoted by the Python backend.\r\n\r\nThis is unlikely to matter in practice, but if you'd like it aligned I can open a separate issue. The simplest fix would be changing the Python code to match the C operators.\r\n"
+  },
+  {
+   "author": "etrepum",
+   "created_at": "2026-04-07T02:13:51Z",
+   "body": "I don't have strong opinions on aligning the behavior between the python and c implementations when it only happens in situations where the usage isn't correct. The important thing is just that it doesn't create a some kind of leak/segfault/etc."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "d0bffce13b24c55f1074556b93a16a8d81c3cb6e",
+   "actor": "etrepum"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dbf6f64fcea1b8b95ab5b9ad9502899a006990b9",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1621e6cc818b2a097e316a3f193b1458a8cb7c27",
+   "actor": "netbsd-srcmastr"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae7cd18c2df9ba696fad92a31e2755ef468a1b25",
+   "actor": "netbsd-srcmastr"
+  }
+ ]
+}

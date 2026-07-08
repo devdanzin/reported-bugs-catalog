@@ -1,0 +1,94 @@
+{
+ "repo": "python/cpython",
+ "number": 121016,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/121016",
+ "title": "`PYTHON_BASIC_REPL` is not currently tested",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "tests",
+  "topic-repl"
+ ],
+ "created_at": "2024-06-26T01:07:56Z",
+ "closed_at": "2024-06-26T21:17:32Z",
+ "body": "# Bug report\n\n### Bug description:\n\nThe environment variable `PYTHON_BASIC_REPL` is meant to make Python use the basic REPL, but this isn't currently tested to work.\n\n### CPython versions tested on:\n\n3.13, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-121017\n* gh-121064\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/121017",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9e45fd9858a059950f7387b4fda2b00df0e8e537",
+   "actor": "AlexWaygood"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "547f13db20e65a7fe3169d27ae6481d235e76303",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1ac30d54c1d42e0cbf38fecb6f0eb51470f23703",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4ecdb52d463a6ca3839d45ba8c550ef0e4adb91d",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "65f456b9d9269259c767aa255c88617840f78fa5",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/121064",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bc515b332bef0eaa3064d3b912ad660932ad8c90",
+   "actor": "AlexWaygood"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "AlexWaygood"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bcd420442c79a22da4fe21f0e19b35365f1e7e65",
+   "actor": "mrahtz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0bbf153d69eca6559145da2f6c869bce19adf171",
+   "actor": "noahbkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "73474bbf33bcbbd1d9b65108da305f7970952a8a",
+   "actor": "estyxx"
+  }
+ ]
+}

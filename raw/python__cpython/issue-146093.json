@@ -1,0 +1,140 @@
+{
+ "repo": "python/cpython",
+ "number": 146093,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/146093",
+ "title": "`_set_str` missing `NULL` check after `PyUnicode_DecodeASCII` in `_csv.c`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2026-03-17T23:41:13Z",
+ "closed_at": "2026-03-18T17:22:51Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter on OOM by trying to write a CSV row.\n\n### Automated diagnosis:\n\nBug: On OOM, `PyUnicode_DecodeASCII` returns `NULL`, `_set_str` stores `NULL` in `*target` and returns 0 (success). Later `PyUnicode_GET_LENGTH(NULL)` segfaults.\n\nFile: Modules/_csv.c, line 319\n\nMRE:\n```python\nimport _testcapi, csv, io\n\n# Persistent failure ensures the allocation inside _set_str fails\nfor n in range(1, 30):\n    print(n)\n    _testcapi.set_nomemory(n, 0)\n    try:\n        w = csv.writer(io.StringIO())\n        w.writerow([\"a\", \"b\"])\n        _testcapi.remove_mem_hooks()\n        break\n    except MemoryError:\n        _testcapi.remove_mem_hooks()\n```\n\nBacktrace:\n```\nProgram received signal SIGSEGV, Segmentation fault.\ndialect_check_char (name=0x7ffff7fa39e5 \"delimiter\", c=44, dialect=dialect@entry=0x7ffff74dadb0, allowspace=true) at ./Modules/_csv.c:353\n353             PyUnicode_GET_LENGTH(dialect->lineterminator), 1) >= 0)\n\n#0  dialect_check_char (name=0x7ffff7fa39e5 \"delimiter\", c=44, dialect=dialect@entry=0x7ffff74dadb0, allowspace=true) at ./Modules/_csv.c:353\n#1  0x00007ffff7f9ee52 in dialect_new (type=0x555555f539b0, args=0x555555d62c40 <_PyRuntime+135440>, kwargs=0x0) at ./Modules/_csv.c:543\n#2  0x000055555576bd44 in type_call (self=0x555555f539b0, args=<optimized out>, kwds=<optimized out>) at Objects/typeobject.c:2441\n#3  0x00005555556a34b4 in _PyObject_MakeTpCall (tstate=0x555555d99c08 <_PyRuntime+360664>, callable=0x555555f539b0, args=0x0, nargs=0, keywords=0x0) at Objects/call.c:242\n#4  0x00007ffff7fa19d3 in _call_dialect (module_state=0x7ffff72d4cc0, dialect_inst=0x0, kwargs=0x0) at ./Modules/_csv.c:646\n#5  csv_writer (module=0x7ffff72b47a0, args=0x7ffff7477cf0, keyword_args=0x0) at ./Modules/_csv.c:1581\n#6  0x00005555557210e2 in cfunction_call (func=0x7ffff72cf170, args=0x7ffff7477cf0, kwargs=0x0) at Objects/methodobject.c:564\n#7  0x00005555556a34b4 in _PyObject_MakeTpCall (tstate=0x555555d99c08 <_PyRuntime+360664>, callable=0x7ffff72cf170, args=0x7fffffffb628, nargs=1, keywords=0x0) at Objects/call.c:242\n#8  0x000055555583f29d in _Py_VectorCall_StackRefSteal (callable=callable@entry=..., arguments=0x7ffff7fa7090, total_args=total_args@entry=1, kwnames=kwnames@entry=...) at Python/ceval.c:733\n#9  0x00005555558556d6 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, frame=<optimized out>, frame@entry=0x7ffff7fa7020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:4170\n#10 0x000055555583f08b in _PyEval_EvalFrame (tstate=0x555555d99c08 <_PyRuntime+360664>, frame=0x7ffff7fa7020, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#11 _PyEval_Vector (tstate=tstate@entry=0x555555d99c08 <_PyRuntime+360664>, func=func@entry=0x7ffff7466690, locals=locals@entry=0x7ffff746a4b0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2130\n#12 0x000055555583ee1e in PyEval_EvalCode (co=co@entry=0x555555f396d0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0) at Python/ceval.c:686\n#13 0x00005555559c8f8e in run_eval_code_obj (tstate=0x555555d99c08 <_PyRuntime+360664>, co=co@entry=0x555555f396d0, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0)\n    at Python/pythonrun.c:1368\n#14 0x00005555559c8adb in run_mod (mod=mod@entry=0x555555f40fa0, filename=filename@entry=0x7ffff74e8580, globals=globals@entry=0x7ffff746a4b0, locals=locals@entry=0x7ffff746a4b0,\n    flags=0x7fffffffc950, arena=arena@entry=0x7ffff74dad40, interactive_src=0x0, generate_new_source=0) at Python/pythonrun.c:1471\n```\n\n\nFound using [cpython-review-toolkit](https://github.com/devdanzin/cpython-review-toolkit) with Claude Opus 4.6, using the `/cpython-review-toolkit:explore Modules/_csv.c all deep` command.\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a7+ (heads/main:e0f7c1097e1, Mar 17 2026, 18:10:52) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-146113\n* gh-146130\n* gh-146131\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T14:30:28Z",
+   "body": "I wrote https://github.com/python/cpython/pull/146113 to fix the issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-18T17:22:52Z",
+   "body": "Issue fixed by https://github.com/python/cpython/pull/146113. Thanks for the bug report."
+  },
+  {
+   "author": "smontanaro",
+   "created_at": "2026-03-19T14:27:31Z",
+   "body": "I'm certainly no expert on crashers, but would it have been possible to add a unit test for this? Even @devdanzin's report code would seem to have been helpful."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-03-19T14:44:39Z",
+   "body": "Causing PyUnicode_DecodeASCII() to fail with a memory allocation failure requires to tune `_testcapi.set_nomemory()` exactly, but the `set_nomemory()` argument can vary over time if Python internals change.\n\nI don't think that we can write a reliable test with reasonable maintenance."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "75006dd3b4cff362361dc7feaa0c85b6f1c03aec",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c1c30604f5b6e0dda8a5384f098957fd72a5f5aa",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7a09d559d161926edf88c2baa08ee3bd1cfece71",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146113",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "724c7c8146f44a7c737ec4588a1ee4b9db994f6f",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "065bba4962139a5fdfea549314bc1598eac1909b",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146130",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f693ea9d3d6f9352c7d5e8525d7aa7f319bc7359",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146131",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c7d7e1c1a023c0b98ffb8e383fa03934bc834d65",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5feedc759363dec4b9e2b0630bd57b8e4eba28f7",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/145978",
+   "commit": null,
+   "actor": "raminfp"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "24789286598acc3e155c6889edefa8b5be2f31d9",
+   "actor": "ljfp"
+  }
+ ]
+}

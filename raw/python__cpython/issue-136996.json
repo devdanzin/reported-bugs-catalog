@@ -1,0 +1,111 @@
+{
+ "repo": "python/cpython",
+ "number": 136996,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/136996",
+ "title": "JIT: `executor->vm_data.valid` assertion failure in `unlink_executor`",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.14",
+  "topic-JIT"
+ ],
+ "created_at": "2025-07-22T12:46:27Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nSorry about the messy and convoluted bug report, I hope something interesting might be gleaned from it.\n\nIt's possible to non-deterministically abort a special debug JIT build by running the code below, **running from a Python executable from a venv where you installed a package in editable mode**. This darn requirement for an install in editable mode stumped me for hours! \n\nFor this special build, apply this diff (couldn't get it to work in a normal build by changing loop lengths):\n```diff\nindex 454c8dde031..9e21c41421a 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -99,8 +99,8 @@ backoff_counter_triggers(_Py_BackoffCounter counter)\n // Must be larger than ADAPTIVE_COOLDOWN_VALUE, otherwise when JIT code is\n // invalidated we may construct a new trace before the bytecode has properly\n // re-specialized:\n-#define JUMP_BACKWARD_INITIAL_VALUE 4095\n-#define JUMP_BACKWARD_INITIAL_BACKOFF 12\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n+#define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n {\n@@ -112,8 +112,8 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4095\n-#define SIDE_EXIT_INITIAL_BACKOFF 12\n+#define SIDE_EXIT_INITIAL_VALUE 63\n+#define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n initial_temperature_backoff_counter(void)\n```\n\nThis MRE must be invoked like this:\n```bash\n/path/to/venv/with/editable/install/bin/python mre.py\n```\n\nSorry about the long MRE, this code seems stubbornly hard to reduce. MRE:\n```python\nfrom random import random\n\nclass C_object_v1:\n\n    def __getitem__(self, item):\n        return 5\nobject_v1 = C_object_v1()\n\n\nint_v4 = -51452741571812374\nfloat_v6 = 46.1\nfloat_v7 = 77.26\n\nclass StatefulLen_stateful_len_object_v12:\n    def __init__(self):\n        self.len_count = 0\n\n    def __len__(self):\n        _len = 0 if self.len_count < 70 else 99\n        self.len_count += 1\n        return _len\nstateful_len_object_v12 = StatefulLen_stateful_len_object_v12()\n\ndef uop_harness_f1():\n    class StatefulIter_uop_harness_f1_6059:\n\n        def __init__(self):\n            self._iter_count = 0\n            self._iterable = {1, 2, 3}\n\n        def __iter__(self):\n            self._iter_count += 1\n            if self._iter_count <= 67:\n                return iter((None,))\n            return iter(self._iterable)\n    uop_harness_f1_6059 = StatefulIter_uop_harness_f1_6059()\n    evil_iterable = StatefulIter_uop_harness_f1_6059()\n    for _ in range(100):\n        tuple(evil_iterable)\n    object_v1 = globals()['object_v1']\n\n    class SwappedClass_2950:\n        pass\n    object_v1.__class__ = SwappedClass_2950\n    if object_v1:\n        pass\n    for i_loop_9595 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] * 50:\n        res_compareopint = int_v4 > int_v4\n    if random() < 0.01:\n        object_v1.__class__.get_value = lambda *a, **kw: 'patched!'\nfor i_f1 in range(500):\n    try:\n        uop_harness_f1()\n    except Exception:\n        break\n```\n\nBacktrace:\n```\npython: Python/optimizer.c:1436: unlink_executor: Assertion `executor->vm_data.valid' failed.\n\nProgram received signal SIGABRT, Aborted.\nDownload failed: Invalid argument.  Continuing without source file ./nptl/./nptl/pthread_kill.c.\n__pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0)\n    at ./nptl/pthread_kill.c:44\nwarning: 44     ./nptl/pthread_kill.c: No such file or directory\n(gdb) bt\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0)\n    at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6)\n    at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c4579e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c288cd in __GI_abort () at ./stdlib/abort.c:73\n#5  0x00007ffff7c28830 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>,\n    file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3be1f in __assert_fail (assertion=<optimized out>, file=<optimized out>,\n    line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x00005555558a2603 in unlink_executor (executor=executor@entry=0x555555f44480)\n    at Python/optimizer.c:1436\n#8  0x00005555558a31a7 in uop_dealloc (op=op@entry=0x555555f44480) at Python/optimizer.c:271\n#9  0x00005555556dc978 in _Py_Dealloc (op=0x555555f44480) at Objects/object.c:3206\n#10 0x00007ffff71d59f7 in ?? ()\n#11 0x00007fffffffd470 in ?? ()\n#12 0x00007ffff71d522b in ?? ()\n#13 0x00007fffffffd470 in ?? ()\n#14 0x00007ffff71d4017 in ?? ()\n#15 0x0000555555e60c70 in ?? ()\n#16 0x00007ffff71d4000 in ?? ()\n#17 0x0000555555cca298 in _PyRuntime ()\n#18 0x00007ffff7fac0b8 in ?? ()\n#19 0x00007ffff7fac160 in ?? ()\n#20 0x00005555557ca1c0 in _PyEval_EvalFrameDefault (tstate=0xcdcdcdcdcdcdcdcd, frame=0x555555cca298 <_PyRuntime+331064>, throwflag=-842150451)\n    at Python/generated_cases.c.h:5598\nBacktrace stopped: previous frame inner to this frame (corrupt stack?)\n```\n\nHere are the outputs from running with `PYTHON_OPT_DEBUG=4` and `PYTHON_LLTRACE=4`, since they are too long I've attached them as files:\n[opt_debug2.txt](https://github.com/user-attachments/files/21367144/opt_debug2.txt)\n[lltrace2.txt](https://github.com/user-attachments/files/21367143/lltrace2.txt)\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 (heads/main-dirty:6bf1c0ab349, Jul 21 2025, 20:28:08) [GCC 14.2.0]",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-07-22T16:05:49Z",
+   "body": "I can't reproduce this. I installed https://github.com/pypa/sampleproject in editable mode on a JIT with the patch applied, and ran the reproducer in an infinite while loop for some time in bash. No crash."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-22T17:30:32Z",
+   "body": "Please try with https://github.com/devdanzin/lafleur/ installed as editable, with no other packages installed. Seems to do the trick here. Sorry for the bad reproducing steps."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-07-22T18:01:17Z",
+   "body": "OK, here's a reproducer that mimics the effects of having a package installed as editable. Please let me know whether it works.\n\n```python\nimport sys\nfrom importlib.machinery import all_suffixes as module_suffixes  # Not sure why, but this unused import seems necessary\nfrom importlib.util import spec_from_file_location\n\nclass _EditableFinder:\n    @classmethod\n    def _find_spec(cls, fullname, candidate_path):\n        return spec_from_file_location(fullname, candidate_path.with_suffix(\"pyc\"))\n\nsys.meta_path.append(_EditableFinder)\n\nfrom random import random\n\nclass C_object_v1:\n    def __getitem__(self, item):\n        return 5\nobject_v1 = C_object_v1()\n\n\nint_v4 = -51452741571812374\nfloat_v6 = 46.1\nfloat_v7 = 77.26\n\nclass StatefulLen_stateful_len_object_v12:\n    def __init__(self):\n        self.len_count = 0\n\n    def __len__(self):\n        _len = 0 if self.len_count < 70 else 99\n        self.len_count += 1\n        return _len\nstateful_len_object_v12 = StatefulLen_stateful_len_object_v12()\n\ndef uop_harness_f1():\n    class StatefulIter_uop_harness_f1_6059:\n\n        def __init__(self):\n            self._iter_count = 0\n            self._iterable = {1, 2, 3}\n\n        def __iter__(self):\n            self._iter_count += 1\n            if self._iter_count <= 67:\n                return iter((None,))\n            return iter(self._iterable)\n    uop_harness_f1_6059 = StatefulIter_uop_harness_f1_6059()\n    evil_iterable = StatefulIter_uop_harness_f1_6059()\n    for _ in range(100):\n        tuple(evil_iterable)\n    object_v1 = globals()['object_v1']\n\n    class SwappedClass_2950:\n        pass\n    object_v1.__class__ = SwappedClass_2950\n    if object_v1:\n        pass\n    for i_loop_9595 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] * 50:\n        res_compareopint = int_v4 > int_v4\n    if random() < 0.01:\n        object_v1.__class__.get_value = lambda *a, **kw: 'patched!'\nfor i_f1 in range(500):\n    try:\n        uop_harness_f1()\n    except Exception:\n        break\n\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-07-22T18:06:05Z",
+   "body": "Reproduced. Thanks!"
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-22T19:20:20Z",
+   "body": "I'm making some progress on reducing. Here's what I've got so far:\n\n```py\nimport gc\n\nclass C1:\n    pass\n\nO = C1()\n\ngc.set_threshold(1)\n\nfor i in range(326):\n    for j in []:\n        pass\n    class C2:\n        pass\n    O.__class__ = C2\n    if O:\n        pass\n```\n\nI'm working now on bringing the JIT thresholds back up."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-22T19:21:54Z",
+   "body": "BTW the imports were just to get the GC in a ready-to-crash state. `gc.set_threshold(1)` is usually my go-to for removing that factor."
+  },
+  {
+   "author": "brandtbucher",
+   "created_at": "2025-07-22T19:54:07Z",
+   "body": "Higher JIT thresholds aren't reproducing. Highest I can get is cranking up the number of loops from 326 to 12868 to reproduce with thresholds of 127 instead of 63."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-07-23T12:25:46Z",
+   "body": "Thanks Brandt for the repro. Based on debugging this, I speculate the following is happening:\nThe code which crashes is\n```\n        case _EXIT_TRACE: {\n        ....\n            if (exit->executor && !exit->executor->vm_data.valid) {\n                exit->temperature = initial_temperature_backoff_counter();\n                _PyFrame_SetStackPointer(frame, stack_pointer);\n                Py_CLEAR(exit->executor);  // THIS CRASHES\n                stack_pointer = _PyFrame_GetStackPointer(frame);\n            }\n```\nThis causes `assert(executor->vm_data.valid);` to fail. The assert is clearly wrong in this case as we only free the exit trace executor when the data is no longer valid.\n\nI think the correct thing is just to remove the assertion. WDYT Brandt?"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-01T17:47:55Z",
+   "body": "@devdanzin can you still repro this on main? Mark recently changed the `_EXIT_TRACE` mechanism."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-01T17:51:13Z",
+   "body": "I cannot reproduce on main anymore. I can still reproduce on 3.14. However, since the JIT is experimental, I'm reluctant to backport any changes to 3.14, especially when it deals with executor lifetimes.\n\nThe fix should be https://github.com/python/cpython/pull/136411"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-09-01T22:21:32Z",
+   "body": "> [@devdanzin](https://github.com/devdanzin) can you still repro this on main? Mark recently changed the `_EXIT_TRACE` mechanism.\n\nIt repros for me in main if we remove the gc tuning from Brandt's MRE:\n\n```python\nclass C1:\n    pass\n\nO = C1()\n\nfor i in range(326):\n    for j in []:\n        pass\n    class C2:\n        pass\n    O.__class__ = C2\n    if O:\n        pass\n```\n\nDoes this abort for you too?"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-02T11:31:04Z",
+   "body": "@devdanzin I can't reproduce the segfault on main.\n\nWhat build flags are you using?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-09-03T09:00:09Z",
+   "body": "I cannot reproduce the segfault either, just the abort. On another machine, it's necessary to add the GC tuning back to get the abort:\n\n```python\nimport gc\ngc.set_threshold(1)\n\nclass C1:\n    pass\n\nO = C1()\n\nfor i in range(326):\n    for j in []:\n        pass\n    class C2:\n        pass\n    O.__class__ = C2\n    if O:\n        pass\n```\n\nI'm using the simplest config flags to get a debug JIT build:\n```\n./configure --with-pydebug --enable-experimental-jit && make -j 14\n```\n\n"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-03T09:12:00Z",
+   "body": "Reproduced without the GC tuning on my machine."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-03T10:00:43Z",
+   "body": "The failing assertion is in `unlink_executor`'s `assert(executor->vm_data.valid);`. I think the assertion is just wrong. I don't see how an executor that is being unlinked should be guaranteed to be valid. Here's what happens:\n\n```\n        case _START_EXECUTOR: {\n            PyObject *executor = (PyObject *)CURRENT_OPERAND0();\n            #ifndef _Py_JIT\n            assert(current_executor == (_PyExecutorObject*)executor);\n            #endif\n            assert(tstate->jit_exit == NULL || tstate->jit_exit->executor == current_executor);\n            tstate->current_executor = (PyObject *)executor;\n            if (!current_executor->vm_data.valid) {\n                assert(tstate->jit_exit->executor == current_executor);\n                assert(tstate->current_executor == executor);\n                _PyFrame_SetStackPointer(frame, stack_pointer);\n                _PyExecutor_ClearExit(tstate->jit_exit);   <------------ this gets called\n                stack_pointer = _PyFrame_GetStackPointer(frame);\n                if (true) {\n                    UOP_STAT_INC(uopcode, miss);\n                    JUMP_TO_JUMP_TARGET();\n                }\n            }\n            break;\n        }\n```\nIf you look above, the branch taken is in `!current_executor->vm_data.valid`. That means the current executor is not valid, and we clear it. Yet when we clear it, we assert it's valid??? Seems like a buggy assertion. @markshannon WDYT?"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/lafleur/issues/12",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/devdanzin/lafleur/issues/18",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

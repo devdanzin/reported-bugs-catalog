@@ -1,0 +1,164 @@
+{
+ "repo": "python/cpython",
+ "number": 122145,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/122145",
+ "title": "Exception raised in traceback.StackSummary._should_show_carets exits interpreter: IndexError on tree.body[0]",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug"
+ ],
+ "created_at": "2024-07-22T23:32:38Z",
+ "closed_at": "2024-09-18T16:56:27Z",
+ "body": "# Bug report\r\n\r\n### Bug description:\r\n\r\nRunning the code sample from #122071 in  3.13.0b4 or main exits the interpreter due to `traceback.StackSummary._should_show_carets` raising an exception:\r\n```python\r\n>>> exec(compile(\"tuple()[0]\", \"s\", \"exec\"))\r\nTraceback (most recent call last):\r\nException ignored in the internal traceback machinery:\r\nTraceback (most recent call last):\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 139, in _print_exception_bltin\r\n    return print_exception(exc, limit=BUILTIN_EXCEPTION_LIMIT, file=file, colorize=colorize)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 130, in print_exception\r\n    te.print(file=file, chain=chain, colorize=colorize)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 1448, in print\r\n    for line in self.format(chain=chain, colorize=colorize):\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 1384, in format\r\n    yield from _ctx.emit(exc.stack.format(colorize=colorize))\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 747, in format\r\n    formatted_frame = self.format_frame_summary(frame_summary, colorize=colorize)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 583, in format_frame_summary\r\n    show_carets = self._should_show_carets(start_offset, end_offset, all_lines, anchors)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 701, in _should_show_carets\r\n    statement = tree.body[0]\r\nIndexError: list index out of range\r\nTraceback (most recent call last):\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\code.py\", line 91, in runcode\r\n    exec(code, self.locals)\r\n  File \"<python-input-2>\", line 1, in <module>\r\n  File \"s\", line 1, in <module>\r\nIndexError: tuple index out of range\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\runpy.py\", line 198, in _run_module_as_main\r\n    return _run_code(code, main_globals, None,\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\runpy.py\", line 88, in _run_code\r\n    exec(code, run_globals)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\__main__.py\", line 6, in <module>\r\n    __pyrepl_interactive_console()\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\main.py\", line 59, in interactive_console\r\n    run_multiline_interactive_console(console)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\simple_interact.py\", line 156, in run_multiline_interactive_console\r\n    more = console.push(_strip_final_indent(statement), filename=input_name, _symbol=\"single\")  # type: ignore[call-arg]\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\code.py\", line 303, in push\r\n    more = self.runsource(source, filename, symbol=_symbol)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\console.py\", line 200, in runsource\r\n    self.runcode(code)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\code.py\", line 95, in runcode\r\n    self.showtraceback()\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\_pyrepl\\console.py\", line 168, in showtraceback\r\n    super().showtraceback(colorize=self.can_colorize)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\code.py\", line 147, in showtraceback\r\n    lines = traceback.format_exception(ei[0], ei[1], last_tb.tb_next, colorize=colorize)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 155, in format_exception\r\n    return list(te.format(chain=chain, colorize=colorize))\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 1384, in format\r\n    yield from _ctx.emit(exc.stack.format(colorize=colorize))\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 747, in format\r\n    formatted_frame = self.format_frame_summary(frame_summary, colorize=colorize)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 583, in format_frame_summary\r\n    show_carets = self._should_show_carets(start_offset, end_offset, all_lines, anchors)\r\n  File \"~\\PycharmProjects\\cpython\\Lib\\traceback.py\", line 701, in _should_show_carets\r\n    statement = tree.body[0]\r\nIndexError: list index out of range\r\n[Thread 31424.0x8ec0 exited with code 1]\r\n[Thread 31424.0x15dc exited with code 1]\r\n[Thread 31424.0x8b8c exited with code 1]\r\n[Inferior 1 (process 31424) exited with code 01]\r\n```\r\n\r\nWe can either protect the `_should_show_carets` call with `suppress(Exception)` here: \r\nhttps://github.com/python/cpython/blob/2762c6cc5e4c1c0d630568db5fbba7a3a71a507c/Lib/traceback.py#L581-L583\r\n\r\nOr guard against `tree.body` being empty here:\r\nhttps://github.com/python/cpython/blob/2762c6cc5e4c1c0d630568db5fbba7a3a71a507c/Lib/traceback.py#L700-L701\r\n\r\n(or both?)\r\n\r\nShould I submit a PR with one of the fixes above? Any preferences?\r\n\r\n### CPython versions tested on:\r\n\r\n3.13, CPython main branch\r\n\r\n### Operating systems tested on:\r\n\r\nWindows, Linux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-122161\n* gh-124214\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-07-23T01:12:50Z",
+   "body": "In my opinion, we should figure out that issue first. This is probably something that should not happen - it's kind of equivalent to a comment only file generates an exception, that's just impossible."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-23T01:46:12Z",
+   "body": "> In my opinion, we should figure out that issue first. This is probably something that should not happen - it's kind of equivalent to a comment only file generates an exception, that's just impossible.\r\n\r\nIndeed, ISTM that due to the linecache bug we try to parse \"lines\" consisting of only a comment then access the tree's body first node. So fixing that issue will fix this specific failure.\r\n\r\nMaybe it would still be interesting to make the code more robust against exceptions in `_should_show_carets`?"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2024-07-23T08:46:45Z",
+   "body": "Looks like there are two bugs:\r\n1. With incorrect module detection, exception is not in `Lib/_pyrepl/__main__.py` (this file is used for sources)\r\n2. But, `tree.body` can be empty in other cases as well, so why not guard it?\r\n\r\n```diff\r\ndiff --git Lib/traceback.py Lib/traceback.py\r\nindex 6ee1a50ca68..eba6f03a3c6 100644\r\n--- Lib/traceback.py\r\n+++ Lib/traceback.py\r\n@@ -698,6 +698,8 @@ def _should_show_carets(self, start_offset, end_offset, all_lines, anchors):\r\n         with suppress(SyntaxError, ImportError):\r\n             import ast\r\n             tree = ast.parse('\\n'.join(all_lines))\r\n+            if not tree.body:\r\n+                return False\r\n             statement = tree.body[0]\r\n             value = None\r\n             def _spawns_full_line(value):\r\n```\r\n\r\nAfter:\r\n\r\n```\r\n\u00bb ./python.exe\r\nPython 3.14.0a0 (heads/main-dirty:3de092b82f5, Jul 20 2024, 09:23:52) [Clang 15.0.0 (clang-1500.3.9.4)] on darwin\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>> exec(compile(\"tuple()[0]\", \"s\", \"exec\"))\r\nTraceback (most recent call last):\r\n  File \"<python-input-0>\", line 1, in <module>\r\n    exec(compile(\"tuple()[0]\", \"s\", \"exec\"))\r\n    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"s\", line 1, in <module>\r\n    # Important: don't add things to this module, as they will end up in the REPL's\r\nIndexError: tuple index out of range\r\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-23T10:39:51Z",
+   "body": "I've fixed the second issue and added a test for that one. I can move to fixing the first issue as well."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-23T11:15:56Z",
+   "body": ">     2. But, `tree.body` can be empty in other cases as well, so why not guard it?\r\n\r\nExactly. Another way to get an empty `tree.body` is to run:\r\n```python\r\nexec(compile(\"tuple()[0]\", \"x.py\", \"exec\"))\r\n```\r\n\r\nWhere you have a x.py file that consists of:\r\n```python\r\n# Just a comment.\r\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-23T12:07:22Z",
+   "body": "~~Yet another way to get an empty `tree.body`:~~\r\n```python\r\nexec(compile(\"print(2**100000)\", \"s\", \"exec\"))\r\n```\r\n\r\nEDIT: never mind, I had reverted the fix."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-07-23T12:09:26Z",
+   "body": "Errr... ok. I'll amend the NEWS entry in the PR since it only talks about comments.\r\n\r\nEDIT: Actually, I think you can only have an empty AST body if you are either an empty string or if you are a comment."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-30T12:27:36Z",
+   "body": "In `StackSummary.format_frame_summary`, `StackSummary._should_show_carets` is called without error suppression (like is done for `_extract_caret_anchors_from_line_segment`). This causes any errors in that method to exit the interpreter. I suggest we also ignore errors from `_should_show_carets` here:\r\n\r\nhttps://github.com/python/cpython/blob/d27a53fc02a87e76066fc4e15ff1fff3922a482d/Lib/traceback.py#L581-L583\r\n\r\nThis time, an error in parsing a too deeply nested structure exits the interpreter:\r\n```python\r\n>>> with open(\"lambda.txt\", \"w\") as n:\r\n...     n.write(\"lambda: lambda: \" * 1000 + \"None\")\r\n...\r\n16004\r\n>>> exec(compile(\"str(2**100000)\", \"lambda.txt\", \"exec\"))\r\nTraceback (most recent call last):\r\nException ignored in the internal traceback machinery:\r\nTraceback (most recent call last):\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 139, in _print_exception_bltin\r\n    return print_exception(exc, limit=BUILTIN_EXCEPTION_LIMIT, file=file, colorize=colorize)\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 130, in print_exception\r\n    te.print(file=file, chain=chain, colorize=colorize)\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1449, in print\r\n    for line in self.format(chain=chain, colorize=colorize):\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1385, in format\r\n    yield from _ctx.emit(exc.stack.format(colorize=colorize))\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 748, in format\r\n    formatted_frame = self.format_frame_summary(frame_summary, colorize=colorize)\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 583, in format_frame_summary\r\n    show_carets = self._should_show_carets(start_offset, end_offset, all_lines, anchors)\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 701, in _should_show_carets\r\n    tree = ast.parse('\\n'.join(all_lines))\r\n  File \"/home/danzin/projects/cpython/Lib/ast.py\", line 53, in parse\r\n    return compile(source, filename, mode, flags,\r\nRecursionError: maximum recursion depth exceeded during compilation\r\nTraceback (most recent call last):\r\n  File \"/home/danzin/projects/cpython/Lib/code.py\", line 91, in runcode\r\n    exec(code, self.locals)\r\n  File \"<python-input-1>\", line 1, in <module>\r\n  File \"lambda.txt\", line 1, in <module>\r\n    lambda: lambda: lambda: lambda: lambda: [...] lambda: None\r\nValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"/home/danzin/projects/cpython/Lib/runpy.py\", line 198, in _run_module_as_main\r\n    return _run_code(code, main_globals, None,\r\n  File \"/home/danzin/projects/cpython/Lib/runpy.py\", line 88, in _run_code\r\n    exec(code, run_globals)\r\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/__main__.py\", line 6, in <module>\r\n    __pyrepl_interactive_console()\r\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/main.py\", line 59, in interactive_console\r\n    run_multiline_interactive_console(console)\r\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/simple_interact.py\", line 156, in run_multiline_interactive_console\r\n    more = console.push(_strip_final_indent(statement), filename=input_name, _symbol=\"single\")  # type: ignore[call-arg]\r\n  File \"/home/danzin/projects/cpython/Lib/code.py\", line 303, in push\r\n    more = self.runsource(source, filename, symbol=_symbol)\r\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/console.py\", line 200, in runsource\r\n    self.runcode(code)\r\n  File \"/home/danzin/projects/cpython/Lib/code.py\", line 95, in runcode\r\n    self.showtraceback()\r\n  File \"/home/danzin/projects/cpython/Lib/_pyrepl/console.py\", line 168, in showtraceback\r\n    super().showtraceback(colorize=self.can_colorize)\r\n  File \"/home/danzin/projects/cpython/Lib/code.py\", line 147, in showtraceback\r\n    lines = traceback.format_exception(ei[0], ei[1], last_tb.tb_next, colorize=colorize)\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 155, in format_exception\r\n    return list(te.format(chain=chain, colorize=colorize))\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 1385, in format\r\n    yield from _ctx.emit(exc.stack.format(colorize=colorize))\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 748, in format\r\n    formatted_frame = self.format_frame_summary(frame_summary, colorize=colorize)\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 583, in format_frame_summary\r\n    show_carets = self._should_show_carets(start_offset, end_offset, all_lines, anchors)\r\n  File \"/home/danzin/projects/cpython/Lib/traceback.py\", line 701, in _should_show_carets\r\n    tree = ast.parse('\\n'.join(all_lines))\r\n  File \"/home/danzin/projects/cpython/Lib/ast.py\", line 53, in parse\r\n    return compile(source, filename, mode, flags,\r\nRecursionError: maximum recursion depth exceeded during compilation\r\n```\r\n\r\nIf an even deeper nested structure is used, `MemoryError` is raised, but somehow doesn't exit the interpreter.\r\n\r\nDoesn't seem to affect 3.13. Should a new issue be created for this one?"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-17T09:56:39Z",
+   "body": "IMO https://github.com/python/cpython/issues/122071 is a duplicate of this issue."
+  },
+  {
+   "author": "hroncok",
+   "created_at": "2024-09-17T11:33:45Z",
+   "body": "> IMO #122071 is a duplicate of this issue.\r\n\r\nI think #122071 affects all the Python versions:\r\n\r\n```python\r\n# Hi, I'm in the error message\r\nimport traceback\r\ntry:\r\n    exec(compile(\"tuple()[0]\", \"s\", \"exec\"))\r\nexcept:\r\n    traceback.print_exc()\r\n```\r\n\r\n```\r\n$ python3.12 repro.py \r\nTraceback (most recent call last):\r\n  File \"/home/churchyard/tmp/repro.py\", line 4, in <module>\r\n    exec(compile(\"tuple()[0]\", \"s\", \"exec\"))\r\n  File \"s\", line 1, in <module>\r\n    # Hi, I'm in the error message\r\n    ^^^^^^^^^^\r\nIndexError: tuple index out of range\r\n```\r\n\r\n\r\nWhile this one only affects Python 3.13, e.g.:\r\n\r\n```pycon\r\n>>> code = \"#boom\\nraise RuntimeError('see the line above')\"\r\n>>> eval(compile(code, \"str_eval\", \"exec\"))\r\nTraceback (most recent call last):\r\nTraceback (most recent call last):\r\n  File \"<python-input-1>\", line 1, in <module>\r\n  File \"str_eval\", line 2, in <module>\r\nRuntimeError: see the line above\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\r\n  File \"<frozen runpy>\", line 88, in _run_code\r\n  File \"/usr/lib64/python3.13/_pyrepl/__main__.py\", line 6, in <module>\r\n    __pyrepl_interactive_console()\r\n  File \"/usr/lib64/python3.13/_pyrepl/main.py\", line 59, in interactive_console\r\n    run_multiline_interactive_console(console)\r\n  File \"/usr/lib64/python3.13/_pyrepl/simple_interact.py\", line 157, in run_multiline_interactive_console\r\n    more = console.push(_strip_final_indent(statement), filename=input_name, _symbol=\"single\")  # type: ignore[call-arg]\r\n  File \"/usr/lib64/python3.13/code.py\", line 313, in push\r\n    more = self.runsource(source, filename, symbol=_symbol)\r\n  File \"/usr/lib64/python3.13/_pyrepl/console.py\", line 205, in runsource\r\n    self.runcode(code)\r\n  File \"/usr/lib64/python3.13/code.py\", line 96, in runcode\r\n    self.showtraceback()\r\n  File \"/usr/lib64/python3.13/code.py\", line 129, in showtraceback\r\n    self._showtraceback(typ, value, tb.tb_next, '')\r\n  File \"/usr/lib64/python3.13/code.py\", line 144, in _showtraceback\r\n    self._excepthook(typ, value, tb)\r\n  File \"/usr/lib64/python3.13/_pyrepl/console.py\", line 169, in _excepthook\r\n    lines = traceback.format_exception(\r\n  File \"/usr/lib64/python3.13/traceback.py\", line 155, in format_exception\r\n    return list(te.format(chain=chain, colorize=colorize))\r\n  File \"/usr/lib64/python3.13/traceback.py\", line 1388, in format\r\n    yield from _ctx.emit(exc.stack.format(colorize=colorize))\r\n  File \"/usr/lib64/python3.13/traceback.py\", line 747, in format\r\n    formatted_frame = self.format_frame_summary(frame_summary, colorize=colorize)\r\n  File \"/usr/lib64/python3.13/traceback.py\", line 583, in format_frame_summary\r\n    show_carets = self._should_show_carets(start_offset, end_offset, all_lines, anchors)\r\n  File \"/usr/lib64/python3.13/traceback.py\", line 701, in _should_show_carets\r\n    statement = tree.body[0]\r\nIndexError: list index out of range\r\n```\r\n\r\nI think they build on top of each other -- when https://github.com/python/cpython/issues/122071 is fixed, this one will likely also get fixed, but I am not quite sure."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-18T12:32:45Z",
+   "body": "This bug is impacting Fedora Installer (Anaconda) and was marked as a Fedora 41 blocker issue: https://bugzilla.redhat.com/show_bug.cgi?id=2311907 So I also mark this bug as a blocker issue."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-18T16:45:07Z",
+   "body": "@Yhg1s explained me that if we add a bugfix after 3.13rc2, another rc3 is needed. I don't think that this bug should require a whole new rc3. So I removed the release-blocker label. The fix can wait for 3.13.1 even if it's bad.\r\n\r\nFor Fedora, we can have a downstream patch to unblock Fedora 41, until the fix is merged into the 3.13 branch."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-09-18T16:56:27Z",
+   "body": "Bug fixed by the change https://github.com/python/cpython/commit/5cd50cb6eb28e525f0c838e049e900ea982a5a23. A backport to 3.13 will follow. I close the issue.\r\n\r\nSee https://github.com/python/cpython/issues/122071 for the second traceback bug."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122161",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122170",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/122126",
+   "commit": null,
+   "actor": "lhish"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/124060",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/122071",
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5cd50cb6eb28e525f0c838e049e900ea982a5a23",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d474ae35a3db3f77c8721b0c00a06dd2d13d4769",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/124214",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/124219",
+   "commit": null,
+   "actor": "zware"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ec030e4408c42970a7580c86c6db49553e41669",
+   "actor": "hroncok"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "96c03b366d4f2430d5662271ee4c7c4928469cf9",
+   "actor": "savannahostrowski"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "99dc0893c7e680a3d6b7c2a917a569681b95b8de",
+   "actor": "Yhg1s"
+  }
+ ]
+}

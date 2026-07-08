@@ -1,0 +1,36 @@
+{
+ "repo": "python/cpython",
+ "number": 127234,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127234",
+ "title": "Assertion failures from `_interpchannels._register_end_types` ",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-subinterpreters",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-24T18:13:16Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort a debug build by calling `_interpchannels._register_end_types`  with invalid values:\n\n```python\nimport _interpchannels\n\n_interpchannels._register_end_types(int, int)\n```\nAbort on 3.13:\n```\npython: Python/crossinterp_data_lookup.h:260: _PyCrossInterpreterData_RegisterClass: Assertion `matched->getdata == getdata' failed.\nAborted\n```\nAbort on main:\n```\npython: Python/crossinterp_data_lookup.h:271: _PyXIData_RegisterClass: Assertion `matched->getdata == getdata' failed.\nAborted\n```\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.13.0+ (heads/3.13:746a0c5, Nov 20 2024, 21:39:05) [GCC 13.2.0]",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-25T15:21:01Z",
+   "body": "I'm not sure this is worth fixing. `_interpchannels` is completely private--the difference with `_intepreters` is that it's eventually going to be exposed publicly with PEP 734 as a wrapper over it."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  }
+ ]
+}

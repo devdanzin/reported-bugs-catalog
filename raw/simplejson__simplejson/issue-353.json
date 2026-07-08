@@ -1,0 +1,48 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 353,
+ "type": "issue",
+ "url": "https://github.com/simplejson/simplejson/issues/353",
+ "title": "NULL dereferences on OOM in module init and static string initialization",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:22:40Z",
+ "closed_at": "2026-04-06T17:41:31Z",
+ "body": "Part of #348 (C extension analysis). [Full report](https://gist.github.com/devdanzin/e8a25ea988dc0461c2fd378efd84a8a3).\n\n## Finding 4: `moduleinit` NULL deref after `PyModule_Create`\n\n**Lines 3385-3392.** `PyModule_Create` return not checked for NULL before `PyModule_AddObject`. Crash on OOM during import.\n\n**Suggested fix:** Add `if (m == NULL) return NULL;` after `PyModule_Create`.\n\nAlso: the `PyModule_AddObject` return values are unchecked \u2014 on failure, the added object's reference is leaked. Consider migrating to `PyModule_AddObjectRef` (available since 3.10).\n\n---\n\n## Finding 8: `_encoded_const` `Py_INCREF(NULL)` on lazy init failure\n\n**Lines 2700-2722.** If `JSON_InternFromString(\"null\")` fails, `s_null` stays NULL. Next line does `Py_INCREF(s_null)` \u2192 NULL pointer dereference. Same for `s_true`, `s_false`, `s_open_dict`, etc.\n\n**Suggested fix:**\n```c\ns_null = JSON_InternFromString(\"null\");\nif (s_null == NULL) return NULL;\n```\n\n---\n\n## Finding 9: Partial static init leaves NULL statics for subsequent calls\n\n**Lines 2982-2987, 3123-3128.** In `encoder_listencode_dict` and `encoder_listencode_list`: if the first `JSON_InternFromString` succeeds but a later one fails, subsequent calls skip the init check (first static is non-NULL) and use the remaining NULL statics \u2192 crash.\n\n**Suggested fix:** Check each `JSON_InternFromString` individually:\n```c\nif (s_open_dict == NULL) {\n    s_open_dict = JSON_InternFromString(\"{\");\n    if (s_open_dict == NULL) return -1;\n}\nif (s_close_dict == NULL) {\n    s_close_dict = JSON_InternFromString(\"}\");\n    if (s_close_dict == NULL) return -1;\n}\n// ... etc for each static\n```",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/348",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "284e7f38190c4d95104f821d3b4a10e0237f3127",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/359",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "188b4378d3a0b94c2b214c4a1ea25f154208d01a",
+   "actor": "devdanzin"
+  }
+ ]
+}

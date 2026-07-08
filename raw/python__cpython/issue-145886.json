@@ -1,0 +1,126 @@
+{
+ "repo": "python/cpython",
+ "number": 145886,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/145886",
+ "title": "`Event.raw` being added to itself instead of to another event's `.raw` in `UnixConsole.getpending`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "stdlib",
+  "topic-repl"
+ ],
+ "created_at": "2026-03-12T21:11:55Z",
+ "closed_at": "2026-05-25T10:42:36Z",
+ "body": "# Bug report\n\n### Bug description:\n\nThere is a small bug in `_pyrepl.unix_console.UnixConsole.getpending`, where instead of adding the raw data of event 2, we add the raw data of event 1 to itself:\nhttps://github.com/python/cpython/blob/cd5217283112d41c0244e2d96302cbe33f0b4cb1/Lib/_pyrepl/unix_console.py#L540-L546\n\nWe can just fix the typo: `e.raw += e.raw` becomes `e.raw += e2.raw`. It's feasible to add a test for this.\n\nBut `Event.raw` isn't read anywhere and is untested. The 3 callers of `getpending()` only use `ev.data` or `pending.data`. The `.raw` field is only written to, never consumed. So we can simply remove it from `Event` and adapt some lines (summary below written with Claude Code).\n\nPlease let me know which solution is preferred and I can write a trivial PR to implement it.\n\n-----\nSince `.raw` is never read by any consumer, it's dead code. This removes the field and all assignments to it:\n\n**`console.py`** \u2014 Remove `raw` from the dataclass:\n```python\n@dataclass\nclass Event:\n    evt: str\n    data: str\n```\n\n**`unix_console.py`** \u2014 Remove all `raw`-related code in both `getpending` variants:\n- Line 540: `Event(\"key\", \"\", b\"\")` \u2192 `Event(\"key\", \"\")`\n- Line 545: delete `e.raw += e.raw`\n- Line 549-550: `raw = ...` / `data = str(raw, ...)` \u2192 `data = str(self.__read(amount), ...)`\n- Line 552: delete `e.raw += raw`\n- Same changes for lines 564, 569, 572-575\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-145888\n* gh-146097\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "chris-eibl",
+   "created_at": "2026-03-13T13:51:36Z",
+   "body": "> Since `.raw` is never read by any consumer, it's dead code. This removes the field and all assignments to it:\n\nYeah, I already did so for Windows in https://github.com/python/cpython/pull/132440/changes/adb89bab0c4be9355988b4615f75660fc9db0094 and left a smiley on that typo https://github.com/python/cpython/pull/132440#discussion_r2051693704.\n\nTbh, I think it is time to remove `.raw` altogether instead of fixing the wrong-but-dead code path.\n\nThe only thing I am concerned is the side effect of `flush_buf` in\nhttps://github.com/python/cpython/blob/79b91e7c50d30dce6599a15cc4459667e25d525e/Lib/_pyrepl/base_eventqueue.py#L90\nand\nhttps://github.com/python/cpython/blob/79b91e7c50d30dce6599a15cc4459667e25d525e/Lib/_pyrepl/base_eventqueue.py#L109\nbut I think, we can just simplify\n```python\ndef flush_buf(self):\n    \"\"\"\n    Flushes the buffer.\n    \"\"\"\n    self.buf = bytearray()\n```\nsince the `raw` member is nowhere needed AFAICT ...\n"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2026-03-13T13:55:53Z",
+   "body": "> Please let me know which solution is preferred and I can write a trivial PR to implement it.\n\n@wavebyrd please don't open a PR when\n- the OP already stated they're up for it\n- and furthermore there even isn't a decision, yet\n"
+  },
+  {
+   "author": "HCYT",
+   "created_at": "2026-03-18T05:22:17Z",
+   "body": "Hi, I opened a PR for this: #146097\n\nI went with removing the `Event.raw` field entirely since it's not read anywhere, instead of just fixing the typo. Also cleaned up the tests.\n\n@chris-eibl would appreciate if you can take a look when you have time, thanks!"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T08:53:48Z",
+   "body": "We did not decide whether to remove the field or not. Please do not open PRs"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T08:56:59Z",
+   "body": "I think we need to keep the raw data. I might be necessary in the future to handle special key sequences that are not recognized. And if we were to expose the repl publicly it would also be a way for custom handlers to handle the event.\n\nSo I personally prefer fixing the typo rather than removing the field."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T08:59:11Z",
+   "body": "OTOH  the Windows console has no more raw buffer. What was the rationale for removing it?"
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2026-03-18T09:05:49Z",
+   "body": "I didn't remove it, just not populate it anymore in the few code parts that did, while most did not, and there was no \"user\" of it."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-03-18T09:14:08Z",
+   "body": "So there was an inconsistency in how it is being populated you mean? if this the case, then ok for removing the field altogether. However could you check if pypi repos use the pyrepl private implementation? while clearly internal we should avoid breaking packages when possible (at least give them a heads up)"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-18T10:40:53Z",
+   "body": "I'm not too attached to writing the PR, I just thought it would help. So feel free to reopen the PR that matches the agreed decision when one is made.\n\nThank you @HCYT and @wavebyrd for the interest and willingness to help, we just need to do things in an orderly way, like reaching a decision before firing up the PRs."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2026-03-20T07:18:56Z",
+   "body": "> So there was an inconsistency in how it is being populated you mean?\n\nFor Windows, yes. And just not populating `Event.raw` anymore at all in https://github.com/python/cpython/commit/adb89bab0c4be9355988b4615f75660fc9db0094 about a year ago seems to have not caused any pain so far.\n\n> However could you check if pypi repos use the pyrepl private implementation?\n\nOk. I've used @vstinner's [search_pypi_top.py](https://github.com/vstinner/misc/blob/main/cpython/search_pypi_top.py) and searched for `_pyrepl` in the top 5000 packages, because `console` or `Event` would give too many false-positives. Stripping `stdlib_list-0.12.0.tar.gz` hits from the output results in only 37 occurrences\n\n<details><summary>Details</summary>\n<p>\n\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: prefer_pyrepl = True\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: using_pyrepl = False  # overwritten by find_pyrepl\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: def find_pyrepl(self):\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: import _pyrepl.completing_reader\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: import _pyrepl.readline\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: sys.modules[\"readline\"] = _pyrepl.readline\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: self.using_pyrepl = True\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: return _pyrepl.readline, True\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: self.using_pyrepl = True\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: if self.prefer_pyrepl:\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: result = self.find_pyrepl()\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: readline.backend = \"_pyrepl\"\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: readline._setup(namespace or {})  # internal _pyrepl implementation\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: if config.using_pyrepl or sys.platform != \"darwin\":\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: def interact_pyrepl(namespace: dict | None = None):\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: from _pyrepl import readline\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: from _pyrepl.console import InteractiveColoredConsole\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: from _pyrepl.simple_interact import run_multiline_interactive_console\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: if completer.config.using_pyrepl and \"__pypy__\" not in sys.builtin_module_names:\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/fancycompleter/__init__.py: interact_pyrepl(namespace)\n.\\fancycompleter-0.11.1.tar.gz: fancycompleter-0.11.1/pyproject.toml: module = [\"_pyrepl.*\", \"pyrepl.*\", \"pyreadline.*\"]\n.\\mpmath-1.4.1.tar.gz: mpmath-1.4.1/mpmath/__main__.py: from _pyrepl.main import CAN_USE_PYREPL\n.\\mpmath-1.4.1.tar.gz: mpmath-1.4.1/mpmath/__main__.py: from _pyrepl.console import \\\n.\\mpmath-1.4.1.tar.gz: mpmath-1.4.1/mpmath/__main__.py: from _pyrepl.main import CAN_USE_PYREPL\n.\\mpmath-1.4.1.tar.gz: mpmath-1.4.1/mpmath/__main__.py: from _pyrepl.simple_interact import \\\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/src/pdbpp.py: def _patch_readline_for_pyrepl(self):\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/src/pdbpp.py: uses_pyrepl = self.fancycompleter.config.readline != sys.modules[\"readline\"]\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/src/pdbpp.py: if not uses_pyrepl:\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/src/pdbpp.py: with self._patch_readline_for_pyrepl():\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/testing/conftest.py: (\"pyrepl\" if sys.version_info < (3, 13) else \"_pyrepl\"),\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/testing/conftest.py: m.setattr(\"fancycompleter.DefaultConfig.prefer_pyrepl\", False)\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/testing/conftest.py: import _pyrepl.readline\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/testing/conftest.py: m.setattr(\"fancycompleter.DefaultConfig.prefer_pyrepl\", True)\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/testing/conftest.py: elif readline_param == \"_pyrepl\":\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/testing/conftest.py: readline = \"_pyrepl.readline\"\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/testing/test_pdb.py: # and readline_param != \"_pyrepl\"\n.\\pdbpp-0.12.1.tar.gz: pdbpp-0.12.1/testing/test_pdb.py: prefer_pyrepl = False\n\n</p>\n</details> \n\nwhere the only line to investigate further\n```\n.\\mpmath-1.4.1.tar.gz: mpmath-1.4.1/mpmath/__main__.py: from _pyrepl.console import \\\n```\nreveals that \nhttps://github.com/mpmath/mpmath/blob/7b40a40cc6b8961cfa9d1697e6e7075d42f56f0a/mpmath/__main__.py#L113-L114\n```python\n                from _pyrepl.console import \\\n                    InteractiveColoredConsole as InteractiveConsole\n```\nis harmless, too. So I could definitely not find a direct user of `Event.raw`. To me, the hits do not even hint for any indirect users, but I might have overlooked some code paths."
+  },
+  {
+   "author": "chris-eibl",
+   "created_at": "2026-05-25T09:57:25Z",
+   "body": "@pablogsal has fixed the type in `getpending()` in https://github.com/python/cpython/pull/146584.\nI think we can close here?"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "baace7f115ff8c403dc38059c3898090e1b1af47",
+   "actor": "wavebyrd"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145888",
+   "commit": null,
+   "actor": "wavebyrd"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8a2d7470678c1d0b897edc2cb55190795c72415f",
+   "actor": "HCYT"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146097",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146589",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146590",
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/146584",
+   "commit": null,
+   "actor": "chris-eibl"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

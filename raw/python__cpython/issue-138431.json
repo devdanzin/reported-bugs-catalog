@@ -1,0 +1,92 @@
+{
+ "repo": "python/cpython",
+ "number": 138431,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/138431",
+ "title": "JIT: failed assertion in `_POP_TOP_NOP` calling `str()` on variable due to wrong reference information",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2025-09-03T09:27:32Z",
+ "closed_at": "2025-09-04T07:42:10Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort the interpreter by running the following MRE in a patched JIT build. Please let me know whether you can reproduce this issue.\n\nTo get this abort, it's necessary to apply this diff before compiling with flags `./configure --with-pydebug --enable-experimental-jit`:\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex 454c8dde031..9e21c41421a 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -99,8 +99,8 @@ backoff_counter_triggers(_Py_BackoffCounter counter)\n // Must be larger than ADAPTIVE_COOLDOWN_VALUE, otherwise when JIT code is\n // invalidated we may construct a new trace before the bytecode has properly\n // re-specialized:\n-#define JUMP_BACKWARD_INITIAL_VALUE 4095\n-#define JUMP_BACKWARD_INITIAL_BACKOFF 12\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n+#define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(void)\n {\n@@ -112,8 +112,8 @@ initial_jump_backoff_counter(void)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4095\n-#define SIDE_EXIT_INITIAL_BACKOFF 12\n+#define SIDE_EXIT_INITIAL_VALUE 63\n+#define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\n initial_temperature_backoff_counter(void)\n```\n\nMRE\n```python\ndef f1():\n    for x in range(200):\n        if x == 148:\n            x = \"abcdef\"\n        str(x)\n\nfor _ in range(300):\n    f1()\n```\n\nBacktrace:\n```\npython: _POP_TOP_NOP.c:121: _Py_CODEUNIT *_JIT_ENTRY(_PyInterpreterFrame *, _PyStackRef *, PyThreadState *): Assertion `PyStackRef_IsNull(value) || (!PyStackRef_RefcountOnObject(value)) || _Py_IsImmortal((PyStackRef_AsPyObjectBorrow(value)))' failed.\n\nProgram received signal SIGABRT, Aborted.\nDownload failed: Invalid argument.  Continuing without source file ./nptl/./nptl/pthread_kill.c.\n__pthread_kill_implementation (no_tid=0, signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:44\nwarning: 44     ./nptl/pthread_kill.c: No such file or directory\n(gdb) bt\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (signo=6, threadid=<optimized out>) at ./nptl/pthread_kill.c:78\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\n#3  0x00007ffff7c4527e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c288ff in __GI_abort () at ./stdlib/abort.c:79\n#5  0x00007ffff7c2881b in __assert_fail_base (fmt=0x7ffff7dd01e8 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\n    assertion=assertion@entry=0x7ffff7e15957 \"PyStackRef_IsNull(value) || (!PyStackRef_RefcountOnObject(value)) || _Py_IsImmortal((PyStackRef_AsPyObjectBorrow(value)))\", file=file@entry=0x7ffff7e159d1 \"_POP_TOP_NOP.c\", line=line@entry=121,\n    function=function@entry=0x7ffff7e159e0 \"_Py_CODEUNIT *_JIT_ENTRY(_PyInterpreterFrame *, _PyStackRef *, PyThreadState *)\")\n    at ./assert/assert.c:96\n#6  0x00007ffff7c3b517 in __assert_fail (\n    assertion=0x7ffff7e15957 \"PyStackRef_IsNull(value) || (!PyStackRef_RefcountOnObject(value)) || _Py_IsImmortal((PyStackRef_AsPyObjectBorrow(value)))\", file=0x7ffff7e159d1 \"_POP_TOP_NOP.c\", line=121,\n    function=0x7ffff7e159e0 \"_Py_CODEUNIT *_JIT_ENTRY(_PyInterpreterFrame *, _PyStackRef *, PyThreadState *)\") at ./assert/assert.c:105\n#7  0x00007ffff7e14047 in ?? ()\n#8  0x0000555555e4f8f2 in ?? ()\n#9  0x00007ffff79c7017 in ?? ()\n#10 0x0000555555e5f9f0 in ?? ()\n#11 0x00007ffff79c7000 in ?? ()\n#12 0x00007ffff7e290f8 in ?? ()\n#13 0x00007ffff7e29090 in ?? ()\n#14 0x0000555555cc3238 in _PyRuntime ()\n#15 0x00005555557c7a67 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x555555cc3238 <_PyRuntime+331128>, throwflag=0)\n    at Python/generated_cases.c.h:5600\n#16 0x00005555557db29b in _PyEval_EvalFrame (tstate=tstate@entry=0x555555cc3238 <_PyRuntime+331128>, frame=frame@entry=0x7ffff7e29020,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:119\n#17 0x00005555557db46c in _PyEval_Vector (tstate=tstate@entry=0x555555cc3238 <_PyRuntime+331128>, func=func@entry=0x7ffff7a4a8d0,\n--Type <RET> for more, q to quit, c to continue without paging--\n    locals=locals@entry=0x7ffff7a58470, args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0)\n    at Python/ceval.c:1981\n#18 0x00005555557db568 in PyEval_EvalCode (co=co@entry=0x7ffff7a40a60, globals=globals@entry=0x7ffff7a58470,\n    locals=locals@entry=0x7ffff7a58470) at Python/ceval.c:872\n```\n\nOutput with `PYTHON_LLTRACE=4`: [lltrace_1771.txt](https://github.com/user-attachments/files/22114586/lltrace_1771.txt)\nOutput with `PYTHON_OPT_DEBUG=4`: [opt_debug_1771.txt](https://github.com/user-attachments/files/22114585/opt_debug_1771.txt)\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 (heads/main-dirty:57eab1b8f78, Sep  3 2025, 06:03:53) [GCC 13.3.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-138458\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-03T10:44:03Z",
+   "body": "Just a tip: you might get a better backtrace in the future if you build and run the repro with ``--enable-experimental-jit=interpreter`` instead."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-03T15:09:47Z",
+   "body": "Smaller reproducer:\n```\ndef f1():\n    for x in range(30000):\n        str(\"abcdef\")\n\nf1()\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-03T15:10:12Z",
+   "body": "The problem is not the unstable type, the problem is that the reference management is faulty."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-03T18:09:38Z",
+   "body": "Thanks Daniel for the bug report!\n\nWe need someone to backport this to 3.14 still. Is anyone up for the task?\n\nBasically, you'd need to copy the changes here https://github.com/python/cpython/pull/138458, ignoring the following files:\n* Python/optimizer_cases.c.h\nTo a branch based off the 3.14 CPython branch.\n\nThen run `make regen-cases` or `./PCBuild/build.bat --regen` depending if you're on nix or Windows."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-03T18:10:21Z",
+   "body": "Marked this easy to get someone to backport the JIT fixes to 3.14 please. See previous comment."
+  },
+  {
+   "author": "XChaitanyaX",
+   "created_at": "2025-09-04T05:51:36Z",
+   "body": "I will try to create the backport pr to 3.14"
+  },
+  {
+   "author": "XChaitanyaX",
+   "created_at": "2025-09-04T07:21:13Z",
+   "body": "I tried to have a backport and there are errors when running `./PCBuild/build.bat --regen`\n\nhere's what i did\ninitially in main branch\n```\ngit fetch upstream\ngit checkout -b backport-2402f84-3.14 upstream/3.14\ngit cherry-pick -x 2402f84665df41732c94db2ccd6f90dd13479fa8\n```\nthere are conflicts\nAccepted incoming changes from these files\n```\nInclude/internal/pycore_optimizer.h\nLib/test/test_capi/tesp_opt.py\nPython/optimizer_bytecodes.c\n```\nAccepted current changes from\n`optimizer_cases.c.h`\n\nError Report:\n```\nUsing \"D:\\Chaitanya\\code\\python_\\cpython\\.venv\\Scripts\\python.exe\" (found in virtual env)\nFetching external libraries...\nbzip2-1.0.8 already exists, skipping.\nmpdecimal-4.0.0 already exists, skipping.\nsqlite-3.50.4.0 already exists, skipping.\nxz-5.2.5 already exists, skipping.\nzlib-ng-2.2.4 already exists, skipping.\nzstd-1.5.7 already exists, skipping.\nFetching external binaries...\nlibffi-3.4.4 already exists, skipping.\nopenssl-bin-3.0.16.2 already exists, skipping.\ntcltk-8.6.15.0 already exists, skipping.\nFinished.\nUsing \"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\msbuild.exe\" (found in the Visual Studio installation)\nUsing \"D:\\Chaitanya\\code\\python_\\cpython\\.venv\\Scripts\\python.exe\" (found in virtual env)\n\nD:\\Chaitanya\\code\\python_\\cpython>\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\msbuild.exe\" \"D:\\Chaitanya\\code\\python_\\cpython\\PCbuild\\\\pythoncore.vcxproj\" /t:Regen /nologo /v:m /clp:summary /p:Configuration=Release /p:Platform=x64 /p:ForceRegen=true \n\n  Touching source files to force regeneration\n  Regenerate parser.c\n  Regenerate pycore_ast.h pycore_ast_state.h Python-ast.c\n  D:\\Chaitanya\\code\\python_\\cpython\\Python\\Python-ast.c, D:\\Chaitanya\\code\\python_\\cpython\\Include\\internal\\pycore_ast.h, D:\\Chaitanya\\code\\python\n  _\\cpython\\Include\\internal\\pycore_ast_state.h regenerated.\n  Regenerate token-list.inc pycore_token.h token.c token.py\n  Regenerate Global Objects\n  # not changed: D:\\Chaitanya\\code\\python_\\cpython\\Include\\internal\\pycore_global_strings.h\n  # not changed: D:\\Chaitanya\\code\\python_\\cpython\\Include\\internal\\pycore_runtime_init_generated.h\n  # not changed: D:\\Chaitanya\\code\\python_\\cpython\\Include\\internal\\pycore_unicodeobject_generated.h\n  # not changed: D:\\Chaitanya\\code\\python_\\cpython\\Include\\internal\\pycore_global_objects_fini_generated.h\n  Regenerate cases\n  Traceback (most recent call last):\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 484, in emit_SimpleStmt\n      self.emit_save(storage)\n      ~~~~~~~~~~~~~~^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\optimizer_generator.py\", line 105, in emit_save\n      storage.flush(self.out)\n      ~~~~~~~~~~~~~^^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\stack.py\", line 510, in flush\n      self.clear_dead_inputs()\n      ~~~~~~~~~~~~~~~~~~~~~~^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\stack.py\", line 479, in clear_dead_inputs\n      raise StackError(\n          f\"Input '{var.name}' is not live, but '{live}' is\"\n      )\n  stack.StackError: Input 'unused' is not live, but 'arg' is\n\n  During handling of the above exception, another exception occurred:\n\n  Traceback (most recent call last):\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\optimizer_generator.py\", line 244, in <module>\n      generate_abstract_interpreter(args.input, abstract, base, outfile, args.debug)\n      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\optimizer_generator.py\", line 198, in generate_abstract_interpreter\n      write_uop(override, uop, out, stack, debug, skip_inputs=(override is None))\n      ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\optimizer_generator.py\", line 148, in write_uop\n      _, storage = emitter.emit_tokens(override, storage, None, False)\n                   ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 660, in emit_tokens\n      reachable, tkn, storage = self.emit_BlockStmt(code.body, code, storage, inst, emit_braces)\n                                ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 614, in emit_BlockStmt\n      reachable, tkn, storage = self._emit_stmt(s, uop, storage, inst)\n                                ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 467, in _emit_stmt\n      return method(stmt, uop, storage, inst) # type: ignore[no-any-return]\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 571, in emit_IfStmt\n      reachable, rbrace, if_storage = self._emit_stmt(stmt.body, uop, if_storage, inst)\n                                      ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 467, in _emit_stmt\n      return method(stmt, uop, storage, inst) # type: ignore[no-any-return]\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 614, in emit_BlockStmt\n      reachable, tkn, storage = self._emit_stmt(s, uop, storage, inst)\n                                ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 467, in _emit_stmt\n      return method(stmt, uop, storage, inst) # type: ignore[no-any-return]\n    File \"D:\\Chaitanya\\code\\python_\\cpython\\Tools\\cases_generator\\generators_common.py\", line 521, in emit_SimpleStmt\n      raise analysis_error(ex.args[0], tkn) #from None\n      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"Python/optimizer_bytecodes.c\", line 891\n\n      ^\n  SyntaxError: Input 'unused' is not live, but 'arg' is\nD:\\Chaitanya\\code\\python_\\cpython\\PCbuild\\regen.targets(109,5): error MSB3073: The command \"\"D:\\Chaitanya\\code\\python_\\cpython\\.venv\\Scripts\\pytho\nn.exe\" Tools\\cases_generator\\optimizer_generator.py Python\\optimizer_bytecodes.c Python\\bytecodes.c\" exited with code 1. [D:\\Chaitanya\\code\\python\n_\\cpython\\PCbuild\\pythoncore.vcxproj]\n\nBuild FAILED.\n\nD:\\Chaitanya\\code\\python_\\cpython\\PCbuild\\regen.targets(109,5): error MSB3073: The command \"\"D:\\Chaitanya\\code\\python_\\cpython\\.venv\\Scripts\\pytho \nn.exe\" Tools\\cases_generator\\optimizer_generator.py Python\\optimizer_bytecodes.c Python\\bytecodes.c\" exited with code 1. [D:\\Chaitanya\\code\\python\n_\\cpython\\PCbuild\\pythoncore.vcxproj]\n    0 Warning(s)\n    1 Error(s)\n\nTime Elapsed 00:00:16.86\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-09-04T07:42:10Z",
+   "body": "I'm so sorry @XChaitanyaX , it seems to me that the changes are not actually in the 3.14 branch. So there's no need to backport.\n\nSo sorry again for taking up your time on this."
+  },
+  {
+   "author": "XChaitanyaX",
+   "created_at": "2025-09-04T09:12:22Z",
+   "body": "@Fidget-Spinner It's fine, there is no waste of time as I learnt how to backport, and use cherry-pick :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/138458",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2402f84665df41732c94db2ccd6f90dd13479fa8",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b244a0930c4fc3e3da02724596d0f8571c62d815",
+   "actor": "lkollar"
+  }
+ ]
+}

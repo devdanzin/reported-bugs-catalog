@@ -1,0 +1,76 @@
+{
+ "repo": "python/cpython",
+ "number": 142975,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/142975",
+ "title": "Abort in free-threading `validate_refcounts`: \"tracked objects must have a reference count > 0\"",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2025-12-19T11:52:58Z",
+ "closed_at": "2025-12-26T21:08:07Z",
+ "body": "# Crash report\n\n### What happened?\n\nThe following code will trigger an abort in a free-threading debug build:\n\n```python\nfrom threading import Thread\nimport gc\n\nfor x in range(50):\n    gc.freeze()\n    gc.collect()\n    gc.unfreeze()\n\n    alive = [Thread(target=gc.unfreeze) for x in range(10)]\n    for t in alive: t.start()\n```\n\nAbort message:\n```\nPython/gc_free_threading.c:1099: validate_refcounts: Assertion \"_Py_REFCNT(((PyObject*)((op)))) > 0\" failed: tracked objects must have a reference count > 0\nEnable tracemalloc to get the memory block allocation traceback\n\nobject address  : 0x7bffb27415d0\nobject refcount : 0\nobject type     : 0x5555566e4ea0\nobject type name: method\nobject repr     : <refcnt 0 at 0x7bffb27415d0>\n\nFatal Python error: _PyObject_AssertFailed: _PyObject_AssertFailed\nPython runtime state: initialized\n\nStack (most recent call first):\n  File \"/home/danzin/crashers/reduced_gc_abort_source.py\", line 6 in <module>\n\nThread 1 \"python\" received signal SIGABRT, Aborted.\n```\n\nBacktrace:\n```\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x0000555556037974 in fatal_error_exit (status=status@entry=-1) at Python/pylifecycle.c:3284\n#6  0x000055555603763b in fatal_error (fd=fd@entry=2, header=header@entry=1, prefix=prefix@entry=0x5555563c1340 <__func__._PyObject_AssertFailed> \"_PyObject_AssertFailed\",\n    msg=msg@entry=0x5555563c1340 <__func__._PyObject_AssertFailed> \"_PyObject_AssertFailed\", status=status@entry=-1) at Python/pylifecycle.c:3493\n#7  0x0000555556033520 in _Py_FatalErrorFunc (func=0x5555563c1340 <__func__._PyObject_AssertFailed> \"_PyObject_AssertFailed\",\n    msg=0x5555563c1340 <__func__._PyObject_AssertFailed> \"_PyObject_AssertFailed\") at Python/pylifecycle.c:3516\n#8  0x00005555557f143b in _PyObject_AssertFailed (obj=obj@entry=0x7bffb27415d0, expr=<optimized out>, msg=<optimized out>, file=<optimized out>, line=line@entry=1099,\n    function=<optimized out>) at Objects/object.c:3166\n#9  0x0000555555f90d9e in validate_refcounts (heap=0x555556940870 <_PyRuntime+410288>, area=<optimized out>, block=<optimized out>, block_size=<optimized out>, args=<optimized out>)\n    at Python/gc_free_threading.c:1098\n#10 0x0000555555c24b52 in _mi_heap_area_visit_blocks (area=0x7bfff5c4bfa0, page=<optimized out>, visitor=<optimized out>, arg=<optimized out>) at Objects/mimalloc/heap.c:619\n#11 0x0000555555c2590f in mi_heap_area_visitor (heap=0x555556940870 <_PyRuntime+410288>, xarea=0x7bfff5c4bfa0, arg=<optimized out>) at Objects/mimalloc/heap.c:681\n#12 mi_heap_visit_areas_page (heap=0x555556940870 <_PyRuntime+410288>, page=0x7bffb20033c8, pq=<optimized out>, vfun=<optimized out>, arg=<optimized out>) at Objects/mimalloc/heap.c:661\n#13 mi_heap_visit_pages (heap=0x555556940870 <_PyRuntime+410288>, fn=<optimized out>, arg1=<optimized out>, arg2=<optimized out>) at Objects/mimalloc/heap.c:46\n#14 mi_heap_visit_areas (heap=0x555556940870 <_PyRuntime+410288>, visitor=<optimized out>, arg=<optimized out>) at Objects/mimalloc/heap.c:667\n#15 mi_heap_visit_blocks (heap=0x555556940870 <_PyRuntime+410288>, visit_blocks=<optimized out>, visitor=<optimized out>, arg=<optimized out>) at Objects/mimalloc/heap.c:692\n#16 0x0000555555f85bd4 in gc_visit_heaps_lock_held (interp=0x555556906580 <_PyRuntime+171968>, visitor=0x555555f90ab0 <validate_refcounts>, arg=0x7fffffffbc30)\n    at Python/gc_free_threading.c:414\n#17 gc_visit_heaps (interp=interp@entry=0x555556906580 <_PyRuntime+171968>, visitor=0x555555f90ab0 <validate_refcounts>, arg=arg@entry=0x7fffffffbc30) at Python/gc_free_threading.c:453\n#18 0x0000555555f88032 in gc_collect_internal (interp=0x555556906580 <_PyRuntime+171968>, generation=2, state=<optimized out>) at Python/gc_free_threading.c:2274\n#19 gc_collect_main (tstate=<optimized out>, generation=2, reason=_Py_GC_REASON_MANUAL) at Python/gc_free_threading.c:2438\n#20 0x00005555561072ef in gc_collect_impl (module=0x7bffb232a830, generation=2) at Modules/gcmodule.c:93\n#21 gc_collect (module=<optimized out>, args=0x7fffffffbe28, nargs=<optimized out>, kwnames=0x0) at Modules/clinic/gcmodule.c.h:143\n#22 0x0000555555e821aa in _Py_BuiltinCallFastWithKeywords_StackRefSteal (callable=callable@entry=..., arguments=0x7e8ff6fe5298, total_args=total_args@entry=0) at Python/ceval.c:1122\n#23 0x0000555555e9d508 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:2336\n#24 0x0000555555e807f4 in _PyEval_EvalFrame (tstate=0x55555693ec48 <_PyRuntime+403080>, frame=0x7e8ff6fe5220, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#25 _PyEval_Vector (tstate=tstate@entry=0x55555693ec48 <_PyRuntime+403080>, func=func@entry=0x7bffb2483c70, locals=locals@entry=0x7bffb26fc8b0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2482\n```\n\nSeems to be related to https://github.com/python/cpython/issues/126312, but I think that one should be fixed (and the abort is different).\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ free-threading build (heads/main:610aabfef2f, Dec 19 2025, 07:12:28) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-143156\n* gh-143175\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-12-24T19:21:34Z",
+   "body": "This was not fun to debug. The problem is here:\n\nhttps://github.com/python/cpython/blob/7342890ed710abaea09fdc011723cbba0ca9ad24/Python/gc_free_threading.c#L906-L938\n\nIn `merge_queued_objects`, the thread's BRC queue is cleared and applies the necessary reference count modification to each object. This can cause the object's reference count to reach zero, in which case the object must be deallocated when the world is started. For tracked objects, this can occur after the garbage collector has identified them as dead, but untracked objects must be placed in a separate queue so they can be manually destroyed when the world starts. With that in mind, frozen objects can break this: they can be tracked by the GC but not destroyed later because they'll be skipped. As such, frozen objects will have a reference count of 0 and will not be destroyed when the collection finishes.\n\nTo summarize, the assertion failure here is due to the following stream of calls:\n\n1. `gc.freeze` freezes all tracked objects.\n2. Biased reference counting does its thing and queues some modifications (I only saw this happen to `dict` and `method` objects in the repro). \n3. `gc.collect` begins a collection, which merges all these reference counts, leaving some frozen objects with BRC at a reference count of zero.\n4. `gc.unfreeze` unfreezes these objects, making them visible to the garbage collector.\n5. `gc.freeze` again begins a collection, but the previously frozen objects are now visible. The GC detects that some incoming objects have a reference count of zero, which causes an assertion failure.\n\nI have a PR ready."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143156",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8611f74e089d9ac9de84dd42be9d251db27889aa",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "524cd8390857abe2105ab9b8e781ed0dbffcffa7",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143175",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8a61b71eeef01b6024dccf6705cdfaa4c6c2edaf",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "eb8aa6b5369969bb0c710c762358c6d7e1c8ba1e",
+   "actor": "thunder-coding"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153051",
+   "commit": null,
+   "actor": "jonasvq"
+  }
+ ]
+}

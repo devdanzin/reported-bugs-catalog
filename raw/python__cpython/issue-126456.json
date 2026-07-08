@@ -1,0 +1,100 @@
+{
+ "repo": "python/cpython",
+ "number": 126456,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126456",
+ "title": "`_pyrepl._minimal_curses.tigetstr` segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-crash",
+  "3.13",
+  "3.14",
+  "topic-repl"
+ ],
+ "created_at": "2024-11-05T21:29:28Z",
+ "closed_at": "2024-11-13T17:17:09Z",
+ "body": "# Crash report\n\n### What happened?\n\nCalling `tigetstr` from the `_pyrepl._minimal_curses` module segfaults, on free-threading or normal builds:\n\n```\npython -c \"from _pyrepl._minimal_curses import tigetstr; tigetstr('')\"\nSegmentation fault\n```\nIt happens in the return line of the function, on access of the `.value` attribute:\n\nhttps://github.com/python/cpython/blob/5e9168492f12c579b2481f3f3e0ae11f9d986857/Lib/_pyrepl/_minimal_curses.py#L55-L61\n\nBacktrace looks like:\n```gdb\n#0  __strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:510\n#1  0x00007ffff7c335ff in z_get (ptr=<optimized out>, size=<optimized out>) at ./Modules/_ctypes/cfield.c:1382\n#2  0x00007ffff7c20f0a in Simple_get_value (self=0x200009b0fe0, _unused_ignored=<optimized out>) at ./Modules/_ctypes/_ctypes.c:5062\n#3  0x0000555555691b7a in getset_get (self=self@entry=<getset_descriptor at remote 0x20000ac5410>,\n    obj=obj@entry=<c_char_p() at remote 0x200009b0fe0>, type=<optimized out>) at Objects/descrobject.c:193\n#4  0x000055555570a99d in _PyObject_GenericGetAttrWithDict (obj=<c_char_p() at remote 0x200009b0fe0>, name='value',\n    dict=dict@entry=0x0, suppress=suppress@entry=0) at Objects/object.c:1659\n#5  0x000055555570b538 in PyObject_GenericGetAttr (obj=<optimized out>, name=<optimized out>) at Objects/object.c:1741\n#6  0x000055555570a740 in PyObject_GetAttr (v=v@entry=<c_char_p() at remote 0x200009b0fe0>, name='value') at Objects/object.c:1255\n#7  0x000055555585be7e in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d2c2a0 <_PyRuntime+359904>, frame=0x7ffff7fb0088,\n    throwflag=throwflag@entry=0) at ./Include/internal/pycore_stackref.h:74\n#8  0x000055555586fb1f in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>, tstate=0x555555d2c2a0 <_PyRuntime+359904>)\n    at ./Include/internal/pycore_ceval.h:116\n#9  _PyEval_Vector (tstate=tstate@entry=0x555555d2c2a0 <_PyRuntime+359904>, func=func@entry=0x20000ad32d0,\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <type at remote 0x20000276e10>, '__spec__': None, '__builtins__': <module at remote 0x2000025c640>, 'tigetstr': <function at remote 0x200008b24d0>},\n    args=args@entry=0x0, argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:1886\n#10 0x000055555586fd6c in PyEval_EvalCode (co=co@entry=<code at remote 0x20000a87450>,\n    globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <type at remote 0x20000276e10>, '__spec__': None, '__builtins__': <module at remote 0x2000025c640>, 'tigetstr': <function at remote 0x200008b24d0>},\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <type at remote 0x20000276e10>, '__spec__': None, '__builtins__': <module at remote 0x2000025c640>, 'tigetstr': <function at remote 0x200008b24d0>})\n    at Python/ceval.c:662\n#11 0x000055555595452a in run_eval_code_obj (tstate=tstate@entry=0x555555d2c2a0 <_PyRuntime+359904>, co=co@entry=0x20000a87450,\n    globals=globals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <type at remote 0x20000276e10>, '__spec__': None, '__builtins__': <module at remote 0x2000025c640>, 'tigetstr': <function at remote 0x200008b24d0>},\n    locals=locals@entry={'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <type at remote 0x20000276e10>, '__spec__': None, '__builtins__': <module at remote 0x2000025c640>, 'tigetstr': <function at remote 0x200008b24d0>})\n    at Python/pythonrun.c:1338\n```\n\nThis issue doesn't affect `curses.tigetstr`.\n\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main-dirty:bfc1d2504c, Nov  4 2024, 07:55:58) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126472\n* gh-126790\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-06T07:07:31Z",
+   "body": "I wrote https://github.com/python/cpython/pull/126472 to fix it."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-13T17:17:09Z",
+   "body": "Fixed in the main branch, the backport to 3.13 will follow. Thanks for your bug report @devdanzin."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "790827482142b7b7a4381243788e82c54ffcf849",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126472",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b2bbdc56e3276f3b37ea5cf5f73f49c4cce6d9f6",
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "737866ca855613c0a721cb6ebfc9e311782a8c3b",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126790",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9162340e0627d0cb0bc8e8c72f1aa53f5556897b",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/issues/5119",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "19eee7bde9d96947bd95c5b3677c7ca3d064d8ce",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7cf1b745e1bb00b5ba5879946114a38b0066ebbc",
+   "actor": "ebonnal"
+  }
+ ]
+}

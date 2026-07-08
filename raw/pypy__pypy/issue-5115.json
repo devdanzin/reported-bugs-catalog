@@ -1,0 +1,40 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5115,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5115",
+ "title": "`ndbm.dbm` segfaults on GC collection",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-12T13:03:40Z",
+ "closed_at": "2024-11-13T07:56:43Z",
+ "body": "It's possible to segfault PyPy by deleting a `dbm.ndbm.dbm` object then calling `gc.collect`:\r\n\r\n```\r\n[PyPy 7.3.17 with GCC 10.2.1 20210130 (Red Hat 10.2.1-11)] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>>> import dbm.ndbm as n\r\n>>>> a = n.dbm(1, 1)\r\n>>>> del a\r\n>>>> import gc\r\n>>>> gc.collect()\r\nSegmentation fault (core dumped)\r\n```\r\n\r\nFound using fusil by @vstinner.",
+ "comments": [
+  {
+   "author": "mattip",
+   "created_at": "2024-11-13T07:55:55Z",
+   "body": "Thanks for the report. `dbm.ndbm.dbm` is not supposed to be exposed. Fixed in c1b68d59"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-15T21:40:09Z",
+   "body": "I got another crash on the nightly with `_dbm.dbm(b\"\\x00\" 10, 1); gc.collect()`, is it the same issue?"
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-11-16T16:14:53Z",
+   "body": "On CPython _dbm.dbm does not exist. On PyPy, it is accessible but after c1b68d5 is no longer part of `__all__`. I don't know if we can idiot-proof this entirely, but I did d0c1d7ffa4e which changes the name of the class to `_dbm` and also tries to ensure `close` is not called without `open` (the root cause of this issue: the first argument to `_dbm()` is meant to be a valid open dbm database)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  }
+ ]
+}

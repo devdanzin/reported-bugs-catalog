@@ -1,0 +1,57 @@
+{
+ "repo": "pypy/pypy",
+ "number": 5117,
+ "type": "issue",
+ "url": "https://github.com/pypy/pypy/issues/5117",
+ "title": "`SystemError` related to `EmptyListStrategy_getitem` when calling list methods from threads",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2024-11-13T15:29:55Z",
+ "closed_at": "2024-11-16T17:19:08Z",
+ "body": "First off, sorry for not being able to provide short repro code. I submit this in hopes that the error message or the long script may be enough for you to diagnose the issue.\r\n\r\nRunning the attached Python script sometimes results in an error like the one below. It's not clear to me which specific object has its methods being called across threads,\r\n\r\n```python\r\nSTART <Thread(Thread-425 (__str__), initial)>\r\nSTARTED <Thread(Thread-425 (__str__), started 139833882416896)>\r\nSTART <Thread(Thread-426 (clear), initial)>\r\nRPython traceback:\r\n  File \"pypy_interpreter.c\", line 51609, in BuiltinCode1_fastcall_1\r\n  File \"implement_4.c\", line 16589, in fastfunc_descr_repr_1_12\r\n  File \"pypy_objspace_std_3.c\", line 4846, in listrepr\r\n  File \"rpython_jit_metainterp.c\", line 20405, in ll_portal_runner__object_vtablePtr_object_vtable\r\n  File \"pypy_objspace_std_6.c\", line 1900, in portal_20\r\n  File \"pypy_objspace_std_2.c\", line 40284, in EmptyListStrategy_getitem\r\nException in thread Thread-425 (__str__):\r\nTraceback (most recent call last):\r\n  File \"/snap/pypy3/130/lib/pypy3.10/threading.py\", line 1016, in _bootstrap_inner\r\n    self.run()\r\n  File \"/snap/pypy3/130/lib/pypy3.10/threading.py\", line 953, in run\r\n    self._target(*self._args, **self._kwargs)\r\nSystemError: unexpected internal exception (please report a bug): <IndexError object at 0x7f2da4e5fda8>; internal traceback was dumped to stderr\r\nSTARTED <Thread(Thread-426 (clear), stopped 139833908909824)>\r\n```\r\n[source_imp.txt](https://github.com/user-attachments/files/17734942/source_imp.txt)\r\n\r\nFound using fusil by @vstinner.\r\n",
+ "comments": [
+  {
+   "author": "cfbolz",
+   "created_at": "2024-11-13T15:53:20Z",
+   "body": "heh, amazing. yeah, I probably understand what is happening from the traceback alone."
+  },
+  {
+   "author": "cfbolz",
+   "created_at": "2024-11-13T16:39:16Z",
+   "body": "the above commit should have fixed it. can't easily confirm however, because on my laptop your full script never crashed so far."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-13T17:20:47Z",
+   "body": "Sorry I didn't mention it, it doesn't crash, just prints the SystemError. "
+  },
+  {
+   "author": "mattip",
+   "created_at": "2024-11-16T17:19:08Z",
+   "body": "Closing as fixed."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "927de4128f8a236aed0f203a2c7c1a1649ca826f",
+   "actor": "cfbolz"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "mattip"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pypy/pypy/issues/3299",
+   "commit": null,
+   "actor": "cfbolz"
+  }
+ ]
+}

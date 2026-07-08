@@ -1,0 +1,47 @@
+{
+ "repo": "python/cpython",
+ "number": 126314,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126314",
+ "title": "Running `tracemalloc` in threads segfaults on no-gil",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-01T22:53:05Z",
+ "closed_at": "2025-03-14T09:18:19Z",
+ "body": "# Crash report\r\n\r\n### What happened?\r\n\r\nThis crash only happens on a no-gil build (only debug tested) with `PYTHON_GIL=0`. \r\n\r\n```python\r\n# This segfaults with PYTHON_GIL=0, works with PYTHON_GIL=1\r\nfrom threading import Thread\r\nimport tracemalloc\r\n\r\nalive = [\r\n    Thread(target=tracemalloc.take_snapshot, args=()),\r\n    Thread(target=tracemalloc.clear_traces, args=()),\r\n]\r\n\r\ntracemalloc.start()\r\nimport inspect # This seems to be important, has to happen after .start()\r\n\r\nfor obj in alive:\r\n    print('START', obj)\r\n    obj.start()\r\n```\r\n\r\nBacktrace looks like:\r\n```gdb\r\nframe_to_pyobject (frame=frame@entry=0x555555e78eac) at Python/tracemalloc.c:994\r\n994         PyTuple_SET_ITEM(frame_obj, 0, Py_NewRef(frame->filename));\r\n(gdb) bt\r\n#0  frame_to_pyobject (\r\n    frame=frame@entry=0x555555e78eac)\r\n    at Python/tracemalloc.c:994\r\n#1  0x000055555591edbd in traceback_to_pyobject (\r\n    traceback=0x555555e78ea0,\r\n    intern_table=intern_table@entry=0x7ffff00019c0)\r\n    at Python/tracemalloc.c:1024\r\n#2  0x000055555591efee in trace_to_pyobject (\r\n    domain=<optimized out>, trace=0x7ffff000ee70,\r\n    intern_tracebacks=0x7ffff00019c0)\r\n    at Python/tracemalloc.c:1070\r\n#3  0x000055555591f46d in tracemalloc_get_traces_fill (traces=<optimized out>, key=<optimized out>,\r\n    value=<optimized out>,\r\n    user_data=0x7ffff7ba7880)\r\n    at Python/tracemalloc.c:1188\r\n#4  0x00005555558b7f49 in _Py_hashtable_foreach (\r\n    ht=0x7ffff0001ab0,\r\n    func=func@entry=0x55555591f44a <tracemalloc_get_traces_fill>,\r\n    user_data=user_data@entry=0x7ffff7ba7880)\r\n    at Python/hashtable.c:275\r\n#5  0x0000555555920889 in _PyTraceMalloc_GetTraces\r\n    () at Python/tracemalloc.c:1470\r\n#6  0x0000555555957b44 in _tracemalloc__get_traces_impl (module=<optimized out>)\r\n    at ./Modules/_tracemalloc.c:57\r\n```\r\n\r\nFound using fusil by @vstinner.\r\n\r\n### CPython versions tested on:\r\n\r\nCPython main branch\r\n\r\n### Operating systems tested on:\r\n\r\nLinux\r\n\r\n### Output from running 'python -VV' on the command line:\r\n\r\nPython 3.14.0a1+ experimental free-threading build (heads/main:d467d9246c, Nov  1 2024, 09:05:56) [GCC 11.4.0]",
+ "comments": [
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-03-14T07:20:55Z",
+   "body": "This doesn't crashes on current main branch "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-14T09:18:19Z",
+   "body": "I confirm that I can no longer reproduce the crash in the main branch on Python built with `--disable-gil`. I close the issue.\n\nI redesigned tracemalloc locking in issue gh-128679 (ex: commit 36c5e3bcc25700645d19eba65dcdf22acd99a7a8)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  }
+ ]
+}

@@ -1,0 +1,325 @@
+{
+ "repo": "python/cpython",
+ "number": 130163,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/130163",
+ "title": "Crash when concurrently writing with `print` and concurrently modifying `sys.stdout`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-C-API"
+ ],
+ "created_at": "2025-02-15T21:07:47Z",
+ "closed_at": "2025-02-27T14:44:51Z",
+ "body": "# Crash report\n\n### What happened?\n\nPlaying with the code from #130148, I stumbled on a segfault in a free-threaded debug build with the following (seems to trigger faster/more consistently when pasted in the REPL):\n\n```python\nfrom contextlib import redirect_stdout\nfrom io import StringIO\nfrom threading import Thread\nimport time\n\n\ndef test_redirect():\n    text = StringIO()\n    with redirect_stdout(text):\n        print(\"hello1\", file=text)\n        time.sleep(0.1)\n        print(\"hello2\", file=text)\n    print(text.getvalue())\n    assert text.getvalue() == \"hello1\\nhello2\\n\"\n\n\nfor x in range(100):\n    Thread(target=test_redirect, args=()).start()\n```\n\n~~I didn't have time to check whether JIT, debug or no-gil are strictly necessary for this to crash.~~ JIT is not needed for this to crash.\n\n\n### Cause\n\nThe problem is that in the `print()` implementation, `_PySys_GetAttr` returns a borrowed reference. \n\nhttps://github.com/python/cpython/blob/655fc8a0fce3396fc1af3f7bc8f5c94ca8ec377d/Python/bltinmodule.c#L2173-L2175\n\nSo if `sys.stdout` changes concurrently with the `print()`, the program may crash because `file` will point to a deallocated Python object.\n\nThis affects the GIL-enabled build as well. See this reproducer: https://gist.github.com/colesbury/c48f50e95d5d68e24814a56e2664e587\n\n### Suggested fix\n\nIntroduce a `_PySys_GetAttrRef` that returns a new reference instead of a borrowed reference. Use that instead.\n\nWe should audit all the uses of `_PySys_GetAttr` and `PySys_GetObject`. I expect most of them will need to be replaced with functions that return new references, but it doesn't all have to be in a single PR.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a5+ experimental free-threading build (heads/main:359c7dde3bb, Feb 15 2025, 17:54:11) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-130282\n* gh-130503\n* gh-130556\n* gh-130568\n* gh-130576\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-15T22:15:56Z",
+   "body": "The issue could be with `StringIO()` or `sys.stdout/sys.stderr` or with context managers in general. I don't know where to start to investigate this =/"
+  },
+  {
+   "author": "tomasr8",
+   "created_at": "2025-02-15T22:23:36Z",
+   "body": "Here's the backtrace:\n\n```\n#0  PyObject_GetAttr (v=v@entry=0x2002c0f00d0, name=0x555555b83358 <_PyRuntime+110680>) at Objects/object.c:1288\n#1  0x0000555555688162 in PyFile_WriteObject (v=v@entry=0x555555b836e0 <_PyRuntime+111584>, f=f@entry=0x2002c0f00d0, flags=flags@entry=1) at Objects/fileobject.c:113\n#2  0x0000555555688279 in PyFile_WriteString (s=s@entry=0x5555558efa49 \"\\n\", f=f@entry=0x2002c0f00d0) at Objects/fileobject.c:149\n#3  0x000055555579c917 in builtin_print_impl (module=module@entry=0x2000025c5d0, args=args@entry=0x7fffd4bffb78, args_length=args_length@entry=1, sep=0x0, sep@entry=0x555555b410a0 <_Py_NoneStruct>, end=0x0, end@entry=0x555555b410a0 <_Py_NoneStruct>, file=0x2002c0f00d0, file@entry=0x555555b410a0 <_Py_NoneStruct>, flush=0) at Python/bltinmodule.c:2222\n#4  0x000055555579ca97 in builtin_print (module=0x2000025c5d0, args=args@entry=0x7fffd4bffb78, nargs=nargs@entry=1, kwnames=kwnames@entry=0x0) at Python/clinic/bltinmodule.c.h:985\n#5  0x00005555556c245b in cfunction_vectorcall_FASTCALL_KEYWORDS (func=0x2000025d670, args=0x7fffd4bffb78, nargsf=<optimized out>, kwnames=0x0) at Objects/methodobject.c:452\n#6  0x0000555555667519 in _PyObject_VectorcallTstate (tstate=0x555555cb4900, callable=callable@entry=0x2000025d670, args=args@entry=0x7fffd4bffb78, nargsf=9223372036854775809, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:167\n#7  0x00005555556675f5 in PyObject_Vectorcall (callable=callable@entry=0x2000025d670, args=args@entry=0x7fffd4bffb78, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#8  0x00005555557abdd3 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x7ffff7e3d1b0, throwflag=<optimized out>) at Python/generated_cases.c.h:1371\n#9  0x00005555557d0ca5 in _PyEval_EvalFrame (tstate=tstate@entry=0x555555cb4900, frame=frame@entry=0x7ffff7e3d020, throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:116\n#10 0x00005555557d0e76 in _PyEval_Vector (tstate=0x555555cb4900, func=0x2000068dc90, locals=locals@entry=0x0, args=0x7fffd4bffd48, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:1745\n#11 0x0000555555667192 in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/call.c:413\n#12 0x000055555566a435 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x555555cb4900, callable=callable@entry=0x2000068dc90, args=args@entry=0x7fffd4bffd48, nargsf=nargsf@entry=1, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:167\n#13 0x000055555566a69a in method_vectorcall (method=<optimized out>, args=0x555555b87c98 <_PyRuntime+129432>, nargsf=0, kwnames=0x0) at Objects/classobject.c:72\n#14 0x0000555555668e22 in _PyVectorcall_Call (tstate=tstate@entry=0x555555cb4900, func=0x55555566a4bd <method_vectorcall>, callable=callable@entry=0x200006b8170, tuple=tuple@entry=0x555555b87c70 <_PyRuntime+129392>, kwargs=kwargs@entry=0x0) at Objects/call.c:273\n#15 0x0000555555669151 in _PyObject_Call (tstate=0x555555cb4900, callable=0x200006b8170, args=0x555555b87c70 <_PyRuntime+129392>, kwargs=0x0) at Objects/call.c:348\n#16 0x000055555566918d in PyObject_Call (callable=<optimized out>, args=<optimized out>, kwargs=<optimized out>) at Objects/call.c:373\n#17 0x00005555558cf626 in thread_run (boot_raw=boot_raw@entry=0x555555cb48b0) at ./Modules/_threadmodule.c:354\n#18 0x000055555585b7f3 in pythread_wrapper (arg=<optimized out>) at Python/thread_pthread.h:242\n#19 0x00007ffff7c9caa4 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:447\n#20 0x00007ffff7d29c3c in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78\n```\n\nThe immediate cause seems to be related to the printing itself, but I didn't dig into it too much"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-15T22:27:26Z",
+   "body": "> The issue could be with `StringIO()` or `sys.stdout/sys.stderr` or with context managers in general.\n\nSubstituting `StringIO` with the following stops crashing, would it point to it being the culprit?\n```python\nclass FakeStringIO:\n    def write(self, value):\n        pass\n    def getvalue(self):\n        return \"hello1\\nhello2\\n\"\n    def flush(self):\n        pass\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-15T22:36:41Z",
+   "body": "I suspect it has something to do with the `PyFile_*` interface."
+  },
+  {
+   "author": "tomasr8",
+   "created_at": "2025-02-15T22:38:02Z",
+   "body": "Might be something to do with `redirect_stdout`, I'm getting a segfault even with this simplified reproducer:\n\n```python\nfrom contextlib import redirect_stdout\nfrom io import StringIO\nfrom threading import Thread\nimport time\n\n\ndef test_redirect():\n    text = StringIO()\n    with redirect_stdout(text):\n        time.sleep(0.1)\n    print(text.getvalue())\n\n\nfor x in range(100):\n    Thread(target=test_redirect, args=()).start()\n\n```\n\nedit:\n\nBoth crashes seem to be caused by `Py_TYPE` returning `NULL`. Here's the backtrace for this repro:\n\n```\n#0  _Py_Dealloc (op=op@entry=0x2009c1000d0) at Objects/object.c:2994\n#1  0x00005555556c8407 in _Py_DecRefSharedDebug (o=o@entry=0x2009c1000d0, filename=filename@entry=0x5555558e4237 \"./Include/refcount.h\", lineno=lineno@entry=502) at Objects/object.c:418\n#2  0x00005555556c2569 in Py_DECREF (filename=filename@entry=0x5555558e4237 \"./Include/refcount.h\", lineno=lineno@entry=502, op=0x2009c1000d0) at ./Include/refcount.h:347\n#3  0x00005555556c28bb in Py_XDECREF (op=<optimized out>) at ./Include/refcount.h:502\n#4  0x00005555556c2ff1 in meth_dealloc (self=0x2009e0e0160) at Objects/methodobject.c:172\n#5  0x00005555556c82fe in _Py_Dealloc (op=0x2009e0e0160) at Objects/object.c:3014\n#6  0x00005555556c83d7 in _Py_MergeZeroLocalRefcount (op=op@entry=0x2009e0e0160) at Objects/object.c:436\n#7  0x000055555568767f in Py_DECREF (filename=filename@entry=0x5555558eb2c2 \"Objects/fileobject.c\", lineno=lineno@entry=127, op=op@entry=0x2009e0e0160) at ./Include/refcount.h:343\n#8  0x00005555556881c1 in PyFile_WriteObject (v=v@entry=0x555555b836e0 <_PyRuntime+111584>, f=f@entry=0x2009c1000d0, flags=flags@entry=1) at Objects/fileobject.c:127\n#9  0x0000555555688279 in PyFile_WriteString (s=s@entry=0x5555558efa49 \"\\n\", f=f@entry=0x2009c1000d0) at Objects/fileobject.c:149\n#10 0x000055555579c917 in builtin_print_impl (module=module@entry=0x2000025c5d0, args=args@entry=0x7fff5f3ffb78, args_length=args_length@entry=1, sep=0x0, sep@entry=0x555555b410a0 <_Py_NoneStruct>, end=0x0, end@entry=0x555555b410a0 <_Py_NoneStruct>, file=0x2009c1000d0, file@entry=0x555555b410a0 <_Py_NoneStruct>, flush=0) at Python/bltinmodule.c:2222\n#11 0x000055555579ca97 in builtin_print (module=0x2000025c5d0, args=args@entry=0x7fff5f3ffb78, nargs=nargs@entry=1, kwnames=kwnames@entry=0x0) at Python/clinic/bltinmodule.c.h:985\n#12 0x00005555556c245b in cfunction_vectorcall_FASTCALL_KEYWORDS (func=0x2000025d670, args=0x7fff5f3ffb78, nargsf=<optimized out>, kwnames=0x0) at Objects/methodobject.c:452\n#13 0x0000555555667519 in _PyObject_VectorcallTstate (tstate=0x555555daaa30, callable=callable@entry=0x2000025d670, args=args@entry=0x7fff5f3ffb78, nargsf=9223372036854775809, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:167\n#14 0x00005555556675f5 in PyObject_Vectorcall (callable=callable@entry=0x2000025d670, args=args@entry=0x7fff5f3ffb78, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#15 0x00005555557abdd3 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x7ffff75641b0, throwflag=<optimized out>) at Python/generated_cases.c.h:1371\n#16 0x00005555557d0ca5 in _PyEval_EvalFrame (tstate=tstate@entry=0x555555daaa30, frame=frame@entry=0x7ffff7564020, throwflag=throwflag@entry=0) at ./Include/internal/pycore_ceval.h:116\n#17 0x00005555557d0e76 in _PyEval_Vector (tstate=0x555555daaa30, func=0x2000068dc90, locals=locals@entry=0x0, args=0x7fff5f3ffd48, argcount=<optimized out>, kwnames=0x0) at Python/ceval.c:1745\n#18 0x0000555555667192 in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/call.c:413\n#19 0x000055555566a435 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x555555daaa30, callable=callable@entry=0x2000068dc90, args=args@entry=0x7fff5f3ffd48, nargsf=nargsf@entry=1, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:167\n#20 0x000055555566a69a in method_vectorcall (method=<optimized out>, args=0x555555b87c98 <_PyRuntime+129432>, nargsf=0, kwnames=0x0) at Objects/classobject.c:72\n#21 0x0000555555668e22 in _PyVectorcall_Call (tstate=tstate@entry=0x555555daaa30, func=0x55555566a4bd <method_vectorcall>, callable=callable@entry=0x200006babd0, tuple=tuple@entry=0x555555b87c70 <_PyRuntime+129392>, kwargs=kwargs@entry=0x0) at Objects/call.c:273\n#22 0x0000555555669151 in _PyObject_Call (tstate=0x555555daaa30, callable=0x200006babd0, args=0x555555b87c70 <_PyRuntime+129392>, kwargs=0x0) at Objects/call.c:348\n#23 0x000055555566918d in PyObject_Call (callable=<optimized out>, args=<optimized out>, kwargs=<optimized out>) at Objects/call.c:373\n#24 0x00005555558cf626 in thread_run (boot_raw=boot_raw@entry=0x555555daa9e0) at ./Modules/_threadmodule.c:354\n#25 0x000055555585b7f3 in pythread_wrapper (arg=<optimized out>) at Python/thread_pthread.h:242\n#26 0x00007ffff7c9caa4 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:447\n#27 0x00007ffff7d29c3c in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78\n```\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-15T22:45:36Z",
+   "body": "> Might be something to do with redirect_stdout, I'm getting a segfault even with this simplified reproducer:\n\nHave you tried removing the usage to `StringIO()`? because it appears that we crash in `Py_DECREF` of a file object."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-16T07:43:58Z",
+   "body": "Yes, it is caused by `redirect_stdout`.\n1. At some point, print from T1 and T2 uses StringIO, which is owned by T1. \n2. `PyObject_GetAttr` (https://github.com/python/cpython/blob/798f8d3ea9f54ee80a684bff74f67ee7d99e35c2/Objects/fileobject.c#L113) increments shared ref_cnt (by T2) and local ref_cnt (by T1).\n3. `Py_DECREF` (https://github.com/python/cpython/blob/798f8d3ea9f54ee80a684bff74f67ee7d99e35c2/Objects/fileobject.c#L127) from T2 decrements shared ref_cnt and got 0 and do `_Py_Dealloc`\n4. `Py_DECREF` from T1 decrements local ref_cnt, got 0 and go to `_Py_MergeZeroLocalRefcount`, see that shared ref_cnt is 0 and go to fast path and do `_Py_Dealloc`.\n5. This is double free and so segfault.\n\nThe easiest way to fix this is probably to protect `PyFile_WriteObject` with a critical section. However, this might slightly affect the performance of single-threaded apps.\n\nThe best solution might be to update the documentation and point out this potential issue with `redirect_*`."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-16T10:08:26Z",
+   "body": "> Have you tried removing the usage to `StringIO()`?\n\nUsing `open(\"/dev/null\", \"w\")` instead of `StringIO` still segfaults.\n\n> Yes, it is caused by `redirect_stdout`.\n\nBut any program that does `redirect_stdout` does will also segfault:\n\n```python\nfrom threading import Thread\nimport sys\nimport time\n\n\ndef test_redirect():\n    text = open(\"/dev/null\", \"w\")\n    old_stdout = sys.stdout\n    sys.stdout = text\n    print(\"hello1\")\n    time.sleep(0.3)\n    print(\"hello2\")\n    sys.stdout = old_stdout\n\n\nfor x in range(200):\n    Thread(target=test_redirect, args=()).start()\n```\n\n> The easiest way to fix this is probably to protect `PyFile_WriteObject` with a critical section. However, this might slightly affect the performance of single-threaded apps.\n\nWould making the presence of the critical section dependent on whether the build is freethreaded (and/or the GIL is disabled) avoid the performance impact for gilfull builds? Or would it be a bad idea to have this conditional difference in behavior?\n\n> The best solution might be to update the documentation and point out this potential issue with `redirect_*`.\n\nISTM that fixing the segfault is necessary, even if a note is added to docs, because users may hit the segfault without using `redirect_*`.\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T10:10:16Z",
+   "body": "Yes it's not redirect_stdout that is the culprit, it's the PyFile API. "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-16T10:30:20Z",
+   "body": "It's much harder to segfault in a non-debug build. There are many `ValueError: I/O operation on uninitialized object` and `ValueError: I/O operation on uninitialized object` errors when running. Here's a Fatal Python error that may happen in such a build:\n```\nObjects/object.c:578: PyObject_CallFinalizerFromDealloc: Assertion failed: PyObject_CallFinalizerFromDealloc called on object with a non-zero refcount\nEnable tracemalloc to get the memory block allocation traceback\n\nobject address  : 0x5e31e1700e0\nobject refcount : 1\nobject type     : 0x5e2ae298200\nobject type name: _io.TextIOWrapper\nobject repr     : <_io.TextIOWrapper name='/dev/null' mode='w' encoding='UTF-8'>\n\nFatal Python error: _PyObject_AssertFailed: _PyObject_AssertFailed\nPython runtime state: initialized\n```\n\nEdit: of course, just after I posted this comment, a segfault in a non-debug build happened:\n```gdb\n#0  __new_sem_post (sem=0x0) at ./nptl/sem_post.c:35\n#1  0x00005555558758ed in PyThread_release_lock (\n    lock=<optimized out>)\n    at Python/thread_pthread.h:618\n#2  0x00005555558c7921 in _io__Buffered_close_impl (\n    self=0x3365e1f00c0)\n    at ./Modules/_io/bufferedio.c:596\n#3  _io__Buffered_close (\n    self=<_io.BufferedWriter at remote 0x3365e1f00c0>,\n    _unused_ignored=<optimized out>)\n    at ./Modules/_io/clinic/bufferedio.c.h:375\n#4  0x0000555555654b83 in method_vectorcall_NOARGS (\n    func=<method_descriptor at remote 0x335fe3d6130>,\n    args=0x7ffe6fdff7e8, nargsf=<optimized out>,\n    kwnames=0x0) at Objects/descrobject.c:447\n#5  0x000055555564184e in _PyObject_VectorcallTstate (\n    tstate=0x555555e53bb0,\n    callable=<method_descriptor at remote 0x335fe3d6130>, args=0x7ffe6fdff7e8, nargsf=<optimized out>,\n    kwnames=0x0)\n    at ./Include/internal/pycore_call.h:167\n    args=args@entry=0x7ffe6fdff7e8, nargsf=<optimized out>, nargsf@entry=9223372036854775809,\n    kwnames=kwnames@entry=0x0) at Objects/call.c:856\n#7  0x00005555558cf1c0 in PyObject_CallMethodNoArgs (self=<optimized out>,\n    name=<optimized out>) at ./Include/cpython/abstract.h:65\n#8  _io_TextIOWrapper_close_impl (self=0x3365e2000e0) at ./Modules/_io/textio.c:3167\n#9  _io_TextIOWrapper_close (self=<_io.TextIOWrapper at remote 0x3365e2000e0>,\n    _unused_ignored=<optimized out>) at ./Modules/_io/clinic/textio.c.h:1138\n#10 0x0000555555654b83 in method_vectorcall_NOARGS (\n    func=<method_descriptor at remote 0x335fe3d8890>, args=0x7ffe6fdff8d0,\n    nargsf=<optimized out>, kwnames=0x0) at Objects/descrobject.c:447\n#11 0x000055555564184e in _PyObject_VectorcallTstate (tstate=0x555555e53bb0,\n    callable=<method_descriptor at remote 0x335fe3d8890>, args=0x7ffe6fdff8d0,\n    nargsf=<optimized out>, kwnames=0x0) at ./Include/internal/pycore_call.h:167\n#12 PyObject_VectorcallMethod (name=<optimized out>, args=args@entry=0x7ffe6fdff8d0,\n    nargsf=<optimized out>, nargsf@entry=9223372036854775809, kwnames=kwnames@entry=0x0)\n    at Objects/call.c:856\n#13 0x00005555558bebad in PyObject_CallMethodNoArgs (self=<optimized out>,\n    name=<optimized out>) at ./Include/cpython/abstract.h:65\n#14 iobase_finalize (self=<_io.TextIOWrapper at remote 0x3365e2000e0>)\n    at ./Modules/_io/iobase.c:317\n#15 0x00005555556bf3a0 in PyObject_CallFinalizer (\n    self=<_io.TextIOWrapper at remote 0x3365e2000e0>) at Objects/object.c:568\n#16 0x00005555556c5dfc in PyObject_CallFinalizerFromDealloc (\n    self=self@entry=<_io.TextIOWrapper at remote 0x3365e2000e0>) at Objects/object.c:586\n#17 0x00005555558bfd4e in _PyIOBase_finalize (\n    self=self@entry=<_io.TextIOWrapper at remote 0x3365e2000e0>) at ./Modules/_io/iobase.c:340\n#18 0x00005555558ce6ca in textiowrapper_dealloc (\n    op=<_io.TextIOWrapper at remote 0x3365e2000e0>) at ./Modules/_io/textio.c:1468\n#19 0x00005555556a8ebd in Py_XDECREF (op=<optimized out>) at ./Include/refcount.h:502\n#20 insertdict (mp=0x335fe01a600, key='stdout', hash=-9074624609838634197,\n    value=<_io.TextIOWrapper(mode='w') at remote 0x3375a1f00e0>, interp=<optimized out>)\n    at Objects/dictobject.c:1864\n#21 0x00005555556aae68 in _PyObjectDict_SetItem (tp=tp@entry=0x555555b023a0 <PyModule_Type>,\n    obj=obj@entry=<module at remote 0x335fe25e060>, dictptr=<optimized out>,\n    key=key@entry='stdout',\n    value=value@entry=<_io.TextIOWrapper(mode='w') at remote 0x3375a1f00e0>)\n    at Objects/dictobject.c:7502\n#22 0x00005555556c3add in _PyObject_GenericSetAttrWithDict (\n    obj=<module at remote 0x335fe25e060>, name='stdout',\n    value=<_io.TextIOWrapper(mode='w') at remote 0x3375a1f00e0>, dict=0x0)\n    at Objects/object.c:1853\n#23 0x00005555556c150c in PyObject_SetAttr (v=v@entry=<module at remote 0x335fe25e060>,\n    name=<optimized out>,\n    value=value@entry=<_io.TextIOWrapper(mode='w') at remote 0x3375a1f00e0>)\n    at Objects/object.c:1443\n#24 0x00005555557d2701 in _PyEval_EvalFrameDefault (tstate=<optimized out>,\n    frame=<optimized out>, throwflag=<optimized out>)\n    at ./Include/internal/pycore_stackref.h:184\n#25 0x00005555557dcf6e in _PyEval_EvalFrame (tstate=0x555555e53bb0, frame=<optimized out>,\n    throwflag=0) at ./Include/internal/pycore_ceval.h:116\n#26 _PyEval_Vector (tstate=0x555555e53bb0, func=0x335fe4f48c0, locals=0x0,\n    args=<optimized out>, argcount=1, kwnames=<optimized out>) at Python/ceval.c:1745\n#27 0x00005555556445c3 in _PyObject_VectorcallTstate (tstate=0x555555e53bb0,\n    callable=<function at remote 0x335fe4f48c0>, args=0x7ffe6fdffe18, nargsf=1, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:167\n#28 method_vectorcall (method=<optimized out>, args=0x555555b45450 <_PyRuntime+113424>,\n    nargsf=<optimized out>, kwnames=0x0) at Objects/classobject.c:72\n#29 0x00005555558fa480 in thread_run (boot_raw=0x555555e53b70)\n    at ./Modules/_threadmodule.c:354\n#30 0x000055555587508b in pythread_wrapper (arg=<optimized out>)\n    at Python/thread_pthread.h:242\n#31 0x00007ffff7ca1e2e in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:447\n#32 0x00007ffff7d33a4c in __GI___clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:78\n```\n\nIs it a different crash?"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-16T10:34:27Z",
+   "body": "Try to acquire CS before https://github.com/python/cpython/blob/798f8d3ea9f54ee80a684bff74f67ee7d99e35c2/Objects/fileobject.c#L113 and release after https://github.com/python/cpython/blob/798f8d3ea9f54ee80a684bff74f67ee7d99e35c2/Objects/fileobject.c#L127 and segfault should gone."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T13:21:39Z",
+   "body": "> Is it a different crash?\n\nOk, it's perhaps not the PyFile API, but just the buffer API itself. To check this, can you try no using `print` but directly use `.write` of the io wrapper?\n\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T13:30:04Z",
+   "body": "Ok, I couldn't manage to make it crash with a pure buffer API, so it's likely the `print()` itself."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T13:46:20Z",
+   "body": "Even with a critical section, I still get a segfault:\n\n```diff\ndiff --git a/Objects/fileobject.c b/Objects/fileobject.c\nindex 7025b5bcffc..7b84f5962fe 100644\n--- a/Objects/fileobject.c\n+++ b/Objects/fileobject.c\n@@ -3,6 +3,7 @@\n #include \"Python.h\"\n #include \"pycore_call.h\"          // _PyObject_CallNoArgs()\n #include \"pycore_runtime.h\"       // _PyRuntime\n+#include \"pycore_critical_section.h\"\n\n #ifdef HAVE_UNISTD_H\n #  include <unistd.h>             // isatty()\n@@ -101,34 +102,33 @@ PyFile_GetLine(PyObject *f, int n)\n\n /* Interfaces to write objects/strings to file-like objects */\n\n+static inline int\n+_PyFile_WriteObject(PyObject *f, PyObject *v)\n+{\n+    PyObject *writer = PyObject_GetAttr(f, &_Py_ID(write));\n+    if (writer == NULL) return -1;\n+    PyObject *res = PyObject_CallOneArg(writer, v);\n+    Py_DECREF(writer);\n+    if (res == NULL) return -1;\n+    Py_DECREF(res);\n+    return 0;\n+}\n+\n int\n PyFile_WriteObject(PyObject *v, PyObject *f, int flags)\n {\n-    PyObject *writer, *value, *result;\n\n     if (f == NULL) {\n         PyErr_SetString(PyExc_TypeError, \"writeobject with NULL file\");\n         return -1;\n     }\n-    writer = PyObject_GetAttr(f, &_Py_ID(write));\n-    if (writer == NULL)\n-        return -1;\n-    if (flags & Py_PRINT_RAW) {\n-        value = PyObject_Str(v);\n-    }\n-    else\n-        value = PyObject_Repr(v);\n-    if (value == NULL) {\n-        Py_DECREF(writer);\n-        return -1;\n-    }\n-    result = PyObject_CallOneArg(writer, value);\n+    int rc = 0;\n+    PyObject *value = (flags & Py_PRINT_RAW) ? PyObject_Str(v) : PyObject_Repr(v);\n+    Py_BEGIN_CRITICAL_SECTION(f);\n+    rc = _PyFile_WriteObject(f, value);\n+    Py_END_CRITICAL_SECTION();\n     Py_DECREF(value);\n-    Py_DECREF(writer);\n-    if (result == NULL)\n-        return -1;\n-    Py_DECREF(result);\n-    return 0;\n+    return rc;\n }\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T13:47:41Z",
+   "body": "And adding a critical section to `print` also doesn't help =/"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T13:52:26Z",
+   "body": "A funny observation. When using `print(file=...)` directly without changing `sys.stdout`, I can't get a segfault as frequently (I didn't hit one yet). So it could really be `sys.stdout` itself. I didn't manage to get a segfault if I directly call `text.write()` =/"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-16T14:09:31Z",
+   "body": "Not sure this helps, but I get a (non-deterministic) segfault under GDB with:\n\n```python\nfrom contextlib import redirect_stdout\nfrom threading import Thread\nimport sys\nimport time\n\ndef test_redirect():\n    text = open(\"/dev/null\", \"w\")\n    with redirect_stdout(text):\n        sys.stdout.buffer.write(b\"hello1\")\n        time.sleep(0.3)\n        sys.stdout.buffer.write(b\"hello1\")\n\nfor x in range(200):\n    Thread(target=test_redirect, args=()).start()\n```\n\nThe backtrace is:\n```gdb\n#0  PyObject_CallFinalizerFromDealloc (self=0x200381b0110) at Objects/object.c:602\n#1  0x000055555598aa30 in _PyIOBase_finalize (self=self@entry=0x200381b0110) at ./Modules/_io/iobase.c:340\n#2  0x000055555599da85 in textiowrapper_dealloc (op=0x200381b0110) at ./Modules/_io/textio.c:1468\n#3  0x000055555570d483 in _Py_Dealloc (op=op@entry=0x200381b0110) at Objects/object.c:3015\n#4  0x000055555570d642 in _Py_DecRefSharedDebug (o=o@entry=0x200381b0110,\n    filename=filename@entry=0x5555559f662f \"./Include/refcount.h\", lineno=lineno@entry=502)\n    at Objects/object.c:418\n#5  0x00005555556e55b4 in Py_DECREF (filename=0x5555559f662f \"./Include/refcount.h\", lineno=502,\n    op=0x200381b0110) at ./Include/refcount.h:347\n#6  0x00005555556f38b7 in Py_XDECREF (op=<optimized out>) at ./Include/refcount.h:502\n#7  insertdict (interp=<optimized out>, mp=mp@entry=0x2000001f850,\n    key=key@entry=0x555555c801d8 <_PyRuntime+106200>, hash=737787358347787621,\n    value=value@entry=0x2003a1b0110) at Objects/dictobject.c:1864\n#8  0x00005555556f3b09 in setitem_take2_lock_held (mp=mp@entry=0x2000001f850,\n    key=key@entry=0x555555c801d8 <_PyRuntime+106200>, value=value@entry=0x2003a1b0110)\n    at Objects/dictobject.c:2594\n#9  0x00005555556f3c5a in setitem_lock_held (mp=mp@entry=0x2000001f850,\n    key=key@entry=0x555555c801d8 <_PyRuntime+106200>, value=value@entry=0x2003a1b0110)\n    at ./Include/refcount.h:519\n#10 0x00005555556f456e in _PyDict_SetItem_LockHeld (dict=dict@entry=0x2000001f850,\n    name=name@entry=0x555555c801d8 <_PyRuntime+106200>, value=value@entry=0x2003a1b0110)\n    at Objects/dictobject.c:6829\n#11 0x00005555556f467d in _PyObjectDict_SetItem (tp=tp@entry=0x555555c3e3a0 <PyModule_Type>,\n    obj=obj@entry=0x20000259f50, dictptr=0x20000259f70, key=key@entry=0x555555c801d8 <_PyRuntime+106200>,\n    value=value@entry=0x2003a1b0110) at Objects/dictobject.c:7502\n#12 0x000055555571118e in _PyObject_GenericSetAttrWithDict (obj=0x20000259f50,\n    name=0x555555c801d8 <_PyRuntime+106200>, value=<optimized out>, dict=dict@entry=0x0)\n    at Objects/object.c:1853\n#13 0x00005555557113c4 in PyObject_GenericSetAttr (obj=<optimized out>, name=<optimized out>,\n    value=<optimized out>) at Objects/object.c:1881\n#14 0x000055555570fbe8 in PyObject_SetAttr (v=0x20000259f50, name=<optimized out>, value=0x2003a1b0110)\n    at Objects/object.c:1443\n#15 0x000055555582d976 in builtin_setattr_impl (module=module@entry=0x2000025c5d0, obj=<optimized out>,\n    name=<optimized out>, value=<optimized out>) at Python/bltinmodule.c:1695\n#16 0x000055555582d9d1 in builtin_setattr (module=0x2000025c5d0, args=args@entry=0x7fffb67fbb48,\n    nargs=nargs@entry=3) at Python/clinic/bltinmodule.c.h:660\n#17 0x000055555584b9ed in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555d90f10,\n    frame=0x7ffff742b240, frame@entry=0x7ffff742b020, throwflag=throwflag@entry=0)\n    at Python/generated_cases.c.h:2011\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T14:21:57Z",
+   "body": "> Not sure this helps, but I get a (non-deterministic) segfault under GDB with:\n\nYes, but this assumes that `sys.stdout` is replaced by whatever object you're using. Note that `sys.stdout` is stored at the interpreter level not just at the module level I think. So I think it's really the fact that we substitute `sys.stdout` for something that is not the original one.\n\nBtw, I didn't manage to have a segfault with your latest reproducer so maybe it's also an OS/kernel issue?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-16T14:30:59Z",
+   "body": "Here's one that sometimes segfaults for me under GDB without `sys.stdout`:\n\n```python\nfrom threading import Thread\nimport time\n\nnull = open(\"/dev/null\", \"w\")\n\nclass Dummy:\n    stdout = null\n\ndummy = Dummy()\n\ndef test_redirect():\n    old_stdout = dummy.stdout\n    dummy.stdout = open(\"/dev/null\", \"w\")\n    dummy.stdout.buffer.write(b\"hello1\\n\")\n    time.sleep(0.3)\n    dummy.stdout.buffer.write(b\"hello2\\n\")\n    dummy.stdout = old_stdout\n    dummy.stdout.buffer.write(b\"hello3\\n\")\n\nfor x in range(200):\n    Thread(target=test_redirect, args=()).start()\n```\n\nBacktrace same as the one before."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T14:41:38Z",
+   "body": "I don't know why I can make it fail on my side :') I only get `ValueError: write to closed file`. However, this could help us targetting the issue. Do you think it'll also be possible to use a normal file to write to instead of `/dev/null`?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-16T14:48:38Z",
+   "body": "> I don't know why I can make it fail on my side :') \n\nIt's only segfaulting under GDB for me, doesn't work otherwise so far.\n\n> Do you think it'll also be possible to use a normal file to write to instead of `/dev/null`?\n\nIt segfaults in the same way, with:\n\n```python\nfrom threading import Thread\nimport time\n\nout = open(\"out1\", \"w\")\n\nclass Dummy:\n    stdout = out\n\ndummy = Dummy()\n\ndef test_redirect():\n    old_stdout = dummy.stdout\n    dummy.stdout = open(\"out2\", \"w\")\n    dummy.stdout.buffer.write(b\"hello1\\n\")\n    time.sleep(0.3)\n    dummy.stdout.buffer.write(b\"hello2\\n\")\n    dummy.stdout = old_stdout\n    dummy.stdout.buffer.write(b\"hello3\\n\")\n\nfor x in range(200):\n    Thread(target=test_redirect, args=()).start()\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T14:53:52Z",
+   "body": "> It's only segfaulting under GDB for me, doesn't work otherwise so far.\n\nEven for me it doesn't work :( \n\n---\n\nOk, so we can now rule out the fact `/dev/stdout` may be a special file, we can also rule out `contextlib.redirect_stdout`, we can also rule out `sys.stdout` and the fact that it's stored at the interpreter level. So, the issue is probably in the IO objects (great, one of the hardest part of the code when hunting bugs).\n\nThere's something about ressurected streams, which could be the issue but I never touched this part of Python so I'm not an expert there. I could try investigating a bit more though."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T14:58:54Z",
+   "body": "If I have to widely guess, I assume that `dummy` is being concurrently modified and combined with the special way IO objects are destroyed, something else happens. Maybe it's just that affecting the attribute works badly? and that's what makes it crash.\n\nIn addition, it seems that IO objects have their own managed dict which makes it even ... harder to track. I don't have enough bandwidth to investigate this one now but I can try next week (though I'm leaving on monday for 1 week)"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-16T16:47:51Z",
+   "body": "I believe the problem in the last script is caused by heavy contention threads. `Py_DECREF` has two paths that leads to `_Py_Dealloc`, and neither path is protected by a CS. I can imagine the case when T1 checks `_Py_DecRefSharedIsDead`, goes to `_Py_Dealloc`, and switched to T2, T2 owns the object (it is local to T2) and T2 goes by slow path in `_Py_MergeZeroLocalRefcount` (because `ob_ref_shared == _Py_REF_MERGED`), then calling `_Py_Dealloc` and switching back to T1, which waits inside an if block before calling `_Py_Dealloc` - so we get double free again.\n\nMaybe @colesbury can help us? Or point me out where I'm wrong in my analysis."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-16T17:33:49Z",
+   "body": "Maybe `_Py_Dealloc` should check (steal via CAS) some flag (like obj_tid == 0, but another one) and do the real deallocation if the flag is not set. But idk how it will work with resurrection.\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T17:35:11Z",
+   "body": "As Peter [said](https://github.com/python/cpython/issues/128396#issuecomment-2657118390) on another issue, crashes in common macros or operations are generally incidental, and not the actual cause of the crash. \n\nIn this case, I think it's the `_PyIOBase_Dealloc` function that is faulty, or something at finalization of an IO object (in this, it would be the object obtained by `open` which is a text IO wrapper)"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-02-16T17:38:23Z",
+   "body": "The problem is that in the `print()` implementation, `_PySys_GetAttr` returns a borrowed reference. \n\nhttps://github.com/python/cpython/blob/655fc8a0fce3396fc1af3f7bc8f5c94ca8ec377d/Python/bltinmodule.c#L2173-L2175\n\nSo if `sys.stdout` changes concurrently with the `print()`, the program may crash because `file` will point to a deallocated Python object.\n\nThis affects the GIL-enabled build as well. See this reproducer: https://gist.github.com/colesbury/c48f50e95d5d68e24814a56e2664e587\n\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T17:47:10Z",
+   "body": "So, are we having one or two issues? because https://github.com/python/cpython/issues/130163#issuecomment-2661465164 doesn't use `print()` at all =/ (maybe it's a gdb-only weird issue)"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-02-16T18:08:30Z",
+   "body": "Yeah, I think that's another bug with `_PyObject_ResurrectEnd`. In the resurrection case, the object may still be deallocated. In particular, `_Py_brc_queue_object()` may immediately free the object or lead to it being freed by another thread. The calls below `_PyObject_ResurrectEnd()` are not safe:\n\nhttps://github.com/python/cpython/blob/655fc8a0fce3396fc1af3f7bc8f5c94ca8ec377d/Objects/object.c#L594-L604\n\nWe either need to ensure that the object remains alive after `_PyObject_ResurrectEnd()` returns `1`, or rearrange the resurrection code."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-02-16T18:13:18Z",
+   "body": "Ok, so let's track it down separately. We can use this issue for the non thread-safetiness of `print` (and remove the `free-threading` label as it also affects GIL-enabled builds) and create another one for the ressurection. WDYT? I unfortunately have no knowledge in this area so if you have time, could you open the issue with what needs / can be done, please? TiA."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-02-16T18:25:37Z",
+   "body": "I've updated the description in this issue and filed https://github.com/python/cpython/issues/130202 for the resurrection. If someone wants to take on the `_PySys_GetAttr()` problem (this issue), that'd be great."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-16T18:30:39Z",
+   "body": "If @devdanzin wouldn't, I will try."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-02-16T18:33:25Z",
+   "body": "There's an open [C API WG discussion](https://github.com/capi-workgroup/decisions/issues/54) about the problem with `_PySys_GetAttr` and friends. I think we'll need a new internal function, so you can take inspiration from some of the designs there."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-02-17T09:29:30Z",
+   "body": "> If @devdanzin wouldn't, I will try.\n\nOh, I wouldn't know how. Feel free to take it forward. "
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-17T19:51:41Z",
+   "body": "> Oh, I wouldn't know how. Feel free to take it forward.\n\nThanks, I will try.\n"
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-23T12:36:54Z",
+   "body": "I've looked at how `_PySys_GetAttr` is used. I can reproduce the `segfault` error in some places where it's used. I've written tests for these places.\n\n@colesbury @ZeroIntensity, @serhiy-storchaka please take a look.\n\nHere's a copy from my [PR](https://github.com/python/cpython/pull/130282):\n|                                                        | Repro  | Tests  | Raised exception |\n| ------------------------------------------------------ |:------:|:------:| ---------------- |\n| `_pickle.c/whichmodule`                                |   No   |   No   | Don't keep       |\n| `_threadmodule.c/thread_excepthook`                    |   No   |   No   | Keep             |\n| `faulthandler.c/faulthandler_get_fileno`               |  Yes   |  Yes   | Don't keep       |\n| `bltinmodule.c/builtin_print_impl`                     |  Yes   |  Yes   | Don't keep       |\n| `bltinmodule.c/builtin_input_impl`                     |  Yes   |  Yes   | Don't keep       |\n| `errors.c/write_unraisable_exc`                        |   No   |   No   | Keep             |\n| `errors.c/format_unraisable_v`                         |  Yes   |  Yes   | Keep             |\n| `_warnings.c/show_warning`                             |  Yes   |  Yes   | Don't keep       |\n| `intrinsics.c/print_expr`                              |   No   |   No   | Don't keep       |\n| `pylifecycle.c/flush_std_files`                        | Yes/No | Yes/No | Don't keep       |\n| `pythonrun.c/_PyRun_InteractiveLoopObject`             |   No   |   No   | Don't keep       |\n| `pythonrun.c/pyrun_one_parse_ast`                      |   No   |   No   | Don't keep       |\n| `pythonrun.c/_Py_HandleSystemExitAndKeyboardInterrupt` |   No   |   No   | Don't keep       |\n| `pythonrun.c/_PyErr_PrintEx`                           |  Yes   |  Yes   | Don't keep       |\n| `pythonrun.c/PyErr_Display`                            |   No   |   No   | Don't keep       |\n| `pythonrun.c/flush_io_stream`                          |   No   |   No   | Don't keep       |\n| `sysmodule.c/sys_displayhook`                          |  Maybe |   No   | Don't keep       |\n| `sysmodule.c/get_warnoptions`                          |   No   |   No   | Don't keep       |\n| `sysmodule.c/PySys_ResetWarnOptions`                   |   No   |   No   | Don't keep       |\n| `sysmodule.c/PySys_HasWarnOptions`                     |   No   |   No   | Don't keep       |\n| `sysmodule.c/_PySys_AddXOptionWithError`               |   No   |   No   | Don't keep       |\n| `sysmodule.c/PySys_SetArgvEx`                          |   No   |   No   | Don't keep       |\n| `sysmodule.c/sys_write`                                |   No   |   No   | Don't keep       |\n| `sysmodule.c/sys_format`                               |   No   |   No   | Don't keep       |\n| `traceback.c/_Py_FindSourceFile`                       |   No   |   No   | Don't keep       |\n|                                                        |        |        |                  |\n\n* I can get a \"segfault\" error when I use `sys_displayhook`, but not where it's used.\n* For `sys_write`, `sys_format` - I have checked all the places where they called, and most of the locations are safe. However, a few places use `%s` specifier, in such places it is very tricky to get `segfault`.\n* `get_warnoptions`, `PySys_ResetWarnOptions`, `_PySys_AddXOptionWithError` - are deprecated, but it is a very tricky to get `segfault` too.\n* `flush_io_stream`, `PyErr_Display`, `pyrun_one_parse_ast`, `print_expr`, `write_unraisable_exc`, `thread_excepthook` - very tight - They use a borrowed reference right after getting. It might be possible to reproduce it under heavy contention, but I wasn't able to do so.\n* `_PyRun_InteractiveLoopObject` only checks presence of `ps1` and `ps2`.\n* `flush_std_files` used from `_Py_Finalize` and from `fatal_error`. For `_Py_Finalize` I can repro, for `fatal_error` - no.\n* `whichmodule`, `_Py_FindSourceFile` iterate borrowed reference, but I wasn't able to reproduce `segfault`.\n* Keep or not before raised exception - in the most places `_PySys_GetAttr` called without an exception set.\n\n\nAlso, can you point me out what to do next? I can replace `_PySys_GetAttr` with `_PySys_GetAttrRef`, but in the most places it is interleave with @serhiy-storchaka PRs. I'm not sure what the correct way to deal with this situation is.\n"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2025-02-25T16:58:12Z",
+   "body": "#130503 is an adaptation of  #111035 or #129736 that does not introduce new public API and does not change the current behavior (except fixing crashes, mainly). It will make minimal difference with #111035 or #129736, whatever will be accepted for future Python version.\n\nI added also tests for `print()`, `input()` and `sys.displayhook()` (they are relatively simple). Reproducers for other crashes are harder, so I do not think that this is worth hassle.\n\nThank you for your tests, @sergey-miryanov, but sorry, I have not used them. They are high quality, but too large and expensive. It is not worth to keep them forever after fixing this issue."
+  },
+  {
+   "author": "sergey-miryanov",
+   "created_at": "2025-02-25T17:34:53Z",
+   "body": "@serhiy-storchaka I simplified it a bit yesterday, not sure if you saw the latest changes. Maybe it will be useful, but it is all up to you. Anyway, it was very interesting."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-02-27T14:39:12Z",
+   "body": "I cannot reproduce the crash using https://github.com/python/cpython/issues/130163#issue-2855716620 reproducer. Can we close the issue?"
+  },
+  {
+   "author": "serhiy-storchaka",
+   "created_at": "2025-02-27T14:44:51Z",
+   "body": "It has already been fixed."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130148",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/130202",
+   "commit": null,
+   "actor": "colesbury"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130282",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/capi-workgroup/decisions/issues/54",
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130503",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ef4ffeefd1737c18dc9326133c7894d58108c2e",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1e4b133c1ea7ed6584e1b03c53fa9350afbfa0e0",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130556",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7c1b76fce8c8df00da38830f72dbdde6881a33be",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "afa680089f7387c60ccf0158c537649de8650c75",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130568",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2ab7e1135a2d5ca45b60881ece27729e4fc0ee8b",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4cf5fc4968786597542a3dd8b922c72276af0c5a",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130576",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "452420fcca8c9b23c3e51376f19ceddcdfa28d55",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "89a79fc919419bfe817da13bc2a4437908d7fc07",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  }
+ ]
+}

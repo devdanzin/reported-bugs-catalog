@@ -1,0 +1,67 @@
+{
+ "repo": "python/cpython",
+ "number": 126884,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126884",
+ "title": "Calling `cProfile.runctx` in threads on a free-threading build segfaults",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-15T19:53:52Z",
+ "closed_at": "2025-08-02T12:44:16Z",
+ "body": "# Crash report\n\n### What happened?\n\nOn a no-gil build running with `PYTHON_GIL=0`, repeatedly calling `cProfile.runctx` in threads leads to a segfault:\n\n```python\nfrom threading import Thread\nimport cProfile\n\nfor x in range(100):\n    Thread(target=cProfile.runctx, args=(\"\", {}, {}, \"\",)).start()\n```\n\nBacktrace:\n```gdb\n#0  RotatingTree_Get (root=0xddddddddddddde25, key=key@entry=0x20002080780) at ./Modules/rotatingtree.c:56\n#1  0x00007ffff7c3c940 in getSubEntry (pObj=pObj@entry=0x200041901e0, caller=<optimized out>,\n    entry=entry@entry=0x20002080780) at ./Modules/_lsprof.c:245\n#2  0x00007ffff7c3cf25 in Stop (pObj=pObj@entry=0x200041901e0, self=self@entry=0x200020e0310,\n    entry=0x20002080780) at ./Modules/_lsprof.c:338\n#3  0x00007ffff7c3cfdb in flush_unmatched (pObj=pObj@entry=0x200041901e0) at ./Modules/_lsprof.c:833\n#4  0x00007ffff7c3e991 in _lsprof_Profiler_disable_impl (self=0x200041901e0) at ./Modules/_lsprof.c:893\n#5  0x00007ffff7c3e9ca in _lsprof_Profiler_disable (self=<optimized out>, _unused_ignored=<optimized out>)\n    at ./Modules/clinic/_lsprof.c.h:288\n#6  0x0000555555694b24 in method_vectorcall_NOARGS (func=<method_descriptor at remote 0x20000aa01d0>,\n    args=0x7ffff7433b48, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/descrobject.c:447\n#7  0x000055555567cc55 in _PyObject_VectorcallTstate (tstate=0x555555dcc3f0,\n    callable=<method_descriptor at remote 0x20000aa01d0>, args=0x7ffff7433b48, nargsf=9223372036854775809,\n    kwnames=0x0) at ./Include/internal/pycore_call.h:167\n#8  0x000055555567cd74 in PyObject_Vectorcall (\n    callable=callable@entry=<method_descriptor at remote 0x20000aa01d0>, args=args@entry=0x7ffff7433b48,\n    nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#9  0x00005555558592c0 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555dcc3f0,\n    frame=0x7ffff6c30340, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:4469\n#10 0x00005555558726ea in _PyEval_EvalFrame (throwflag=0, frame=<optimized out>, tstate=0x555555dcc3f0)\n    at ./Include/internal/pycore_ceval.h:116\n#11 _PyEval_Vector (tstate=<optimized out>, func=0x20000a8b450, locals=locals@entry=0x0,\n    args=0x7ffff7433cd8, argcount=1, kwnames=<optimized out>) at Python/ceval.c:1901\n```\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.13, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main-dirty:54c63a32d0, Nov  8 2024, 20:16:36) [GCC 11.4.0]",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-15T20:52:49Z",
+   "body": "While reducing the code for this crash, I got the following debug message:\r\n```\r\nDebug memory block at address p=0x200080e0150: API '\ufffd'\r\n    7440851960500309042 bytes originally requested\r\n    The 7 pad bytes at p-7 are not all FORBIDDENBYTE (0xfd):\r\n        at p-7: 0xdd *** OUCH\r\n        at p-6: 0xdd *** OUCH\r\n        at p-5: 0xdd *** OUCH\r\n        at p-4: 0xdd *** OUCH\r\n        at p-3: 0xdd *** OUCH\r\n        at p-2: 0xdd *** OUCH\r\n        at p-1: 0xdd *** OUCH\r\n    Because memory is corrupted at the start, the count of bytes requested\r\n       may be bogus, and checking the trailing pad bytes may segfault.\r\n    The 8 pad bytes at tail=0x6743396f53f1cd82 are Segmentation fault\r\n```\r\n\r\nHowever, it seems in reducing I removed whatever caused this message to appear. Is it another problem or just a detail of the main issue? Should I try to reduce the code in a way that preserves it?\r\n"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-11-15T21:53:13Z",
+   "body": "I don't think cProfile is nogil-safe at this point."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-24T10:39:53Z",
+   "body": "> I don't think cProfile is nogil-safe at this point.\r\n\r\nAgreed, `cProfile` and `_lsprof` aren't expected to work correctly in this scenario. Should I close the issue, mark it as pending or leave it open?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-03-04T03:00:13Z",
+   "body": "Fusil found a set of segfaults in `_lsprof` that look like the same issue here, but they happen without calling profiling methods in threads. Instead, the mere presence of a thread in a no-gil build is enough to crash:\n```python\nfrom threading import Thread\nimport _lsprof\n\n_lsprof.Profiler().enable()\nThread(target=lambda: 1/0).start()\n```\n\nHere are the backtraces for some of the segfaults:\n\n```gdb\n#0  0x00005555556d1f77 in _PyObject_DebugDumpAddress (p=p@entry=0x20002050110) at Objects/obmalloc.c:3131\n#1  0x00005555556d2286 in _PyMem_DebugCheckAddress (func=func@entry=0x55555595dee0 <__func__.8> \"_PyMem_DebugRawFree\", api=109 'm', p=p@entry=0x20002050110) at Objects/obmalloc.c:3049\n#2  0x00005555556d3d05 in _PyMem_DebugRawFree (ctx=ctx@entry=0x555555b6d6b0 <_PyRuntime+944>, p=p@entry=0x20002050110) at Objects/obmalloc.c:2869\n#3  0x00005555556d3d74 in _PyMem_DebugFree (ctx=0x555555b6d6b0 <_PyRuntime+944>, ptr=0x20002050110) at Objects/obmalloc.c:3019\n#4  0x00005555556e78e0 in PyMem_Free (ptr=<optimized out>) at Objects/obmalloc.c:1069\n#5  0x00007ffff7c534c3 in clearEntries (pObj=pObj@entry=0x20000984690) at ./Modules/_lsprof.c:300\n#6  0x00007ffff7c53503 in profiler_dealloc (op=0x20000984690) at ./Modules/_lsprof.c:948\n#7  0x00005555556cd065 in _Py_Dealloc (op=0x20000984690) at Objects/object.c:3004\n#8  0x00005555556cd13e in _Py_MergeZeroLocalRefcount (op=op@entry=0x20000984690) at Objects/object.c:436\n#9  0x00005555556c7296 in Py_DECREF (filename=filename@entry=0x5555558e8242 \"./Include/refcount.h\", lineno=lineno@entry=502, op=0x20000984690) at ./Include/refcount.h:343\n#10 0x00005555556c75db in Py_XDECREF (op=<optimized out>) at ./Include/refcount.h:502\n#11 0x00005555556c7d0e in meth_dealloc (self=0x20000c30710) at Objects/methodobject.c:172\n#12 0x00005555556cd065 in _Py_Dealloc (op=0x20000c30710) at Objects/object.c:3004\n#13 0x00005555556cd13e in _Py_MergeZeroLocalRefcount (op=op@entry=0x20000c30710) at Objects/object.c:436\n#14 0x0000555555843ec6 in Py_DECREF (filename=filename@entry=0x5555558fd1c1 \"Python/pystate.c\", lineno=lineno@entry=857, op=0x20000c30710) at ./Include/refcount.h:343\n#15 0x0000555555847cb7 in interpreter_clear (interp=0x555555b8cd40 <_PyRuntime+129600>, tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pystate.c:857\n#16 0x000055555584824d in _PyInterpreterState_Clear (tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pystate.c:962\n#17 0x000055555584064c in finalize_interp_clear (tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pylifecycle.c:1876\n#18 0x0000555555842cac in _Py_Finalize (runtime=runtime@entry=0x555555b6d300 <_PyRuntime>) at Python/pylifecycle.c:2177\n#19 0x0000555555842d3f in Py_FinalizeEx () at Python/pylifecycle.c:2218\n#20 0x0000555555873dfb in Py_RunMain () at Modules/main.c:762\n#21 0x0000555555873e6d in pymain_main (args=args@entry=0x7fffffffdd10) at Modules/main.c:790\n#22 0x0000555555873f3b in Py_BytesMain (argc=<optimized out>, argv=<optimized out>) at Modules/main.c:814\n#23 0x00005555555d78d6 in main (argc=<optimized out>, argv=<optimized out>) at ./Programs/python.c:15\n```\n\n```gdb\n#0  Stop (pObj=pObj@entry=0x20000984690, self=self@entry=0x200002b64d0, entry=0xdddddddddddddddd) at ./Modules/_lsprof.c:331\n#1  0x00007ffff7c53400 in flush_unmatched (pObj=pObj@entry=0x20000984690) at ./Modules/_lsprof.c:837\n#2  0x00007ffff7c534fb in profiler_dealloc (op=0x20000984690) at ./Modules/_lsprof.c:947\n#3  0x00005555556cd065 in _Py_Dealloc (op=0x20000984690) at Objects/object.c:3004\n#4  0x00005555556cd13e in _Py_MergeZeroLocalRefcount (op=op@entry=0x20000984690) at Objects/object.c:436\n#5  0x00005555556c7296 in Py_DECREF (filename=filename@entry=0x5555558e8242 \"./Include/refcount.h\", lineno=lineno@entry=502, op=0x20000984690) at ./Include/refcount.h:343\n#6  0x00005555556c75db in Py_XDECREF (op=<optimized out>) at ./Include/refcount.h:502\n#7  0x00005555556c7d0e in meth_dealloc (self=0x20000c30710) at Objects/methodobject.c:172\n#8  0x00005555556cd065 in _Py_Dealloc (op=0x20000c30710) at Objects/object.c:3004\n#9  0x00005555556cd13e in _Py_MergeZeroLocalRefcount (op=op@entry=0x20000c30710) at Objects/object.c:436\n#10 0x0000555555843ec6 in Py_DECREF (filename=filename@entry=0x5555558fd1c1 \"Python/pystate.c\", lineno=lineno@entry=857, op=0x20000c30710) at ./Include/refcount.h:343\n#11 0x0000555555847cb7 in interpreter_clear (interp=0x555555b8cd40 <_PyRuntime+129600>, tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pystate.c:857\n#12 0x000055555584824d in _PyInterpreterState_Clear (tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pystate.c:962\n#13 0x000055555584064c in finalize_interp_clear (tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pylifecycle.c:1876\n#14 0x0000555555842cac in _Py_Finalize (runtime=runtime@entry=0x555555b6d300 <_PyRuntime>) at Python/pylifecycle.c:2177\n#15 0x0000555555842d3f in Py_FinalizeEx () at Python/pylifecycle.c:2218\n#16 0x0000555555873dfb in Py_RunMain () at Modules/main.c:762\n#17 0x0000555555873e6d in pymain_main (args=args@entry=0x7fffffffdd10) at Modules/main.c:790\n#18 0x0000555555873f3b in Py_BytesMain (argc=<optimized out>, argv=<optimized out>) at Modules/main.c:814\n#19 0x00005555555d78d6 in main (argc=<optimized out>, argv=<optimized out>) at ./Programs/python.c:15\n```\n\n```gdb\n#0  RotatingTree_Get (root=0xddddddddddddde25, key=key@entry=0x20002023730) at ./Modules/rotatingtree.c:56\n#1  0x00007ffff7c532e7 in getSubEntry (pObj=pObj@entry=0x20000984690, caller=<optimized out>, entry=entry@entry=0x20002023730) at ./Modules/_lsprof.c:249\n#2  0x00007ffff7c53370 in Stop (pObj=pObj@entry=0x20000984690, self=self@entry=0x20002050110, entry=0x20002023730) at ./Modules/_lsprof.c:342\n#3  0x00007ffff7c53400 in flush_unmatched (pObj=pObj@entry=0x20000984690) at ./Modules/_lsprof.c:837\n#4  0x00007ffff7c534fb in profiler_dealloc (op=0x20000984690) at ./Modules/_lsprof.c:947\n#5  0x00005555556cd065 in _Py_Dealloc (op=0x20000984690) at Objects/object.c:3004\n#6  0x00005555556cd13e in _Py_MergeZeroLocalRefcount (op=op@entry=0x20000984690) at Objects/object.c:436\n#7  0x00005555556c7296 in Py_DECREF (filename=filename@entry=0x5555558e8242 \"./Include/refcount.h\", lineno=lineno@entry=502, op=0x20000984690) at ./Include/refcount.h:343\n#8  0x00005555556c75db in Py_XDECREF (op=<optimized out>) at ./Include/refcount.h:502\n#9  0x00005555556c7d0e in meth_dealloc (self=0x20000c30710) at Objects/methodobject.c:172\n#10 0x00005555556cd065 in _Py_Dealloc (op=0x20000c30710) at Objects/object.c:3004\n#11 0x00005555556cd13e in _Py_MergeZeroLocalRefcount (op=op@entry=0x20000c30710) at Objects/object.c:436\n#12 0x0000555555843ec6 in Py_DECREF (filename=filename@entry=0x5555558fd1c1 \"Python/pystate.c\", lineno=lineno@entry=857, op=0x20000c30710) at ./Include/refcount.h:343\n#13 0x0000555555847cb7 in interpreter_clear (interp=0x555555b8cd40 <_PyRuntime+129600>, tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pystate.c:857\n#14 0x000055555584824d in _PyInterpreterState_Clear (tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pystate.c:962\n#15 0x000055555584064c in finalize_interp_clear (tstate=tstate@entry=0x555555bc5370 <_PyRuntime+360560>) at Python/pylifecycle.c:1876\n#16 0x0000555555842cac in _Py_Finalize (runtime=runtime@entry=0x555555b6d300 <_PyRuntime>) at Python/pylifecycle.c:2177\n#17 0x0000555555842d3f in Py_FinalizeEx () at Python/pylifecycle.c:2218\n#18 0x0000555555873dfb in Py_RunMain () at Modules/main.c:762\n#19 0x0000555555873e6d in pymain_main (args=args@entry=0x7fffffffdd10) at Modules/main.c:790\n#20 0x0000555555873f3b in Py_BytesMain (argc=<optimized out>, argv=<optimized out>) at Modules/main.c:814\n#21 0x00005555555d78d6 in main (argc=<optimized out>, argv=<optimized out>) at ./Programs/python.c:15\n```"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2025-03-04T03:17:46Z",
+   "body": "You enabled the profiler - that will call the profiling callbacks in the thread. This is almost equivalent to the previous example."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-08-02T12:44:12Z",
+   "body": "This is a duplicate of https://github.com/python/cpython/issues/125165"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ]
+}

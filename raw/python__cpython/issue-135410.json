@@ -1,0 +1,289 @@
+{
+ "repo": "python/cpython",
+ "number": 135410,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/135410",
+ "title": "Segfault from calling `StringIO` methods in threads on free-threading debug build",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "topic-free-threading",
+  "3.14",
+  "3.15"
+ ],
+ "created_at": "2025-06-11T22:43:51Z",
+ "closed_at": "2026-02-07T12:13:47Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault or abort the interpreter in a free-threading debug build by calling StringIO methods from threads:\n```python\nfrom io import StringIO\nfrom threading import Thread\n\nfor _ in range(10):\n    alive = []\n\n    sio = StringIO(newline=\"\")\n    def call_stringio_methods():\n        try:\n            sio.write(\"\\x00\" * 10 ** 5)\n            sio.seek(0)  # Comment this line out for a different segfault\n            sio.readlines()\n        except Exception:\n            pass\n\n    for _ in range(5):\n        alive.append(Thread(target=call_stringio_methods))\n    for t in alive:\n        t.start()\n```\n\nThe segfault for this MRE can happen in different places, all seemingly related to `_stringio_readline`. If you comment out the `sio.seek(0)` line, a different segfault happens.\n\nBacktrace:\n```shell\nThread 14 \"Thread-13 (call\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7fffb1ffb640 (LWP 3706081)]\n0x00005555560a4b15 in _stringio_readline (self=self@entry=0x7fffb4301090, limit=300000, limit@entry=-1) at ./Modules/_io/stringio.c:370\n370         old_char = *end;\n\n#0  0x00005555560a4b15 in _stringio_readline (self=self@entry=0x7fffb4301090, limit=300000, limit@entry=-1) at ./Modules/_io/stringio.c:370\n#1  0x00005555560aa0b4 in stringio_iternext (op=<_io.StringIO at remote 0x7fffb4301090>) at ./Modules/_io/stringio.c:418\n#2  0x0000555555a5dfc7 in list_extend_iter_lock_held (self=self@entry=0x7fffc0040070,\n    iterable=iterable@entry=<_io.StringIO at remote 0x7fffb4301090>) at Objects/listobject.c:1262\n#3  0x0000555555a5e6a6 in _list_extend (self=0x7fffc0040070, iterable=<_io.StringIO at remote 0x7fffb4301090>) at Objects/listobject.c:1451\n#4  0x0000555555a61168 in list_extend_impl (self=<optimized out>, iterable=<optimized out>) at Objects/listobject.c:1470\n#5  0x0000555555a61189 in list_extend (self=<optimized out>, iterable=<optimized out>) at Objects/clinic/listobject.c.h:145\n#6  0x00005555559ce5fb in method_vectorcall_O (func=<optimized out>, args=0x7fffb1ff89a0, nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/descrobject.c:476\n#7  0x000055555599674e in _PyObject_VectorcallTstate (kwnames=0x0, nargsf=2, args=0x7fffb1ff89a0,\n    callable=<method_descriptor at remote 0x7fffb4201120>, tstate=0x6290000aa210) at ./Include/internal/pycore_call.h:169\n#8  object_vacall (tstate=tstate@entry=0x6290000aa210, base=base@entry=[], callable=<optimized out>, vargs=vargs@entry=0x7fffb1ff8ab0)\n    at Objects/call.c:819\n#9  0x0000555555996b34 in PyObject_CallMethodObjArgs (obj=[], name=<optimized out>) at Objects/call.c:886\n#10 0x0000555556055b9f in _io__IOBase_readlines_impl (self=self@entry=<_io.StringIO at remote 0x7fffb4301090>, hint=-1)\n    at ./Modules/_io/iobase.c:729\n#11 0x000055555605627b in _io__IOBase_readlines (self=<optimized out>, args=0x7fffb1ff93a0, nargs=0) at ./Modules/_io/clinic/iobase.c.h:369\n#12 0x00005555559cda46 in method_vectorcall_FASTCALL (func=<optimized out>, args=0x7fffb1ff9398, nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/descrobject.c:402\n#13 0x00005555559956af in _PyObject_VectorcallTstate (tstate=0x6290000aa210, callable=<method_descriptor at remote 0x7fffb45359c0>,\n    args=0x7fffb1ff9398, nargsf=9223372036854775809, kwnames=0x0) at ./Include/internal/pycore_call.h:169\n#14 0x000055555599580a in PyObject_Vectorcall (callable=callable@entry=<method_descriptor at remote 0x7fffb45359c0>,\n    args=args@entry=0x7fffb1ff9398, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#15 0x0000555555d82a18 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x6290000aa210, frame=0x6290000af3a8, frame@entry=0x6290000af328,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:1619\n#16 0x0000555555de46bc in _PyEval_EvalFrame (throwflag=0, frame=0x6290000af328, tstate=0x6290000aa210) at ./Include/internal/pycore_ceval.h:119\n#17 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=locals@entry=0x0, args=<optimized out>, argcount=1,\n    kwnames=<optimized out>) at Python/ceval.c:1975\n#18 0x0000555555994c83 in _PyFunction_Vectorcall (func=<optimized out>, stack=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/call.c:413\n#19 0x00005555559a0259 in _PyObject_VectorcallTstate (kwnames=0x0, nargsf=1, args=0x7fffb1ff9b90, callable=<function at remote 0x7fffb44ab0d0>,\n    tstate=0x6290000aa210) at ./Include/internal/pycore_call.h:169\n#20 method_vectorcall (method=<optimized out>, args=0x7fffb1ffa388, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/classobject.c:72\n#21 0x0000555555e2dd35 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x6290000aa210, callable=<method at remote 0x7fffc0040130>,\n    args=args@entry=0x7fffb1ffa388, nargsf=nargsf@entry=0, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:169\n```\n\nSimilar backtrace:\n```shell\nThread 15 \"Thread-14 (call\" received signal SIGSEGV, Segmentation fault.\n[Switching to Thread 0x7fffb37fe640 (LWP 3712552)]\n0x00005555560a0d24 in PyUnicode_READ (index=0, data=0x7fffba270000, kind=4) at ./Include/cpython/unicodeobject.h:343\n343         return _Py_STATIC_CAST(const Py_UCS4*, data)[index];\n(gdb) bt\n#0  0x00005555560a0d24 in PyUnicode_READ (index=0, data=0x7fffba270000, kind=4) at ./Include/cpython/unicodeobject.h:343\n#1  _PyIO_find_line_ending (translated=<optimized out>, universal=1, readnl='', kind=kind@entry=4, start=start@entry=0x7fffba170010 \"\",\n    end=end@entry=0x7fffba233510 \"\\315\\315\\315\\315\\315\\315\\315\\315\", '\\375' <repeats 24 times>, '\\315' <repeats 168 times>...,\n    consumed=0x7fffb37fb330) at ./Modules/_io/textio.c:2139\n#2  0x00005555560a4bb4 in _stringio_readline (self=self@entry=0x7fffb4301090, limit=200000, limit@entry=-1) at ./Modules/_io/stringio.c:372\n#3  0x00005555560aa0b4 in stringio_iternext (op=<_io.StringIO at remote 0x7fffb4301090>) at ./Modules/_io/stringio.c:418\n#4  0x0000555555a5dfc7 in list_extend_iter_lock_held (self=self@entry=0x7fffb60c00d0,\n    iterable=iterable@entry=<_io.StringIO at remote 0x7fffb4301090>) at Objects/listobject.c:1262\n#5  0x0000555555a5e6a6 in _list_extend (self=0x7fffb60c00d0, iterable=<_io.StringIO at remote 0x7fffb4301090>) at Objects/listobject.c:1451\n#6  0x0000555555a61168 in list_extend_impl (self=<optimized out>, iterable=<optimized out>) at Objects/listobject.c:1470\n#7  0x0000555555a61189 in list_extend (self=<optimized out>, iterable=<optimized out>) at Objects/clinic/listobject.c.h:145\n#8  0x00005555559ce5fb in method_vectorcall_O (func=<optimized out>, args=0x7fffb37fba60, nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/descrobject.c:476\n#9  0x000055555599674e in _PyObject_VectorcallTstate (kwnames=0x0, nargsf=2, args=0x7fffb37fba60,\n    callable=<method_descriptor at remote 0x7fffb4201120>, tstate=0x6290000be210) at ./Include/internal/pycore_call.h:169\n#10 object_vacall (tstate=tstate@entry=0x6290000be210, base=base@entry=[], callable=<optimized out>, vargs=vargs@entry=0x7fffb37fbb70)\n    at Objects/call.c:819\n#11 0x0000555555996b34 in PyObject_CallMethodObjArgs (obj=[], name=<optimized out>) at Objects/call.c:886\n#12 0x0000555556055b9f in _io__IOBase_readlines_impl (self=self@entry=<_io.StringIO at remote 0x7fffb4301090>, hint=-1)\n    at ./Modules/_io/iobase.c:729\n#13 0x000055555605627b in _io__IOBase_readlines (self=<optimized out>, args=0x7fffb37fc460, nargs=0) at ./Modules/_io/clinic/iobase.c.h:369\n#14 0x00005555559cda46 in method_vectorcall_FASTCALL (func=<optimized out>, args=0x7fffb37fc458, nargsf=<optimized out>, kwnames=<optimized out>)\n    at Objects/descrobject.c:402\n#15 0x00005555559956af in _PyObject_VectorcallTstate (tstate=0x6290000be210, callable=<method_descriptor at remote 0x7fffb45359c0>,\n    args=0x7fffb37fc458, nargsf=9223372036854775809, kwnames=0x0) at ./Include/internal/pycore_call.h:169\n#16 0x000055555599580a in PyObject_Vectorcall (callable=callable@entry=<method_descriptor at remote 0x7fffb45359c0>,\n    args=args@entry=0x7fffb37fc458, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#17 0x0000555555d82a18 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x6290000be210, frame=0x6290000cd3a8, frame@entry=0x6290000cd328,\n    throwflag=throwflag@entry=0) at Python/generated_cases.c.h:1619\n```\n\nBacktrace with indicated line commented out:\n```shell\nThread 1 \"python\" received signal SIGSEGV, Segmentation fault.\n0x0000555555b17d3b in mi_block_nextx (keys=0x555556751cd0 <_PyRuntime+365968>, block=0x210162caff47ebfd, null=0x555556751190 <_PyRuntime+363088>) at ./Include/internal/mimalloc/mimalloc/internal.h:637\n637       next = (mi_block_t*)mi_ptr_decode(null, mi_atomic_load_relaxed(&block->next), keys);\n\n#0  0x0000555555b17d3b in mi_block_nextx (keys=0x555556751cd0 <_PyRuntime+365968>, block=0x210162caff47ebfd,\n    null=0x555556751190 <_PyRuntime+363088>) at ./Include/internal/mimalloc/mimalloc/internal.h:637\n#1  _mi_heap_delayed_free_partial (heap=heap@entry=0x555556751190 <_PyRuntime+363088>) at Objects/mimalloc/page.c:331\n#2  0x0000555555b208ce in _mi_malloc_generic (heap=heap@entry=0x555556751190 <_PyRuntime+363088>, size=size@entry=56, zero=zero@entry=false,\n    huge_alignment=huge_alignment@entry=0) at Objects/mimalloc/page.c:943\n#3  0x0000555555b21586 in _mi_page_malloc (heap=heap@entry=0x555556751190 <_PyRuntime+363088>, page=0x7fffb4006148, size=size@entry=56,\n    zero=zero@entry=false) at Objects/mimalloc/alloc.c:44\n#4  0x0000555555b2237f in mi_heap_malloc_small_zero (heap=0x555556751190 <_PyRuntime+363088>, size=48, zero=<optimized out>)\n    at Objects/mimalloc/alloc.c:127\n#5  0x0000555555b231db in _mi_heap_malloc_zero_ex (huge_alignment=0, zero=false, size=48, heap=0x555556751190 <_PyRuntime+363088>)\n    at Objects/mimalloc/alloc.c:156\n#6  _mi_heap_malloc_zero (zero=false, size=48, heap=0x555556751190 <_PyRuntime+363088>) at Objects/mimalloc/alloc.c:179\n#7  mi_heap_malloc (size=48, heap=0x555556751190 <_PyRuntime+363088>) at Objects/mimalloc/alloc.c:183\n#8  _PyMem_MiMalloc (ctx=<optimized out>, size=48) at Objects/obmalloc.c:209\n#9  0x0000555555afad90 in _PyMem_DebugRawAlloc (use_calloc=use_calloc@entry=0, ctx=0x5555566f8b58 <_PyRuntime+1048>, nbytes=24)\n    at Objects/obmalloc.c:2788\n#10 0x0000555555afadf8 in _PyMem_DebugRawMalloc (ctx=<optimized out>, nbytes=<optimized out>) at Objects/obmalloc.c:2821\n#11 0x0000555555afae15 in _PyMem_DebugMalloc (ctx=<optimized out>, nbytes=<optimized out>) at Objects/obmalloc.c:2986\n#12 0x0000555555b29338 in PyMem_Malloc (size=size@entry=24) at Objects/obmalloc.c:1007\n#13 0x0000555555999f59 in _PyStack_UnpackDict (tstate=tstate@entry=0x555556750de8 <_PyRuntime+362152>, args=args@entry=0x7fffffffc460,\n    nargs=nargs@entry=1, kwargs=kwargs@entry={'target': <function at remote 0x7fffb5139150>}, p_kwnames=p_kwnames@entry=0x7fffffffc370)\n    at Objects/call.c:988\n#14 0x000055555599aaaa in _PyObject_VectorcallDictTstate (tstate=tstate@entry=0x555556750de8 <_PyRuntime+362152>,\n    callable=callable@entry=<function at remote 0x7fffb4ea8970>, args=args@entry=0x7fffffffc460, nargsf=nargsf@entry=1,\n    kwargs=kwargs@entry={'target': <function at remote 0x7fffb5139150>}) at Objects/call.c:140\n#15 0x000055555599adc3 in _PyObject_Call_Prepend (tstate=tstate@entry=0x555556750de8 <_PyRuntime+362152>, callable=<optimized out>,\n    obj=obj@entry=<Thread() at remote 0x7fffb45620a0>, args=args@entry=(), kwargs=kwargs@entry={'target': <function at remote 0x7fffb5139150>})\n    at Objects/call.c:504\n#16 0x0000555555ba4972 in call_method (self=<Thread() at remote 0x7fffb45620a0>, attr=<optimized out>, args=<optimized out>, kwds=<optimized out>)\n    at Objects/typeobject.c:3042\n#17 0x0000555555ba4b68 in slot_tp_init (self=<optimized out>, args=<optimized out>, kwds=<optimized out>) at Objects/typeobject.c:10720\n#18 0x0000555555b875f8 in type_call (self=self@entry=<type at remote 0x7fffb4d8e110>, args=args@entry=(),\n    kwds=kwds@entry={'target': <function at remote 0x7fffb5139150>}) at Objects/typeobject.c:2426\n#19 0x000055555599504b in _PyObject_MakeTpCall (tstate=tstate@entry=0x555556750de8 <_PyRuntime+362152>,\n    callable=callable@entry=<type at remote 0x7fffb4d8e110>, args=args@entry=0x7fffffffcf58, nargs=0, keywords=keywords@entry=('target',))\n    at Objects/call.c:242\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a0 experimental free-threading build (heads/main:ac7511062bf, Jun  9 2025, 15:09:10) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-135412\n* gh-135425\n* gh-135430\n* gh-135439\n* gh-135449\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-06-12T08:52:46Z",
+   "body": "This seems very similar to https://github.com/python/cpython/issues/134908 we should add critical section around iteration"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-06-12T13:30:15Z",
+   "body": "We broke the refleak buildbots."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-06-18T03:01:45Z",
+   "body": "I plan to take a look at this issue deeply from today cc @ZeroIntensity @vstinner @colesbury "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-07-01T16:13:37Z",
+   "body": "What's the status of this issue?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-07-01T16:17:33Z",
+   "body": "The concern is that in the process of making `StringIO` memory-safe, we also made it thread-safe, but the pure-Python implementation is only memory-safe. It didn't seem right to have that much of a difference between the two implementations."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-07-02T09:37:07Z",
+   "body": "Is there a way to make _pyio.StringIO thread-safe?"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-07-02T18:07:33Z",
+   "body": "Yeah, we could add locks to it. But is that a good idea? Should we guarantee that `StringIO` is thread-safe?"
+  },
+  {
+   "author": "cmaloney",
+   "created_at": "2025-07-02T20:56:25Z",
+   "body": "It looks like [`_pyio.StringIO`](https://github.com/python/cpython/blob/3.14/Lib/_pyio.py#L2702-L2750) is implemented on top of `_pyio.TextIOWrapper` containing a `_pyio.BytesIO`. `TextIOWrapper` and `BytesIO` (_io/C PR: GH-132616) in `_io` are expected to be thread-safe so I'd argue it's reasonable to have `StringIO` be. How far `_pyio` is from implementing that I'm not sure (in the PRs I've looked at only changed and added tests to `_io`)\n\nPersonally I'm okay with just `_io` being thread-safe for now; more thread safety in these I think is worthwhile for the cost and a little step for just `_io` is better than no step for to me."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-07-03T14:54:55Z",
+   "body": "@vstinner @ZeroIntensity @cmaloney \nSorry for the delayed response. I\u2019ve been tied up with several issues.\n\nSince PEP 779 has been accepted with a number of considerations:\nhttps://discuss.python.org/t/pep-779-criteria-for-supported-status-for-free-threaded-python/84319/123\n\nIn any case, we should update the relevant documentation to clarify whether thread-safety is guaranteed or not.\nAdditionally, please keep in mind the performance trade-offs, as there is a performance guardrail that allows for no more than a 10% regression in overall performance.\n\nIf making a specific object thread-safe causes a significant performance regression, then please consider ensuring only memory-safety for that object and explicitly documenting that thread-safety is not guaranteed."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2025-08-03T06:34:51Z",
+   "body": "> If making a specific object thread-safe causes a significant performance regression, then please consider ensuring only memory-safety for that object and explicitly documenting that thread-safety is not guaranteed.\n\nI don't think there were concerns about significant perf loss in this case, and the easiest way to ensure memory safety is to add critical section which means we should just add back the critical section which was reverted. \n\n"
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T14:04:35Z",
+   "body": "@kumaraditya303 Let me follow up this issue from this week, I was too busy with other issues for several weeks."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T15:22:46Z",
+   "body": "@kumaraditya303 If we decide to make C implementation to be thread-safe. We must make a pure Python implementation to be thread-safe too (currently not). That's what we require from PEP 779. And pure python implementation performance will not be a big issue."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-08-05T15:25:46Z",
+   "body": "@corona10 - we've never required that. Historically, there are lots of cases where the C implementation is thread-safe and the the Python implementation is not. Off the top of my head, this is true for both `OrderedDict` and `abc`."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T15:56:21Z",
+   "body": "> Documentation expectations\n> Documentation must be clearly written and maintained.\n> For Python users: What guarantees exist, and how are they affected by the free-threaded build on all APIs in all modules of the standard library.\n\nApproval of PEP 779 requires the recording the status of thread-safety at the docs.python.org\nSo then, Python users only rely on the C implementation from now on? At least from the current fix should guarantee the status of thread safe."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T15:58:56Z",
+   "body": "My simple question would be if we do not guarantee both implementations into the same implementation, then how will we record it on docs.python.org?"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-08-05T16:07:36Z",
+   "body": "The docs are for [`io.StringIO`](https://docs.python.org/3/library/io.html#io.StringIO). We should document that behavior. `_pyio` is, as far as I can tell, undocumented."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T16:14:03Z",
+   "body": "I am not sure why you separate the fallback implementation, io.StringIO should be documented as to whether it is thread-safe or not, if we consider the next step and this is very important.\n (IIUC it includes a fallback implementation)\nSimilar concerns were issued with other PR https://github.com/python/cpython/pull/137021#issuecomment-3107280111 \n\nI am fine with making a pure Python implementation slower (I need to find, but I approved at least one PR with that change.)"
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T16:17:44Z",
+   "body": "Here is the PR that I approved for the same condition. https://github.com/python/cpython/pull/136218#pullrequestreview-2985217259"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-08-05T17:05:36Z",
+   "body": "I think most modules that have been made thread-safe under FT do not have a safe pure-Python implementation."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-08-05T17:10:12Z",
+   "body": "> I am not sure why you separate the fallback implementation\n\nIt's not a \"fallback\" in the normal sense of the word. The only way to get `_pyio` is to explicitly the import the undocumented `_pyio` module. `import io` never gives you `_pyio`. The C extension isn't optional and `io.py` only uses the C extension:\n\nhttps://github.com/python/cpython/blob/525784aa65d35a5609aba53c873a9a3a578f992b/Lib/io.py#L53\n\n> Similar concerns were issued with other PR https://github.com/python/cpython/pull/137021#issuecomment-3107280111\n\nI don't think this is a legitimate concern. This is not new behavior. It's long been the case -- since `_pyio` was split from `io` in 3.1 -- that `io.StringIO` is thread-safe and `_pyio.StringIO` is not. That's not currently true in the FT build and we need to fix that. We shouldn't expand scope to `_pyio.StringIO`."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T22:49:11Z",
+   "body": "> that io.StringIO is thread-safe and _pyio.StringIO is not\n\nI don't get it, it was thread-safe because GIL exists? It's not? \nI think that this is why https://docs.python.org/3/library/io.html#multi-threading we have not recorded it as thread-safe even in the default build. One thing we have to do from now on is write this status explicitly, even if it has not been documented.\n\n> It's not a \"fallback\" in the normal sense of the word. The only way to get _pyio is to explicitly the import the undocumented _pyio module. import io never gives you _pyio. The C extension isn't optional and io.py only uses the C extension:\n\nOkay, but it still needs that we should record the thread-safe status somewhere in docs.python.org\nThen, can we document that the FT build does not guarantee the thread safety of _pyio implementation? (Maybe just top of the  io page)\n\n\n"
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T22:51:17Z",
+   "body": "> I think most modules that have been made thread-safe under FT do not have a safe pure-Python implementation.\n\nYeah, that's one issue that I have tackled recently. If the fallback implementation exists, then we need to make them have the same behavior... because it's related to the documentation issue."
+  },
+  {
+   "author": "corona10",
+   "created_at": "2025-08-05T23:15:20Z",
+   "body": "The easiest solution would be removing pure Python implementation from FT build \ud83d\ude06 "
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-08-06T09:17:36Z",
+   "body": "> The easiest solution would be removing pure Python implementation from FT build \ud83d\ude06\n\nYou might add a sentence in _pyio classes docstrings to mention that they are not thread-safe."
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2026-02-09T14:59:00Z",
+   "body": "So what's the io.StringIO and _pyio.StringIO status at the end?"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135412",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e6c3039cb39e68ae9af9ddcaca341c5af8f9cf23",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ead9fb0a532fe0dac36d81d7ae608997fb582234",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135425",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8cb7d9a8102163387907425dc14b5d629b930e76",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135430",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4ab61b3eed103089a2c4185e6cee453d5dbbc611",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135439",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "73431356d324842cac0d545018c3ad21c85bc883",
+   "actor": "corona10"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fcc34936b80db697d88842aab0703a08ba6b92ef",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/135449",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3efd3d7d3b052a8b3a1d2afa2c8001b3bac26d5",
+   "actor": "corona10"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c4d421c5a5ff4f18237c360481ab5c0535cb5c76",
+   "actor": "lkollar"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dd95024aea40c4f30a766000754af1bdb01cc84d",
+   "actor": "lkollar"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/136218",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f58e3d9c52efdfd760496222748cf7003fac4908",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8ce3f1a6878f812e069394dc9f049d9125dae0cc",
+   "actor": "Pranjal095"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "02a55c461f3e19924a325ee6a14bf044aa75e6a9",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "902e279df3f52d33812c5e153bf63377075c37f8",
+   "actor": "taegyunkim"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9b3cc437add17312de2c5668bab3141643ae4652",
+   "actor": "Agent-Hellboy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "031304784fa1b09707dd479674ecf8bc01e830f0",
+   "actor": "Agent-Hellboy"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "corona10"
+  }
+ ]
+}

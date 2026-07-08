@@ -1,0 +1,49 @@
+{
+ "repo": "python/cpython",
+ "number": 143751,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/143751",
+ "title": "JIT: Segfault from setting `UOP_MAX_TRACE_LENGTH` to a large value",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-JIT"
+ ],
+ "created_at": "2026-01-12T19:42:01Z",
+ "closed_at": "2026-01-12T22:06:59Z",
+ "body": "# Crash report\n\n### What happened?\n\nA JIT build with the patch below applied will frequently segfault. A way to reproduce is to start an interpreter (with PyREPL) and hold the space key.\n\nThe necessary patch:\n```diff\ndiff --git a/Include/internal/pycore_backoff.h b/Include/internal/pycore_backoff.h\nindex fadd11f04ec..3e779a141af 100644\n--- a/Include/internal/pycore_backoff.h\n+++ b/Include/internal/pycore_backoff.h\n@@ -125,7 +125,7 @@ trigger_backoff_counter(void)\n // For example, 4095 does not work for the nqueens benchmark on pyperformance\n // as we always end up tracing the loop iteration's\n // exhaustion iteration. Which aborts our current tracer.\n-#define JUMP_BACKWARD_INITIAL_VALUE 4000\n+#define JUMP_BACKWARD_INITIAL_VALUE 63\n #define JUMP_BACKWARD_INITIAL_BACKOFF 6\n static inline _Py_BackoffCounter\n initial_jump_backoff_counter(_PyPolicy *policy)\n@@ -139,7 +139,7 @@ initial_jump_backoff_counter(_PyPolicy *policy)\n  * Must be larger than ADAPTIVE_COOLDOWN_VALUE,\n  * otherwise when a side exit warms up we may construct\n  * a new trace before the Tier 1 code has properly re-specialized. */\n-#define SIDE_EXIT_INITIAL_VALUE 4000\n+#define SIDE_EXIT_INITIAL_VALUE 63\n #define SIDE_EXIT_INITIAL_BACKOFF 6\n\n static inline _Py_BackoffCounter\ndiff --git a/Include/internal/pycore_uop.h b/Include/internal/pycore_uop.h\nindex e828a1cc5a5..538bd3bc630 100644\n--- a/Include/internal/pycore_uop.h\n+++ b/Include/internal/pycore_uop.h\n@@ -38,9 +38,9 @@ typedef struct _PyUOpInstruction{\n // This is the length of the trace we translate initially.\n #ifdef Py_DEBUG\n     // With asserts, the stencils are a lot larger\n-#define UOP_MAX_TRACE_LENGTH 2000\n+#define UOP_MAX_TRACE_LENGTH 8000\n #else\n-#define UOP_MAX_TRACE_LENGTH 5000\n+#define UOP_MAX_TRACE_LENGTH 8000\n #endif\n #define UOP_BUFFER_SIZE (UOP_MAX_TRACE_LENGTH * sizeof(_PyUOpInstruction))\n \n```\n\n\nBacktrace:\n```batch\nProgram received signal SIGSEGV, Segmentation fault.\n0x0000555556406cd4 in _Py_ExecutorDetach (executor=executor@entry=0x7ebff6e30220) at Python/optimizer.c:1762\n1762        assert(instruction->op.code == ENTER_EXECUTOR);\n\n#0  0x0000555556406cd4 in _Py_ExecutorDetach (executor=executor@entry=0x7ebff6e30220) at Python/optimizer.c:1762\n#1  0x0000555556407bf3 in executor_invalidate (op=0x7ebff6e30220) at Python/optimizer.c:1786\n#2  0x000055555640177e in uop_dealloc (op=0x7ebff6e30280) at Python/optimizer.c:342\n#3  0x0000555555c1e067 in _Py_Dealloc (op=op@entry=0x7ebff6e30220) at Objects/object.c:3207\n#4  0x00005555563fe83c in Py_DECREF (lineno=1415, op=0x7ebff6e30220, filename=<optimized out>) at ./Include/refcount.h:403\n#5  make_executor_from_uops (buffer=<optimized out>, length=1246, dependencies=0x7bfff5806870, tstate=<optimized out>) at Python/optimizer.c:1415\n#6  uop_optimize (frame=0x7e8ff6de5928, tstate=<optimized out>, progress_needed=true, exec_ptr=<optimized out>) at Python/optimizer.c:1532\n#7  _PyOptimizer_Optimize (frame=frame@entry=0x7e8ff6de5928, tstate=tstate@entry=0x555556ed1d70 <_PyRuntime+359408>) at Python/optimizer.c:170\n#8  0x0000555555ed98c4 in stop_tracing_and_jit (tstate=0x555556ed1d70 <_PyRuntime+359408>, frame=frame@entry=0x7e8ff6de5928) at Python/ceval.c:1461\n#9  0x0000555555e922c0 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:12450\n#10 0x0000555555e72c88 in _PyEval_EvalFrame (tstate=0x555556ed1d70 <_PyRuntime+359408>, frame=0x7e8ff6de5220, throwflag=0) at ./Include/internal/pycore_ceval.h:118\n#11 _PyEval_Vector (tstate=<optimized out>, func=<optimized out>, locals=<optimized out>, args=<optimized out>, argcount=<optimized out>, kwnames=0x7c7ff6f692c0) at Python/ceval.c:2541\n#12 0x0000555555ae3814 in _PyVectorcall_Call (tstate=<optimized out>, func=<optimized out>, callable=<optimized out>, tuple=0x555556e9ae60 <_PyRuntime+134368>, kwargs=<optimized out>)\nat Objects/call.c:285\n#13 0x0000555556511505 in pymain_start_pyrepl (pythonstartup=<optimized out>) at Modules/main.c:310\n#14 0x0000555556510a15 in pymain_run_stdin (config=<optimized out>) at Modules/main.c:570\n#15 0x000055555650e21b in pymain_run_python (exitcode=0x7bfff5c1e500) at Modules/main.c:694\n#16 Py_RunMain () at Modules/main.c:772\n#17 0x000055555650f117 in pymain_main (args=<optimized out>) at Modules/main.c:802\n#18 0x000055555650f288 in Py_BytesMain (argc=<optimized out>, argv=0x7fffffffdc08) at Modules/main.c:826\n#19 0x00007ffff7c2a575 in __libc_start_call_main (main=main@entry=0x55555591ec40 <main>, argc=argc@entry=1, argv=argv@entry=0x7fffffffdc08) at ../sysdeps/nptl/libc_start_call_main.h:58\n#20 0x00007ffff7c2a628 in __libc_start_main_impl (main=0x55555591ec40 <main>, argc=1, argv=0x7fffffffdc08, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>,\nstack_end=0x7fffffffdbf8) at ../csu/libc-start.c:360\n#21 0x00005555558354f5 in _start ()\n```\n\nOutput from running with `PYTHON_OPT_DEBUG=4` and `PYTHON_LLTRACE=4`.\n[uop_max_trace_length_lltrace_opt_debug.txt](https://github.com/user-attachments/files/24572061/uop_max_trace_length_lltrace_opt_debug.txt)\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ (heads/main-dirty:43c76587c1b, Jan 12 2026, 16:22:56) [Clang 21.1.2 (2ubuntu6)]",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-12T20:38:46Z",
+   "body": "Is this with the tier 2 interpreter or the actual JIT?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-01-12T21:21:58Z",
+   "body": "It's the actual JIT:\n```\nCC=clang-21 ./configure --enable-experimental-jit --with-pydebug --with-address-sanitizer --without-pymalloc\n```"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-12T21:35:31Z",
+   "body": "So I'm not too sure whether to accept this issue, as we explicitly limit the trace length because our counters have limits (e.g. the JIT itself is limited to 2MB jitted size).\n\nI will investigate further to see if it's hitting a limit, or an actual issue is happening."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2026-01-12T22:06:59Z",
+   "body": "Ok yeah this is a generated code limit I think. I can't reproduce this with just the tier 2 interpreter, so that means it's a machine code problem."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  }
+ ]
+}

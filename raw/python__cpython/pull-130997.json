@@ -1,0 +1,61 @@
+{
+ "repo": "python/cpython",
+ "number": 130997,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/130997",
+ "title": "gh-129573: Fix possible abort from non-string suggestions in `calculate_suggestions`/`_Py_CalculateSuggestions`",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting review",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
+  "needs backport to 3.15"
+ ],
+ "created_at": "2025-03-09T02:29:24Z",
+ "closed_at": null,
+ "body": "This PR adds a simple check that suggestion candidates are strings in  `calculate_suggestions`(3.12)/`_Py_CalculateSuggestions`(main), avoiding an abort in debug builds from code like below:\r\n```python\r\nimport runpy\r\nrunpy._run_module_code(\"blech\", {0: \"\", \"bluch\": \"\"}, \"\")\r\n```\r\n\r\nThe abort only happens in 3.12, because the code in main checks for non-string candidates in `_suggestions__generate_suggestions_impl`. However, since the affected code [is still present in main](https://github.com/python/cpython/pull/129574#issuecomment-2629457649), this PR is against that branch.\r\n\r\nIn main, the code above exits the new REPL, which will be reported as a new issue with associated PR.\r\n\r\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\r\n\n\n<!-- gh-issue-number: gh-129573 -->\n* Issue: gh-129573\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2025-03-10T09:24:36Z",
+   "body": "test_traceback is failing on the CI."
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2025-04-18T09:28:07Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2025-04-18T09:42:32Z",
+   "body": "@devdanzin: Tests are failing on your PR, and you didn't sign the CLA. What's the status of this PR?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-18T20:42:38Z",
+   "body": "I'm sorry, I've left this one fall behind. Would you like to take it over?\r\n\r\nI have signed the CLA and even contributed some trivial code, I'll wait to see if it's a CLA bot issue or my CLA status changed to unverified somehow.\r\n"
+  },
+  {
+   "author": "github-actions[bot]",
+   "created_at": "2026-04-22T06:37:04Z",
+   "body": "This PR is stale because it has been open for 30 days with no activity."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/129573",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/131001",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

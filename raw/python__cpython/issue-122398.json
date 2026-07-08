@@ -1,0 +1,38 @@
+{
+ "repo": "python/cpython",
+ "number": 122398,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/122398",
+ "title": "Crash in _curses when calling .initscr() after ignoring exception from .resizeterm()",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "created_at": "2024-07-29T13:40:53Z",
+ "closed_at": "2024-08-05T23:35:44Z",
+ "body": "# Crash report\n\n### What happened?\n\nRunning this test script segfaults on main, with the following backtrace. \n`$ ./python test.py`\ntest.py:\n```python\nimport _curses\n_curses.initscr()\ntry:\n    _curses.resizeterm(40000, 40000)\nexcept:\n    pass\n_curses.initscr()\n```\n\n```gdb\n#0  0x00007ffff79985aa in ?? () from /lib/x86_64-linux-gnu/libncursesw.so.6\n#1  0x00007ffff799ad0a in doupdate_sp () from /lib/x86_64-linux-gnu/libncursesw.so.6\n#2  0x00007ffff798e6d8 in wrefresh () from /lib/x86_64-linux-gnu/libncursesw.so.6\n#3  0x00007ffff79ce89f in _curses_initscr_impl (module=<optimized out>) at ./Modules/_cursesmodule.c:3272\n#4  0x00007ffff79cf62f in _curses_initscr (module=<optimized out>, _unused_ignored=<optimized out>)\n    at ./Modules/clinic/_cursesmodule.c.h:2661\n#5  0x00005555556fb6e9 in cfunction_vectorcall_NOARGS (func=0x7ffff7ac7fb0, args=<optimized out>,\n    nargsf=<optimized out>, kwnames=<optimized out>) at Objects/methodobject.c:484\n```\n\nSeems fixable by setting `initialised` to `FALSE` in ` _curses_resizeterm_impl` for the error paths, not sure this is a valid fix:\n```diff\ndiff --git a/Modules/_cursesmodule.c b/Modules/_cursesmodule.c\nindex b5854e8c33f..10f1c4b14c5 100644\n--- a/Modules/_cursesmodule.c\n+++ b/Modules/_cursesmodule.c\n@@ -4106,9 +4106,12 @@ _curses_resizeterm_impl(PyObject *module, int nlines, int ncols)\n     PyCursesInitialised;\n\n     result = PyCursesCheckERR(resizeterm(nlines, ncols), \"resizeterm\");\n-    if (!result)\n+    if (!result) {\n+        initialised = FALSE;\n         return NULL;\n+    }\n     if (!update_lines_cols()) {\n+        initialised = FALSE;\n         Py_DECREF(result);\n         return NULL;\n     }\n```\n\nFound in https://github.com/pypy/pypy/issues/4989.\n\n### CPython versions tested on:\n\n3.11, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a0 (heads/main:9187484dd97, Jul 29 2024, 09:25:22) [GCC 11.4.0]",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2024-07-29T13:55:03Z",
+   "body": "Also crashes with `resize_term(40000, 40000)`."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-08-05T23:35:44Z",
+   "body": "This is a duplicate of #120378."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

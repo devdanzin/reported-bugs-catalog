@@ -1,0 +1,83 @@
+{
+ "repo": "python/cpython",
+ "number": 127196,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127196",
+ "title": "`_interpreters.exec` with invalid dict as `shared` segfaults",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-subinterpreters",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-23T13:56:23Z",
+ "closed_at": "2025-01-09T22:06:38Z",
+ "body": "# Crash report\n\n### What happened?\n\nPassing a dict with an invalid key as the `shared` parameter to `_interpreters.exec` segfaults the interpreter (or aborts in a debug build):\n\n```python\nimport _interpreters\n_interpreters.exec(0, \"1\", {\"\\uFD7C\\u5124\\u7B91\\u92E9\\u1850\\u39AA\\u0DF2\\uD82A\\u2D68\\uACAD\\u92DE\\u47C5\\uFFD0\\uDE0B\\uAA9C\\u2C17\\\\u6577\\u4C92\\uD37C\": 0})\n```\nBacktrace:\n```gdb\n#0  0x00005555557c496c in _PyXI_ApplyError (error=0x0) at Python/crossinterp.c:1056\n#1  0x00007ffff79db822 in _run_in_interpreter (p_excinfo=0x7fffffffd820, flags=1,\n    shareables=0x7ffff7a186c0, codestrlen=<optimized out>, codestr=0x555555aceff8 <_PyRuntime+76888> \"1\",\n    interp=0x555555ad1f18 <_PyRuntime+88952>) at ./Modules/_interpretersmodule.c:463\n]#2  _interp_exec (interp=interp@entry=0x555555ad1f18 <_PyRuntime+88952>, code_arg=<optimized out>,\n    shared_arg=0x7ffff7a186c0, p_excinfo=p_excinfo@entry=0x7fffffffd820, self=<optimized out>)\n    at ./Modules/_interpretersmodule.c:955\n#3  0x00007ffff79db9b0 in interp_exec (self=<optimized out>, args=<optimized out>, kwds=<optimized out>)\n    at ./Modules/_interpretersmodule.c:1000\n#4  0x00005555556abb43 in cfunction_call (func=0x7ffff7a6d9e0, args=<optimized out>,\n    kwargs=<optimized out>) at Objects/methodobject.c:551\n#5  0x0000555555643350 in _PyObject_MakeTpCall (tstate=0x555555b08c10 <_PyRuntime+313456>,\n    callable=callable@entry=0x7ffff7a6d9e0, args=args@entry=0x7ffff7fb0080, nargs=<optimized out>,\n    keywords=keywords@entry=0x0) at Objects/call.c:242\n#6  0x0000555555643c76 in _PyObject_VectorcallTstate (kwnames=0x0, nargsf=<optimized out>,\n    args=0x7ffff7fb0080, callable=0x7ffff7a6d9e0, tstate=<optimized out>)\n    at ./Include/internal/pycore_call.h:165\n#7  0x00005555555d8e75 in _PyEval_EvalFrameDefault (tstate=0x555555b08c10 <_PyRuntime+313456>,\n    frame=0x7ffff7fb0020, throwflag=<optimized out>) at Python/generated_cases.c.h:955\n#8  0x00005555557a559c in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020,\n    tstate=0x555555b08c10 <_PyRuntime+313456>) at ./Include/internal/pycore_ceval.h:116\n#9  _PyEval_Vector (args=0x0, argcount=0, kwnames=0x0, locals=0x7ffff7a18680, func=0x7ffff7a033d0,\n    tstate=0x555555b08c10 <_PyRuntime+313456>) at Python/ceval.c:1898\n#10 PyEval_EvalCode (co=co@entry=0x7ffff7a32230, globals=globals@entry=0x7ffff7a18680,\n    locals=locals@entry=0x7ffff7a18680) at Python/ceval.c:659\n```\nThe abort message is:\n```\npython: ./Modules/_interpretersmodule.c:462: _run_in_interpreter: Assertion `!PyErr_Occurred()' failed.\nAborted\n```\n\nRelated to https://github.com/python/cpython/issues/126654.\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a2+ (heads/main:3c770e3f097, Nov 22 2024, 09:48:39) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-127220\n* gh-128689\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-23T16:15:10Z",
+   "body": "I think we just need to fix the assumption that `_PyXI_Enter` always successfully switches to the interpreter. I'll leave the patch to @sobolevn :)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-01-09T22:34:04Z",
+   "body": "Thank you @devdanzin for the report!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "72b9e97605acc39100d277e8b25e05f947778d61",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127220",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "087bb48acac997c06e69dae25bae2dd75194b980",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "da3aba9498c6c000c50f72605670c25c524c9c08",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/128689",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0d2b9abd18ff4fc6d2fbf1b398b411ed3b76266c",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ]
+}

@@ -1,0 +1,66 @@
+{
+ "repo": "cython/cython",
+ "number": 7600,
+ "type": "pull",
+ "url": "https://github.com/cython/cython/pull/7600",
+ "title": "Try to avoid unguarded PyErr_Clear",
+ "state": "closed",
+ "state_reason": null,
+ "author": "da-woods",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-03-28T11:05:56Z",
+ "closed_at": "2026-04-08T17:10:46Z",
+ "body": "Another thing raised by @devdanzin's automated analysis...\r\n\r\nThere's quite a few places where we discard all errors with PyErr_Clear. That's usually close to what's intended, but it also discards \"BaseException\" which are typically things that we don't want to ignore like MemoryError, KeyboardInterrupt.\r\n\r\nI've usually adopted the pattern or \"discard regular exception; keep base exception\". One exception is `__Pyx_PyDict_GetItemStr`\r\n- this minics the interface for `PyDict_GetItem` so in that case I've just followed their lead and done \"write unraisable\".\r\n\r\nThere's a few examples which I haven't addressed here because they looked like they needed a bit more thought:\r\n\r\n* MergeVTables\r\n* __Pyx_setup_reduce and __Pyx_setup_reduce_is_named (I have a branch for this https://github.com/da-woods/cython/tree/setup-reduce but it depends on this PR)\r\n* `__Pyx_Py_UNICODE_is_*`\r\n* `__Pyx_PyType_GetFullyQualifiedName` (in this case it should probably be failable, and there's a better option in recent Python versions).",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/cython/cython/pull/7601",
+   "commit": null,
+   "actor": "da-woods"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "47bd371a5f854b500940a31c5c73db88045daa7e",
+   "actor": "da-woods"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1f5484d5d11a4073214f322d685630985a93d590",
+   "actor": "da-woods"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/cython/cython/pull/7602",
+   "commit": null,
+   "actor": "da-woods"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c967a9646d0ae4b4f937ae3730408731158e15e4",
+   "actor": "da-woods"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f464cb01bb944e8fb5df84f58b641170165102e8",
+   "actor": "da-woods"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "bb6b1b0489f3a63ee554d6ac6a6a04ea99ec021f",
+   "actor": "da-woods"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "da-woods"
+  }
+ ]
+}

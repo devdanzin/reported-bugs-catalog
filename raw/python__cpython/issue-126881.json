@@ -1,0 +1,166 @@
+{
+ "repo": "python/cpython",
+ "number": 126881,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126881",
+ "title": "Segfault with `asyncio.base_events.BaseEventLoop` when passed a small float to `set_debug`.",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-11-15T19:07:53Z",
+ "closed_at": "2024-11-29T09:49:24Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to segfault the interpreter by passing a small float as the `enabled` parameter of `asyncio.base_events.BaseEventLoop.set_debug()`:\n\n```python\nimport asyncio.base_events\n\nobj = asyncio.base_events.BaseEventLoop()\nobj.set_debug(0.0005)\nobj._run_forever_setup()\n```\nFound using fusil by @vstinner.\n\n### CPython versions tested on:\n\n3.13, 3.14, CPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ experimental free-threading build (heads/main-dirty:54c63a32d0, Nov  8 2024, 20:16:36) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126901\n* gh-126904\n* gh-127395\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T09:02:34Z",
+   "body": "I'm assuming that this only happens on the free-threaded build, or?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T09:15:23Z",
+   "body": "No, it segfaults on normal build too, sorry for not mentioning it."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T09:24:38Z",
+   "body": "I'll have a look at this one."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T09:32:07Z",
+   "body": "FTR: the interpreter crashes upon exit (at least on my machine)\r\n\r\n```pycon\r\nChecked 112 modules (34 built-in, 77 shared, 1 n/a on linux-x86_64, 0 disabled, 0 missing, 0 failed on import)\r\nPython 3.14.0a1+ (heads/fix/asyncio-set-debug-126881-dirty:08f98f4576f, Nov 16 2024, 10:29:31) [GCC 7.5.0] on linux\r\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\r\n>>> import asyncio.base_events\r\n...\r\n... obj = asyncio.base_events.BaseEventLoop()\r\n... obj.set_debug(0.0005)\r\n... obj._run_forever_setup()\r\n...\r\n>>>\r\nSegmentation fault (core dumped)\r\n```"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T09:57:13Z",
+   "body": "Something is happening in the `__del__` method:\r\n\r\n```py\r\n    def __del__(self, _warn=warnings.warn):\r\n        if not self.is_closed():\r\n            _warn(f\"unclosed event loop {self!r}\", ResourceWarning, source=self)\r\n            if not self.is_running():\r\n                self.close()\r\n```\r\n\r\nNow, if I just put a print just before `if not self.is_closed()`, no crash happens but the print is not printed. I think the moment `close` is being called, the `_debug` attribute is already gone, hence causing an segfault. Actually, changing to:\r\n\r\n```py\r\n    def __del__(self, _warn=warnings.warn, _str=str, _stdout=sys.stdout):\r\n        _stdout.write(\"no!!!\" + _str(self) + \"\\n\")\r\n        if not self.is_closed():\r\n            _warn(f\"unclosed event loop {self!r}\", ResourceWarning, source=self)\r\n            if not self.is_running():\r\n                self.close()\r\n```\r\n\r\nThe line `_stdout.write` is NOT printed but if I change `_str(self)` to `_str(1)`, it is printed."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T10:30:19Z",
+   "body": "The following patch seems to work though I wonder why. I think it's \r\n\r\n```diff\r\ndiff --git a/Lib/asyncio/base_events.py b/Lib/asyncio/base_events.py\r\nindex 1c7ffe37c75..d7d64162108 100644\r\n--- a/Lib/asyncio/base_events.py\r\n+++ b/Lib/asyncio/base_events.py\r\n@@ -2052,8 +2052,9 @@ def get_debug(self):\r\n         return self._debug\r\n\r\n     def set_debug(self, enabled):\r\n-        self._debug = enabled\r\n+        self._debug = enabled = bool(enabled)\r\n\r\n         if self.is_running():\r\n             self.call_soon_threadsafe(self._set_coroutine_origin_tracking, enabled)\r\n```\r\n\r\nBy the way, the segfault happens when cleaning up `_frozen_importlib` (or maybe it's `# destroy traceback` that crashes):\r\n\r\n```text\r\n# destroy _struct\r\n# clear sys.meta_path\r\n# clear sys.modules\r\n# destroy _frozen_importlib\r\nSegmentation fault (core dumped)\r\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T10:31:13Z",
+   "body": "The backtrace is:\r\n```gdb\r\n#0  0x00007ffff7bc9f51 in mult (a=0x7ffff7f19338 <_PyRuntime+118936>, b=0x0) at Python/dtoa.c:618\r\n#1  0x00007ffff7bca2dc in pow5mult (b=0x7ffff7f19338 <_PyRuntime+118936>, k=1) at Python/dtoa.c:702\r\n#2  0x00007ffff7bcdede in _Py_dg_dtoa (dd=0.00050000000000000001, mode=0, ndigits=0, decpt=0x7fffffff956c,\r\n    sign=0x7fffffff9570, rve=0x7fffffff9580) at Python/dtoa.c:2550\r\n#3  0x00007ffff7bc82e0 in format_float_short (d=0.00050000000000000001, format_code=114 'r', mode=0,\r\n    precision=0, always_add_sign=0, add_dot_0_if_integer=2, use_alt_formatting=0, no_negative_zero=0,\r\n    float_strings=0x7ffff7e6fab0 <lc_float_strings>, type=0x0) at Python/pystrtod.c:986\r\n#4  0x00007ffff7bc8b3d in PyOS_double_to_string (val=0.00050000000000000001, format_code=114 'r',\r\n    precision=0, flags=2, type=0x0) at Python/pystrtod.c:1279\r\n#5  0x00007ffff794ca67 in float_repr (v=0x7ffff73ac970) at Objects/floatobject.c:380\r\n#6  0x00007ffff79ecc50 in object_str (self=0x7ffff73ac970) at Objects/typeobject.c:6215\r\n#7  0x00007ffff799fa89 in PyObject_Str (v=0x7ffff73ac970) at Objects/object.c:742\r\n```\r\nThat, along with the fact that using `0.5` instead of `0.0005` doesn't segfault, points to the `repr` of `_debug` in the `ResourceWarning` on interpreter shutdown being the cause of the segfault:\r\n```python\r\n/Lib/asyncio/base_events.py:759: ResourceWarning: unclosed event loop <BaseEventLoop running=False closed=False debug=0.0005>\r\n```\r\n\r\nCommenting out `bool(enabled)` (where enabled is `self._debug`) here avoids the segfault:\r\nhttps://github.com/python/cpython/blob/2313f8421080ceb3343c6f5d291279adea85e073/Lib/asyncio/base_events.py#L2036-L2038"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T10:34:26Z",
+   "body": "Maybe it's an issue with `bool` at finalization time? \r\n\r\nEDIT: I still have a crash even if I comment the above line.\r\n\r\ncc @ncoghlan (I don't really know who to ask for this). "
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-11-16T10:51:20Z",
+   "body": "I'm guessing at the time we try to `repr` that float, `interp->dtoa.p5s` has been freed/set to `NULL`/contains `NULL` (sorry, my C is weak):\r\n\r\n```\r\n#0  0x00007ffff7bc9f51 in mult (a=0x7ffff7f19338 <_PyRuntime+118936>, b=0x0) at Python/dtoa.c:618\r\n```\r\nThis would mean `mult` has been called with `b=0x0` from line 702 here:\r\nhttps://github.com/python/cpython/blob/2313f8421080ceb3343c6f5d291279adea85e073/Python/dtoa.c#L695-L702\r\n\r\nNow, why that would segfault with `0.0005` but not `0.5` I have no idea."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-16T10:52:10Z",
+   "body": "I am investigating this, will have a fix soon."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-16T10:53:38Z",
+   "body": "> I am investigating this, will have a fix soon.\r\n\r\nOh I suggested a way to do it by converting it into a boolean when you call `set_debug`. I think it's an easy way to do it but the problem of using `__repr__` in other places while finalizing might be a more general issue. If your fix is better, you can just close my PR when the time comes (I won't be available for the next two weeks)."
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-16T11:06:43Z",
+   "body": "https://github.com/python/cpython/pull/126904 fixes this"
+  },
+  {
+   "author": "vstinner",
+   "created_at": "2024-11-18T08:12:20Z",
+   "body": "> self._debug = enabled = bool(enabled)\r\n\r\nIMO it's also worth it to fix asyncio."
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-11-18T13:06:34Z",
+   "body": "I'll reopen it once I'm back from my travels if you think it's worth it!"
+  },
+  {
+   "author": "kumaraditya303",
+   "created_at": "2024-11-29T09:49:24Z",
+   "body": "Fixed by https://github.com/python/cpython/pull/126904"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126901",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126904",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "762c603a866146afc7db2591fb49605e0858e9b1",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4df6666d685c1b7cfa2e2e30aeafb5d3225deb91",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127395",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "47b0f8f2972facc29ec33f1f0b353784ff94b709",
+   "actor": "vstinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e1d9f404a5964a1d40cd864fd3818568d1cdf06c",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ee07bab15f763a295f46d8c09795c5e956b6e41c",
+   "actor": "ebonnal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/137384",
+   "commit": null,
+   "actor": "kumaraditya303"
+  }
+ ]
+}

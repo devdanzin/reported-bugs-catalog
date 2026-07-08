@@ -1,0 +1,80 @@
+{
+ "repo": "python/cpython",
+ "number": 126644,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126644",
+ "title": "`_interpreters` is not thread safe on the free-threaded build",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-subinterpreters",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-10T15:09:04Z",
+ "closed_at": "2025-01-11T17:25:47Z",
+ "body": "# Crash report\r\n\r\n### What happened?\r\n\r\nFirst off, sorry for not being able to offer code that is more reduced and certain to trigger a repro.\r\n\r\nThe code below non-deterministically triggers `python: Python/index_pool.c:92: heap_pop: Assertion 'heap->size > 0' failed.` in a free-threading build with `PYTHON_GIL=0`.\r\n\r\n```python\r\nimport _interpreters\r\nfrom threading import Thread\r\n\r\ndef f(): pass\r\n\r\nints = []\r\nfor x in range(300):\r\n    ints.append(_interpreters.create())\r\n\r\nthreads = []\r\nfor interpr in ints:\r\n    threads.append(Thread(target=_interpreters.run_string, args=(interpr, \"f()\",)))\r\n    threads.append(Thread(target=_interpreters.get_current, args=()))\r\n    threads.append(Thread(target=_interpreters.destroy, args=(interpr,)))\r\n    threads.append(Thread(target=_interpreters.list_all, args=()))\r\n    threads.append(Thread(target=_interpreters.destroy, args=(interpr,)))\r\n    threads.append(Thread(target=_interpreters.get_current, args=()))\r\n    threads.append(Thread(target=_interpreters.get_main, args=()))\r\n    threads.append(Thread(target=_interpreters.destroy, args=(interpr,)))\r\n    threads.append(Thread(target=_interpreters.run_string, args=(interpr, \"f()\",)))\r\n\r\nfor thread in threads:\r\n    try:\r\n        print(\"START\", thread)\r\n        thread.start()\r\n    except Exception:\r\n        pass\r\n\r\nfor thread in threads:\r\n    try:\r\n        print(\"JOIN\", thread)\r\n        thread.join()\r\n    except Exception:\r\n        pass\r\n```\r\n\r\nBacktrace:\r\n```gdb\r\n#0  __pthread_kill_implementation (no_tid=0, signo=6, threadid=140729519150656) at ./nptl/pthread_kill.c:44\r\n#1  __pthread_kill_internal (signo=6, threadid=140729519150656) at ./nptl/pthread_kill.c:78\r\n#2  __GI___pthread_kill (threadid=140729519150656, signo=signo@entry=6) at ./nptl/pthread_kill.c:89\r\n#3  0x00007ffff7ce0476 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\r\n#4  0x00007ffff7cc67f3 in __GI_abort () at ./stdlib/abort.c:79\r\n#5  0x00007ffff7cc671b in __assert_fail_base (fmt=0x7ffff7e7b130 \"%s%s%s:%u: %s%sAssertion `%s' failed.\\n%n\",\r\n    assertion=0x555555aceaf4 \"heap->size > 0\", file=0x555555aceae0 \"Python/index_pool.c\", line=92, function=<optimized out>)\r\n    at ./assert/assert.c:92\r\n#6  0x00007ffff7cd7e96 in __GI___assert_fail (assertion=assertion@entry=0x555555aceaf4 \"heap->size > 0\",\r\n    file=file@entry=0x555555aceae0 \"Python/index_pool.c\", line=line@entry=92,\r\n    function=function@entry=0x555555aceb40 <__PRETTY_FUNCTION__.1> \"heap_pop\") at ./assert/assert.c:101\r\n#7  0x00005555558caa1c in heap_pop (heap=<optimized out>) at Python/index_pool.c:92\r\n#8  0x00005555558cac33 in _PyIndexPool_AllocIndex (pool=pool@entry=0x7ffff780f498) at Python/index_pool.c:173\r\n#9  0x000055555568d9f0 in _Py_ReserveTLBCIndex (interp=interp@entry=0x7ffff780b020) at Objects/codeobject.c:2752\r\n#10 0x0000555555951c33 in new_threadstate (interp=interp@entry=0x7ffff780b020, whence=whence@entry=5) at Python/pystate.c:1516\r\n#11 0x0000555555953994 in _PyThreadState_NewBound (interp=interp@entry=0x7ffff780b020, whence=whence@entry=5)\r\n    at Python/pystate.c:1578\r\n#12 0x0000555555896ee9 in _enter_session (session=session@entry=0x7ffe24ff8740, interp=interp@entry=0x7ffff780b020)\r\n    at Python/crossinterp.c:1548\r\n#13 0x000055555589b9fb in _PyXI_Enter (session=session@entry=0x7ffe24ff8740, interp=interp@entry=0x7ffff780b020,\r\n    nsupdates=nsupdates@entry=0x0) at Python/crossinterp.c:1711\r\n#14 0x00007ffff7c3d217 in _run_in_interpreter (interp=interp@entry=0x7ffff780b020, codestr=0x200006182c8 \"f()\", codestrlen=3,\r\n    shareables=shareables@entry=0x0, flags=1, p_excinfo=p_excinfo@entry=0x7ffe24ff8870) at ./Modules/_interpretersmodule.c:461\r\n#15 0x00007ffff7c3d3ef in _interp_exec (self=self@entry=<module at remote 0x20000778b30>, interp=interp@entry=0x7ffff780b020,\r\n    code_arg=<optimized out>, shared_arg=0x0, p_excinfo=p_excinfo@entry=0x7ffe24ff8870) at ./Modules/_interpretersmodule.c:950\r\n#16 0x00007ffff7c3dc6b in interp_run_string (self=<module at remote 0x20000778b30>, args=args@entry=(9, 'f()'), kwds=kwds@entry={})\r\n    at ./Modules/_interpretersmodule.c:1110\r\n#17 0x000055555570145a in cfunction_call (func=func@entry=<built-in method run_string of module object at remote 0x20000778b30>,\r\n    args=args@entry=(9, 'f()'), kwargs=kwargs@entry={}) at Objects/methodobject.c:551\r\n#18 0x000055555567f69a in _PyObject_Call (tstate=0x5555560c09d0,\r\n    callable=callable@entry=<built-in method run_string of module object at remote 0x20000778b30>, args=args@entry=(9, 'f()'),\r\n    kwargs=kwargs@entry={}) at Objects/call.c:361\r\n```\r\n\r\nThis code most usually results in one of the following errors, from most common to rarest:\r\n\r\n1. tstate_delete_common assertion, which seems to indicate a thread creation failed, see https://github.com/python/cpython/issues/109746.\r\n```\r\npython: Python/pystate.c:1739: tstate_delete_common: Assertion `tstate->_status.cleared && !tstate->_status.finalized' failed.\r\n```\r\n\r\n2. Fatal Python error, seems to be https://github.com/python/cpython/issues/113148.\r\n\r\n```\r\nFatal Python error: Py_EndInterpreter: not the last thread\r\nPython runtime state: initialized\r\n\r\nCurrent thread 0x00007f09af37e640 (most recent call first):\r\n  <no Python frame>\r\n\r\nThread 0x00007f09b0380640 (most recent call first):\r\n  <no Python frame>\r\nAborted\r\n```\r\n\r\nGiven that, running it multiple times seems necessary to trigger the correct abort in `heap_pop`. The affected code seems to have been included in https://github.com/python/cpython/pull/123926, so cc @mpage.\r\n\r\nFound using fusil by @vstinner.\r\n\r\n### CPython versions tested on:\r\n\r\nCPython main branch\r\n\r\n### Operating systems tested on:\r\n\r\nLinux\r\n\r\n### Output from running 'python -VV' on the command line:\r\n\r\nPython 3.14.0a1+ experimental free-threading build (heads/main-dirty:54c63a32d0, Nov  8 2024, 20:16:36) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126696\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-10T15:15:23Z",
+   "body": "Confirmed on main. I'll try and deal with this today."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-10T20:05:32Z",
+   "body": "There are two bugs here. First, the initial check for if the subinterpreter is running in `_interpreters.destroy` doesn't account for the fact that another thread could start running it on the free-threaded build. That's a relatively simple fix, though--just set up some synchronization and prevent interpreters from starting once `destroy` has started.\r\n\r\nThe much more difficult issue is how we capture exceptions. Because we need to send the object to the caller, we have to detach from the subinterpreter, and then access it from the calling interpreter, which isn't thread safe, even on the GIL-ful build. The moment we detach from the thread state it's fair game for another thread to try and attach to it, and overwrite the exception that we want. There are a few possible fixes, and I'm not sure which one I want to do yet:\r\n\r\n- Add a big ugly lock around interpreter switching to any interpreter (will contend very badly).\r\n- Add an equally ugly lock to `_interpreters` (as in, marking it as needing the GIL).\r\n- Add a per-interpreter lock for switching. This is what I'm leaning towards, but it hurts the C API, because exception capturing happens outside of `_PyXI_Enter` and `_PyXI_Exit`, so those APIs will need a lock to call them, foiling [my plans](https://discuss.python.org/t/make-the-crossinterpreter-switching-apis-public/69806/) to make them public.\r\n- Capture exceptions *before* detaching the thread, serialize them and store them on the crossinterpreter session, and then deserialize once we're back in the calling interpreter (will be a PITA to implement)."
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-11T16:01:00Z",
+   "body": "OK, it looks like the exception-capturing problem is less severe than I thought. We only rely on the state of the interpreter for `_PyXI_ERR_ALREADY_RUNNING`, so the easy fix is to just manually raise the error there. The much bigger problem is that it seems subinterpreters just isn't meant to run on the free-threaded build. I guess I'll do what I can to help deal with what."
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2024-11-11T16:03:37Z",
+   "body": "> Because we need to send the object to the caller, we have to detach from the subinterpreter, and then access it from the calling interpreter, which isn't thread safe, even on the GIL-ful build\r\n\r\nCan you expand on this? Accessing Python objects from another interpreter is not safe in the free-threaded build, even with a lock. The GC and some other code paths assume that interpreter's and their objects are isolated.\r\n\r\n"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2024-11-11T16:11:32Z",
+   "body": "I was wrong with my analysis. I thought originally that we just moved the exception between the interpreter, but instead it gets stored and serialized. The issue right now is that `_PyXI_ERR_ALREADY_RUNNING` uses `_PyInterpreterState_FailIfRunningMain`, which isn't right because another thread could start and stop the interpreter in the meantime. I just fixed it on my end by manually raising the interpreter error and not using that function.\r\n\r\nThe much bigger concern I have is that it seems `_PyInterpreterState_SetRunningMain` and `_PyInterpreterState_SetNotRunningMain` aren't thread-safe. On the free-threaded build, I'm assuming there's no waiting for `_PyThreadState_Attach`, because there's no GIL? If that's the case, then a few of the interpreter state functions need to get some locking. (For example, `_PyInterpreterState_SetRunningMain` checks if the main thread state has already been set, and then sets the current thread state, but on the free-threaded build it's possible for it to start running *after* that check, and then overwrite the old thread state, which causes a fatal error upon finalization.)"
+  },
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-01-11T17:25:47Z",
+   "body": "I'm closing this at \"not planned\" because it's just collecting dust. I don't think this really qualifies as a tracking issue, so any new issues related to subinterpreters + free-threading should just get their own issue. Thanks @devdanzin for the report, and Sam for teaching me more about thread safety via #126696 :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126696",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/126914",
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ]
+}

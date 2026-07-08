@@ -1,0 +1,113 @@
+{
+ "repo": "python/cpython",
+ "number": 143189,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/143189",
+ "title": "Assertion failure in `insertdict`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2025-12-26T13:53:15Z",
+ "closed_at": "2026-01-13T10:19:00Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to cause the interpreter to abort by running the code below:\n\n```python\nfrom threading import Thread\nfrom asyncio import Runner, gather, to_thread\n\nclass Str(str): ...\nclass Class: ...\n\ndef instance_1__setattr__():\n    Class().__setattr__(Str(), \"\")\n\nasync def run_async_tasks():\n    await gather(to_thread(instance_1__setattr__))\n\nThread(target=Class().__setattr__, args=(\"\", \"\")).start()\nRunner().run(run_async_tasks())\n```\n\nBacktrace:\n```\npython: Objects/dictobject.c:1916: int insertdict(PyDictObject *, PyObject *, Py_hash_t, PyObject *): Assertion `old_value != NULL' failed.\n\nThread 3 \"asyncio_0\" received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7c45e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7c28888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff7c287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff7c3c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555ba106f in insertdict (mp=0x7bffb60d0190, key=<Str() at remote 0x7bffb61c01e0>, hash=0, value='') at Objects/dictobject.c:1916\n#8  0x0000555555bbb4be in store_instance_attr_lock_held (obj=<Class() at remote 0x7bffb61301a0>, values=values@entry=0x7bffb61301c0, name=<Str() at remote 0x7bffb61c01e0>, value='') at Objects/dictobject.c:6882\n#9  0x0000555555bba260 in _PyObject_StoreInstanceAttribute (obj=obj@entry=<Class() at remote 0x7bffb61301a0>, name=name@entry=<Str() at remote 0x7bffb61c01e0>, value=value@entry='') at Objects/dictobject.c:6988\n#10 0x0000555555c0c80e in _PyObject_GenericSetAttrWithDict (obj=<Class() at remote 0x7bffb61301a0>, name=<Str() at remote 0x7bffb61c01e0>, value='', dict=0x0) at Objects/object.c:1972\n#11 0x0000555555cd32d5 in wrap_setattr (self=<optimized out>, args=(<Str() at remote 0x7bffb61c01e0>, ''), wrapped=<optimized out>) at Objects/typeobject.c:9933\n#12 0x0000555555ad9531 in wrapperdescr_raw_call (descr=0x7bffb40a02b0, self=<Class() at remote 0x7bffb61301a0>, args=(<Str() at remote 0x7bffb61c01e0>, ''), kwds=0x0) at Objects/descrobject.c:532\n#13 wrapperdescr_call (_descr=<wrapper_descriptor at remote 0x7bffb40a02b0>, args=(<Str() at remote 0x7bffb61c01e0>, ''), kwds=0x0) at Objects/descrobject.c:570\n#14 0x0000555555aa9b3d in _PyObject_MakeTpCall (tstate=0x7e8ff6ff4210, callable=<wrapper_descriptor at remote 0x7bffb40a02b0>, args=0x7bffb37fb068, nargs=3, keywords=0x0) at Objects/call.c:242\n#15 0x0000555555e831cb in _Py_VectorCallInstrumentation_StackRefSteal (callable=<wrapper_descriptor at remote 0x7bffb40a02b0>, arguments=arguments@entry=0x7e8ff70035d8, total_args=total_args@entry=3, kwnames=kwnames@entry=0x0, \n    call_instrumentation=false, frame=0x7e8ff7003580, this_instr=0x7bffb60a012c, tstate=0x7e8ff6ff4210) at Python/ceval.c:1097\n#16 0x0000555555ebe861 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:1680\n#17 0x0000555555e82094 in _PyEval_EvalFrame (tstate=0x7e8ff6ff4210, frame=0x7e8ff7003580, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#18 _PyEval_Vector (tstate=0x7e8ff6ff4210, func=0x7bffb53b9a10, locals=0x0, args=0x7bffb5440828, argcount=0, kwnames=0x0) at Python/ceval.c:2542\n#19 0x0000555555f3ebc3 in _PyObject_VectorcallTstate (tstate=0x7e8ff6ff4210, callable=<function at remote 0x7bffb53b9a10>, args=0x7bffb37ff6c0, nargsf=22, kwnames=0x0) at ./Include/internal/pycore_call.h:136\n#20 context_run (self=<_contextvars.Context at remote 0x7bffb5440fd0>, args=args@entry=0x7bffb5440820, nargs=nargs@entry=1, kwnames=kwnames@entry=0x0) at Python/context.c:722\n#21 0x0000555555bf1e3c in cfunction_vectorcall_FASTCALL_KEYWORDS (func=<built-in method run of _contextvars.Context object at remote 0x7bffb5440fd0>, args=0x7bffb5440820, nargsf=1, kwnames=0x0) at Objects/methodobject.c:465\n#22 0x00005555562a65f0 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x7e8ff6ff4210, callable=<built-in method run of _contextvars.Context object at remote 0x7bffb5440fd0>, args=args@entry=0x7bffb5440820, nargsf=nargsf@entry=1, \n    kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:136\n#23 0x00005555562ac4c5 in partial_vectorcall (self=self@entry=<functools.partial at remote 0x7bffb5325d10>, args=args@entry=0x555556907810 <_PyRuntime+172496>, nargsf=0, kwnames=kwnames@entry=0x0) at ./Modules/_functoolsmodule.c:390\n#24 0x0000555555aab83f in _PyVectorcall_Call (tstate=<optimized out>, func=<optimized out>, callable=<optimized out>, tuple=(), kwargs=<optimized out>) at Objects/call.c:273\n#25 0x0000555555eaa594 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:2534\n#26 0x0000555555e82094 in _PyEval_EvalFrame (tstate=0x7e8ff6ff4210, frame=0x7e8ff7003328, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#27 _PyEval_Vector (tstate=0x7e8ff6ff4210, func=0x7bffb49cb1b0, locals=0x0, args=0x7bffb26ffa20, argcount=1, kwnames=0x0) at Python/ceval.c:2542\n#28 0x0000555555ab53f0 in _PyObject_VectorcallTstate (tstate=tstate@entry=0x7e8ff6ff4210, callable=callable@entry=<function at remote 0x7bffb49cb1b0>, args=0x7bffb26ffa20, nargsf=nargsf@entry=1, kwnames=kwnames@entry=0x0)\n    at ./Include/internal/pycore_call.h:136\n#29 0x0000555555ab2aea in method_vectorcall (method=<method at remote 0x7bffb60d0070>, args=<optimized out>, nargsf=<optimized out>, kwnames=<optimized out>) at Objects/classobject.c:73\n#30 0x0000555555f3ebc3 in _PyObject_VectorcallTstate (tstate=0x7e8ff6ff4210, callable=<method at remote 0x7bffb60d0070>, args=0x7bffb37ff6c0, nargsf=22, kwnames=0x0) at ./Include/internal/pycore_call.h:136\n#31 context_run (self=<_contextvars.Context at remote 0x7bffb5443250>, args=0x7bffb37fd950, nargs=1, kwnames=0x0) at Python/context.c:722\n#32 0x0000555555e8501a in _PyCallMethodDescriptorFastWithKeywords_StackRefSteal (callable=<method_descriptor at remote 0x7bffb40a8580>, meth=meth@entry=0x555556712e60 <PyContext_methods+160>, \n    self=<_contextvars.Context at remote 0x7bffb5443250>, arguments=0x7e8ff70032f8, total_args=total_args@entry=2) at Python/ceval.c:1248\n#33 0x0000555555eb41c6 in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=<optimized out>, throwflag=<optimized out>) at Python/generated_cases.c.h:3470\n#34 0x0000555555e82094 in _PyEval_EvalFrame (tstate=0x7e8ff6ff4210, frame=0x7e8ff7003220, throwflag=0) at ./Include/internal/pycore_ceval.h:119\n#35 _PyEval_Vector (tstate=0x7e8ff6ff4210, func=0x7bffb49cb290, locals=0x0, args=0x7bffb26ff120, argcount=1, kwnames=0x0) at Python/ceval.c:2542\n```\n\nMay be related to https://github.com/python/cpython/issues/142731.\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a3+ free-threading build (heads/main:cf6758ff9eb, Dec 24 2025, 21:09:14) [Clang 21.1.2 (2ubuntu6)]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-143285\n* gh-143771\n* gh-143772\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "colesbury",
+   "created_at": "2025-12-27T20:50:01Z",
+   "body": "Not free threading specific. The assertion is just wrong after:\n* https://github.com/python/cpython/pull/140558"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-12-29T11:58:04Z",
+   "body": "Should we just remove it, or is there an interesting check to assert there?"
+  },
+  {
+   "author": "colesbury",
+   "created_at": "2025-12-29T18:16:13Z",
+   "body": "I think it's more than just the assertion that is wrong. @methane I think the logic in the PR we reviewed doesn't handle the case where you insert a unicode subclass that matches something in the shared keys (but not in the dict) properly. Here is a repro without any threads:\n\n```python\nclass MyClass: pass\nclass MyStr(str): pass\n\nobj = MyClass()\nobj.attr1 = \"attr1\"\n\nobj2 = MyClass()\nd = obj2.__dict__\nd[MyStr(\"attr1\")] = \"attr1\"  # Crashes in debug builds\nassert isinstance(list(d.keys())[0], MyStr)  # Fails in release builds of 3.13+ with \"IndexError: list index out of range\"\n```"
+  },
+  {
+   "author": "methane",
+   "created_at": "2025-12-30T02:13:04Z",
+   "body": "@colesbury you are right.\n\nI did not consider the case where key exists in the shared keys table but old_value==NULL.\nIn that case, since the dict cannot use shared keys table, conversion to a combined table is necessary.\n\n```\ndiff --git a/Objects/dictobject.c b/Objects/dictobject.c\nindex ac4a46dab10..e363253480b 100644\n--- a/Objects/dictobject.c\n+++ b/Objects/dictobject.c\n@@ -1898,7 +1898,7 @@ insertdict(PyInterpreterState *interp, PyDictObject *mp,\n             goto Fail;\n     }\n\n-    if (ix == DKIX_EMPTY) {\n+    if (old_value == NULL) {\n         // insert_combined_dict() will convert from non DICT_KEYS_GENERAL table\n         // into DICT_KEYS_GENERAL table if key is not Unicode.\n         // We don't convert it before _Py_dict_lookup because non-Unicode key\n```"
+  },
+  {
+   "author": "methane",
+   "created_at": "2025-12-30T06:46:34Z",
+   "body": "For the record, this issue is very similar to #142218.\n\n#142218 is crash when inserting non-Unicode key when matching Unicode key is in split table and there is a value.\nThis issue is crash when inserting non-Unicode key when matching Unicode key is in split table, but there is no value in the dict."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f1e7bccbb15180961a46ae8de2dd430222b4174f",
+   "actor": "methane"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143285",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "43c76587c1ba2c3937fa6834db10cffc604e39e0",
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ed50c2efad32bc450ac1fb7e1c578dfbf6cfc14f",
+   "actor": "reidenong"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143771",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/143772",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fd7d935d224b4d2673fb23b257715b4723a20428",
+   "actor": "methane"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5d26a0410e7a64d13b5da5d189f9e2a894d71dd1",
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b739bd1d4251368be9a2269290a0019eff9ee866",
+   "actor": "hugovk"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e715ccd549c8dcc3bf35d35538b874a4406cecaf",
+   "actor": "thunder-coding"
+  }
+ ]
+}

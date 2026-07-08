@@ -1,0 +1,202 @@
+{
+ "repo": "python/cpython",
+ "number": 127085,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127085",
+ "title": "Calling `ShareableList.count` in threads aborts: `Assertion 'self->exports == 0' failed`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-multiprocessing",
+  "3.13",
+  "topic-free-threading",
+  "3.14"
+ ],
+ "created_at": "2024-11-21T02:00:57Z",
+ "closed_at": "2024-12-16T19:12:20Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to abort the interpreter by calling `multiprocessing.shared_memory.ShareableList.count` in threads with `PYTHON_GIL=0` in a debug build:\n\n```python\nimport gc\nimport multiprocessing.shared_memory\nfrom threading import Thread\n\nobj = multiprocessing.shared_memory.ShareableList(\"Uq..SeDAmB+EBrkLl.SG.Z+Z.ZdsV..wT+zLxKwdN\\b\")\n\nfor x in range(10):\n    Thread(target=obj.count, args=(1,)).start()\n\ndel obj\ngc.collect()\n```\n\nResult:\n```python\nException ignored in: <function SharedMemory.__del__ at 0x200006bbfb0>\nTraceback (most recent call last):\n  File \"/home/danzin/projects/mycpython/Lib/multiprocessing/shared_memory.py\", line 189, in __del__\n    self.close()\n  File \"/home/danzin/projects/mycpython/Lib/multiprocessing/shared_memory.py\", line 229, in close\n    self._buf.release()\nBufferError: memoryview has 2 exported buffers\npython: Objects/memoryobject.c:1143: memory_dealloc: Assertion `self->exports == 0' failed.\nAborted\n```\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a2+ experimental free-threading build (heads/main-dirty:c9b399fbdb0, Nov 19 2024, 20:12:48) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-127412\n* gh-128019\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "LindaSummer",
+   "created_at": "2024-11-22T06:03:02Z",
+   "body": "Hi @devdanzin ,\n\n  I'm a newbie of CPython and want to have a try on this issue.\n\n  Could it be assigned to me?\ud83d\ude0a\n\nBest Regards,\nEdward"
+  },
+  {
+   "author": "JelleZijlstra",
+   "created_at": "2024-11-22T16:19:34Z",
+   "body": "@LindaSummer you don't need to be assigned an issue to work on it. If you're interested in this issue, I suggest you read through the code where the crash happens to understand it. If you feel you found something useful, you can post on this issue with your findings. If you find a possible solution, you can open a PR with your fix."
+  },
+  {
+   "author": "LindaSummer",
+   "created_at": "2024-11-23T06:53:04Z",
+   "body": "> @LindaSummer you don't need to be assigned an issue to work on it. If you're interested in this issue, I suggest you read through the code where the crash happens to understand it. If you feel you found something useful, you can post on this issue with your findings. If you find a possible solution, you can open a PR with your fix.\r\n\r\nHi @JelleZijlstra ,\r\n\r\nGot it! Thanks very much for your warm guidance! \ud83d\ude0a\r\n\r\nI will try to go through the code and search for the root cause.\r\n\r\nBest Regards,\r\nEdward"
+  },
+  {
+   "author": "LindaSummer",
+   "created_at": "2024-11-26T15:09:03Z",
+   "body": "Hi @JelleZijlstra ,\r\n\r\nHere are some updates during these days.\r\n\r\n1. I constructed a new case to reproduce this issue. This issue should have no relation to gc.\r\n```python\r\nimport multiprocessing.shared_memory\r\nfrom threading import Thread\r\n\r\ndef test_memoryview_buffer():\r\n    import struct\r\n    class TA:\r\n        data = bytearray(\"Uq..SeDAmB+EBrkLl.SG.Z+Z.ZdsV..wT+zLxKwdN\\b\", encoding=\"utf8\")\r\n        _fmt = \"b\"*len(data)\r\n        shm = multiprocessing.shared_memory.SharedMemory(create=True, size=struct.calcsize(_fmt))\r\n        def __init__(self):\r\n            struct.pack_into(self._fmt, self.shm.buf, 0, *self.data)\r\n        def count(self, t):\r\n            res = 0\r\n            for i in range(len(self.data)):\r\n                (v,) = struct.unpack_from('b', self.shm.buf, i)\r\n                if i == v:\r\n                    res += 1\r\n            return res\r\n    obj = TA()\r\n    for x in range(2000):\r\n        Thread(target=obj.count, args=(1,)).start()\r\n    del obj\r\n\r\ntest_memoryview_buffer()\r\n```\r\n\r\n2. I print the ignored exception details and find below.\r\n```\r\nException ignored in: <function SharedMemory.__del__ at 0x20000c0efd0>\r\nTraceback (most recent call last):\r\n  File \"/workspaces/cpython/Lib/multiprocessing/shared_memory.py\", line 189, in __del__\r\n    self.close()\r\n  File \"/workspaces/cpython/Lib/multiprocessing/shared_memory.py\", line 230, in close\r\n    self._buf.release()\r\nBufferError: memoryview:  negative export count \r\npython.exe: Objects/memoryobject.c:1150: void memory_dealloc(PyObject *): Assertion `self->exports == 0' failed.\r\n```\r\nThis should be inside the SharedMemory release function.\r\n\r\n3. I use an bytearray memoryview and this issue doesn't happen again. I think it should be related to SharedMemory accessors.\r\n\r\n4. I searched for the `exports` references and find it is incremented and decremented in file [`memory_getbuf`](https://github.com/python/cpython/blob/2b0e2b2893a821ca36cd65a204bed932741ac189/Objects/memoryobject.c#L1518) and [`memory_releasebuf`](https://github.com/python/cpython/blob/2b0e2b2893a821ca36cd65a204bed932741ac189/Objects/memoryobject.c#L1598).\r\n\r\nI think it should be a race condition issue on the `shm.buf` memoryview object.\r\n\r\nI will try to learn more about the non-gil synchronization logic and try to find the root cause.\r\n\r\nPlease correct me if my analysis has any problems. \ud83d\ude0a\r\n\r\nBest Regards,\r\nEdward\r\n\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1c88b907a1b53162747189ba18a4a3538d28c4b4",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7a2cfa6451ad3773b31b2576a9ccb721185db978",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1cd98d0a498bdbb34d5f7784c66fa619d6c8ed93",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c7872cdb3691d2e69ddadfad208193c7e574b963",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/127412",
+   "commit": null,
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "06f462fa2af1e0500b687a987fb5fb9c372ced57",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9e6402cafa888a3e375fbc951e69d02151c22f87",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "bb9d67e3504c77372c14c108503d2ce5344a7cbe",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "376f3827a2669c38a628823ab7e5195c82930bab",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "49957d11132c35ef546fcdc78b2270fc9068d530",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "399120145526f3897b5ce28d1d0b476a40a2509d",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d4dc897449c6a414d5aee773c1f8d77e1907d5cd",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/hugovk/test/issues/88",
+   "commit": null,
+   "actor": "github-actions[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e287b885457a56e261abe886214423512ad5000b",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "666fde35308f18880e719e48f6cb4b44b845883b",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a3d58f1cf201d960400aba5159b2cc9f0e381941",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d3481136038f716d77848cab3adae11468211aea",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9594f385ae3b169d188e5fb32e2acdde1664e830",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ca811ef4acfdb4fac9ba45849845ac52e27b2ff",
+   "actor": "LindaSummer"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4937ba54c0ff7cc4a83d7345d398b804365af2d6",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/128019",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b9a492b809d8765ee365a5dd3c6ba4e5130a80af",
+   "actor": "freakboy3742"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0be115deac8b855c8d1a6c940ae438bd30db2d15",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b5d061c474d7684abec2d007de5050be26f334f8",
+   "actor": "srinivasreddy"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/110408",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

@@ -1,0 +1,96 @@
+{
+ "repo": "python/cpython",
+ "number": 132002,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132002",
+ "title": "Segfault deallocating a `ContextVar` built with `str` subclass",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2025-04-02T08:07:06Z",
+ "closed_at": "2025-04-02T12:30:56Z",
+ "body": "# Crash report\n\n### What happened?\n\nCreating a `ContextVar` with an instance of a subclass of `str` leads to a segfault during its deallocation:\n\n```python\nfrom _contextvars import ContextVar\n\nclass weird_str(str):\n    def __eq__(self, other):\n        pass\n\nContextVar(weird_str())\n```\n\nBacktrace:\n```gdb\nProgram received signal SIGSEGV, Segmentation fault.\ncontextvar_tp_clear (op=op@entry=<_contextvars.ContextVar at remote 0x7ffff7ac7150>) at Python/context.c:935\n935         Py_CLEAR(self->var_name);\n(gdb) bt\n#0  contextvar_tp_clear (op=op@entry=<_contextvars.ContextVar at remote 0x7ffff7ac7150>) at Python/context.c:935\n#1  0x000055555587e395 in contextvar_tp_dealloc (self=<_contextvars.ContextVar at remote 0x7ffff7ac7150>) at Python/context.c:958\n#2  0x00005555556ffa08 in _Py_Dealloc (op=op@entry=<_contextvars.ContextVar at remote 0x7ffff7ac7150>) at Objects/object.c:3021\n#3  0x000055555587e672 in Py_DECREF (op=<_contextvars.ContextVar at remote 0x7ffff7ac7150>, lineno=883,\n    filename=0x555555a49efe \"Python/context.c\") at ./Include/refcount.h:416\n#4  contextvar_new (name=<weird_str() at remote 0x7ffff7bc7260>, def=0x0) at Python/context.c:883\n#5  0x000055555587e6fe in contextvar_tp_new (type=<optimized out>, args=<optimized out>, kwds=<optimized out>)\n    at Python/context.c:928\n#6  0x000055555574692f in type_call (self=<type at remote 0x555555bff380>, args=(<weird_str() at remote 0x7ffff7bc7260>,), kwds=0x0)\n    at Objects/typeobject.c:2244\n#7  0x000055555567b9a7 in _PyObject_MakeTpCall (tstate=tstate@entry=0x555555c69558 <_PyRuntime+330424>,\n    callable=callable@entry=<type at remote 0x555555bff380>, args=args@entry=0x7fffffffd7c8, nargs=<optimized out>,\n    keywords=keywords@entry=0x0) at Objects/call.c:242\n#8  0x000055555567bdc8 in _PyObject_VectorcallTstate (tstate=0x555555c69558 <_PyRuntime+330424>,\n    callable=<type at remote 0x555555bff380>, args=0x7fffffffd7c8, nargsf=<optimized out>, kwnames=0x0)\n    at ./Include/internal/pycore_call.h:167\n#9  0x000055555567bdf4 in PyObject_Vectorcall (callable=callable@entry=<type at remote 0x555555bff380>,\n    args=args@entry=0x7fffffffd7c8, nargsf=<optimized out>, kwnames=kwnames@entry=0x0) at Objects/call.c:327\n#10 0x000055555582f4c0 in _PyEval_EvalFrameDefault (tstate=tstate@entry=0x555555c69558 <_PyRuntime+330424>,\n    frame=frame@entry=0x7ffff7fb0020, throwflag=throwflag@entry=0) at Python/generated_cases.c.h:1366\n#11 0x000055555585cd69 in _PyEval_EvalFrame (throwflag=0, frame=0x7ffff7fb0020, tstate=0x555555c69558 <_PyRuntime+330424>)\n    at ./Include/internal/pycore_ceval.h:119\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a6+ (heads/main:be2d2181e62, Mar 31 2025, 07:30:17) [GCC 11.4.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132003\n* gh-132007\n* gh-132008\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2025-04-02T08:24:02Z",
+   "body": "I know what happens. Thanks for the report! "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "37ae65a0301f6b3e46106b367af6c8ab48094701",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132003",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ab2a3dda1d3b6668162a847bf5b6aca2855a3416",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "27c1e4bbcde0d19ae1764c344573be0c547bf5ad",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "af141766d83a10afc6bf00c621832ac2d233f95d",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132007",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132008",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b3cf1f27e94d65eba4ed300bdf5851c0326a2a44",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "57e4f0886da453ef4125a7532e2b682e00c67843",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "58fd6eada5148374d70c274a108d60868454e40e",
+   "actor": "sobolevn"
+  }
+ ]
+}

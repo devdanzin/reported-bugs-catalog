@@ -1,0 +1,58 @@
+{
+ "repo": "python/cpython",
+ "number": 145058,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/145058",
+ "title": "Assertion failure from `__lazy_import__(b\"\")`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-importlib"
+ ],
+ "created_at": "2026-02-20T23:20:05Z",
+ "closed_at": "2026-02-21T12:53:19Z",
+ "body": "# Crash report\n\n### What happened?\n\nIt's possible to make the interpreter abort by calling `__lazy_import__()` on a `bytes` object (edit: actually on any non-string objects):\n\n```python\n__lazy_import__(b\"\")\n```\n\nBacktrace:\n```\npython: ./Include/cpython/unicodeobject.h:297: PyUnicode_GET_LENGTH: Assertion `PyUnicode_Check(op)' failed.\n\nProgram received signal SIGABRT, Aborted.\n\n#0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44\n#1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89\n#2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100\n#3  0x00007ffff7445e2e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26\n#4  0x00007ffff7428888 in __GI_abort () at ./stdlib/abort.c:77\n#5  0x00007ffff74287f0 in __assert_fail_base (fmt=<optimized out>, assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:118\n#6  0x00007ffff743c19f in __assert_fail (assertion=<optimized out>, file=<optimized out>, line=<optimized out>, function=<optimized out>) at ./assert/assert.c:127\n#7  0x0000555555d47486 in PyUnicode_GET_LENGTH (op=op@entry=0x555556862c10 <_PyRuntime+63088>) at ./Include/cpython/unicodeobject.h:297\n#8  0x0000555555d4cd51 in get_abs_name (tstate=tstate@entry=0x5555568ab628 <_PyRuntime+360584>, name=name@entry=0x555556862c10 <_PyRuntime+63088>, globals=globals@entry=0x7c7ff66885c0,\n    level=level@entry=0) at Python/import.c:4157\n#9  0x0000555555d566f0 in _PyImport_LazyImportModuleLevelObject (tstate=tstate@entry=0x5555568ab628 <_PyRuntime+360584>, name=name@entry=0x555556862c10 <_PyRuntime+63088>,\n    builtins=<optimized out>, globals=globals@entry=0x7c7ff66885c0, locals=locals@entry=0x7c7ff66885c0, fromlist=fromlist@entry=0x0, level=<optimized out>) at Python/import.c:4471\n#10 0x0000555555c61626 in builtin___lazy_import___impl (module=module@entry=0x7ccff65e6450, name=name@entry=0x555556862c10 <_PyRuntime+63088>, globals=0x7c7ff66885c0, globals@entry=0x0,\n    locals=0x7c7ff66885c0, locals@entry=0x0, fromlist=fromlist@entry=0x0, level=level@entry=0) at Python/bltinmodule.c:340\n#11 0x0000555555c61a79 in builtin___lazy_import__ (module=<optimized out>, args=<optimized out>, args@entry=0x7bfff5331848, nargs=nargs@entry=1, kwnames=kwnames@entry=0x0)\n    at Python/clinic/bltinmodule.c.h:205\n#12 0x0000555555a9df23 in cfunction_vectorcall_FASTCALL_KEYWORDS (func=0x7c7ff66364c0, args=0x7bfff5331848, nargsf=<optimized out>, kwnames=0x0) at Objects/methodobject.c:465\n#13 0x00005555559e658b in _PyObject_VectorcallTstate (tstate=0x5555568ab628 <_PyRuntime+360584>, callable=callable@entry=0x7c7ff66364c0, args=args@entry=0x7bfff5331848,\n    nargsf=9223372036854775809, kwnames=kwnames@entry=0x0) at ./Include/internal/pycore_call.h:136\n#14 0x00005555559e667e in PyObject_Vectorcall (callable=callable@entry=0x7c7ff66364c0, args=args@entry=0x7bfff5331848, nargsf=<optimized out>, kwnames=kwnames@entry=0x0)\n    at Objects/call.c:327\n#15 0x0000555555c6f450 in _Py_VectorCallInstrumentation_StackRefSteal (callable=..., callable@entry=..., arguments=arguments@entry=0x7e8ff65e5280, total_args=total_args@entry=1,\n    kwnames=..., kwnames@entry=..., call_instrumentation=call_instrumentation@entry=false, frame=frame@entry=0x7e8ff65e5220, this_instr=<optimized out>, tstate=<optimized out>)\n    at Python/ceval.c:769\n#16 0x0000555555c7f44d in _PyEval_EvalFrameDefault (tstate=<optimized out>, frame=0x7e8ff65e5220, throwflag=<optimized out>) at Python/generated_cases.c.h:1817\n#17 0x0000555555cb7ba5 in _PyEval_EvalFrame (tstate=tstate@entry=0x5555568ab628 <_PyRuntime+360584>, frame=frame@entry=0x7e8ff65e5220, throwflag=throwflag@entry=0)\n    at ./Include/internal/pycore_ceval.h:118\n#18 0x0000555555cb7f0b in _PyEval_Vector (tstate=tstate@entry=0x5555568ab628 <_PyRuntime+360584>, func=func@entry=0x7cfff661ca60, locals=locals@entry=0x7c7ff66885c0, args=args@entry=0x0,\n    argcount=argcount@entry=0, kwnames=kwnames@entry=0x0) at Python/ceval.c:2132\n#19 0x0000555555cb81bb in PyEval_EvalCode (co=co@entry=0x7d0ff663c0d0, globals=globals@entry=0x7c7ff66885c0, locals=locals@entry=0x7c7ff66885c0) at Python/ceval.c:680\n#20 0x0000555555f761b0 in run_eval_code_obj (tstate=tstate@entry=0x5555568ab628 <_PyRuntime+360584>, co=co@entry=0x7d0ff663c0d0, globals=globals@entry=0x7c7ff66885c0,\n    locals=locals@entry=0x7c7ff66885c0) at Python/pythonrun.c:1366\n#21 0x0000555555f764f6 in run_mod (mod=mod@entry=0x7e4ff65f9b10, filename=filename@entry=0x7c6ff66e4680, globals=globals@entry=0x7c7ff66885c0, locals=locals@entry=0x7c7ff66885c0,\n    flags=flags@entry=0x7bfff521b1c0, arena=arena@entry=0x7c7ff66ae5b0, interactive_src=<optimized out>, generate_new_source=<optimized out>) at Python/pythonrun.c:1469\n```\n\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.15.0a6+ (heads/main:70da972f97e, Feb 20 2026, 20:09:41) [GCC 15.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-145068\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "pablogsal",
+   "created_at": "2026-02-21T12:53:31Z",
+   "body": "Thanks for the report @devdanzin !"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/145068",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e1bd0cd37b1816092761e5ad5f2d0464c0e78fbb",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5fb3e72ed03f8be76120adbdfc9cdbfa7c4afcfa",
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "98fcb72f0c4b5586b85d2c3e72159c72e6f5c116",
+   "actor": "ljfp"
+  }
+ ]
+}

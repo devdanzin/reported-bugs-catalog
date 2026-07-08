@@ -1,0 +1,55 @@
+{
+ "repo": "pydata/bottleneck",
+ "number": 519,
+ "type": "issue",
+ "url": "https://github.com/pydata/bottleneck/issues/519",
+ "title": "move_median MEMORY_ERR without return \u2014 segfault under OOM",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-29T12:33:49Z",
+ "closed_at": null,
+ "body": "When `mm_new_nan` (float path) or `mm_new` (int path) returns NULL under OOM, the `MEMORY_ERR` macro sets a `MemoryError` but **does not return**. Execution falls through to `BN_BEGIN_ALLOW_THREADS` (releasing the GIL with a pending exception), then dereferences the NULL `mm` pointer inside the computation loop \u2014 segfault.\n\n**File(s):** `move_template.c:568-570` (float), `move_template.c:604-606` (int)\n\n**Reproducer:**\n\n```python\nimport bottleneck as bn\nimport numpy as np\nimport _testcapi\n\narr = np.array([1.0, 2.0, 3.0, 4.0, 5.0])\n_testcapi.set_nomemory(1, 0)  # Fail all allocations\ntry:\n    bn.move_median(arr, window=3)\n    _testcapi.remove_mem_hooks()\nexcept MemoryError:\n    _testcapi.remove_mem_hooks()\n# Segmentation fault (core dumped)\n```\n\nCrashes at n=1 because `mm_new_nan` uses raw `malloc` (hooked by `_testcapi.set_nomemory`).\n\n**Suggested fix:** Add `return NULL;` after each `MEMORY_ERR`. Also free `y` from the INIT macro:\n\n```c\n// Before:\nif (mm == NULL) {\n    MEMORY_ERR(\"Could not allocate memory for move_median\");\n}\n\n// After:\nif (mm == NULL) {\n    MEMORY_ERR(\"Could not allocate memory for move_median\");\n    Py_DECREF(y);\n    return NULL;\n}\n```\n\nSee #518 for the complete report.\n\nFound using [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-03-30T14:12:43Z",
+   "body": "where is `_testcapi` defined ? It seems necessary to reproduce reliably here\n\nperharps more importantly, I don't get this\n> When mm_new_nan (float path) or mm_new (int path) returns NULL under OOM, the MEMORY_ERR macro sets a MemoryError but does not return\n\nneither `mm_new_nan` nor `mm_new` seem to rely on `MEMORY_ERR` as far as I can tell. Am I missing anything ?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-03-31T01:24:17Z",
+   "body": "`_testcapi` is a CPython module (`Modules/_testcapimodule.c`). `_testcapi.set_nomemory(n, 0)` makes the first n allocations succeed, then returns NULL every one after that, allowing us to simulate OOM situations.\n\nRegarding `mm_new_nan` / `MEMORY_ERR`, the wording was unclear, sorry about that. The bug is in `move_template.c`, not in `mm_new_nan` itself. Here's how Claude describes the flow:\n\n1. `mm_new_nan(window, min_count)` is called at line 562 and returns NULL (OOM)\n2. The NULL check at line 568 runs `MEMORY_ERR(...)` which expands to `PyErr_SetString(PyExc_MemoryError, ...)` \u2014 this sets the exception but does not return\n3. Execution falls through to `BN_BEGIN_ALLOW_THREADS` at line 571 (releasing the GIL with a pending exception)\n4. The loop body dereferences `mm` (which is NULL) \u2192 segfault\n\nThe fix is adding `Py_DECREF(y); return NULL;` after the `MEMORY_ERR` call, so the function actually returns instead of falling through.\n\n"
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-04-09T09:05:29Z",
+   "body": "gotcha. I finally took a minute to understand why I couldn't import `_testcapi`; I was using uv-distributed python interpreters, which explicitly strip this module. I can get it running with pyenv."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-04-09T09:14:34Z",
+   "body": "Now the question becomes how do I transform this into a normal test ?\nRunning the reproducer as is just ends like a successful process with no stderr ouptut.\nOn the other hand if I remove the `try` clause and cleanups as\n```py\nimport bottleneck as bn\nimport numpy as np\nimport _testcapi\n\narr = np.array([1.0, 2.0, 3.0, 4.0, 5.0])\n_testcapi.set_nomemory(1, 0)  # Fail all allocations\nbn.move_median(arr, window=3)\n```\n\nI get the following stderr, which I assume is what `_testcapi.set_nomemory(1, 0)` prints instead of a real segfault\n```\nobject address  : 0x100785f00\nobject refcount : 3\nobject type     : 0x10129a720\nobject type name: MemoryError\nobject repr     : \nlost sys.stderr\nobject address  : 0x100785ea0\nobject refcount : 3\nobject type     : 0x10129a720\nobject type name: MemoryError\nobject repr     : \nlost sys.stderr\n```"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-04-09T09:34:36Z",
+   "body": "I think it might be necessary to depend on printing some success message when the MemoryError is caught, because the reproducer just catches it and allows the script to terminate normally. I can test this approach later tonight, if you don't solve it before then."
+  },
+  {
+   "author": "neutrinoceros",
+   "created_at": "2026-04-09T10:01:30Z",
+   "body": "I couldn't crack it with what little time I had on my hands. I'll let you have a go at it for now. Thank you !"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pydata/bottleneck/issues/518",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

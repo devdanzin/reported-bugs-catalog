@@ -1,0 +1,88 @@
+{
+ "repo": "python/cpython",
+ "number": 126018,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/126018",
+ "title": "`sys.audit(0)` aborts due to an assertion in debug build",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "extension-modules",
+  "type-crash",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-10-26T22:49:06Z",
+ "closed_at": "2024-10-27T15:43:23Z",
+ "body": "# Crash report\n\n### What happened?\n\nThere is an assert in `sysmodule.c` that makes the interpreter abort when calling `sys.audit` with a non-string value in debug builds:\nhttps://github.com/python/cpython/blob/f6cc7c8bd01d8468af70a65e550abef3854d0754/Python/sysmodule.c#L522\n\n```python\nPython 3.14.0a1+ (heads/main:c5b99f5c2c, Oct 26 2024, 12:35:53) [GCC 13.2.0] on linux\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n>>> import sys\n>>> sys.audit(9)\npython: ./Python/sysmodule.c:522: sys_audit: Assertion `PyUnicode_Check(args[0])' failed.\nAborted (core dumped)\n```\n\nThis assert seems completely unnecessary, as the code that runs the hooks (which only triggers if there is some hook registered) will raise an exception if the first argument to `sys.audit` isn't a string:\n\n```python\nPython 3.14.0a1+ (heads/remove_sysaudit_assert:ba8ac4d398, Oct 26 2024, 19:45:11) [GCC 11.4.0] on linux\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n>>> import sys\n>>> sys.addaudithook(lambda *args: None)\n>>> sys.audit(9)\nTraceback (most recent call last):\n  File \"<python-input-2>\", line 1, in <module>\n    sys.audit(9)\n    ~~~~~~~~~^^^\nTypeError: expected str for argument 'event', not int\n```\n\nI'll submit a trivial PR removing this assert.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux, Windows\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.14.0a1+ (heads/main:c5b99f5c2c, Oct 26 2024, 12:35:53) [GCC 13.2.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-126020\n* gh-126042\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "picnixz",
+   "created_at": "2024-10-26T23:51:12Z",
+   "body": "Ok, 3.12 is actually not affected:\r\n\r\nhttps://github.com/python/cpython/blob/67b270142d58b8f9a64f8ae2b84a195e7e49adda/Python/sysmodule.c#L499-L514"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-10-27T00:09:43Z",
+   "body": "> Ok, 3.12 is actually not affected:\r\n\r\nHmm. The assert was deliberately added in https://github.com/python/cpython/pull/108965. @vstinner, what do you think about the proposal to remove the eager assert for non-string argument to `sys.audit`?\r\n"
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2024-10-27T15:43:23Z",
+   "body": "Closing since completed and backported. Thanks!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126020",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "80eec52fc813bc7d20478da3114ec6ffd73e7c31",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e0eeb7070132b331733870bd236ced0b55b1ac58",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/126042",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e4157f0fd71676c5dcee687ad17871dc226a5560",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "353994ff99bdb46544e5b311ab5b1d3c3a930592",
+   "actor": "picnixz"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3a9bc3f68206a3e93295afb93963ba09a0a0c2ea",
+   "actor": "ebonnal"
+  }
+ ]
+}

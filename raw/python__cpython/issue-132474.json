@@ -1,0 +1,111 @@
+{
+ "repo": "python/cpython",
+ "number": 132474,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/132474",
+ "title": "Speed up `int.__round__` for large negative `ndigits`",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-feature",
+  "performance",
+  "interpreter-core"
+ ],
+ "created_at": "2025-04-13T11:28:18Z",
+ "closed_at": "2025-10-10T03:50:10Z",
+ "body": "# Feature or enhancement\n\n### Proposal:\n\nRounding an int by a large positive ndigits is instantaneous, while a by a large negative number takes ages, only to return zero:\n\n```python\n>>> large_number = 2**31\n>>> large_negative_number = -2**31\n>>> d = 17000\n>>> d.__round__(large_number)  # Instant result, returns d\n17000\n>>> d.__round__(large_negative_number)  # Takes forever, calculating divmod(d, int(pow(10, large_negative_number)))\n```\n\nIt could be almost as fast as the positive ndigits case by checking:\n```python\nint(math.log10(d)) < abs(large_negative_number)\n```\nAnd returning zero if it's True. \n\nA similar optimization is possible for `Fraction`: #132472\n\nI realize there may not be a real use case for these enhancements.\n\ncc @JelleZijlstra \n\n### Has this already been discussed elsewhere?\n\nThis is a minor feature, which does not need previous discussion elsewhere\n\n### Links to previous discussion of this feature:\n\nIt was very briefly discussed on Discord.\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-132579\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-04-13T11:46:13Z",
+   "body": "cc @skirpichev"
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2025-04-13T12:13:15Z",
+   "body": "Yes, that does make sense for me, the gmpy2 has similar optimization:\nhttps://github.com/aleaxit/gmpy/blob/ea6cdf16064e8f5bd575c0c1b02df0ea0fa70fc4/src/gmpy2_mpz_misc.c#L269-L272\nThough, this must be benchmarked.\n\nBut you should be slightly more careful.  It's easy to find a counterexample for your inequality:\n```pycon\n>>> import math\n>>> d = 501\n>>> n = -3\n>>> round(d, n)\n1000\n>>> int(math.log10(d)) < abs(n)\nTrue\n```\n\n> calculating divmod(d, int(pow(10, large_negative_number)))\n\nIt's actually divmod_near().  You can see it's pure-Python equivalent in commentary."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-04-13T13:40:03Z",
+   "body": "> But you should be slightly more careful. It's easy to find a counterexample for your inequality:\n\nUnfortunately that's as far as my math can take me, I have no idea about how to start fixing this (other than brute forcing values to see where errors happen, trying to figure out a pattern and a convoluted way to avoid them)."
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2025-04-14T02:13:19Z",
+   "body": "Here my tests (`0` coming for `ndigits <= -5`).  As expected, slowdown for small `abs(ndigits)` is noticeable (patch 1).\n\n| Benchmark          | ref     | patch                | patch2               |\n|--------------------|:-------:|:--------------------:|:--------------------:|\n| round(17000, -1)   | 508 ns  | 647 ns: 1.27x slower | 481 ns: 1.06x faster |\n| round(17000, -2)   | 484 ns  | 618 ns: 1.28x slower | 471 ns: 1.03x faster |\n| round(17000, -3)   | 587 ns  | 672 ns: 1.14x slower | 549 ns: 1.07x faster |\n| round(17000, -4)   | 682 ns  | 784 ns: 1.15x slower | 673 ns: 1.01x faster |\n| round(17000, -5)   | 561 ns  | 696 ns: 1.24x slower | 549 ns: 1.02x faster |\n| round(17000, -6)   | 577 ns  | 312 ns: 1.85x faster | 555 ns: 1.04x faster |\n| round(17000, -7)   | 613 ns  | 313 ns: 1.96x faster | 584 ns: 1.05x faster |\n| round(17000, -8)   | 562 ns  | 312 ns: 1.80x faster | not significant      |\n| round(17000, -9)   | 612 ns  | 312 ns: 1.96x faster | 595 ns: 1.03x faster |\n| round(17000, -10)  | 653 ns  | 311 ns: 2.10x faster | 658 ns: 1.01x slower |\n| round(17000, -20)  | 958 ns  | 311 ns: 3.08x faster | 197 ns: 4.87x faster |\n| round(17000, -50)  | 1.45 us | 311 ns: 4.66x faster | 197 ns: 7.37x faster |\n| round(17000, -100) | 1.97 us | 311 ns: 6.33x faster | 197 ns: 9.99x faster |\n| Geometric mean     | (ref)   | 1.69x faster         | 1.61x faster         |\n\nWe try different cutoff tests.  First version - close to the original proposal (almost literally it's `math.log10(self)`, which we can simplify further - `_PyLong_Frexp()` is an important part here), second - seems cheaper, but will be successful only for much bigger `abs(ndigits)`.  I appreciate if someone repeat tests on less noisy system.\n\n<details>\n\n<summary>Patch and benchmark code.</summary>\n\nPatch 1:\n```diff\ndiff --git a/Objects/longobject.c b/Objects/longobject.c\nindex 692312c1ad..36f9d95b9c 100644\n--- a/Objects/longobject.c\n+++ b/Objects/longobject.c\n@@ -6212,6 +6212,21 @@ int___round___impl(PyObject *self, PyObject *o_ndigits)\n         return long_long(self);\n     }\n \n+    int64_t n, e;\n+\n+    if (PyLong_AsInt64(ndigits, &n) < 0) {\n+        Py_DECREF(ndigits);\n+        return NULL;\n+    }\n+    n = -n;\n+\n+    double x = _PyLong_Frexp((PyLongObject *)self, &e);\n+\n+    if ((int64_t)(log10(x) + 0.3010299956639812*e) < n - 1) {\n+        Py_DECREF(ndigits);\n+        return _PyLong_GetZero();\n+    }\n+\n     /* result = self - divmod_near(self, 10 ** -ndigits)[1] */\n     PyObject *temp = (PyObject*)long_neg((PyLongObject*)ndigits);\n     Py_SETREF(ndigits, temp);\n```\n\nPatch 2:\n```diff\ndiff --git a/Objects/longobject.c b/Objects/longobject.c\nindex 692312c1ad..6ca54cbb55 100644\n--- a/Objects/longobject.c\n+++ b/Objects/longobject.c\n@@ -6212,6 +6212,21 @@ int___round___impl(PyObject *self, PyObject *o_ndigits)\n         return long_long(self);\n     }\n \n+    int64_t n;\n+\n+    if (PyLong_AsInt64(ndigits, &n) < 0) {\n+        Py_DECREF(ndigits);\n+        return NULL;\n+    }\n+    n = -n;\n+\n+    int64_t nbits = _PyLong_NumBits(self) + 1;\n+\n+    if (nbits + 1 < n) {\n+        Py_DECREF(ndigits);\n+        return _PyLong_GetZero();\n+    }\n+\n     /* result = self - divmod_near(self, 10 ** -ndigits)[1] */\n     PyObject *temp = (PyObject*)long_neg((PyLongObject*)ndigits);\n     Py_SETREF(ndigits, temp);\n```\n\n```py\n# bench.py\nimport pyperf\nrunner = pyperf.Runner()\nd = 17000\nfor n in list(range(1, 11)) + [20, 50, 100]:\n    n = -n\n    s = f\"round({d}, {n})\"\n    runner.bench_func(s, round, d, n)\n```\n\n</details>\n\nCC @tim-one "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2025-04-14T13:51:35Z",
+   "body": "Can you tests when `round(d, n)` does not give 0 instead? namely, what happens when `d` is very large (possibly much larger than $10^n$)? having benchmarks there would be interesting as well."
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2025-04-15T03:35:49Z",
+   "body": "> Can you tests when round(d, n) does not give 0 instead?\n\nIn fact, above tests have such case (n > -5).\n\n> namely, what happens when ``d`` is very large (possibly much larger than ``10**n``)?\n\ndivmod() cost will be eventually dominate in running time, I think.\n\n| Benchmark         | ref    | patch                | patch2               | patch3               |\n|-------------------|:------:|:--------------------:|:--------------------:|:--------------------:|\n| round(2**5, -5)   | 525 ns | 297 ns: 1.77x faster | 532 ns: 1.01x slower | 233 ns: 2.26x faster |\n| round(2**7, -5)   | 528 ns | 301 ns: 1.76x faster | 536 ns: 1.01x slower | 234 ns: 2.26x faster |\n| round(2**10, -5)  | 554 ns | 298 ns: 1.86x faster | 581 ns: 1.05x slower | 619 ns: 1.12x slower |\n| round(2**15, -5)  | 555 ns | 675 ns: 1.22x slower | 586 ns: 1.06x slower | 620 ns: 1.12x slower |\n| round(2**20, -5)  | 667 ns | 803 ns: 1.20x slower | 668 ns: 1.00x slower | 730 ns: 1.10x slower |\n| round(2**25, -5)  | 751 ns | 877 ns: 1.17x slower | 761 ns: 1.01x slower | 783 ns: 1.04x slower |\n| round(2**30, -5)  | 808 ns | 896 ns: 1.11x slower | 784 ns: 1.03x faster | 840 ns: 1.04x slower |\n| round(2**50, -5)  | 793 ns | 898 ns: 1.13x slower | 784 ns: 1.01x faster | 830 ns: 1.05x slower |\n| round(2**100, -5) | 864 ns | 996 ns: 1.15x slower | not significant      | 908 ns: 1.05x slower |\n| Geometric mean    | (ref)  | 1.10x faster         | 1.01x slower         | 1.14x faster         |\n\n(Here ``round(2**d, -5) != 0`` for ``d>=20``.)\n\n<details>\n\n<summary>Benchmark code and patch3.</summary>\n\n```py\n# bench.py\nimport math\nimport pyperf\nrunner = pyperf.Runner()\nn = -5\nfor d in [5, 7, 10, 15, 20, 25, 30, 50, 100]:\n    x = 1<<d\n    s = f\"round(2**{d}, {n})\"\n    runner.bench_func(s, round, x, n)\n```\n\nPatch 3:\n```diff\ndiff --git a/Objects/longobject.c b/Objects/longobject.c\nindex 692312c1ad..856bbf3c0b 100644\n--- a/Objects/longobject.c\n+++ b/Objects/longobject.c\n@@ -6212,6 +6212,21 @@ int___round___impl(PyObject *self, PyObject *o_ndigits)\n         return long_long(self);\n     }\n \n+    int64_t n, e;\n+\n+    if (PyLong_AsInt64(ndigits, &n) < 0) {\n+        Py_DECREF(ndigits);\n+        return NULL;\n+    }\n+    n = -n;\n+\n+    (void)_PyLong_Frexp((PyLongObject *)self, &e);\n+\n+    if (e/3 + 2 < n) {\n+        Py_DECREF(ndigits);\n+        return _PyLong_GetZero();\n+    }\n+\n     /* result = self - divmod_near(self, 10 ** -ndigits)[1] */\n     PyObject *temp = (PyObject*)long_neg((PyLongObject*)ndigits);\n     Py_SETREF(ndigits, temp);\n```\n\n</details>"
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2025-04-16T07:18:25Z",
+   "body": "Ok, I'm not sure that it worth, but here is a pr: https://github.com/python/cpython/pull/132579"
+  },
+  {
+   "author": "skirpichev",
+   "created_at": "2025-10-10T03:50:10Z",
+   "body": "It seems nobody interested in pushing this, lets close."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/132472",
+   "commit": null,
+   "actor": "skirpichev"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/gmpy2/gmpy2/issues/552",
+   "commit": null,
+   "actor": "skirpichev"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4a3238d5a027aff4a700237962fbfd34c15e7721",
+   "actor": "skirpichev"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132579",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/61461",
+   "commit": null,
+   "actor": "skirpichev"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "skirpichev"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/30071",
+   "commit": null,
+   "actor": "ngoldbaum"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/numpy/numpy/pull/30076",
+   "commit": null,
+   "actor": "charris"
+  }
+ ]
+}

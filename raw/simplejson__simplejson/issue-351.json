@@ -1,0 +1,54 @@
+{
+ "repo": "simplejson/simplejson",
+ "number": 351,
+ "type": "issue",
+ "url": "https://github.com/simplejson/simplejson/issues/351",
+ "title": "iterable_as_array swallows MemoryError and KeyboardInterrupt",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-04-05T20:22:06Z",
+ "closed_at": "2026-04-06T19:42:58Z",
+ "body": "Part of #348 (C extension analysis). [Full report](https://gist.github.com/devdanzin/e8a25ea988dc0461c2fd378efd84a8a3).\n\n## Finding 3: `PyErr_Clear()` clears ALL exceptions from `PyObject_GetIter()`\n\n**Line 2916.** When `iterable_as_array=True`, the code tries `PyObject_GetIter()` and falls back to the default encoder on failure. But `PyErr_Clear()` clears ALL exceptions \u2014 not just `TypeError` (the expected \"not iterable\" error). `MemoryError`, `KeyboardInterrupt`, and other non-TypeError exceptions from `__iter__` are silently swallowed.\n\n**Reproducer (100% reproducible):**\n```python\nimport simplejson\n\nclass BadIter:\n    def __iter__(self):\n        raise MemoryError(\"OOM in __iter__\")\n\nsimplejson.dumps(BadIter(), iterable_as_array=True)\n# Actual:   TypeError: Object of type BadIter is not JSON serializable\n# Expected: MemoryError: OOM in __iter__\n```\n\nSame for `KeyboardInterrupt`:\n```python\nclass KBIter:\n    def __iter__(self):\n        raise KeyboardInterrupt()\n\nsimplejson.dumps(KBIter(), iterable_as_array=True)\n# Actual:   TypeError: Object of type KBIter is not JSON serializable\n# Expected: KeyboardInterrupt\n```\n\n**Suggested fix:**\n```c\nif (newobj == NULL) {\n    if (PyErr_ExceptionMatches(PyExc_TypeError))\n        PyErr_Clear();\n    else\n        break;  // propagate non-TypeError exceptions\n}\n```\n\nThere's a similar pattern in `_call_json_method` (line 403) where `PyErr_Clear` on attribute lookup swallows all exceptions, not just `AttributeError`.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/issues/348",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ae6831180ba835a8501edbe37ba3903ee47f1035",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/simplejson/simplejson/pull/357",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6725b85ce27001b367af91cf2f48e181bc5235bf",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d3ecab515e065c0642f9635ff3c29b34bed89af5",
+   "actor": "github-merge-queue[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "etrepum"
+  }
+ ]
+}

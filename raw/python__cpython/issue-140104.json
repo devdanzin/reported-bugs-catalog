@@ -1,0 +1,147 @@
+{
+ "repo": "python/cpython",
+ "number": 140104,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/140104",
+ "title": "JIT (correctness): Different `UnboundLocalError` for same code with JIT on or off",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "interpreter-core",
+  "3.14",
+  "topic-JIT"
+ ],
+ "created_at": "2025-10-14T12:04:55Z",
+ "closed_at": "2025-11-13T18:48:03Z",
+ "body": "# Bug report\n\n### Bug description:\n\nThe following code results in two different `UnboundLocalError` exceptions depending on whether it's run with the JIT on or off:\n\n```python\ndef f():\n\n    if 0:\n        class Class:\n            pass\n\n    if 0:\n        instance = Class()\n\n    for _ in range(5000):\n        try:\n            _ = instance.f()\n        except Exception:\n            pass\n    Class.__bases__ = (object,)\n\nf()\n```\n\nWith JIT on, the `UnboundLocalError` points to `'instance'`, while with JIT off it points to `'Class'`.\n\nTraceback with JIT on:\n```python\nTraceback (most recent call last):\n  File \"/home/danzin/divergences/divergence_child_6010_3_1.py\", line 17, in <module>\n    f()\n    ~^^\n  File \"/home/danzin/divergences/divergence_child_6010_3_1.py\", line 12, in f\n    _ = instance.f()\n        ^^^^^^^^\nUnboundLocalError: cannot access local variable 'instance' where it is not associated with a value\n```\n\nTraceback with JIT off:\n```python\nTraceback (most recent call last):\n  File \"/home/danzin/divergences/divergence_child_6010_3_1.py\", line 17, in <module>\n    f()\n    ~^^\n  File \"/home/danzin/divergences/divergence_child_6010_3_1.py\", line 15, in f\n    Class.__bases__ = (object,)\n    ^^^^^\nUnboundLocalError: cannot access local variable 'Class' where it is not associated with a value\n```\n\nOutput for `PYTHON_LLTRACE=4`:\n[divergence_01_lltrace.txt](https://github.com/user-attachments/files/22903957/divergence_01_lltrace.txt)\n\nOutput for `PYTHON_OPT_DEBUG=4`:\n[divergence_01_opt_debug.txt](https://github.com/user-attachments/files/22903958/divergence_01_opt_debug.txt)\n\nPlease let me know whether you're able to reproduce this issue.\n\nFound using [lafleur](https://github.com/devdanzin/lafleur/).\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-140233\n* gh-140687\n* gh-140890\n* gh-141495\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-10-14T19:06:43Z",
+   "body": "It's possible https://github.com/python/cpython/issues/139109 might end up fixing this inadvertently, so let's not fix this for now maybe? Or we could fix it with the knowledge the code will be ripped out soon."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2025-10-15T04:20:39Z",
+   "body": "Here's a simpler reproducer for what seems to be the same issue:\n```python\ndef f():\n    for i in range(500):\n        try:\n            g(i)\n        except Exception:\n            pass\n\nfor _ in range(5000):\n    f()\n```\nThis one runs to completion without the JIT and raises an exception with it."
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-10-27T18:32:38Z",
+   "body": "We need a backport for 3.14, don't we?\nOr we ignore backports since JIT is in expiremental stage?"
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-10-27T19:10:32Z",
+   "body": "Let's backport to 3.14 but not 3.13."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-10-27T19:12:26Z",
+   "body": "Backport failed, maybe I should open up the backport to anyone who wants to try please?\n\n"
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-10-27T19:14:34Z",
+   "body": "> Backport failed, maybe I should open up the backport to anyone who wants to try please?\n\nI'd like to provide this backport."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-01T16:50:19Z",
+   "body": "This is still broken on 3.14 sadly."
+  },
+  {
+   "author": "efimov-mikhail",
+   "created_at": "2025-11-01T17:54:01Z",
+   "body": "> This is still broken on 3.14 sadly.\n\nI'm sorry. It seems that I've tested incorrectly.\nIt's actually still broken on 3.14."
+  },
+  {
+   "author": "Fidget-Spinner",
+   "created_at": "2025-11-01T17:57:29Z",
+   "body": "> > This is still broken on 3.14 sadly.\n> \n> I'm sorry. It seems that I've tested incorrectly. It's actually still broken on 3.14.\n\nNo worries. I didn't realize CI didn't trigger for JIT on the backport either!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/140233",
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a7160912274003672dc116d918260c0a81551c21",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/140687",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b240ff565d9af5477dd2d909b13454e45213cd0f",
+   "actor": "efimov-mikhail"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2e216728038a03d387231f39ded091ec318ba61b",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/140890",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e028e35c087362693924ccb4238c67be2f759c9d",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4d68b758fa0a18c949d7d2f22dde091c8d7a3ba7",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/141495",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "af20b880fc14c5a397f2f160877b94cb3d69f45c",
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "Fidget-Spinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "aa1348bab783401e244e1f987afc011b28e47196",
+   "actor": "StanFromIreland"
+  }
+ ]
+}

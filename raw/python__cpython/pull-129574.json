@@ -1,0 +1,44 @@
+{
+ "repo": "python/cpython",
+ "number": 129574,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/129574",
+ "title": "[3.12] gh-129573: Fix abort from non-string suggestions in `calculate_suggestions`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2025-02-02T11:36:22Z",
+ "closed_at": "2025-02-02T16:16:07Z",
+ "body": "This PR adds a simple check that suggestion candidates are strings in `calculate_suggestions`, avoiding an abort in debug builds from code like below:\r\n\r\n```python\r\nclass Parent:\r\n    def __dir__(self):\r\n        return [0]\r\n\r\nclass WithNonStringAttrs(Parent):\r\n    blech = None\r\n\r\nWithNonStringAttrs().bluch\r\n```\r\n\r\nFound using [fusil](https://github.com/devdanzin/fusil) by @vstinner.\n\n<!-- gh-issue-number: gh-129573 -->\n* Issue: gh-129573\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2025-02-02T16:16:07Z",
+   "body": "Thanks for doing this! See my comment: https://github.com/python/cpython/issues/129573#issuecomment-2629457344\r\n\r\nThe offending code isn't a problem on 3.13+, but it still exists. Please open a new PR for the main branch."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/129573",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/130997",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ]
+}

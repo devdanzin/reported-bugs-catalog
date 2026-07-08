@@ -1,0 +1,17 @@
+{
+ "repo": "nucleic/enaml",
+ "number": 603,
+ "type": "issue",
+ "url": "https://github.com/nucleic/enaml/issues/603",
+ "title": "load_obj_dict unchecked PyDict_New + fontext copy-paste bug + unchecked PyModule_AddObject for UserKeyError",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "NONE",
+ "labels": [],
+ "created_at": "2026-03-27T13:35:10Z",
+ "closed_at": null,
+ "body": "Three smaller bugs across different files:\n\n### 1. `load_obj_dict` unchecked `PyDict_New` corrupts dict pointer (`signaling.cpp:98`)\n\nWhen `forcecreate` is true and `*dict` is NULL, `PyDict_New()` is called but its return value is not checked. On OOM, NULL is stored into `*dict` and the function returns `true` (success). The caller's object now has a corrupted `__dict__` pointer.\n\n**Fix**:\n```cpp\nif( forcecreate && !*dict )\n{\n    *dict = PyDict_New();\n    if( !*dict )\n        return false;\n}\n```\n\n### 2. Copy-paste bug in `fontext.cpp:341` \u2014 `!PyFontCaps` instead of `!PyFontStretch`\n\nAfter creating `PyFontStretch`, the code checks `PyFontCaps` (the previous variable):\n```cpp\ncppy::ptr PyFontStretch( new_enum_class( \"FontStretch\" ) );\nif( !PyFontCaps )   // BUG: should be !PyFontStretch\n{\n    return -1;\n}\n```\n\nIf `new_enum_class(\"FontStretch\")` fails, NULL propagates to later use. Currently latent because creation succeeds, but a real bug if the allocation ever fails.\n\nAlso, the slot array is named `Nonlocals_Type_slots` (copy-paste from `dynamicscope.cpp`) instead of `Font_Type_slots` (line 239).\n\n### 3. Unchecked `PyModule_AddObject` for `UserKeyError` (`dynamicscope.cpp:927`)\n\nThe only `PyModule_AddObject` call in the codebase that doesn't follow the cppy::ptr + check + release() pattern. Return value ignored; on failure the error is silently swallowed.\n\n**Fix**: use `PyModule_AddObjectRef` (available since 3.10):\n```cpp\nif( PyModule_AddObjectRef( mod, \"UserKeyError\", UserKeyError ) < 0 )\n    return -1;\n```\n\nFound by [cext-review-toolkit](https://github.com/devdanzin/cext-review-toolkit).",
+ "comments": [],
+ "timeline_refs": []
+}
