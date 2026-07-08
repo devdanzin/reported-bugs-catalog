@@ -59,8 +59,9 @@ won't match, so the campaign totals (Table B) sit above these.
 *Cross-checks:* CPython authored = **157 issues + 18 PRs**; fusil 77 + lafleur 27
 + crtk 17 = **121 tag-attributed**, leaving ~36 untagged (some OOM without the
 word "fusil", some manual). fusil-cpython **77 ≈ 52 (2025) + 15 OOM + wsgiref +
-OrderedDict + tail** — reconciles. Negation (`-fusil`/`NOT fusil`) is **unreliable
-in the search API** (returned 20 not 3 on pypy) — list-and-filter instead.
+OrderedDict + tail** — reconciles. **Keyword negation needs `NOT`, not `-`**:
+`NOT fusil` = 3 correct, `-fusil` = 20 (minus silently ignored for keywords;
+`-` works only for `owner:`/`repo:`).
 
 **Table B — campaign findings** (milestones/Discourse; *findings*, the larger
 unit — never sum with Table A):
@@ -251,8 +252,9 @@ topic-JIT 33, 3.13 30, topic-free-threading 26, 3.15 14, type-bug 11, stdlib 10.
   the gist-URL vector + registry `filed_by` for the true per-tool total.
 - **True counts:** always `gh api search/issues -f q=… --jq .total_count`
   (uncapped); the listable `gh search` caps at 1000 and undercounts.
-- **Negation is unreliable** in the search API (`-fusil`/`NOT fusil` returned 20
-  not 3) — list the set and filter locally instead.
+- **Keyword negation = `NOT`, not `-`.** `NOT fusil` = 3 (correct); `-fusil` = 20
+  (minus silently ignored for keywords). `-` works only for `owner:`/`repo:`
+  qualifiers (e.g. `-owner:devdanzin`, `-repo:python/cpython`).
 - **`ajaksu2`** is not `author:`-searchable — use body-text + local notes.
 
 ---
