@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 321,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/321",
+ "title": "`FunctionWrapper` silently bypasses wrapper when `enabled.__bool__` raises",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-07T03:33:25Z",
+ "closed_at": "2026-04-07T03:35:56Z",
+ "body": "## Summary\n\nIn the C implementation of `FunctionWrapper`, if the `enabled` argument (or the value returned from a callable `enabled`) raises an exception while its truthiness is being evaluated, the exception is silently swallowed and the wrapper is bypassed \u2014 the wrapped function ends up being called directly with a pending Python exception.\n\nThe root cause is that `PyObject_Not()` is tri-valued (`1` = false, `0` = true, `-1` = error) but its result is being used as a plain C boolean, so the `-1` error case is misinterpreted as \"falsy\" and takes the wrapper-disabled fast path. Affects both `WraptFunctionWrapperBase_call` and `WraptBoundFunctionWrapper_call`, in both the callable and non-callable `enabled` branches.\n\nThe pure-Python implementation in `wrappers.py` is not affected.\n\n**Expected:** the exception from `__bool__` should propagate to the caller and the wrapped function should not be invoked.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "ce43bf0179f73e5455bb829202e305f79c3b546c",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ce43bf0179f73e5455bb829202e305f79c3b546c",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

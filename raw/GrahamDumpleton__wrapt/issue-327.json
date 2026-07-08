@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 327,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/327",
+ "title": "Module init leaks module reference on `PyType_Ready` failure and ignores `PyModule_AddObject` errors",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-08T02:03:40Z",
+ "closed_at": "2026-04-08T02:04:44Z",
+ "body": "## Summary\n\nThe C extension's module initialisation in `src/wrapt/_wrappers.c` (`moduleinit()`) has two related cleanup bugs on cold error paths.\n\n## Problem 1 \u2014 Module reference leaked on `PyType_Ready` failure\n\nAfter `PyModule_Create(&moduledef)` succeeds, six successive `PyType_Ready()` calls each `return NULL` on failure without `Py_DECREF`-ing the freshly created module object. Any failure here strands the module reference owned by the init function.\n\n## Problem 2 \u2014 Unchecked `PyModule_AddObject()` calls\n\nThe six `PyModule_AddObject()` calls that publish the proxy/wrapper types onto the module are not checked for failure. `PyModule_AddObject()` only steals its reference on success, so:\n\n1. **Return value ignored.** A failure is silently dropped on the floor.\n2. **Type reference leaked.** Each call site does a `Py_INCREF` immediately before `PyModule_AddObject()`. On failure the steal does not happen, but the corresponding `Py_DECREF` is never issued, permanently inflating the (statically allocated) type's refcount.\n3. **Pending exception is not honoured.** If one of the calls fails it sets an exception, but the function then continues to issue further `PyModule_AddObject()` calls with a pending exception, and finally returns the module object as if everything succeeded. Returning a non-`NULL` module with an exception set violates the C-API contract for module init and surfaces as a confusing `SystemError: ... returned a result with an exception set` from the import machinery instead of a clean `ImportError`.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "cc4d2ddf34e7f07b1bc44083aaa0659dfce2e30e",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cc4d2ddf34e7f07b1bc44083aaa0659dfce2e30e",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

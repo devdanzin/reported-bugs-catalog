@@ -1,0 +1,82 @@
+{
+ "repo": "python/cpython",
+ "number": 150178,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/150178",
+ "title": "hamt.c: sub_node leaked in bitmap_assoc and bitmap_without",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-05-21T07:47:38Z",
+ "closed_at": "2026-05-23T08:41:09Z",
+ "body": "# Bug report\n\n### Bug description:\n\n# Bug report\n\n### Bug description:\n\nParent issue \uff1ahttps://github.com/python/cpython/issues/146102\nGlist:https://gist.github.com/devdanzin/332a120e4c7750e8a7aff47419311696\n\nTwo analogous bugs:\n1. hamt_node_bitmap_assoc\u00a0(line 704): Recursive\u00a0hamt_node_assoc\u00a0returns new sub_node, then\u00a0hamt_node_bitmap_clone\u00a0fails \u2192 sub_node leaked. Line 755 correctly DECREFs.\n2. hamt_node_bitmap_without\u00a0(line 997): Same pattern. Line 968 correctly DECREFs.\n\n### Fix:\n\nAdd\u00a0Py_DECREF(sub_node)\u00a0before\u00a0return NULL/return W_ERROR\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-150179\n* gh-150301\n* gh-150303\n* gh-150302\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150179",
+   "commit": null,
+   "actor": "lpyu001"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "32823af153b76b7042fbce28ea8a6e0c3c4f1ca8",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150301",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "95c93239be9d6e7f047ab3fba41b6bff3e9aca0c",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150303",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6b17d1a783d3c0a9c8a35a94e24a2987807728ef",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/150302",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5676bfcf859529b9ddd9a74b3199f2d932992458",
+   "actor": "kumaraditya303"
+  }
+ ],
+ "fetch_errors": null
+}

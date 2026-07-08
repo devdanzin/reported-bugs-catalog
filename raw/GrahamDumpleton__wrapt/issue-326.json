@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 326,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/326",
+ "title": "`C extension swallows exceptions from PyObject_RichCompareBool in binding dispatch`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-08T01:14:03Z",
+ "closed_at": "2026-04-08T01:16:03Z",
+ "body": "## Summary\n\nThe C implementations of `FunctionWrapper.__call__`, `FunctionWrapper.__get__`, and `BoundFunctionWrapper.__call__` dispatch on `self._self_binding` using chains of `PyObject_RichCompareBool(...) == 1` comparisons. The `== 1` test conflates the error return `-1` with the false return `0`, so any exception raised during a comparison (e.g. from an `__eq__` on the binding object, or a transient `MemoryError` inside Unicode comparison) is silently swallowed. Subsequent comparisons in the same `||`-chain then overwrite the pending error indicator, and control falls through into a downstream `PyObject_CallFunctionObjArgs` that executes with a stale exception set \u2014 typically surfacing as a confusing `SystemError: ... returned a result with an exception set` instead of the original exception.\n\nEleven call sites across `src/wrapt/_wrappers.c` are affected. The pure-Python implementation propagates the exception correctly, so this is a C-extension-only divergence.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "2dc7bf6d1d8ddfb89ad9b9d687b9972fc61c0d13",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "2dc7bf6d1d8ddfb89ad9b9d687b9972fc61c0d13",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

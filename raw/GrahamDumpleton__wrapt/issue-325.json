@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 325,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/325",
+ "title": "Crash on OOM: unchecked `PyTuple_New` / `PyDict_New` in C `PartialCallableObjectProxy.__call__`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-07T23:48:51Z",
+ "closed_at": "2026-04-07T23:49:50Z",
+ "body": "## Summary\n\nThe C implementation of `PartialCallableObjectProxy.__call__`\n(`WraptPartialCallableObjectProxy_call` in `src/wrapt/_wrappers.c`) does not\ncheck the return values of two allocation calls:\n\n1. `fnargs = PyTuple_New(...)` \u2014 used to build the combined positional\n   argument tuple from the partial's stored args and the call-site args.\n2. `fnkwargs = PyDict_New()` \u2014 used to build the combined keyword argument\n   dict.\n\nIf either allocation fails (e.g. under low-memory conditions), the function\nreturns `NULL` with `MemoryError` set, but the C code proceeds to use the\n`NULL` pointer:\n\n- After a failed `PyTuple_New`, the following loop calls\n  `PyTuple_SetItem(NULL, i, item)`, which dereferences a `NULL` pointer\n  and crashes the interpreter.\n- After a failed `PyDict_New`, the subsequent `PyDict_Update(NULL, ...)`\n  calls similarly dereference `NULL`, and the existing error path would\n  also `Py_DECREF(NULL)`.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "596a51d7915adda8cb3b1bd0c9044610bd3aa937",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "596a51d7915adda8cb3b1bd0c9044610bd3aa937",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

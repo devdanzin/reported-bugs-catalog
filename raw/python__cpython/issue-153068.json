@@ -1,0 +1,82 @@
+{
+ "repo": "python/cpython",
+ "number": 153068,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/153068",
+ "title": "_lsprof.c: Profiler.enable() clobbers exception from use_tool_id",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "extension-modules"
+ ],
+ "created_at": "2026-07-05T07:02:15Z",
+ "closed_at": "2026-07-07T03:47:20Z",
+ "body": "# Bug report\n\n### Bug description:\n\nOriginal gist: https://gist.github.com/devdanzin/ed7691a99c26ede561a549ab1dba00b2\n\n> ## Summary\n> \n> In `Modules/_lsprof.c` (lines 821-823), when `sys.monitoring.use_tool_id()` fails, `PyErr_Format` unconditionally replaces the real exception with a generic ValueError.\n> \n> ## Fix\n> \n> Remove the `PyErr_Format` call and let the original exception propagate.\n> \n> ## Reproducer\n> \n> ```python\n> import cProfile\n> p1 = cProfile.Profile()\n> p1.enable()\n> p2 = cProfile.Profile()\n> try:\n>     p2.enable()  # ValueError: \"Another profiling tool is already active\"\n> except ValueError as e:\n>     print(f\"Generic message masks real error: {e}\")\n> finally:\n>     p1.disable()\n> ```\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-153070\n* gh-153240\n* gh-153241\n* gh-153242\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153070",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "dea93ce2a203a9b3aedf091faa6610d13d2b5aea",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153240",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153241",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153242",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f57837a3f157f230e2f49d1c7d8e0987b1d942e1",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "33948e7231a500e3d736c6bfc9f162d11c78f597",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "78e9fdb78f61f99a0ee05f412b45292df2088cc2",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  }
+ ],
+ "fetch_errors": null
+}

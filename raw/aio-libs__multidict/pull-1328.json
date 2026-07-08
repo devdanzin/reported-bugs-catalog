@@ -1,0 +1,27 @@
+{
+ "repo": "aio-libs/multidict",
+ "number": 1328,
+ "type": "pull",
+ "url": "https://github.com/aio-libs/multidict/pull/1328",
+ "title": "Fix `__repr__` race (Free-Threaded)",
+ "state": "open",
+ "state_reason": null,
+ "author": "Vizonex",
+ "author_association": "MEMBER",
+ "labels": [
+  "bot:chronographer:provided",
+  "free-threading"
+ ],
+ "created_at": "2026-04-28T20:34:04Z",
+ "closed_at": null,
+ "body": "<!-- Thank you for your contribution! -->\r\n\r\n## What do these changes do?\r\n\r\nFixes another race condition seen in https://gist.github.com/devdanzin/fa00e03ef041c030660f083116a7e1b6#7-repr-race--md_repr Item 7. \r\n\r\n## Are there changes in behavior for the user?\r\n\r\n<!-- Outline any notable behaviour for the end users. -->\r\n\r\n## Related issue number\r\n\r\n<!-- Are there any issues opened that will be resolved by merging this change? -->\r\n<!-- Remember to prefix with 'Fixes' if it should close the issue (e.g. 'Fixes #123'). -->\r\n\r\n#1321\r\n\r\n## Checklist\r\n\r\n- [x] I think the code is well written\r\n- [x] Unit tests for the changes exist\r\n- [x] Documentation reflects the changes\r\n",
+ "comments": [
+  {
+   "author": "codspeed-hq[bot]",
+   "created_at": "2026-04-28T20:38:59Z",
+   "body": "<!-- __CODSPEED_PERFORMANCE_REPORT_COMMENT__ -->\n## Merging this PR will **not alter performance**\n\n\n\n\n`\u2705 242` untouched benchmarks  \n\n\n\n\n\n---\n\n<sub>Comparing <code>Vizonex:md-repr-ft</code> (7906b89) with <code>master</code> (eece5fb)</sub>\n\n<a href=\"https://app.codspeed.io/aio-libs/multidict/branches/Vizonex%3Amd-repr-ft?utm_source=github&utm_medium=comment-v2&utm_content=button\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://codspeed.io/pr-report/open-in-codspeed-dark.svg\">\n    <source media=\"(prefers-color-scheme: light)\" srcset=\"https://codspeed.io/pr-report/open-in-codspeed-light.svg\">\n    <img alt=\"Open in CodSpeed\" src=\"https://codspeed.io/pr-report/open-in-codspeed-light.svg\" width=\"169\" height=\"32\">\n  </picture>\n</a>\n\n"
+  }
+ ],
+ "timeline_refs": [],
+ "fetch_errors": null
+}

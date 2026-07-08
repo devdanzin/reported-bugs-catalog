@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 319,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/319",
+ "title": "`Py_DECREF(NULL)` crash in inplace operator error path when `__object_proxy__` lookup fails",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-07T00:12:20Z",
+ "closed_at": "2026-04-07T00:18:40Z",
+ "body": "## Summary\n\nAll 13 inplace operator implementations on the C `ObjectProxy` type contain a bug that causes a guaranteed `Py_DECREF(NULL)` crash (and a leak of an intermediate result object) when `PyObject_GetAttrString(self, \"__object_proxy__\")` fails.\n\nThis was introduced in commit 8b19c0a (October 2025) and affects every inplace operator: `+=`, `-=`, `*=`, `%=`, `**=`, `<<=`, `>>=`, `&=`, `^=`, `|=`, `//=`, `/=`, `@=`.\n\n## Reproducer\n\n```python\nimport wrapt\n\nclass BrokenObjectProxy(wrapt.ObjectProxy):\n    @property\n    def __object_proxy__(self):\n        raise RuntimeError(\"boom\")\n\np = BrokenObjectProxy(10)\np += 5   # crashes the interpreter (Py_DECREF on NULL)\n```\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "f5f01cdbb9cef24018f3d731503d5ea103f3fef9",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f5f01cdbb9cef24018f3d731503d5ea103f3fef9",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,34 @@
+{
+ "repo": "python/cpython",
+ "number": 153058,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/153058",
+ "title": "weakrefobject.c: binary, ternary, or comparison operations ref leak with dead proxy",
+ "state": "open",
+ "state_reason": null,
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "extension-modules"
+ ],
+ "created_at": "2026-07-05T02:52:01Z",
+ "closed_at": null,
+ "body": "# Bug report\n\n### Bug description:\n\nOriginal gist: https://gist.github.com/devdanzin/f7d0c7694b2be2345f4cf85f4eedc3ee\n\n\n> ## Summary\n> \n> When first `UNWRAP(x)` succeeds but second `UNWRAP(y)` fails (dead proxy), `x`'s new reference is leaked. Affects ~20 binary operators (+, -, *, /, |, &, ^, etc.).\n> \n> ## Reproducer\n> \n> ```python\n> import weakref, sys, gc\n> \n> class C:\n>     def __add__(self, other): return NotImplemented\n>     def __radd__(self, other): return NotImplemented\n> \n> obj = type('D', (), {})()\n> dead = weakref.proxy(obj)\n> del obj; gc.collect()\n> \n> live_obj = C()\n> live = weakref.proxy(live_obj)\n> \n> before = sys.gettotalrefcount()\n> for i in range(10000):\n>     try:\n>         live + dead\n>     except ReferenceError:\n>         pass\n> after = sys.gettotalrefcount()\n> print(f\"Leaked {after - before} refs (~{(after-before)//10000}/call)\")\n> ```\n\nActually,  ternary, or comparison operations have the same problem.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-153059\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153059",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  }
+ ],
+ "fetch_errors": null
+}

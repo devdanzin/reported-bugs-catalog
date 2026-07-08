@@ -1,0 +1,1693 @@
+[
+ {
+  "author": {
+   "id": "MDQ6VXNlcjQ2NjAyNzU=",
+   "is_bot": false,
+   "login": "sobolevn",
+   "type": "User",
+   "url": "https://github.com/sobolevn"
+  },
+  "createdAt": "2026-06-24T21:51:06Z",
+  "isPullRequest": false,
+  "number": 152130,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "Abort: `assert(!queue->alive)` in `_queue_clear` in `_interpqueuesmodule.c`",
+  "url": "https://github.com/python/cpython/issues/152130"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjQ2NjAyNzU=",
+   "is_bot": false,
+   "login": "sobolevn",
+   "type": "User",
+   "url": "https://github.com/sobolevn"
+  },
+  "createdAt": "2026-06-25T18:31:08Z",
+  "isPullRequest": false,
+  "number": 152228,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "`str.replace` can crash under memory pressure",
+  "url": "https://github.com/python/cpython/issues/152228"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjQ2NjAyNzU=",
+   "is_bot": false,
+   "login": "sobolevn",
+   "type": "User",
+   "url": "https://github.com/sobolevn"
+  },
+  "createdAt": "2026-06-26T08:32:41Z",
+  "isPullRequest": false,
+  "number": 152254,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "Crash because of ownership assert in `PyObject_ClearManagedDict`",
+  "url": "https://github.com/python/cpython/issues/152254"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjY5OTYzNg==",
+   "is_bot": false,
+   "login": "aisk",
+   "type": "User",
+   "url": "https://github.com/aisk"
+  },
+  "createdAt": "2026-06-21T14:15:14Z",
+  "isPullRequest": false,
+  "number": 151847,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "PY_SSIZE_T_MIN negate UB in unicode_format.c and bytesobject.c",
+  "url": "https://github.com/python/cpython/issues/151847"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjY5OTYzNg==",
+   "is_bot": false,
+   "login": "aisk",
+   "type": "User",
+   "url": "https://github.com/aisk"
+  },
+  "createdAt": "2026-07-05T02:52:01Z",
+  "isPullRequest": false,
+  "number": 153058,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "weakrefobject.c: binary, ternary, or comparison operations ref leak with dead proxy",
+  "url": "https://github.com/python/cpython/issues/153058"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T14:23:43Z",
+  "isPullRequest": false,
+  "number": 1321,
+  "repository": {
+   "name": "multidict",
+   "nameWithOwner": "aio-libs/multidict"
+  },
+  "state": "open",
+  "title": "multidict Free-Threading Analysis Report",
+  "url": "https://github.com/aio-libs/multidict/issues/1321"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-24T09:40:44Z",
+  "isPullRequest": false,
+  "number": 1306,
+  "repository": {
+   "name": "multidict",
+   "nameWithOwner": "aio-libs/multidict"
+  },
+  "state": "open",
+  "title": "multidict C Extension Analysis Report",
+  "url": "https://github.com/aio-libs/multidict/issues/1306"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-07-07T22:24:56Z",
+  "isPullRequest": false,
+  "number": 149,
+  "repository": {
+   "name": "cereggii",
+   "nameWithOwner": "dpdani/cereggii"
+  },
+  "state": "open",
+  "title": "Four bugs from allocation-failure fuzzing (get_handle, reduce, __setitem__, concurrent resize)",
+  "url": "https://github.com/dpdani/cereggii/issues/149"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-22T11:55:31Z",
+  "isPullRequest": false,
+  "number": 31046,
+  "repository": {
+   "name": "numpy",
+   "nameWithOwner": "numpy/numpy"
+  },
+  "state": "open",
+  "title": "BUG: NumPy C Extension Analysis Report",
+  "url": "https://github.com/numpy/numpy/issues/31046"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjQ2NjAyNzU=",
+   "is_bot": false,
+   "login": "sobolevn",
+   "type": "User",
+   "url": "https://github.com/sobolevn"
+  },
+  "createdAt": "2026-06-24T13:52:48Z",
+  "isPullRequest": false,
+  "number": 152083,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "Crash in `DistributionFinder.context` because it is using `vars(self).update(kwargs)` under memory preasure",
+  "url": "https://github.com/python/cpython/issues/152083"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-29T03:01:00Z",
+  "isPullRequest": false,
+  "number": 408,
+  "repository": {
+   "name": "duckdb-python",
+   "nameWithOwner": "duckdb/duckdb-python"
+  },
+  "state": "open",
+  "title": "duckdb Python Extension Analysis Report",
+  "url": "https://github.com/duckdb/duckdb-python/issues/408"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjcxMjEzNDY3",
+   "is_bot": false,
+   "login": "Wulian233",
+   "type": "User",
+   "url": "https://github.com/Wulian233"
+  },
+  "createdAt": "2026-05-10T03:05:59Z",
+  "isPullRequest": false,
+  "number": 149630,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "pylifecycle.c: Multiple init/fini cleanup bugs",
+  "url": "https://github.com/python/cpython/issues/149630"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-29T12:33:34Z",
+  "isPullRequest": false,
+  "number": 518,
+  "repository": {
+   "name": "bottleneck",
+   "nameWithOwner": "pydata/bottleneck"
+  },
+  "state": "open",
+  "title": "Umbrella issue: bottleneck C Extension Analysis Report",
+  "url": "https://github.com/pydata/bottleneck/issues/518"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-28T19:11:29Z",
+  "isPullRequest": false,
+  "number": 24927,
+  "repository": {
+   "name": "scipy",
+   "nameWithOwner": "scipy/scipy"
+  },
+  "state": "open",
+  "title": "BUG: umbrella issue for SciPy C Extension Analysis Report",
+  "url": "https://github.com/scipy/scipy/issues/24927"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T00:41:43Z",
+  "isPullRequest": false,
+  "number": 361,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "open",
+  "title": "copt: PyObject_IsTrue error treated as truthy in IB__adapt__",
+  "url": "https://github.com/zopefoundation/zope.interface/issues/361"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjU2NDYyMzgw",
+   "is_bot": false,
+   "login": "zangjiucheng",
+   "type": "User",
+   "url": "https://github.com/zangjiucheng"
+  },
+  "createdAt": "2026-06-24T17:31:59Z",
+  "isPullRequest": false,
+  "number": 152107,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "`dict` item-iterator: `_PyObject_GC_UNTRACK` on never-tracked iterator under OOM (`dictobject.c`)",
+  "url": "https://github.com/python/cpython/issues/152107"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-29T22:43:33Z",
+  "isPullRequest": false,
+  "number": 31424,
+  "repository": {
+   "name": "matplotlib",
+   "nameWithOwner": "matplotlib/matplotlib"
+  },
+  "state": "open",
+  "title": "[Bug]: Umbrella issue: matplotlib C/C++ Extension Analysis Report",
+  "url": "https://github.com/matplotlib/matplotlib/issues/31424"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T00:42:00Z",
+  "isPullRequest": false,
+  "number": 362,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "open",
+  "title": "copt: missing NULL checks for PyTuple_New and _get_adapter_hooks",
+  "url": "https://github.com/zopefoundation/zope.interface/issues/362"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T00:41:27Z",
+  "isPullRequest": false,
+  "number": 360,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "open",
+  "title": "copt: reference leaks in getObjectSpecification on error and fallthrough paths",
+  "url": "https://github.com/zopefoundation/zope.interface/issues/360"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T00:42:22Z",
+  "isPullRequest": false,
+  "number": 363,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "open",
+  "title": "copt: refcount leaks in declaration import and module init error paths",
+  "url": "https://github.com/zopefoundation/zope.interface/issues/363"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T00:41:07Z",
+  "isPullRequest": false,
+  "number": 359,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "open",
+  "title": "copt: NULL-without-exception returns in SB_extends, IB__adapt__, CPB_descr_get",
+  "url": "https://github.com/zopefoundation/zope.interface/issues/359"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-18T11:06:17Z",
+  "isPullRequest": false,
+  "number": 146103,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "Umbrella issue: code review reports from cpython-review-toolkit",
+  "url": "https://github.com/python/cpython/issues/146103"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:22:19Z",
+  "isPullRequest": false,
+  "number": 300,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "GIL held during long-running ZSTD operations: 7 sites (5 EOF compression finalizations + dictionary creation + dict-chain content-size)",
+  "url": "https://github.com/indygreg/python-zstandard/issues/300"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:01:37Z",
+  "isPullRequest": false,
+  "number": 292,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "Segfault: 4+ unchecked `PyBytes_AsStringAndSize` on user `read()` return uses uninitialized memory",
+  "url": "https://github.com/indygreg/python-zstandard/issues/292"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:22:21Z",
+  "isPullRequest": false,
+  "number": 301,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "CFFI backend parity gaps: garbled `ZstdError` messages, `__exit__` ordering mismatch with C backend, minor parameter-validation drift",
+  "url": "https://github.com/indygreg/python-zstandard/issues/301"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:22:17Z",
+  "isPullRequest": false,
+  "number": 299,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "`MemoryError` silently swallowed in 20 sites: 18 `PyObject_HasAttrString` + 2 unguarded `PyErr_Clear` after `PyObject_GetBuffer` (silent data loss in `flush()` / `close()`)",
+  "url": "https://github.com/indygreg/python-zstandard/issues/299"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:05:34Z",
+  "isPullRequest": false,
+  "number": 295,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "Silent data-correctness bug: `readinto()` / `readinto1()` on `stream_reader` return `tell() == 0` after successful reads",
+  "url": "https://github.com/indygreg/python-zstandard/issues/295"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjY5OTYzNg==",
+   "is_bot": false,
+   "login": "aisk",
+   "type": "User",
+   "url": "https://github.com/aisk"
+  },
+  "createdAt": "2026-07-05T07:02:15Z",
+  "isPullRequest": false,
+  "number": 153068,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "_lsprof.c: Profiler.enable() clobbers exception from use_tool_id",
+  "url": "https://github.com/python/cpython/issues/153068"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:22:13Z",
+  "isPullRequest": false,
+  "number": 297,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "Fix-propagation gaps: `compressionreader` missing 3 mirrors of fixes previously applied to `decompressionreader`",
+  "url": "https://github.com/indygreg/python-zstandard/issues/297"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjQ2NjAyNzU=",
+   "is_bot": false,
+   "login": "sobolevn",
+   "type": "User",
+   "url": "https://github.com/sobolevn"
+  },
+  "createdAt": "2026-06-25T06:55:23Z",
+  "isPullRequest": false,
+  "number": 152156,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "Fix error handling in `Modules/_interpchannelsmodule.c`",
+  "url": "https://github.com/python/cpython/issues/152156"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-26T22:27:37Z",
+  "isPullRequest": false,
+  "number": 26596,
+  "repository": {
+   "name": "protobuf",
+   "nameWithOwner": "protocolbuffers/protobuf"
+  },
+  "state": "open",
+  "title": "Umbrella issue: protobuf Python C Extension Analysis Report",
+  "url": "https://github.com/protocolbuffers/protobuf/issues/26596"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjY5OTYzNg==",
+   "is_bot": false,
+   "login": "aisk",
+   "type": "User",
+   "url": "https://github.com/aisk"
+  },
+  "createdAt": "2026-06-21T13:48:57Z",
+  "isPullRequest": false,
+  "number": 151845,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "formatfloat wrong return in unicode_format.c",
+  "url": "https://github.com/python/cpython/issues/151845"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjY5OTYzNg==",
+   "is_bot": false,
+   "login": "aisk",
+   "type": "User",
+   "url": "https://github.com/aisk"
+  },
+  "createdAt": "2026-06-15T15:45:05Z",
+  "isPullRequest": false,
+  "number": 151510,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "bltinmodule.c: lazy_import NULL deref without Python frame",
+  "url": "https://github.com/python/cpython/issues/151510"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-04T21:52:42Z",
+  "isPullRequest": false,
+  "number": 52,
+  "repository": {
+   "name": "guppy3",
+   "nameWithOwner": "zhuyifei1999/guppy3"
+  },
+  "state": "open",
+  "title": "Free-threading support: StopTheWorld synchronization + per-object locking",
+  "url": "https://github.com/zhuyifei1999/guppy3/issues/52"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:22:22Z",
+  "isPullRequest": false,
+  "number": 302,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "Modernization roadmap: multi-phase init, stable ABI, free-threading, GC support, deprecated-API cleanup (discussion)",
+  "url": "https://github.com/indygreg/python-zstandard/issues/302"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:22:15Z",
+  "isPullRequest": false,
+  "number": 298,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "OOM-path hardening: ~45 sites crash on allocation failure (most critically: `ZstdError` NULL at module init cascades into ~50 error paths)",
+  "url": "https://github.com/indygreg/python-zstandard/issues/298"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:22:11Z",
+  "isPullRequest": false,
+  "number": 296,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "Memory leaks in stream lifecycle: 4 `__exit__` + 2 `close()` discard CallMethod returns; 5 types leak on `__init__` re-call (~5.5 KB); 2 `Py_buffer` leaks on closed streams",
+  "url": "https://github.com/indygreg/python-zstandard/issues/296"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:01:38Z",
+  "isPullRequest": false,
+  "number": 293,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "SystemError / wrong behavior: 15+ sites conflate error-return sentinels with data (`PyObject_IsTrue`, `PyObject_IsInstance`, `PyLong_AsSsize_t`)",
+  "url": "https://github.com/indygreg/python-zstandard/issues/293"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:01:35Z",
+  "isPullRequest": false,
+  "number": 291,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "Segfault: 12 types dereference NULL on `Type.__new__(Type)` without `__init__()`",
+  "url": "https://github.com/indygreg/python-zstandard/issues/291"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-19T16:05:33Z",
+  "isPullRequest": false,
+  "number": 294,
+  "repository": {
+   "name": "python-zstandard",
+   "nameWithOwner": "indygreg/python-zstandard"
+  },
+  "state": "open",
+  "title": "Heap-type refcount imbalance: 19 dealloc sites miss `Py_DECREF(Py_TYPE(self))` + 4 factories bypass `tp_alloc` (type-object leak, latent crash)",
+  "url": "https://github.com/indygreg/python-zstandard/issues/294"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-27T08:34:48Z",
+  "isPullRequest": false,
+  "number": 1881,
+  "repository": {
+   "name": "traits",
+   "nameWithOwner": "enthought/traits"
+  },
+  "state": "open",
+  "title": "ctraits Extension Analysis Report",
+  "url": "https://github.com/enthought/traits/issues/1881"
+ },
+ {
+  "author": {
+   "id": "U_kgDOC07Gjg",
+   "is_bot": false,
+   "login": "lpyu001",
+   "type": "User",
+   "url": "https://github.com/lpyu001"
+  },
+  "createdAt": "2026-05-21T07:47:38Z",
+  "isPullRequest": false,
+  "number": 150178,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "hamt.c: sub_node leaked in bitmap_assoc and bitmap_without",
+  "url": "https://github.com/python/cpython/issues/150178"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjIyNTIxNzUy",
+   "is_bot": false,
+   "login": "prakashsellathurai",
+   "type": "User",
+   "url": "https://github.com/prakashsellathurai"
+  },
+  "createdAt": "2026-04-08T17:15:15Z",
+  "isPullRequest": false,
+  "number": 148263,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "weakrefobject.c:  UNWRAP ref leak with dead proxy",
+  "url": "https://github.com/python/cpython/issues/148263"
+ },
+ {
+  "author": {
+   "id": "U_kgDOC07Gjg",
+   "is_bot": false,
+   "login": "lpyu001",
+   "type": "User",
+   "url": "https://github.com/lpyu001"
+  },
+  "createdAt": "2026-05-13T08:33:49Z",
+  "isPullRequest": false,
+  "number": 149760,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "tarfile.TarFile.next() adds an unnecessary traceback frame when reraising exceptions",
+  "url": "https://github.com/python/cpython/issues/149760"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-06-20T00:55:43Z",
+  "isPullRequest": false,
+  "number": 151763,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "CPython crashes on memory-allocation failure (OOM): 35 findings  (4 dups \u2192 31 distinct)",
+  "url": "https://github.com/python/cpython/issues/151763"
+ },
+ {
+  "author": {
+   "id": "U_kgDOC07Gjg",
+   "is_bot": false,
+   "login": "lpyu001",
+   "type": "User",
+   "url": "https://github.com/lpyu001"
+  },
+  "createdAt": "2026-05-22T02:17:16Z",
+  "isPullRequest": false,
+  "number": 150213,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "`_interpchannels`: missing `PyErr_NoMemory()` causes `SystemErroron` OOM in `{create,close}()`",
+  "url": "https://github.com/python/cpython/issues/150213"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-27T00:54:27Z",
+  "isPullRequest": false,
+  "number": 2792,
+  "repository": {
+   "name": "psutil",
+   "nameWithOwner": "giampaolo/psutil"
+  },
+  "state": "open",
+  "title": "Umbrella issue: psutil C Extension Analysis Report",
+  "url": "https://github.com/giampaolo/psutil/issues/2792"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjcxMjEzNDY3",
+   "is_bot": false,
+   "login": "Wulian233",
+   "type": "User",
+   "url": "https://github.com/Wulian233"
+  },
+  "createdAt": "2026-04-12T02:23:35Z",
+  "isPullRequest": false,
+  "number": 148418,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "marshal.c: 8 refs leaked on corrupt TYPE_CODE marshal stream",
+  "url": "https://github.com/python/cpython/issues/148418"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-06-25T02:53:14Z",
+  "isPullRequest": false,
+  "number": 152147,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "Use-after-free under MemoryError: opcode error path leaves stale stackref that `_PyFrame_ClearLocals` over-decrefs",
+  "url": "https://github.com/python/cpython/issues/152147"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-27T02:20:02Z",
+  "isPullRequest": false,
+  "number": 960,
+  "repository": {
+   "name": "pycurl",
+   "nameWithOwner": "pycurl/pycurl"
+  },
+  "state": "closed",
+  "title": "pycurl C Extension Analysis Report",
+  "url": "https://github.com/pycurl/pycurl/issues/960"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjIzNzg5",
+   "is_bot": false,
+   "login": "nedbat",
+   "type": "User",
+   "url": "https://github.com/nedbat"
+  },
+  "createdAt": "2024-12-14T21:00:26Z",
+  "isPullRequest": false,
+  "number": 127953,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "sys.settrace suffers quadratic behavior for large dictionary literals on 3.12+",
+  "url": "https://github.com/python/cpython/issues/127953"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjIyNTIxNzUy",
+   "is_bot": false,
+   "login": "prakashsellathurai",
+   "type": "User",
+   "url": "https://github.com/prakashsellathurai"
+  },
+  "createdAt": "2026-04-07T14:40:26Z",
+  "isPullRequest": false,
+  "number": 148222,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "genericaliasobject.c: Two NULL dereference bugs",
+  "url": "https://github.com/python/cpython/issues/148222"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-11T02:23:04Z",
+  "isPullRequest": false,
+  "number": 333,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Fix missing NULL guards in C extension call and descriptor slots",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/333"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjcxMjEzNDY3",
+   "is_bot": false,
+   "login": "Wulian233",
+   "type": "User",
+   "url": "https://github.com/Wulian233"
+  },
+  "createdAt": "2026-04-07T12:19:05Z",
+  "isPullRequest": false,
+  "number": 148208,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "object.c: recursion depth leak in `PyObject_Print`",
+  "url": "https://github.com/python/cpython/issues/148208"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-09T03:24:09Z",
+  "isPullRequest": false,
+  "number": 330,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Unchecked `PyDict_New()` in function wrapper call paths can mask `MemoryError`",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/330"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-11T03:17:16Z",
+  "isPullRequest": false,
+  "number": 334,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Fix missing NULL guard for `other` operand in inplace operators (SIGSEGV)",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/334"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-07T04:41:59Z",
+  "isPullRequest": false,
+  "number": 322,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Reference leak in C implementation of `__round__` on `ObjectProxy`",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/322"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-07T23:40:00Z",
+  "isPullRequest": false,
+  "number": 324,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "ObjectProxy.__new__ returns half-built proxy when PyDict_New() fails",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/324"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-07T00:12:20Z",
+  "isPullRequest": false,
+  "number": 319,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "`Py_DECREF(NULL)` crash in inplace operator error path when `__object_proxy__` lookup fails",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/319"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-07T01:55:25Z",
+  "isPullRequest": false,
+  "number": 320,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "C extension swallows non-AttributeError exceptions during optional attribute lookups",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/320"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-11T05:45:30Z",
+  "isPullRequest": false,
+  "number": 335,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Replace deprecated `PyObject_HasAttrString()` in inplace operators with exception-safe alternative",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/335"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjcxMjEzNDY3",
+   "is_bot": false,
+   "login": "Wulian233",
+   "type": "User",
+   "url": "https://github.com/Wulian233"
+  },
+  "createdAt": "2026-04-04T08:36:22Z",
+  "isPullRequest": false,
+  "number": 148074,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "typeobject.c: Missing return -1 after PyErr_Format in type_ready_post_checks",
+  "url": "https://github.com/python/cpython/issues/148074"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-08T01:14:03Z",
+  "isPullRequest": false,
+  "number": 326,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "`C extension swallows exceptions from PyObject_RichCompareBool in binding dispatch`",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/326"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-07T23:48:51Z",
+  "isPullRequest": false,
+  "number": 325,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Crash on OOM: unchecked `PyTuple_New` / `PyDict_New` in C `PartialCallableObjectProxy.__call__`",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/325"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-07T03:33:25Z",
+  "isPullRequest": false,
+  "number": 321,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "`FunctionWrapper` silently bypasses wrapper when `enabled.__bool__` raises",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/321"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-09T03:12:49Z",
+  "isPullRequest": false,
+  "number": 329,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "C extension swallows exceptions from `PyObject_IsInstance` in `FunctionWrapper.__init__` and bound-method dispatch",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/329"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-07T23:27:10Z",
+  "isPullRequest": false,
+  "number": 323,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Reference leak and swallowed exception in C `FunctionWrapper.__init__` when wrapping another FunctionWrapperBase",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/323"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-04-05T20:20:52Z",
+  "isPullRequest": false,
+  "number": 348,
+  "repository": {
+   "name": "simplejson",
+   "nameWithOwner": "simplejson/simplejson"
+  },
+  "state": "closed",
+  "title": "C extension (_speedups.c) analysis: 15 bugs found",
+  "url": "https://github.com/simplejson/simplejson/issues/348"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-09T02:20:45Z",
+  "isPullRequest": false,
+  "number": 328,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Use-after-free window when replacing `self->wrapped` and other proxy fields in C extension",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/328"
+ },
+ {
+  "author": {
+   "id": "U_kgDOCU119g",
+   "is_bot": false,
+   "login": "NitayDariel",
+   "type": "User",
+   "url": "https://github.com/NitayDariel"
+  },
+  "createdAt": "2026-04-06T13:18:19Z",
+  "isPullRequest": false,
+  "number": 503,
+  "repository": {
+   "name": "greenlet",
+   "nameWithOwner": "python-greenlet/greenlet"
+  },
+  "state": "closed",
+  "title": "Free-threaded CPython support - follow-up",
+  "url": "https://github.com/python-greenlet/greenlet/issues/503"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUwNzYzNw==",
+   "is_bot": false,
+   "login": "GrahamDumpleton",
+   "type": "User",
+   "url": "https://github.com/GrahamDumpleton"
+  },
+  "createdAt": "2026-04-08T02:03:40Z",
+  "isPullRequest": false,
+  "number": 327,
+  "repository": {
+   "name": "wrapt",
+   "nameWithOwner": "GrahamDumpleton/wrapt"
+  },
+  "state": "closed",
+  "title": "Module init leaks module reference on `PyType_Ready` failure and ignores `PyModule_AddObject` errors",
+  "url": "https://github.com/GrahamDumpleton/wrapt/issues/327"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T00:40:25Z",
+  "isPullRequest": false,
+  "number": 357,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "closed",
+  "title": "copt: PyDict_GetItem silently swallows exceptions in SB_extends and IB__adapt__",
+  "url": "https://github.com/zopefoundation/zope.interface/issues/357"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T00:40:47Z",
+  "isPullRequest": false,
+  "number": 358,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "closed",
+  "title": "copt: unguarded PyErr_Clear swallows KeyboardInterrupt/MemoryError at 4 sites",
+  "url": "https://github.com/zopefoundation/zope.interface/issues/358"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc0MjgwMjk3",
+   "is_bot": false,
+   "login": "devdanzin",
+   "type": "User",
+   "url": "https://github.com/devdanzin"
+  },
+  "createdAt": "2026-03-31T17:07:27Z",
+  "isPullRequest": false,
+  "number": 51,
+  "repository": {
+   "name": "guppy3",
+   "nameWithOwner": "zhuyifei1999/guppy3"
+  },
+  "state": "closed",
+  "title": "Umbrella issue: guppy3 C Extension Analysis Report",
+  "url": "https://github.com/zhuyifei1999/guppy3/issues/51"
+ },
+ {
+  "author": {
+   "id": "U_kgDOC07Gjg",
+   "is_bot": false,
+   "login": "lpyu001",
+   "type": "User",
+   "url": "https://github.com/lpyu001"
+  },
+  "createdAt": "2026-06-17T06:44:22Z",
+  "isPullRequest": true,
+  "number": 151578,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "gh-146102\uff1aFix cross-interpreter NotShareableError ref handling",
+  "url": "https://github.com/python/cpython/pull/151578"
+ },
+ {
+  "author": {
+   "id": "U_kgDOBtXzGg",
+   "is_bot": false,
+   "login": "Vizonex",
+   "type": "User",
+   "url": "https://github.com/Vizonex"
+  },
+  "createdAt": "2026-04-28T20:34:04Z",
+  "isPullRequest": true,
+  "number": 1328,
+  "repository": {
+   "name": "multidict",
+   "nameWithOwner": "aio-libs/multidict"
+  },
+  "state": "open",
+  "title": "Fix `__repr__` race (Free-Threaded)",
+  "url": "https://github.com/aio-libs/multidict/pull/1328"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjcxMjEzNDY3",
+   "is_bot": false,
+   "login": "Wulian233",
+   "type": "User",
+   "url": "https://github.com/Wulian233"
+  },
+  "createdAt": "2026-05-10T03:09:23Z",
+  "isPullRequest": true,
+  "number": 149631,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "open",
+  "title": "gh-149630: Fix pylifecycle multiple init/fini cleanup bugs ",
+  "url": "https://github.com/python/cpython/pull/149631"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjIyNTIxNzUy",
+   "is_bot": false,
+   "login": "prakashsellathurai",
+   "type": "User",
+   "url": "https://github.com/prakashsellathurai"
+  },
+  "createdAt": "2026-06-22T06:00:40Z",
+  "isPullRequest": true,
+  "number": 151906,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "merged",
+  "title": "gh-151905: fix assert(!PyErr_Occurred()) in _PyType_LookupStackRefAndVersion",
+  "url": "https://github.com/python/cpython/pull/151906"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE5NDEyOQ==",
+   "is_bot": false,
+   "login": "vstinner",
+   "type": "User",
+   "url": "https://github.com/vstinner"
+  },
+  "createdAt": "2026-06-11T14:39:58Z",
+  "isPullRequest": true,
+  "number": 151347,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "merged",
+  "title": "gh-146102: Don't clear exception on success in odictobject.c",
+  "url": "https://github.com/python/cpython/pull/151347"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE5NDEyOQ==",
+   "is_bot": false,
+   "login": "vstinner",
+   "type": "User",
+   "url": "https://github.com/vstinner"
+  },
+  "createdAt": "2026-06-11T14:02:24Z",
+  "isPullRequest": true,
+  "number": 151342,
+  "repository": {
+   "name": "cpython",
+   "nameWithOwner": "python/cpython"
+  },
+  "state": "closed",
+  "title": "gh-146102: Catch PyErr_NewException() failure in zlib",
+  "url": "https://github.com/python/cpython/pull/151342"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjI3ODk4MjA=",
+   "is_bot": false,
+   "login": "mhvk",
+   "type": "User",
+   "url": "https://github.com/mhvk"
+  },
+  "createdAt": "2026-04-10T13:32:33Z",
+  "isPullRequest": true,
+  "number": 225,
+  "repository": {
+   "name": "pyerfa",
+   "nameWithOwner": "liberfa/pyerfa"
+  },
+  "state": "merged",
+  "title": "Fixes found by automated analysis",
+  "url": "https://github.com/liberfa/pyerfa/pull/225"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjc3Mjcy",
+   "is_bot": false,
+   "login": "charris",
+   "type": "User",
+   "url": "https://github.com/charris"
+  },
+  "createdAt": "2026-04-26T17:41:15Z",
+  "isPullRequest": true,
+  "number": 31336,
+  "repository": {
+   "name": "numpy",
+   "nameWithOwner": "numpy/numpy"
+  },
+  "state": "merged",
+  "title": "BUG: Fix segfault in nditer.multi_index when __getitem__ raises (#31314)",
+  "url": "https://github.com/numpy/numpy/pull/31336"
+ },
+ {
+  "author": {
+   "id": "U_kgDODVaAdg",
+   "is_bot": false,
+   "login": "Breno-Favaretto",
+   "type": "User",
+   "url": "https://github.com/Breno-Favaretto"
+  },
+  "createdAt": "2026-04-23T02:36:56Z",
+  "isPullRequest": true,
+  "number": 31314,
+  "repository": {
+   "name": "numpy",
+   "nameWithOwner": "numpy/numpy"
+  },
+  "state": "merged",
+  "title": "BUG: Fix segfault in nditer.multi_index when __getitem__ raises",
+  "url": "https://github.com/numpy/numpy/pull/31314"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T00:54:49Z",
+  "isPullRequest": true,
+  "number": 364,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "merged",
+  "title": "Replace all PyDict_GetItem with exception-safe alternatives",
+  "url": "https://github.com/zopefoundation/zope.interface/pull/364"
+ },
+ {
+  "author": {
+   "id": "U_kgDODVaAdg",
+   "is_bot": false,
+   "login": "Breno-Favaretto",
+   "type": "User",
+   "url": "https://github.com/Breno-Favaretto"
+  },
+  "createdAt": "2026-04-21T22:30:32Z",
+  "isPullRequest": true,
+  "number": 31297,
+  "repository": {
+   "name": "numpy",
+   "nameWithOwner": "numpy/numpy"
+  },
+  "state": "closed",
+  "title": "BUG: prevent crash when setting array flags with non-ASCII strings",
+  "url": "https://github.com/numpy/numpy/pull/31297"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjEyNTYwODI=",
+   "is_bot": false,
+   "login": "jamadden",
+   "type": "User",
+   "url": "https://github.com/jamadden"
+  },
+  "createdAt": "2026-04-04T14:19:37Z",
+  "isPullRequest": true,
+  "number": 502,
+  "repository": {
+   "name": "greenlet",
+   "nameWithOwner": "python-greenlet/greenlet"
+  },
+  "state": "merged",
+  "title": "Address automated code audit results",
+  "url": "https://github.com/python-greenlet/greenlet/pull/502"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjE1NzE0MA==",
+   "is_bot": false,
+   "login": "jensens",
+   "type": "User",
+   "url": "https://github.com/jensens"
+  },
+  "createdAt": "2026-03-30T01:27:18Z",
+  "isPullRequest": true,
+  "number": 365,
+  "repository": {
+   "name": "zope.interface",
+   "nameWithOwner": "zopefoundation/zope.interface"
+  },
+  "state": "merged",
+  "title": "Guard 4 unprotected PyErr_Clear calls with exception type checks",
+  "url": "https://github.com/zopefoundation/zope.interface/pull/365"
+ },
+ {
+  "author": {
+   "id": "U_kgDOBtXzGg",
+   "is_bot": false,
+   "login": "Vizonex",
+   "type": "User",
+   "url": "https://github.com/Vizonex"
+  },
+  "createdAt": "2026-03-28T18:32:29Z",
+  "isPullRequest": true,
+  "number": 1310,
+  "repository": {
+   "name": "multidict",
+   "nameWithOwner": "aio-libs/multidict"
+  },
+  "state": "merged",
+  "title": "fix format error that leads to segfaults",
+  "url": "https://github.com/aio-libs/multidict/pull/1310"
+ },
+ {
+  "author": {
+   "id": "MDQ6VXNlcjUyMjE5MjUy",
+   "is_bot": false,
+   "login": "etiennebacher",
+   "type": "User",
+   "url": "https://github.com/etiennebacher"
+  },
+  "createdAt": "2025-04-28T14:51:19Z",
+  "isPullRequest": true,
+  "number": 22469,
+  "repository": {
+   "name": "polars",
+   "nameWithOwner": "pola-rs/polars"
+  },
+  "state": "merged",
+  "title": "fix: Return input instead of panicking if empty subset in `drop_nulls()` and `drop_nans()`",
+  "url": "https://github.com/pola-rs/polars/pull/22469"
+ }
+]

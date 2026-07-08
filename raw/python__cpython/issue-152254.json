@@ -1,0 +1,34 @@
+{
+ "repo": "python/cpython",
+ "number": 152254,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/152254",
+ "title": "Crash because of ownership assert in `PyObject_ClearManagedDict`",
+ "state": "open",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2026-06-26T08:32:41Z",
+ "closed_at": null,
+ "body": "# Crash report\n\nRefs https://github.com/python/cpython/issues/151763\nOriginal description: https://gist.github.com/devdanzin/99b84915b197ae0ade7face262b8af66\n\nRepro: \n\n```python\nfrom unittest.mock import MagicMock\nfrom _testcapi import set_nomemory\n\nset_nomemory(200)              # fail allocations from the 200th onward (lands in shutdown GC)\n(MagicMock(), undefined_name)  # build a MagicMock (managed __dict__), then NameError abandons\n                               # it into a traceback cycle -> survives to shutdown GC\n\n```\n\nI have a fix ready.\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-152255\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152255",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

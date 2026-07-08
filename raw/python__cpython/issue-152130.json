@@ -1,0 +1,29 @@
+{
+ "repo": "python/cpython",
+ "number": 152130,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/152130",
+ "title": "Abort: `assert(!queue->alive)` in `_queue_clear` in `_interpqueuesmodule.c`",
+ "state": "open",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-subinterpreters"
+ ],
+ "created_at": "2026-06-24T21:51:06Z",
+ "closed_at": null,
+ "body": "# Crash report\n\nDescription OOM-0016: https://gist.github.com/devdanzin/05be8efe6b08c2b3ac3e2c17c784da0c\nOriginal issue: https://github.com/python/cpython/issues/151763\n\nI am working on it :)",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

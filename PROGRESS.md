@@ -38,26 +38,36 @@ Completed:
       simplejson→review-toolkit (both corrected from "manual"). 75 upstream
       issues cite a devdanzin gist (Phase-2 vector). §1/§2/§5/§6/§7 updated.
 
-## Phase 2 — Raw harvest / import  🟡 IN PROGRESS (core harvest DONE 2026-07-08)
-`tools/harvest.py` (idempotent, resumable). **403 artifacts in `raw/`** — full
-core + labels + comments + issue↔PR timeline refs. 300 issues / 103 PRs; 296
-closed / 107 open; **343 self + 60 maintainer-authored**; 0 fetch errors (2
-cpython timeline hiccups retried clean after making sub-fetches non-fatal).
-Coverage in `sources/harvest_coverage.json`. Enumeration matched refined counts
-(cpython 175, pypy 31, …); cext-JSON ingest added the maintainer-authored ones
-(Pillow 0→24, zope 0→9, h5py 16→25, bottleneck 15→24). Labels: type-crash 133,
+## Phase 2 — Raw harvest / import  ✅ DONE (2026-07-08)
+`tools/harvest.py` (idempotent, resumable). **452 artifacts in `raw/`** across
+**34 repos** — full core + labels + comments + issue↔PR timeline refs. 338
+issues / 114 PRs; 332 closed / 120 open; **344 self + 108 maintainer-authored**;
+0 fetch errors. Coverage in `sources/harvest_coverage.json`. Enumeration matched
+refined counts (cpython 175, pypy 31, …); cext-JSON ingest added maintainer
+artifacts (Pillow 0→24, zope 0→9, h5py 16→25). Labels: type-crash 133,
 fusil-fuzzer 8, topic-JIT 34.
 
-**Still to do in Phase 2 (long-tail + enrichment):**
-- [ ] **Gist-cite sub-pass:** the 75 upstream issues citing a `gist.github.com/
-      devdanzin` gist → harvest any not already in `raw/` (maintainer-filed +
-      untagged finds). Enumerate the 285 gists → per-id issue search.
-- [ ] **cext communicated-only extensions** (astropy, cffi, cvxopt, isal,
-      ml-dtypes, msgspec, mypyc, nanobind, pybind, pyerfa, pymongo, wrapt,
-      awkward-cpp): confirm 0 filed (enum returned 0) or catch late filings.
-- [ ] **Reconcile the ~30 no-ref crash dirs** + drafts staging.
-- [ ] **Verify #146443 vs #146124** (cpython-review PR) during classify.
-- [ ] Old bpo / ajaksu2 long-tail (Phase-3-adjacent).
+Sub-passes:
+- [x] **Gist-cite sub-pass** — 89 artifacts cite a `gist.github.com/devdanzin`
+      gist; 48 were new → harvested. **Grew maintainer-filed 60→108**: +26
+      cpython fix-PRs/issues citing OOM gists, **+wrapt 15 (all GrahamDumpleton)**,
+      +pyerfa 1, +pola-rs/polars 1, +greenlet/multidict/numpy extras.
+- [x] **Communicated-only extensions** resolved: **10 confirmed 0-filed**
+      (astropy, cffi, cvxopt, isal, ml_dtypes, msgspec, nanobind, pybind11,
+      pymongo, awkward). 3 were NOT 0-filed → harvested: **wrapt 15** (maintainer),
+      **pyerfa 1** (maintainer), **mypyc = python/mypy#20585** (devdanzin, mypyc
+      assertion crash).
+- [x] **Crashers reconciled** — 59 dirs, only 8 have a report/finding; 51 are
+      bare historical repros (expected unfiled, per user). Of the 8: 4 cereggii +
+      wsgiref + fleet8 already filed & captured; **h5py_get_name + hdf5_property
+      _list = the only genuine unfiled drafts.**
+- [x] **Drafts staged** → `drafts/` (12 stubs + INDEX; found-but-not-filed,
+      excluded from counts): h5py/HDF5/astropy/coveragepy/numpy + review-toolkit
+      backlog (couchbase/frozendict/uvloop/ijson/_decimal/igraph) + itertools draft.
+
+**Deferred to Phase 3 (classify-adjacent):**
+- [ ] Verify #146443 vs #146124 (cpython-review PR).
+- [ ] Old bpo / ajaksu2 long-tail.
 
 ## Open decisions (block Phase 3, not Phase 2) — SCOPING_REPORT §5 + §10
 - Own-repo (1471) EXCLUDE? OTHER_OSS (120) EXCLUDE? pypy/simplejson → `manual`?

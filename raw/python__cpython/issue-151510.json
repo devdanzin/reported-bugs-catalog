@@ -1,0 +1,59 @@
+{
+ "repo": "python/cpython",
+ "number": 151510,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/151510",
+ "title": "bltinmodule.c: lazy_import NULL deref without Python frame",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "aisk",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-lazy-imports"
+ ],
+ "created_at": "2026-06-15T15:45:05Z",
+ "closed_at": "2026-06-17T18:14:32Z",
+ "body": "# Crash report\n\n### What happened?\n\nOriginal gist: https://gist.github.com/devdanzin/cc84f43d7a5c774b47551060c061391f. A PR is on the way.\n\n## Summary\n\n`builtin___lazy_import___impl` (line 321): When `globals=NULL` and `PyEval_GetGlobals()` returns NULL (no Python frame), `PyDict_Check(globals)` dereferences NULL \u2192 segfault. Reachable from embedded interpreters.\n\n## Fix\n\nAdd NULL check for `globals` after `PyEval_GetGlobals()`.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n### Output from running 'python -VV' on the command line:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151511\n* gh-151610\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151511",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "eff805b7a7a9678639bbcebe804864406cc4eab2",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151610",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8fe5897853b1f5d8b7a1dc9fc2b72c6244a74983",
+   "actor": "pablogsal"
+  }
+ ],
+ "fetch_errors": null
+}

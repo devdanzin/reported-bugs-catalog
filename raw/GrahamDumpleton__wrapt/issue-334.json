@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 334,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/334",
+ "title": "Fix missing NULL guard for `other` operand in inplace operators (SIGSEGV)",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-11T03:17:16Z",
+ "closed_at": "2026-04-11T03:18:31Z",
+ "body": "## Summary\n\nThe C implementation of all thirteen inplace numeric operators (`+=`, `-=`, `*=`, `%=`, `**=`, `<<=`, `>>=`, `&=`, `^=`, `|=`, `//=`, `/=`, `@=`) on `ObjectProxy` was missing a NULL guard when unwrapping the `other` operand. If `other` was itself a proxy whose `wrapped` attribute had not been set (e.g. created via `__new__` without `__init__`), the code unwrapped it to `NULL` and passed that to the corresponding `PyNumber_InPlace*` function, crashing the interpreter with a SIGSEGV. The non-inplace binary operators already had the correct guard; the same check has now been added to all inplace variants.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/34c9fad09694958b83fbbea19ea30e69",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "6039b4456e9e5e04a840fe8b486ca464de9a6c9c",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6039b4456e9e5e04a840fe8b486ca464de9a6c9c",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

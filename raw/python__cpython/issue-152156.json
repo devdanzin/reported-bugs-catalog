@@ -1,0 +1,95 @@
+{
+ "repo": "python/cpython",
+ "number": 152156,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/152156",
+ "title": "Fix error handling in `Modules/_interpchannelsmodule.c`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "extension-modules",
+  "type-crash",
+  "topic-subinterpreters"
+ ],
+ "created_at": "2026-06-25T06:55:23Z",
+ "closed_at": "2026-06-27T11:50:24Z",
+ "body": "# Crash report\n\n@serhiy-storchaka requested to double check this in https://github.com/python/cpython/pull/151239#pullrequestreview-4469335788 several weeks ago. \n\nIt might contain error handling issues.\n\nAlso mentioned in https://gist.github.com/devdanzin/bf6f784d4bcd21acd471ea45b6f23c70 as OOM-0026\nRefs https://github.com/python/cpython/issues/151763\n\nI will send a PR.\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-152163\n* gh-152268\n* gh-152269\n* gh-152270\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "28a6abf7145aa150701ada6593e37d4327522e3f",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152163",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9b2987915347d2bc56202f58400faf7f7c9315e0",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3ad66bf10dbb929bcf8efd889e56a9b9068319ca",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152268",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152269",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152270",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "df7c9e1eda6a35ad2f10e522c6c1163164660217",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "62842c9ff592114ade3049d6a85aea031b783beb",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d1faedab4ea927d436c2a015d7c1c5fe50bf5a86",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

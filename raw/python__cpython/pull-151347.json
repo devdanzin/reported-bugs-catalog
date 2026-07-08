@@ -1,0 +1,51 @@
+{
+ "repo": "python/cpython",
+ "number": 151347,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151347",
+ "title": "gh-146102: Don't clear exception on success in odictobject.c",
+ "state": "closed",
+ "state_reason": null,
+ "author": "vstinner",
+ "author_association": "MEMBER",
+ "labels": [
+  "skip news"
+ ],
+ "created_at": "2026-06-11T14:39:58Z",
+ "closed_at": "2026-06-15T09:46:52Z",
+ "body": "Calling PyErr_Clear() on success can mask a pending exception. Replace it with an assertion checking that no exception is set.\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\n\n<!-- gh-issue-number: gh-146102 -->\n* Issue: gh-146102\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "vstinner",
+   "created_at": "2026-06-11T14:40:07Z",
+   "body": "See the report: https://gist.github.com/devdanzin/9015c335e324a94ea06932bdd643a7dc."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "b3b7c0025be4f9d08d5f4259b8ffc7b05fa0ba7f",
+   "actor": "vstinner"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "vstinner"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8cd462efe3ed536af628ab48c27f93035e10b57d",
+   "actor": "philthompson10"
+  }
+ ],
+ "fetch_errors": null
+}

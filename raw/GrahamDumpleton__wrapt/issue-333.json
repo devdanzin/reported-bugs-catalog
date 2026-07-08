@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 333,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/333",
+ "title": "Fix missing NULL guards in C extension call and descriptor slots",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-11T02:23:04Z",
+ "closed_at": "2026-04-11T02:25:24Z",
+ "body": "## Summary\n\nThe C extension's `WraptFunctionWrapperBase_call`, `WraptFunctionWrapperBase_descr_get`,\nand `WraptBoundFunctionWrapper_call` functions were missing the standard\n`if (!self->object_proxy.wrapped)` NULL guard that other slots use. If a wrapper object\nwas constructed via `__new__` without calling `__init__`, calling or accessing the\ndescriptor on the uninitialized object would dereference NULL pointers, resulting in a\ncrash (SIGSEGV) rather than raising `WrapperNotInitializedError`. Added the same guard\npattern already used throughout the rest of the C extension to these three functions.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/34c9fad09694958b83fbbea19ea30e69",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "c1da74f7051cbc0b5f00976f4f5d4f37698fa2e9",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c1da74f7051cbc0b5f00976f4f5d4f37698fa2e9",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

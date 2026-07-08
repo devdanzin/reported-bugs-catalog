@@ -1,0 +1,105 @@
+{
+ "repo": "python/cpython",
+ "number": 151906,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151906",
+ "title": "gh-151905: fix assert(!PyErr_Occurred()) in _PyType_LookupStackRefAndVersion",
+ "state": "closed",
+ "state_reason": null,
+ "author": "prakashsellathurai",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "interpreter-core"
+ ],
+ "created_at": "2026-06-22T06:00:40Z",
+ "closed_at": "2026-06-22T11:11:32Z",
+ "body": "<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n<!-- gh-issue-number: gh-151905 -->\r\n* Issue: gh-151905\r\n<!-- /gh-issue-number -->\r\n\r\nTested  the change with repro script and ensured it doesn't crash after this change\r\n\r\nhttps://gist.github.com/devdanzin/3c6690d0561acc62752a953e12b20197\r\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-22T11:12:10Z",
+   "body": "Thanks @prakashsellathurai for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-22T11:12:11Z",
+   "body": "Thanks @prakashsellathurai for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-22T11:12:11Z",
+   "body": "Thanks @prakashsellathurai for the PR, and @kumaraditya303 for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-22T11:12:15Z",
+   "body": "Sorry, @prakashsellathurai and @kumaraditya303, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 1ab8862ea0ad8d52af8a75866077b1e09b0ba62d 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-22T11:12:30Z",
+   "body": "[GH-151918](https://github.com/python/cpython/pull/151918) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-22T11:12:36Z",
+   "body": "[GH-151919](https://github.com/python/cpython/pull/151919) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T11:19:36Z",
+   "body": "[GH-152065](https://github.com/python/cpython/pull/152065) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151905",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "1ab8862ea0ad8d52af8a75866077b1e09b0ba62d",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "fe5dc86f1f8a3e2baad924cf0c01e1a4c81858da",
+   "actor": "hugovk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "eaa3facd35177b34b9f96ef9a5fb4a5e9978a4d7",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152065",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "117b76a19078e5454f2530e91cae5646eec7502c",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "431fc5140b4bd89df6c3bef36ebfb219fad530a4",
+   "actor": "pyctrl"
+  }
+ ],
+ "fetch_errors": null
+}

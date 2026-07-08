@@ -1,0 +1,46 @@
+{
+ "repo": "numpy/numpy",
+ "number": 31336,
+ "type": "pull",
+ "url": "https://github.com/numpy/numpy/pull/31336",
+ "title": "BUG: Fix segfault in nditer.multi_index when __getitem__ raises (#31314)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "charris",
+ "author_association": "MEMBER",
+ "labels": [
+  "00 - Bug",
+  "08 - Backport"
+ ],
+ "created_at": "2026-04-26T17:41:15Z",
+ "closed_at": "2026-04-26T20:41:58Z",
+ "body": "Backport of #31314.\r\n\r\n### PR summary\r\n<!-- Please take some time to make it easier for us maintainers to understand\r\n  and review your PR. Describe the pull request, using the questions below as\r\n  guidance, and link to any relevant issues and PRs.\r\n\r\n\r\n  Also, have you hit all [the guidelines](https://numpy.org/devdocs/dev/index.html#guidelines)?\r\n  And have you filled out the disclosure section below?\r\n\r\n-->\r\n\r\nAdd a NULL check for PySequence_GetItem in the multi_index setter to prevent\r\nsegmentation faults when __getitem__ raises an exception.\r\n\r\nAs reported in:\r\nhttps://gist.github.com/devdanzin/ccc2d9553ca1c90ab1835362ee21a40a#reproducer-3-nditermulti_index-segfault-with-raising-sequence\r\n(discussed in https://github.com/numpy/numpy/issues/31046)\r\n\r\n#### Reproduce error:\r\n```py\r\nimport numpy as np\r\n\r\nclass BadSequence:\r\n    def __len__(self):\r\n        return 2\r\n\r\n    def __getitem__(self, i):\r\n        if i == 1:\r\n            raise RuntimeError(\"intentional error\")\r\n        return 0\r\n\r\n\r\n\r\narr = np.zeros((3, 4))\r\nit = np.nditer(arr, flags=[\"multi_index\"])\r\n\r\nit.multi_index = BadSequence()\r\n```\r\n#### Actual behavior:\r\n```raw\r\nSegmentation fault         (core dumped)\r\n```\r\n\r\n#### Expected behavior:\r\n```py\r\nRuntimeError: intentional error\r\n```\r\n### First time committer introduction\r\n<!-- If you are new to the NumPy community, please introduce yourself. How do you\r\n use NumPy, what prompted you to make this contribution? We are a community of\r\n mostly volunteers, and getting to know you helps us trust your judgement\r\n and welcome you into the community.\r\n-->\r\n\r\n#### AI Disclosure\r\n<!-- If AI was used in the preparation of this pull request, please disclose\r\nthe tool(s) used, how they were used, and specify what code or text is AI generated.\r\nIf no AI tools were used, please write \"No AI tools used\" in this section. Read our\r\npolicy on AI generated code at\r\nhttps://numpy.org/devdocs/dev/ai_policy.html.\r\n\r\nIn particular, all interaction is to be done by humans, including submission of PRs.\r\n-->AI tools were used to assist with English writing and phrasing in this PR.\r\nThe technical analysis, debugging, and code changes were performed and verified manually.\r\n",
+ "comments": [
+  {
+   "author": "charris",
+   "created_at": "2026-04-26T20:41:51Z",
+   "body": "The test failures are unrelated."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "f16e67ef7cbef5eff8925f9be68b715f69c0a8e7",
+   "actor": "charris"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "charris"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "022629bd0804fcf63f83edcc9209a24995153921",
+   "actor": "736-c41-2c1-e464fc974"
+  }
+ ],
+ "fetch_errors": null
+}

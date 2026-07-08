@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 329,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/329",
+ "title": "C extension swallows exceptions from `PyObject_IsInstance` in `FunctionWrapper.__init__` and bound-method dispatch",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-09T03:12:49Z",
+ "closed_at": "2026-04-09T03:15:31Z",
+ "body": "## Summary\n\nTwo call sites in `src/wrapt/_wrappers.c` invoke `PyObject_IsInstance` without checking for the `-1` error return:\n\n1. **`WraptFunctionWrapper_init`**  \u2014 the cascade that picks a `binding` (\"function\", \"classmethod\", \"class\", \"staticmethod\", \"instancemethod\", ...) uses bare `else if (PyObject_IsInstance(wrapped, ...))`. Because `-1` is truthy in C, an exception raised from a metaclass's `__instancecheck__` is silently treated as \"yes, this is an instance\". The wrong binding is recorded *and* a Python exception is left set on the thread state, which then surfaces later as a spurious failure in unrelated code.\n\n2. **`WraptBoundFunctionWrapper_call`** \u2014 uses `if (PyObject_IsInstance(instance, self->owner) == 1)`. The `== 1` avoids the truthy trap, but the `-1` error case is silently swallowed: the partial-binding branch is skipped, the stale exception is left set, and execution continues into the regular call path.\n\nBoth sites should capture the result, propagate `-1` / `NULL` on error, and only take the \"true\" branch on a positive result.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "6302c772acbf829bc578127b8eee45d3e8aa7b82",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6302c772acbf829bc578127b8eee45d3e8aa7b82",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

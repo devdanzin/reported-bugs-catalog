@@ -1,0 +1,70 @@
+{
+ "repo": "python/cpython",
+ "number": 152107,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/152107",
+ "title": "`dict` item-iterator: `_PyObject_GC_UNTRACK` on never-tracked iterator under OOM (`dictobject.c`)",
+ "state": "open",
+ "state_reason": null,
+ "author": "zangjiucheng",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2026-06-24T17:31:59Z",
+ "closed_at": null,
+ "body": "Creating a **dict item-iterator** (`iter(d.items())` or `reversed(d.items())`) while\nallocations are failing aborts a debug build with:\n\n```\nObjects/dictobject.c:5532: _PyObject_GC_UNTRACK:\n    Assertion \"_PyObject_GC_IS_TRACKED(op)\" failed:\n    object not tracked by the garbage collector\nobject type name: dict_itemiterator\nFatal Python error: _PyObject_AssertFailed\n```\n\n`dictiter_new()` allocates the iterator with `PyObject_GC_New()` but only calls\n`_PyObject_GC_TRACK(di)` at the very end. For item iterators it first allocates\n`di->di_result` via `_PyTuple_FromPairSteal()`. If that allocation fails (OOM), the\nerror path runs `Py_DECREF(di)` on the **still-untracked** iterator, and\n`dictiter_dealloc()` unconditionally calls `_PyObject_GC_UNTRACK(di)`.\n\n- **Debug build:** the `_PyObject_GC_IS_TRACKED` assertion fires \u2192 `Py_FatalError` / abort.\n- **Release build (NDEBUG):** the assert is compiled out and untracking a never-tracked\n  object corrupts the GC list, leading to a later segfault in `_Py_Dealloc`.\n\nOnly item iterators are affected (`dict_itemiterator` / `dict_reverseitemiterator`) \u2014\nthey are the only dict iterators whose `di_result` requires an allocation between\n`PyObject_GC_New` and `_PyObject_GC_TRACK`.\n\nThis was found via allocation-failure fuzzing as **OOM-0006** in the umbrella issue\n#151763. Filing a focused issue per that issue's process.\n\n### Reproducer\n\nMinimal, stdlib-only, deterministic (requires a `--with-pydebug` interpreter so\n`_testcapi.set_nomemory` is available):\n\n```python\nimport faulthandler, _strptime\nfaulthandler.enable()\nfrom _testcapi import set_nomemory\nfor start in range(60):\n    set_nomemory(start)\n    try:\n        _strptime._strptime(\"\", \"\")\n    except BaseException:\n        pass\nprint(\"done, no crash\")\n```\n\n`_strptime._strptime(\"\", \"\")` performs an `iter(d.items())` once the size-2 tuple\nfreelist is drained, so `_PyTuple_FromPairSteal()` reaches the failing allocator and\ndrives the `dictiter_new()` OOM error path. (Reducer by @devdanzin; gist:\nhttps://gist.github.com/devdanzin/c809eb4072c0c787c0c890f54ba1c843)\n\n### Backtrace (abbreviated)\n\n```\n_PyObject_AssertFailed                       Objects/object.c\n_PyObject_GC_UNTRACK                          Include/internal/pycore_gc.h:254\ndictiter_dealloc (self=dict_itemiterator)     Objects/dictobject.c:5532\n_Py_Dealloc                                   Objects/object.c\nPy_DECREF                                     Include/refcount.h\ndictiter_new (itertype=PyDictIterItem_Type)   Objects/dictobject.c   <- Py_DECREF(di) after di_result alloc fails\nPyObject_GetIter                              Objects/abstract.c\n```\n\n### Suggested fix\n\nEither guard the untracked against the never-tracked error path:\n\n```c\nif (_PyObject_GC_IS_TRACKED(di)) {\n    _PyObject_GC_UNTRACK(di);\n}\n```\n\nor move `_PyObject_GC_TRACK(di)` ahead of the fallible `di_result` allocation (after\ninitializing `di->di_result = NULL` so traverse/dealloc stay safe). A PR with the first\napproach and a regression test is ready.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nmacOS\n\n### Output from running 'python -VV' on the command line:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-152110\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "devdanzin",
+   "created_at": "2026-06-24T23:16:22Z",
+   "body": "At the request of @StanFromIreland, I asked Claude to find a reproducer that doesn't rely on `_strptime`, here's the result:\n\n```python\n\"\"\"OOM-0006 minimal reproducer (stdlib only) \u2014 no _strptime.\n\nA dict item-iterator (iter(d.items())) under the set_nomemory sweep. The size-2\ntuple freelist is drained first so that dictiter_new's di_result tuple allocation\nactually reaches the failing allocator; the sweep lands the failure on that alloc,\ndriving the Py_DECREF(di) error path on the still-untracked iterator. Deterministic.\n\"\"\"\nimport faulthandler\nfaulthandler.enable()\nfrom _testcapi import set_nomemory\n\nd = {}\nkeep = [(x, x) for x in range(500)]   # drain the size-2 tuple freelist\nfor start in range(16):\n    set_nomemory(start)\n    try:\n        iter(d.items())\n    except BaseException:\n        pass\nprint(\"done, no crash\")\n```\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152110",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a8e8473dac4a9d3415b6dcfe162f1b4c569de8ce",
+   "actor": "zangjiucheng"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b49ddd8e15f9c9653489feb2a4b1932f80677f8c",
+   "actor": "zangjiucheng"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9f894f496fa0514ca6e788975f4cf92ddd53459e",
+   "actor": "zangjiucheng"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "ef52ba1707da61b348ed18b5bb4ffa611ef16df0",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a6cf8a4e54238577862254a3c14e9fca9d64faf1",
+   "actor": "zangjiucheng"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6832e0308fb0747d66a71db5da45a3e9c52eca77",
+   "actor": "sergey-miryanov"
+  }
+ ],
+ "fetch_errors": null
+}

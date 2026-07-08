@@ -1,0 +1,61 @@
+{
+ "repo": "python/cpython",
+ "number": 148263,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/148263",
+ "title": "weakrefobject.c:  UNWRAP ref leak with dead proxy",
+ "state": "closed",
+ "state_reason": "not_planned",
+ "author": "prakashsellathurai",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-04-08T17:15:15Z",
+ "closed_at": "2026-07-04T09:35:52Z",
+ "body": "# Bug report\n\n### Bug description:\n\n# Bug report\n\n### Bug description:\n\nParent: https://github.com/python/cpython/issues/146102\n\nhttps://gist.github.com/devdanzin/f7d0c7694b2be2345f4cf85f4eedc3ee\n\n## Summary\n\nWhen first `UNWRAP(x)` succeeds but second `UNWRAP(y)` fails (dead proxy), `x`'s new reference is leaked. Affects ~20 binary operators (+, -, *, /, |, &, ^, etc.).\n\n\n \n\n\n\n## Reproducer\n\n```python\nimport weakref, sys, gc\n\nclass C:\n    def __add__(self, other): return NotImplemented\n    def __radd__(self, other): return NotImplemented\n\nobj = type('D', (), {})()\ndead = weakref.proxy(obj)\ndel obj; gc.collect()\n\nlive_obj = C()\nlive = weakref.proxy(live_obj)\n\nbefore = sys.gettotalrefcount()\nfor i in range(10000):\n    try:\n        live + dead\n    except ReferenceError:\n        pass\nafter = sys.gettotalrefcount()\nprint(f\"Leaked {after - before} refs (~{(after-before)//10000}/call)\")\n```\nwhich gives \n\n```\n(venv) PS C:\\Users\\Prakash\\Documents\\work\\projects\\cpython>\n>> .\\python.bat  .\\tmp\\test.py\nRunning Debug|x64 interpreter...\nLeaked 10003 refs (~1/call)\n```\n\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-148308\n* gh-148486\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "prakashsellathurai",
+   "created_at": "2026-04-09T16:02:03Z",
+   "body": "upon investigation found the issue in ternary operator also\n\n\ntest script https://gist.github.com/prakashsellathurai/69d9d3ed90c5975a343e36f08e437046\n\noutput  (main line)\n\n\n```\n\n(venv) PS C:\\Users\\Prakash\\Documents\\work\\projects\\mainline>  .\\python.bat  ..\\cpython\\tmp\\ternar-test.py\nRunning Debug|x64 interpreter...\npow(live, dead)      leaked 10003 refs (~1/call)\npow(live, live, dead) leaked 20000 refs (~2/call)\npow(dead, live, live) leaked 0 refs\n```\n\n"
+  },
+  {
+   "author": "prakashsellathurai",
+   "created_at": "2026-04-09T16:05:04Z",
+   "body": "problem is in UNWRAP https://github.com/python/cpython/blob/d8c56581560ed139d261dd14acd73597e40cf88b/Objects/weakrefobject.c#L541-L542\n\nwhere Unwrap macro returns early if the object is null "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-04-09T17:42:14Z",
+   "body": "Not entirely sure that the fix is trivial. There is a kind of steal-borrow thing behind the scene here. UNWRAP is called on strong references so we should be careful. Instead, we should perhaps add a \"cleanup\" C suite to perform on error instead of directly returning NULL."
+  },
+  {
+   "author": "prakashsellathurai",
+   "created_at": "2026-04-09T19:02:34Z",
+   "body": " Above comment from me is just a reference note for me  not the fix . \n\nThanks for pointing out about  reference cleanups.\nI've actually already handled those in the latest push of my draft pr. "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148308",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148486",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "prakashsellathurai"
+  }
+ ],
+ "fetch_errors": null
+}

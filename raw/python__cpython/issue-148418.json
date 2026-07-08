@@ -1,0 +1,82 @@
+{
+ "repo": "python/cpython",
+ "number": 148418,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/148418",
+ "title": "marshal.c: 8 refs leaked on corrupt TYPE_CODE marshal stream",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "Wulian233",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-04-12T02:23:35Z",
+ "closed_at": "2026-05-04T13:43:59Z",
+ "body": "# Bug report\n\n### Bug description:\n\nParent: #146121 \n\nhttps://gist.github.com/devdanzin/60b787bfa22651ba6a18aef3b6e1439d/raw/5b12fb962510aed36b457ae3670424bbb91ecacd/marshal_type_code_leak.md\n\nIn `r_object` TYPE_CODE case (line 1601-1602), when `firstlineno == -1 && PyErr_Occurred()`, code does `break` instead of `goto code_error`. Skips cleanup of 8 owned refs. Reachable via `marshal.loads()` with crafted input.\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-148419\n* gh-149363\n* gh-149364\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6855d74a09c5bed0b8ed3e0da6a3bf4853c2fbcc",
+   "actor": "Wulian233"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148419",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "aisk"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c3972f2795bf9270008d09dc6919b9735e20c606",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/149363",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/149364",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6d6471b7eb099fefc243b2fba3825979fad7cf6f",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "95979d18138a2afe2e9dd9917bf59148116be394",
+   "actor": "serhiy-storchaka"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/RustPython/RustPython/pull/7958",
+   "commit": null,
+   "actor": "coderabbitai[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

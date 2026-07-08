@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 328,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/328",
+ "title": "Use-after-free window when replacing `self->wrapped` and other proxy fields in C extension",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-09T02:20:45Z",
+ "closed_at": "2026-04-09T02:24:51Z",
+ "body": "## Summary\n\nIn `src/wrapt/_wrappers.c`, every site that replaces an instance field on a proxy object (`self->wrapped`, `self->args`, `self->kwargs`, `self->instance`, `self->wrapper`, `self->enabled`, `self->binding`, `self->parent`, `self->owner`) decrements the old value's refcount *before* assigning the new value to the field. The pattern is uniformly:\n\n```\nPy_INCREF(value);\nPy_XDECREF(self->field);   /* may run the old object's __del__ */\nself->field = value;       /* not reached until after __del__ returns */\n```\n\nThis creates a reentrancy window: if the `Py_XDECREF` drops the old object's last reference, its `tp_dealloc` runs synchronously, and any Python code reachable from that finalizer (`__del__`, weakref callbacks, GC triggered by allocation inside the finalizer, logging hooks, audit hooks) that touches the proxy will read `self->field` while it still points at the now-freed object. The result is a use-after-free observable as a crash, an attribute lookup against garbage memory, or \u2014 most insidiously \u2014 a successful read of stale data from a memory region that has not yet been overwritten.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "eb9560c6edf3909946a945fb22a6b4092ae3c561",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "eb9560c6edf3909946a945fb22a6b4092ae3c561",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

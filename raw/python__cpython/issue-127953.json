@@ -1,0 +1,191 @@
+{
+ "repo": "python/cpython",
+ "number": 127953,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/127953",
+ "title": "sys.settrace suffers quadratic behavior for large dictionary literals on 3.12+",
+ "state": "open",
+ "state_reason": "reopened",
+ "author": "nedbat",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "interpreter-core",
+  "3.12",
+  "3.13",
+  "3.14"
+ ],
+ "created_at": "2024-12-14T21:00:26Z",
+ "closed_at": null,
+ "body": "# Bug report\n\n### Bug description:\n\nUsing a trace function with sys.settrace, performance suffers when importing a large dictionary literal.  The performance exhibits quadratic time complexity on 3.12 and up.  It is fine on 3.11.\n\nThis originated with a coverage.py bug report: https://github.com/nedbat/coveragepy/issues/1906\n\nTo reproduce, create make_mapping.py:\n\n```python\n\"\"\"\nCreate a really large dict to import.\n\"\"\"\n\nimport random\n\nprint(\"MAPPING = {\")\nfor n in range(25_000):\n    print(f\"    '{n:08d}': {n},\")\nprint(\"}\")\n```\n\nand trace_it.py:\n\n```python\nimport linecache, sys, time\n\nt0 = tlast = time.monotonic_ns()\n\ndef trace(frame, event, arg):\n    global tlast\n    if \"mapping.py\" in frame.f_code.co_filename:\n        lineno = frame.f_lineno\n        now = time.monotonic_ns()\n        print(\"{:12d} ({}): {} {:05d}\".format(\n            now - t0, now - tlast,\n            event[:4], lineno,\n        ))\n        tlast = now\n    return trace\n\nprint(sys.version)\nsys.settrace(trace)\n\nimport mapping\n```\n\nThen, create the large mapping, and run trace_it.py on multiple versions, and look at the timings:\n\n```\npython3 make_mapping.py > mapping.py\npython3.11 trace_it.py > 11.out\npython3.12 trace_it.py > 12.out\npython3.13 trace_it.py > 13.out\npython3.14 trace_it.py > 14.out\ngrep 'line \\d[05]000' *.out\n```\n\nThese are the results I see. The parenthetical numbers are nanoseconds since the last output line:\n\n```\n11.out:    76131833 (1917): line 05000\n11.out:    86116875 (917): line 10000\n11.out:    96115250 (917): line 15000\n11.out:   106099958 (958): line 20000\n11.out:   116161416 (875): line 25000\n\n12.out:   803728958 (148833): line 05000\n12.out:  3009835500 (293042): line 10000\n12.out:  6750690750 (444833): line 15000\n12.out: 11966781625 (596292): line 20000\n12.out: 18720473667 (739000): line 25000\n\n13.out:   443250333 (75125): line 05000\n13.out:  1565451416 (147583): line 10000\n13.out:  3447408625 (220625): line 15000\n13.out:  6130466958 (294458): line 20000\n13.out:  9455595416 (370500): line 25000\n\n14.out:   445441625 (89291): line 05000\n14.out:  1556189584 (152250): line 10000\n14.out:  3410512125 (220625): line 15000\n14.out:  6007919334 (366584): line 20000\n14.out:  9369414792 (375083): line 25000\n```\n\n\n### CPython versions tested on:\n\n3.11, 3.12, 3.13, 3.14\n\n### Operating systems tested on:\n\nmacOS\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-128350\n* gh-129127\n* gh-132268\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "nedbat",
+   "created_at": "2024-12-15T21:59:14Z",
+   "body": "I bisected CPython and it is perhaps no surprise that the problem started with:\r\n```\r\ncommit 411b1692811b2ecac59cb0df0f920861c7cf179a\r\nAuthor: Mark Shannon <mark@hotpy.org>\r\nDate:   Wed Apr 12 12:04:55 2023 +0100\r\n\r\n    GH-103082: Implementation of PEP 669: Low Impact Monitoring for CPython (GH-103083)\r\n```\r\n/cc @markshannon "
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-12-15T23:43:18Z",
+   "body": "This is a known issue, which I tried to alleviate in #118127. The problem is getting the line number - with the new mechanism, if a function(module) is super long, calculating the line number would be difficult. We can solve this for good, but we need extra run-time memory (plenty of those) to remember the line number. Considering how rare this case is, it might not be worth it to make the trade off."
+  },
+  {
+   "author": "nedbat",
+   "created_at": "2024-12-15T23:48:56Z",
+   "body": "> Considering how rare this case is, it might not be worth it to make the trade off.\r\n\r\nDo you have a suggestion for the person who cannot move up from 3.11?"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-12-16T00:05:29Z",
+   "body": "Is ruling out that specific file a possible solution? If coverage.py does not access `f_lineno` for events on that specific file, the speed should be normal. If it's a file that contains a giant mapping, coverage for that specific file should not be needed I assume.\r\n\r\nI know this is not a perfect solution, maybe there is a way to solve this in a better way. I did not manage to do it without too much sacrifice on memory but that might just because of my limited knowledge of the topic. Anyone should feel free to try it out - I think I explained the reason of this slow down in the PR mentioned above."
+  },
+  {
+   "author": "nedbat",
+   "created_at": "2024-12-16T00:28:03Z",
+   "body": "Dup of #107674 (which I also wrote, oops!)"
+  },
+  {
+   "author": "nedbat",
+   "created_at": "2024-12-16T10:53:51Z",
+   "body": "(Continuing here for a moment...)  If I change the trace_it.py code to return None, then 11.out and 12.out both are very short:\r\n```\r\n3.11.11 (main, Dec  3 2024, 19:47:16) [Clang 16.0.0 (clang-1600.0.26.4)]\r\n    91913042 (91913042): call 00000\r\n```\r\nand\r\n```\r\n3.12.8 (main, Dec  3 2024, 19:49:11) [Clang 16.0.0 (clang-1600.0.26.4)]\r\n    81839750 (81839750): call 00000\r\n```\r\nbut 3.12 still takes a long time to complete.  Are we calculating the line number even when we don't need to call the trace function?  This is a simulation of omitting the large file from coverage.py, which doesn't solve the problem."
+  },
+  {
+   "author": "nedbat",
+   "created_at": "2024-12-16T11:27:51Z",
+   "body": "BTW, the same is true of tracing very long functions: even returning None from the trace function, 3.12 takes much longer than 3.11.  The effect isn't as pronounced as with a dict literal."
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-12-16T21:39:27Z",
+   "body": "That's because the optimization is not backported (it's not a bug fix unfortunately). It should be different on 3.13 - and we can't really do anything about it."
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-12-16T21:41:20Z",
+   "body": "And yes, as I mentioned in the comment above, it's not about the literal, it's about line number. Any function/module-level code that's really long will trigger the issue. Calculating the line number of the current byte code is an O(N) operation after 3.12."
+  },
+  {
+   "author": "nedbat",
+   "created_at": "2024-12-16T22:34:44Z",
+   "body": "Thanks, 3.13 does go quickly when not tracing.  Can we talk more about ways to prevent the problem when tracing?  Can you point me to the code so I can try to understand the underlying issue?  Would increased memory use be a problem? Wouldn't it be a small fraction of the code's memory footprint?"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-12-17T01:26:39Z",
+   "body": "The fundamental thing of this issue is, you need a mapping from an instruction to a line number. If you take a look at `PyCode_Addr2Line`, that's how we get the line number of a specific instruction based on its offset, and that's `O(N)`. So, without any optimization, getting the line number of an instruction would be `O(N)`, unless you propose to store a huge mapping from address to line number for each bytecode.\r\n\r\nThe original optimization, is to calculate it once (we need to do it anyway for instrumentation), and store the data somewhere. First of all, we don't want to impact the size of memory when there's no instrumentation, so it does not live with CodeObject directly. For each instrumented line of code, we have a `_PyCoLineInstrumentationData` which stores the original opcode of `INSTRUMENTED_LINE` and an *offset* to `co_firstlineno` of the code object, both are `uint8`. A heuristic algorithm is used to do a linear estimation then add this *offset*, so in most cases (where a function is less than a few hundred lines), we can get the line number in `O(1)`.\r\n\r\nHowever, this estimation would be off when there are too many lines in a code object, where we would fall back to the `O(N)` calculation.\r\n\r\nOne way to sovle this, is to increase the `uint8` of *offset* to `uint16` so it can cover tens of thousands of lines of code. However, that would make `_PyCoLineInstrumentationData` 50% larger (not considering padding, maybe it's more as it would be 3 bytes of data).\r\n\r\nIn the best case, it would be 1 byte per line with instrumentation, which probably results in kb level run-time memory cost. I don't think that's unacceptable, but the benefit is also insignificant - it helps with the tracing speed when the function is more than a few hundred lines, which is rare (and not recommended). Probably the only real life scenario, is the coverage tool for a constant mapping. Notice that debugger will not trigger the issue after the optimization I made (because it does not access line number for every line event).\r\n\r\nSo like I mentioned above, I just don't know if this is worth the effort. And of course, if we decide to fix it, the fix would be trivial. It's more about whether we should do it.\r\n\r\nI can add @markshannon to the discussion about the issue."
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2024-12-17T13:40:08Z",
+   "body": "> So, without any optimization, getting the line number of an instruction would be `O(N)`, unless you propose to store a huge mapping from address to line number for each bytecode.\n\nPlaying with ways to map instructions to line numbers, I figured that it seemed cheaper (and faster to build) to store a tuple of size N-instructions where the value at each index is the line number. So retrieval should be `O(1)` and probably more compact than a mapping, right?\n\n```python\n# Instruction -> line number:\ninstr_to_line = {1: 1, 2: 1, 3: 2, 4: 2, 5: 2, 6: 3, 7: 4}\n\n# (line_number, line_number, ...):\nas_tuple = (1, 1, 2, 2, 2, 3, 4)\n```\n\n\nEdit: I found a gist where I recorded this idea: https://gist.github.com/devdanzin/591394b798b38a332ec3ecdef0f6f082"
+  },
+  {
+   "author": "gaogaotiantian",
+   "created_at": "2024-12-17T23:18:21Z",
+   "body": "This actually costs more than what I mentioned above (by mapping I did not mean a hashmap, simply a math-level mapping, a one-on-one relation).\r\n\r\nThe method I mentioned above costs 1 byte per line, the tuple solution takes a Python integer per bytecode, which is probably 100x larger on average :)"
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2024-12-30T09:46:58Z",
+   "body": "This is still an issue.\r\nI don't think it is a duplicate of https://github.com/python/cpython/issues/107674 as that issue appears to be fixed, but this isn't."
+  },
+  {
+   "author": "markshannon",
+   "created_at": "2024-12-30T10:01:21Z",
+   "body": "Possible solutions:\r\n1. Increase the size of the line number table for sys.monitoring to 2 bytes. Will work up to 64k lines, but will still exhibit the extreme slowdown for files larger than 64k lines (pytest can generate very large files)\r\n2. Add markers at intervals to the locations table. Will allow ~O(log n) lookup of line numbers at a ~10% increase in the size of the locations table for all code objects.\r\n3. Vary the size of the line number table for sys.monitoring, using as many bytes as necessary. This uses no extra memory in most cases, but fixes the slowdown.\r\n   \r\nOf the above, 1 is this simplest but still has the same fundamental flaw. 2 is possibly the most complex, but will speed up *all* line number lookups, not just those for `sys.monitoring`. 3. is of intermediate complexity and solves the problem\r\n\r\nI think the deciding factor in favor of 3, is that solution 2 cannot be backported.\r\nOnce we've implemented and backported 3, we could still implement 2 if we wanted.\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/coveragepy/coveragepy/issues/1906",
+   "commit": null,
+   "actor": "nedbat"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "nedbat"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/128350",
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7239da75592081b6e8d0917a2cd2bf19907c8165",
+   "actor": "markshannon"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/129127",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c41a1f95714a7b3f95a99d53c7c4dc657349503e",
+   "actor": "markshannon"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/enthought/comtypes/pull/775",
+   "commit": null,
+   "actor": "junkmd"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e5afdd4b8813cf993372306d8ad29eaea9672da6",
+   "actor": "facebook-github-bot"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "f2b87594b9e550a6b231d69ede5d7c3f46145b04",
+   "actor": "facebook-github-bot"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3f3863281bb3cd40efc2f1c4bed901457b8cd170",
+   "actor": "Yhg1s"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6e55d3fa86b052c71ae961ca3292a285eb4fc984",
+   "actor": "markshannon"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/132268",
+   "commit": null,
+   "actor": "markshannon"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/coveragepy/coveragepy/issues/2107",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/openMetadataInitiative/openMINDS_Python/issues/87",
+   "commit": null,
+   "actor": "apdavison"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/chardet/chardet/issues/321",
+   "commit": null,
+   "actor": "etkaDT"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,112 @@
+{
+ "repo": "python/cpython",
+ "number": 148222,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/148222",
+ "title": "genericaliasobject.c: Two NULL dereference bugs",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "prakashsellathurai",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-04-07T14:40:26Z",
+ "closed_at": "2026-04-18T16:48:11Z",
+ "body": "# Bug report\n\n### Bug description:\n\nParent: https://github.com/python/cpython/issues/146102\n\nhttps://gist.github.com/devdanzin/266ca45099796a2373866a07447d5ebf\n\n\n## Summary\n\n1. `ga_vectorcall` (line 653): `PyVectorcall_Function(alias->origin)` can return NULL, immediately called as function pointer \u2192 segfault.\n2. `_Py_make_parameters` (line 243-245): After `_PyTuple_Resize` fails, `parameters` is NULL but `Py_DECREF(parameters)` is called \u2192 crash.\n\n## Fix\n\n1. Add NULL check and fallback to `PyObject_Vectorcall`.\n2. Change `Py_DECREF(parameters)` to `Py_XDECREF(parameters)` at line 245.\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-148226\n* gh-148705\n* gh-148712\n* gh-148717\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148226",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "634568d030f18183212c01bd4544aa7f97e05442",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "559c63c92ab4a99de18ef824c7850c72461a0271",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148705",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "67100b3e926c2c7cdd9d0825add677b19664f377",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "6a8f75a5fb7e0702ae659dabf53a5fb5211c8291",
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148712",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "83552a67e60a422234db564942f5053ab1576ed4",
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148717",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "66908658103d448de251d3073e8341b21ed0c77c",
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7aca63fa469d54ccae48759dd5388ab0926ec84f",
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "0ca5390b6089035490861dedd6514f878fe291b6",
+   "actor": "JelleZijlstra"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "aab45e015d07abba642ab3271936858114d1d884",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

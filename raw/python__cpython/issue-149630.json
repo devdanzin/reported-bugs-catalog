@@ -1,0 +1,28 @@
+{
+ "repo": "python/cpython",
+ "number": 149630,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/149630",
+ "title": "pylifecycle.c: Multiple init/fini cleanup bugs",
+ "state": "open",
+ "state_reason": null,
+ "author": "Wulian233",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core"
+ ],
+ "created_at": "2026-05-10T03:05:59Z",
+ "closed_at": null,
+ "body": "# Bug report\n\n### Bug description:\n\nParent: https://github.com/python/cpython/issues/146102\n\nhttps://gist.github.com/devdanzin/b022ff2d1304a4b2b8d3d8750abd8da5\n\n# pylifecycle.c: Multiple init/fini cleanup bugs\n\n## Summary\n\n5 bugs in interpreter lifecycle:\n\n1. **new_interpreter (line 2534)**: `return status` bypasses switch-back after `save_tstate` detach \u2192 thread state corruption.\n2. **pycore_init_builtins (line 860)**: Direct `return` leaks `bimod` ref.\n3. **add_main_module (line 2762)**: `bimod`/`loader` refs leaked on `PyDict_SetItemString` failure.\n4. **finalize_clear_modules_dict (line 1685)**: Return value of `PyObject_CallMethodNoArgs` never DECREF'd.\n5. **init_sys_streams (line 3019-3031)**: Unchecked `PySys_SetObject` for stdin/stdout (stderr correctly checked).\n\n### CPython versions tested on:\n\nCPython main branch, 3.15\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-149631\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/149631",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

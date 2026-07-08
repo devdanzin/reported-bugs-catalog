@@ -1,0 +1,27 @@
+{
+ "repo": "python/cpython",
+ "number": 151578,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151578",
+ "title": "gh-146102\uff1aFix cross-interpreter NotShareableError ref handling",
+ "state": "open",
+ "state_reason": null,
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-17T06:44:22Z",
+ "closed_at": null,
+ "body": "This fixes two ownership issues:\r\n\r\n- `_ensure_notshareableerror()` now returns immediately when the current raised exception is already a `NotShareableError`. The function had restored `ctx` to the thread state but then continued using it, even though ownership had been handed back.\r\n- `_PyXI_UnwrapNotShareableError()` now decrefs the exception taken from the thread state if `_PyXI_InitFailure()` fails, avoiding a leaked exception reference on that error path.\r\n\r\nThe `_pop_preserved()` shadowed-variable leak is already fixed on this branch, so this PR does not touch it.\r\n\r\nglist\uff1ahttps://gist.github.com/devdanzin/a56b8cb579b1950b4206e8a42d6be650\n\n<!-- gh-issue-number: gh-146102 -->\n* Issue: gh-146102\n<!-- /gh-issue-number -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/146102",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

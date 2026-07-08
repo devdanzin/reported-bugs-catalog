@@ -1,0 +1,33 @@
+{
+ "repo": "liberfa/pyerfa",
+ "number": 225,
+ "type": "pull",
+ "url": "https://github.com/liberfa/pyerfa/pull/225",
+ "title": "Fixes found by automated analysis",
+ "state": "closed",
+ "state_reason": null,
+ "author": "mhvk",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "bug"
+ ],
+ "created_at": "2026-04-10T13:32:33Z",
+ "closed_at": "2026-04-18T08:19:00Z",
+ "body": "This is a set of fixes found by @devdanzin using automated analysis, which include two real bugs (now tested for):\r\n- using non-aligned output for 3x3 matrices (leads to wrong results);\r\n- using zero-sized leap-second tables (gives wrong error message).\r\nFortunately, the only serious one is difficult to trigger in practice.\r\n\r\nThe only thing not done from the recommendations in https://gist.github.com/devdanzin/60672184d31713866902adc964e2289b is specifically releasing the GIL in the erfa loops. \r\nThis should be automatically done in the ufunc machinery since we do not use any dtypes that hold references.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "e20e78727a52d49b9fae603f93e49759ae39c97f",
+   "actor": "avalentino"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "avalentino"
+  }
+ ],
+ "fetch_errors": null
+}

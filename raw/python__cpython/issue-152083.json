@@ -1,0 +1,56 @@
+{
+ "repo": "python/cpython",
+ "number": 152083,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/152083",
+ "title": "Crash in `DistributionFinder.context` because it is using `vars(self).update(kwargs)` under memory preasure",
+ "state": "open",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [
+  "stdlib",
+  "type-crash",
+  "topic-importlib"
+ ],
+ "created_at": "2026-06-24T13:52:48Z",
+ "closed_at": null,
+ "body": "# Crash report\n\nOriginal report: https://gist.github.com/devdanzin/bf9fec4554c58c2a279b05b7ff8e6d9b (it produces the correct repro, but everything else is not correct, since it is AI generated and can be fuzzy).\n\nHere's the real picture.\n\nThis class raises an error: \n\nhttps://github.com/python/cpython/blob/1785f4b35f899704df0be54cba3776906186b2b1/Lib/importlib/metadata/__init__.py#L742-L750\n\nRepro:\n\n```python\nimport faulthandler, importlib.metadata\nfaulthandler.enable()\nfrom _testcapi import set_nomemory\nfor start in range(40):\n    set_nomemory(start)\n    try:\n        importlib.metadata.metadata(\"f\")\n    except BaseException:\n        pass\nprint(\"done, no crash\")\n```\n\nError:\n\n```\nFatal Python error: _Py_Dealloc: Deallocator of type 'Context' cleared the current exception\nPython runtime state: initialized\n\nStack (most recent call first):\n  File \"/Users/sobolev/Desktop/cpython/Lib/importlib/metadata/__init__.py\", line 465 in from_name\n  File \"/Users/sobolev/Desktop/cpython/Lib/importlib/metadata/__init__.py\", line 1091 in metadata\n  File \"/Users/sobolev/Desktop/cpython/ex.py\", line 7 in <module>\n\nExtension modules: _testcapi (total: 1)\n[1]    14108 abort      ./python.exe ex.py\n```\n\nI tested this hack, no crash:\n\n```python\ndiff --git Lib/importlib/metadata/__init__.py Lib/importlib/metadata/__init__.py\nindex 32f4b7d2d6e..43ec93db749 100644\n--- Lib/importlib/metadata/__init__.py\n+++ Lib/importlib/metadata/__init__.py\n@@ -777,7 +777,8 @@ class Context:\n         \"\"\"\n \n         def __init__(self, **kwargs):\n-            vars(self).update(kwargs)\n+            for k, v in kwargs.items():\n+                setattr(self, k, v)\n \n         @property\n         def path(self) -> list[str]:\n```\n\nBut, this is clearly not a proper fix. Because for some reason the exception is cleared somewhere.\n\nAfter:\n\n```\n\u00bb ./python.exe ex.py\nobject address  : 0x20002128190\nobject refcount : 3\nobject type     : 0x101267e70\nobject type name: MemoryError\nobject repr     : \nlost sys.stderr\nobject address  : 0x20002128110\nobject refcount : 3\nobject type     : 0x101267e70\nobject type name: MemoryError\nobject repr     : \nlost sys.stderr\n```\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-152981\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2026-06-24T14:30:05Z",
+   "body": "Config: `make clean && ./configure --with-pydebug --disable-gil && make -j$(sysctl -n hw.ncpu)`\nSimplier repro:\n\n```python\nimport faulthandler, importlib.metadata\nfaulthandler.enable()\nfrom _testcapi import set_nomemory\nimport abc\n\n\nclass DistributionFinder:\n    class Context:\n        name = None\n        def __init__(self, **kwargs):\n            vars(self).update(kwargs)\n\n    @abc.abstractmethod\n    def find_distributions(self, context=Context()):\n        pass\n\nfor start in range(40):\n    set_nomemory(start)\n    try:\n        DistributionFinder.Context(name='f')\n    except BaseException:\n        pass\nprint(\"done, no crash\")\n\n```\n\nTraceback:\n\n```\ndone, no crash\nAssertion failed: (_Py_IsOwnedByCurrentThread((PyObject *)mp) || IS_DICT_SHARED(mp)), function set_keys, file dictobject.c, line 206.\nFatal Python error: Aborted\n\n<Cannot show all threads while the GIL is disabled>\nStack (most recent call first):\n\nCurrent thread's C stack trace (most recent call first):\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at _Py_DumpStack+0x44 [0x1007b2234]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at faulthandler_dump_c_stack+0x68 [0x1007e19e0]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at faulthandler_fatal_error+0x1ac [0x1007e177c]\n  Binary file \"/usr/lib/system/libsystem_platform.dylib\", at _sigtramp+0x38 [0x1a00d16a4]\n  Binary file \"/usr/lib/system/libsystem_pthread.dylib\", at pthread_kill+0x128 [0x1a009788c]\n  Binary file \"/usr/lib/system/libsystem_c.dylib\", at abort+0x7c [0x19ffa0a3c]\n  Binary file \"/usr/lib/system/libsystem_c.dylib\", at err+0x0 [0x19ff9fc70]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at set_keys+0x70 [0x1004d5d3c]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at PyObject_ClearManagedDict+0x144 [0x1004d58ac]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at subtype_clear+0xd8 [0x1005630ec]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at delete_garbage+0x1c8 [0x10070ab20]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at gc_collect_internal+0x2ec [0x100709474]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at gc_collect_main+0x248 [0x100706708]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at _PyGC_CollectNoFail+0x20 [0x100706984]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at finalize_modules+0xc4 [0x1007658b0]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at _Py_Finalize+0x1c4 [0x100764bac]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at Py_FinalizeEx+0x14 [0x1007649e0]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at Py_RunMain+0x28 [0x1007cb5b8]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at pymain_main+0x64 [0x1007cba84]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at Py_BytesMain+0x38 [0x1007cbad4]\n  Binary file \"/Users/sobolev/Desktop/cpython/python.exe\", at main+0x24 [0x1003588fc]\n  Binary file \"/usr/lib/dyld\", at start+0x17bc [0x19fcf6b98]\n[1]    14739 abort      ./python.exe ex.py\n```\n\nThe crash seems different, but it might have the similar cause."
+  },
+  {
+   "author": "deadlovelll",
+   "created_at": "2026-06-29T19:51:43Z",
+   "body": "Hi @sobolevn ! I think the proper fix somewhere deep in the c-side, i can work on this issue if you dont mind =)"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2026-06-29T19:56:08Z",
+   "body": "@deadlovelll please go ahead :)"
+  },
+  {
+   "author": "deadlovelll",
+   "created_at": "2026-07-03T20:28:02Z",
+   "body": "> [@deadlovelll](https://github.com/deadlovelll) please go ahead :)\n\nHello! Just pushed the fix, would appreciate a review =)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152981",
+   "commit": null,
+   "actor": "deadlovelll"
+  }
+ ],
+ "fetch_errors": null
+}

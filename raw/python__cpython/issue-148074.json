@@ -1,0 +1,77 @@
+{
+ "repo": "python/cpython",
+ "number": 148074,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/148074",
+ "title": "typeobject.c: Missing return -1 after PyErr_Format in type_ready_post_checks",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "Wulian233",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core",
+  "topic-typing"
+ ],
+ "created_at": "2026-04-04T08:36:22Z",
+ "closed_at": "2026-04-04T15:35:11Z",
+ "body": "# Bug report\n\n### Bug description:\n\nParent issue https://github.com/python/cpython/issues/146102\n\nhttps://gist.github.com/devdanzin/551cace22f112ef0ff4ed3fdbe54d235\n\nAt line 9314-9320, `PyErr_Format` sets a `SystemError` for invalid `tp_dictoffset` but falls through to `return 0` (success). Type finishes initialization with invalid offset and pending exception. Requires C extension to trigger.\n\n\n### CPython versions tested on:\n\nCPython main branch, 3.15, 3.14\n\n### Operating systems tested on:\n\n_No response_\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-148075\n* gh-148095\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "3dc743f73d5dd9f3bfd9c5791ce4345bbb230eba",
+   "actor": "Wulian233"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148075",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "c398490fbf15ede5de3389b4ca4e32fb9a7c5d67",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "9c1383350cee38336be07c2e79ebf85dee5da217",
+   "actor": "miss-islington"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/148095",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "61c919cf1b9b365add10915764c93119f6195b4a",
+   "actor": "kumaraditya303"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/142529",
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "4e89463a7a7b42e5c15fa2463c0127b9517c5888",
+   "actor": "ljfp"
+  }
+ ],
+ "fetch_errors": null
+}

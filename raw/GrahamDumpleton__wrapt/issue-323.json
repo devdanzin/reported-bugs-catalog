@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 323,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/323",
+ "title": "Reference leak and swallowed exception in C `FunctionWrapper.__init__` when wrapping another FunctionWrapperBase",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-07T23:27:10Z",
+ "closed_at": "2026-04-07T23:27:58Z",
+ "body": "## Summary\n\nIn the C implementation of `FunctionWrapper.__init__`, when the wrapped\nobject is itself a `FunctionWrapperBase`, the binding is obtained via:\n\n\u200b```c\nbinding = PyObject_GetAttrString(wrapped, \"_self_binding\");\n\u200b```\n\nThis has two defects:\n\n1. **Reference leak.** `PyObject_GetAttrString` returns a new strong\n   reference, and `WraptFunctionWrapperBase_raw_init` then `Py_INCREF`s\n   `binding` again before storing it. The original new reference is never\n   released, so one reference to the binding string object (e.g.\n   `\"function\"`, `\"instancemethod\"`) is leaked every time a\n   `FunctionWrapper` wraps another `FunctionWrapperBase`.\n\n2. **Swallowed exception / missing NULL check.** The return value of\n   `PyObject_GetAttrString` is not checked. If the lookup fails with a\n   non-`AttributeError` (e.g. `MemoryError`), the code falls through into\n   the type-sniffing fallback with a live exception still set, leading to\n   the exception being lost or misattributed to an unrelated branch.\n\nThe fix should release the new reference after `raw_init` and only fall\nthrough to the fallback when the exception is `AttributeError`, matching\nthe pattern already used for the sibling `__self__` lookup.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "8e144351e3d92a36a9030da39c0d385c945ec284",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8e144351e3d92a36a9030da39c0d385c945ec284",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

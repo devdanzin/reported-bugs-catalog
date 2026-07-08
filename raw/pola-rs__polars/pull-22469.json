@@ -1,0 +1,67 @@
+{
+ "repo": "pola-rs/polars",
+ "number": 22469,
+ "type": "pull",
+ "url": "https://github.com/pola-rs/polars/pull/22469",
+ "title": "fix: Return input instead of panicking if empty subset in `drop_nulls()` and `drop_nans()`",
+ "state": "closed",
+ "state_reason": null,
+ "author": "etiennebacher",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "python",
+  "rust",
+  "fix"
+ ],
+ "created_at": "2025-04-28T14:51:19Z",
+ "closed_at": "2025-05-07T15:05:44Z",
+ "body": "Fixes #22605\r\n\r\nListed here: https://gist.github.com/devdanzin/dc2ef895928fc5758ea66a1ccf2eedd2\r\n\r\nPing @devdanzin\r\n\r\n---\r\n\r\n**Before:**\r\n\r\n```python\r\nimport polars as pl\r\npl.DataFrame({\"a\": [1.0, float(\"nan\")]}).drop_nans([])\r\n```\r\n```\r\npyo3_runtime.PanicException: called `Result::unwrap()` on an `Err` value: ComputeError(ErrString(\"cannot return empty fold because the number of output rows is unknown\"))\r\n```\r\n\r\n**After:**\r\n\r\n```python\r\nimport polars as pl\r\npl.DataFrame({\"a\": [1.0, float(\"nan\")]}).drop_nans([])\r\n```\r\n```\r\nshape: (2, 1)\r\n\u250c\u2500\u2500\u2500\u2500\u2500\u2510\r\n\u2502 a   \u2502\r\n\u2502 --- \u2502\r\n\u2502 f64 \u2502\r\n\u255e\u2550\u2550\u2550\u2550\u2550\u2561\r\n\u2502 1.0 \u2502\r\n\u2502 NaN \u2502\r\n\u2514\u2500\u2500\u2500\u2500\u2500\u2518\r\n```",
+ "comments": [
+  {
+   "author": "etiennebacher",
+   "created_at": "2025-04-28T14:53:09Z",
+   "body": "My bad, I guess `drop_nans([])` should be the same as `drop_nans()`."
+  },
+  {
+   "author": "codecov[bot]",
+   "created_at": "2025-04-28T15:18:57Z",
+   "body": "## [Codecov](https://app.codecov.io/gh/pola-rs/polars/pull/22469?dropdown=coverage&src=pr&el=h1&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=pola-rs) Report\nAll modified and coverable lines are covered by tests :white_check_mark:\n> Project coverage is 81.03%. Comparing base [(`58bfe67`)](https://app.codecov.io/gh/pola-rs/polars/commit/58bfe67ea6ba8a1547c9bedabe0dc1ab8abab905?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=pola-rs) to head [(`58b1734`)](https://app.codecov.io/gh/pola-rs/polars/commit/58b1734f9c30388cad1b9251fcab0df1c693efb2?dropdown=coverage&el=desc&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=pola-rs).\n> Report is 71 commits behind head on main.\n\n<details><summary>Additional details and impacted files</summary>\n\n\n```diff\n@@            Coverage Diff             @@\n##             main   #22469      +/-   ##\n==========================================\n+ Coverage   80.97%   81.03%   +0.06%     \n==========================================\n  Files        1643     1643              \n  Lines      232106   231856     -250     \n  Branches     2720     2720              \n==========================================\n- Hits       187951   187889      -62     \n+ Misses      43512    43324     -188     \n  Partials      643      643              \n```\n\n</details>\n\n[:umbrella: View full report in Codecov by Sentry](https://app.codecov.io/gh/pola-rs/polars/pull/22469?dropdown=coverage&src=pr&el=continue&utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=pola-rs).   \n:loudspeaker: Have feedback on the report? [Share it here](https://about.codecov.io/codecov-pr-comment-feedback/?utm_medium=referral&utm_source=github&utm_content=comment&utm_campaign=pr+comments&utm_term=pola-rs).\n\n<details><summary> :rocket: New features to boost your workflow: </summary>\n\n- :snowflake: [Test Analytics](https://docs.codecov.com/docs/test-analytics): Detect flaky tests, report on failures, and find test suite problems.\n</details>"
+  },
+  {
+   "author": "etiennebacher",
+   "created_at": "2025-04-28T15:29:57Z",
+   "body": "Ok, I'll revert to the behavior in the first commit "
+  },
+  {
+   "author": "orlp",
+   "created_at": "2025-04-28T15:31:05Z",
+   "body": "To justify my above request, note the description of `drop_nulls`:\r\n\r\n> Drop all rows that contain null values.\r\n\r\nand `drop_nans`:\r\n\r\n> Drop all rows that contain one or more NaN values.\r\n\r\nIf the subset of columns considered is empty neither condition is ever met, so no rows should be dropped."
+  },
+  {
+   "author": "orlp",
+   "created_at": "2025-05-07T15:05:40Z",
+   "body": "Thank you :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/pola-rs/polars/issues/22605",
+   "commit": null,
+   "actor": "etiennebacher"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "50b3d25a90091bda6a23ba2f7ab63e9c908e86fd",
+   "actor": "orlp"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "orlp"
+  }
+ ],
+ "fetch_errors": null
+}

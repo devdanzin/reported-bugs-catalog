@@ -1,0 +1,31 @@
+{
+ "repo": "GrahamDumpleton/wrapt",
+ "number": 330,
+ "type": "issue",
+ "url": "https://github.com/GrahamDumpleton/wrapt/issues/330",
+ "title": "Unchecked `PyDict_New()` in function wrapper call paths can mask `MemoryError`",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "GrahamDumpleton",
+ "author_association": "OWNER",
+ "labels": [],
+ "created_at": "2026-04-09T03:24:09Z",
+ "closed_at": "2026-04-09T03:26:24Z",
+ "body": "## Summary\n\nThree call sites in `src/wrapt/_wrappers.c` allocate an empty kwargs dict via\n`PyDict_New()` without checking for failure. On allocation failure the `NULL`\nreturn is then passed as the `kwds` argument to `PyObject_CallFunctionObjArgs`,\nwhose variadic argument list is `NULL`-terminated. This truncates the call,\nmasking the original `MemoryError` and producing a misleading `TypeError` from\nthe wrapper signature mismatch instead.\n\n## Credits\n\nThanks to @devdanzin for the report via:\n\n* https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": "d8e4b65bb30d5d276d3038345acd67f684b4c92c",
+   "actor": "GrahamDumpleton"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d8e4b65bb30d5d276d3038345acd67f684b4c92c",
+   "actor": "pull[bot]"
+  }
+ ],
+ "fetch_errors": null
+}
