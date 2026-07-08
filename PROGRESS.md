@@ -120,13 +120,19 @@ umbrella #151763, not devdanzin; added OOM-catalog overrides so they tag fusil/o
 **Contributor/maintainer impact: 113 bugs have a non-devdanzin filer** (radarhere 16,
 neutrinoceros 16, GrahamDumpleton 15, sobolevn 6, hugovk 5…).
 
-**Remaining Phase 3:**
-- [ ] **Review queue: 27 bugs** (`sources/review_queue.md`) — untagged CPython
-      artifacts needing user tool sign-off (12 fusil-guess / 6 lafleur-guess /
-      9 manual-guess; mostly PyREPL work vs fusil crashes vs JIT).
-- [ ] Findings rollup (umbrella bodies + OOM 37 + cext 690) → the *findings* number;
-      **gist-comb for the reproduced-count** (per user — 575 may = reproduced).
-- [ ] Then Phase 4 index (catalog.json + INDEX.md).
+**Phase 3 sub-tasks:**
+- [x] Review queue resolved (user): 26/27 manual, #130999 fusil.
+- [x] **Findings rollup DONE → `FINDINGS.md` + `sources/findings_rollup.json`.**
+      Settled what "575/690" is: **cumulative FIX-level findings itemized across
+      the per-extension review reports (gisted)** — NOT reproduced (=215+) nor
+      filed issues (=106+). Tracked in milestone_report_6 (575 Apr6 → 645 M5 →
+      690 M6). Reconstruction cross-check: 115 findings in 12 machine-countable
+      reports (~9.6 avg × ~50 ≈ 690). Reports use `### N.` numbered findings;
+      formats vary so milestone tally is authoritative. **3-unit totals: 455 bugs
+      / 338 issues + 490 PRs (333 fixes + 157 backports) / campaign findings ~690
+      cext FIX-level + 4,556+ ft races (per-campaign, never summed).**
+- [ ] Then Phase 4 index (catalog.json + INDEX.md) — per-tool + per-label rollups,
+      umbrella impact chains, timeline; hand-verify sample.
 
 ## Open decisions (block Phase 3, not Phase 2) — SCOPING_REPORT §5 + §10
 - Own-repo (1471) EXCLUDE? OTHER_OSS (120) EXCLUDE? pypy/simplejson → `manual`?

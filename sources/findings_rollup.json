@@ -1,0 +1,137 @@
+{
+ "catalog_rollup": {
+  "fusil": {
+   "bugs": 141,
+   "issues": 112,
+   "prs": 191,
+   "distinct_fixes": 107,
+   "backports": 84,
+   "filed_by": {
+    "self": 36,
+    "self+maintainer": 61,
+    "none": 22,
+    "maintainer": 22
+   }
+  },
+  "cext-review-toolkit": {
+   "bugs": 138,
+   "issues": 90,
+   "prs": 77,
+   "distinct_fixes": 75,
+   "backports": 1,
+   "filed_by": {
+    "self": 59,
+    "maintainer": 59,
+    "self+maintainer": 20
+   }
+  },
+  "cpython-review-toolkit": {
+   "bugs": 55,
+   "issues": 40,
+   "prs": 91,
+   "distinct_fixes": 47,
+   "backports": 44,
+   "filed_by": {
+    "self": 13,
+    "self+maintainer": 13,
+    "maintainer": 27,
+    "self+commit": 2
+   }
+  },
+  "manual": {
+   "bugs": 50,
+   "issues": 35,
+   "prs": 75,
+   "distinct_fixes": 53,
+   "backports": 22,
+   "filed_by": {
+    "self": 27,
+    "self+maintainer": 21,
+    "maintainer": 2
+   }
+  },
+  "ft-review-toolkit": {
+   "bugs": 29,
+   "issues": 23,
+   "prs": 12,
+   "distinct_fixes": 12,
+   "backports": 0,
+   "filed_by": {
+    "maintainer": 4,
+    "self+maintainer": 3,
+    "self": 22
+   }
+  },
+  "lafleur": {
+   "bugs": 28,
+   "issues": 28,
+   "prs": 33,
+   "distinct_fixes": 27,
+   "backports": 6,
+   "filed_by": {
+    "self+maintainer": 20,
+    "self": 8
+   }
+  },
+  "fusil-plugin-cereggii": {
+   "bugs": 14,
+   "issues": 10,
+   "prs": 13,
+   "distinct_fixes": 12,
+   "backports": 0,
+   "filed_by": {
+    "self+maintainer": 8,
+    "self": 6
+   }
+  }
+ },
+ "campaign_findings": {
+  "cext-review-toolkit": {
+   "fix_level_findings": "~690",
+   "reproduced_from_python": "215+",
+   "extensions_analyzed": 50,
+   "source": "analysis_milestone_report_6 (2026-04-22); 575 on Discourse Apr 6, 645 at M5",
+   "meaning": "cumulative sum of FIX-level findings itemized across the per-extension review reports (gisted)"
+  },
+  "ft-review-toolkit": {
+   "unique_races": "4,556+",
+   "live_crashes": "30+",
+   "extensions_ft_deep": 18,
+   "production_ready_validated": 2,
+   "source": "ft_review_toolkit_milestone_report_3 (2026-04-30)"
+  },
+  "fusil": {
+   "findings_approx": "~142 (each catalog bug = a distinct crash finding); OOM sub-campaign 37 unique",
+   "source": "catalog + cpython-oom-findings"
+  },
+  "lafleur": {
+   "findings_approx": "28 JIT crashes",
+   "source": "catalog"
+  },
+  "cpython-review-toolkit": {
+   "select_fix_bugs": 47,
+   "report_gists": 59,
+   "source": "umbrella #146102 (47 select) + #146103 (59 review-report gists)",
+   "meaning": "47 select FIX-level bugs; broader reports cover more findings"
+  },
+  "fusil-plugin-cereggii": {
+   "findings": 4,
+   "source": "catalog"
+  },
+  "manual": {
+   "findings_approx": 50,
+   "source": "catalog (devdanzin-found, no tool)"
+  }
+ },
+ "reconstruction_crosscheck": {
+  "method": "sum of ### N. finding headers in correctness reports",
+  "result": "115 findings across 12 machine-countable reports (~9.6 avg); ~50 reports x ~14 avg ~= 690",
+  "note": "report formats vary; milestone cumulative is authoritative"
+ },
+ "catalog_totals": {
+  "bugs": 455,
+  "umbrellas": 20,
+  "distinct_issue_artifacts": 338,
+  "distinct_pr_artifacts": 490
+ }
+}
