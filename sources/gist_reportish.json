@@ -1,0 +1,1208 @@
+[
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "10536845b9ec874be0b9471258879b55",
+  "desc": "cereggii \u2014 four bugs from free-threaded fuzzing"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "8c86ca358f3711740a692eaac730b527",
+  "desc": "OOM-0035: Abort / malformed str: invalid `maxchar` in `_PyUnicode_FromUCS4` (`unicodeobjec"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "9871a21facf4c9c6a415e220f9d10762",
+  "desc": "OOM-0034: Segfault: unchecked `PyUnicode_AsUTF8` NULL deref in `pegen.c:33`"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "249032e1746d63406a5f68d7dfdedb79",
+  "desc": "[SUPERSEDED \u2014 duplicate of OOM-0036 / python/cpython#151818] OOM-0033: Segfault / negative"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "f7e483080647c7b76fbda79bfeb07e9c",
+  "desc": "OOM-0032: Abort: pending-exception assert from `warn_explicit` normalization (`_warnings.c"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "44ffdf25538575e497fd80552ea5d467",
+  "desc": "OOM-0031: Segfault: NULL `info` deref in `_excinfo_clear_type` (`crossinterp.c:1319`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "fbfb9d6cd5eeb518e4f9eeab44be3893",
+  "desc": "OOM-0030: Abort: `Py_DECREF` of NULL-data unicode in `unicode_subtype_new` (`unicodeobject"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "10e0fdaf3d89dbe394d94fbf765c70a1",
+  "desc": "[SUPERSEDED \u2014 duplicate of OOM-0036 / python/cpython#151818] OOM-0029: Abort: negative ref"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "774867b89b3de8d36d7e2ac405034577",
+  "desc": "OOM-0028: Segfault: NULL deref in `os__path_normpath_impl` (`posixmodule.c:6149`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "d5c602c29ac3881290269b444d77db3c",
+  "desc": "OOM-0027: Abort: `assert(PyStackRef_BoolCheck(cond))` in `POP_JUMP_IF_FALSE` (`generated_c"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "bf6f784d4bcd21acd471ea45b6f23c70",
+  "desc": "OOM-0026: Abort: err-code vs `PyErr` desync in `handle_channel_error` (`_interpchannelsmod"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "3aaffc18b68ca2ae5fffa72aa6cdb2ea",
+  "desc": "OOM-0025: Abort: `assert(!PyErr_Occurred())` in `unspecialize` (`specialize.c:378`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "acf15ad4117c6343b48ed8fdfe7ad167",
+  "desc": "OOM-0024: Segfault: dealloc of uninitialized iterator in `template_iter` (`templateobject."
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "dc5123e50ea0402292e841411a294d3d",
+  "desc": "OOM-0023: Fatal: dealloc clears the in-flight exception in `subtype_dealloc` (`typeobject."
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "0964a71a7038ee90137f11c2527aad3c",
+  "desc": "OOM-0022: Fatal: stale `MemoryError` trips `_Py_CheckSlotResult` in `reload_singlephase_ex"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "e113c48a4e249ae7e4d1e42020db65c4",
+  "desc": "OOM-0021: Fatal: NULL returned without an exception set in `_Py_CheckFunctionResult` (`cal"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "df523c79368baa0c44bd69e9d5ee0c7e",
+  "desc": "OOM-0020: Fatal: `_PyMem_DebugRawFree: bad ID` in `free_threadstate` (`pystate.c:1527`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "9bd9423256ea03c08231d1ebe542db89",
+  "desc": "OOM-0019: Abort: double-free in `_PyPegen_raise_error_known_location` (`pegen_errors.c:363"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "99b84915b197ae0ade7face262b8af66",
+  "desc": "OOM-0018: Abort: ownership assert in `set_keys` (`dictobject.c:205`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "6e7a3a9487689e55d7dd4f70b1ce489f",
+  "desc": "OOM-0017: Abort: negative `gc_refs` (\"refcount too small\") in `validate_gc_objects` (`gc_f"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "05be8efe6b08c2b3ac3e2c17c784da0c",
+  "desc": "OOM-0016: Abort: `assert(!queue->alive)` in `_queue_clear` (`_interpqueuesmodule.c:559`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "d40d39e6abfb746bd9d96de261205190",
+  "desc": "OOM-0015: Abort: stale exception in `cfunction_check_kwargs` (`methodobject.c:409`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "ceb4b16662d22b3dcb1b56cd8481c9e7",
+  "desc": "OOM-0014: Abort/Segfault: unchecked NULL in `channelsmod__channel_id` (`_interpchannelsmod"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "1736971107bea3aa04ce19db21c90845",
+  "desc": "OOM-0013: Abort: builtin breaks result/error contract in `_Py_BuiltinCallFastWithKeywords_"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "610c147c8e2d42a576bab3c1c2713391",
+  "desc": "OOM-0012: Abort/Segfault: stale instrumentation in `get_tools_for_instruction` (`instrumen"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "892b61619c1b3c8c2018331b3f1f4983",
+  "desc": "[SUPERSEDED \u2014 duplicate of OOM-0008] OOM-0011: Abort: assert(!PyErr_Occurred()) in special"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "d3c1d06e95c006a320dbbfffcc210d52",
+  "desc": "OOM-0010: Abort: `assert(_PyErr_Occurred(tstate))` in `_PyEval_EvalFrameDefault` (`generat"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "34b633230f6d2301ba17dec195ffe4b7",
+  "desc": "OOM-0009: Abort: stale `release1` flag trips an ownership assert in `replace` (`unicodeobj"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "3c6690d0561acc62752a953e12b20197",
+  "desc": "OOM-0008: Abort: `assert(!PyErr_Occurred())` in `_PyType_LookupStackRefAndVersion` (`typeo"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "bf9fec4554c58c2a279b05b7ff8e6d9b",
+  "desc": "OOM-0007: Fatal: `context_tp_dealloc` clears the pending exception (`context.c:535`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "c809eb4072c0c787c0c890f54ba1c843",
+  "desc": "OOM-0006: Abort/Segfault: `_PyObject_GC_UNTRACK` assert on untracked iterator in `dictiter"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "22b71f61343c81df5bea9b7fca798e87",
+  "desc": "[SUPERSEDED \u2014 duplicate of OOM-0036 / python/cpython#151818] OOM-0005: Abort: negative-ref"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "315e83b2da6a5809ce5ae1d748cdd0ae",
+  "desc": "OOM-0004: Abort/Segfault: corrupted object freelist in `clear_freelist` (`object.c:909`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "b628c59722820b55c61a400a973771d5",
+  "desc": "OOM-0003: Abort: uninitialized `_co_unique_id` assert in `code_dealloc` (`codeobject.c:244"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "2dfeabe7508f8e98f27f6df7e381f1cf",
+  "desc": "OOM-0002: Segfault: `Py_DECREF(NULL)` in `PyContextVar_Set` (`context.c:367`)"
+ },
+ {
+  "cat": "oom-report",
+  "public": true,
+  "id": "464cef74ca8186843f33a38078476ac4",
+  "desc": "OOM-0001: Segfault: `Py_DECREF` of a NULL `filename` in `do_warn` (`_warnings.c:1139`)"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "9c16992b7e91f973265883e8eed9da2b",
+  "desc": "lxml Reanalysis Actionable Items"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "a16b55d7a24c7e5fc3ac8d58d3106440",
+  "desc": "cryptography Review"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "0b288534254959a52b39f8d551140cdd",
+  "desc": "pytsk C Extension Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "6fca29b90a7fa97c5d2a114e9946f77f",
+  "desc": "ijson C Extension Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "41532552e33b5f06d2cc8ce520b8476a",
+  "desc": "ujson C Extension Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "00dac82d9f5f024d04d0ce0b3b3274f5",
+  "desc": "uvloop C Extension Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "0bb91763272182eeb274ae19c6dfa262",
+  "desc": "Blosc2 C Extension Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "e1c05b48ef37b293a5c13d2e25c8c251",
+  "desc": "pyskein C Extension Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "bb73cbfce9e421fd853c53652804ac68",
+  "desc": "VTK full analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "8d0c5d7f04099b0de56cb043ca98341c",
+  "desc": "frozendict Review"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "fa00e03ef041c030660f083116a7e1b6",
+  "desc": "multidict Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "1ba9105822a39ec360df998a7017cb32",
+  "desc": "lxml `ft_python` Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "b86039ac097141579590c1a0f3a43605",
+  "desc": "zstandard C Extension Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "c440ff4c2e9d2c8e1b5d08ce4a39b865",
+  "desc": "couchbase-python-client C Extension Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "d6b2d907a3cf8dbf26e1a8c97b3998d8",
+  "desc": "guppy3 Re-analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "34c9fad09694958b83fbbea19ea30e69",
+  "desc": "wrapt C Extension Analysis Report v2"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "a4287a475683d41238da1e8bb6b22542",
+  "desc": "wrapt 2.2.0rc2 \u2014 Free-Threading Re-Analysis"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "917aa6c675d74f873eb833409c8e7ce9",
+  "desc": "Pillow Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "0726d4f7939bfe193ee494370fe8b0d3",
+  "desc": "Pillow C Extension Reanalysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "ddbcdf1bb41194e2f81a0feab6c15616",
+  "desc": "time-machine C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "4cd3234a5ede15c7688b590d95b0dfe9",
+  "desc": "tprof C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "7f1e9d05849cea565b39e5eaaee207b5",
+  "desc": "icu4py C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "012439d5e589c69deebd505dbd5f9a45",
+  "desc": "wrapt Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "be2bea00e879ed44e273eec1a0715f00",
+  "desc": "simplejson Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "e8a25ea988dc0461c2fd378efd84a8a3",
+  "desc": "simplejson C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "1f3d76d0fa083429906291901b99d7d5",
+  "desc": "greenlet: Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "16400e820e0fdd754a99f2a9454a3a72",
+  "desc": "pyerfa Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "60672184d31713866902adc964e2289b",
+  "desc": "pyerfa C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "c48c793bc1c08a3dc8c30c969dbe20ee",
+  "desc": "python-isal Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "06fc813184bd21a44c7b94eafc49b297",
+  "desc": "regex Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "38246591e423c703f575b8e816d8ab55",
+  "desc": "python-igraph C Extension Analysis Report (v2)"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "c430e676ac2c27b30af644847af9aa1b",
+  "desc": "guppy3 Free-Threading Synchronization Guide"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "c668905424a9aee0f392a5d72b11e071",
+  "desc": "zope.interface Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "71fe004f9312c6924fbb9fa239b73d50",
+  "desc": "cereggii Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "d53c60a0f0a5a22f745d5569dda6f066",
+  "desc": "bitarray Free-Threading Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "4d825741d94fd7c4c93b18f0a8a1a071",
+  "desc": "zlib-ng C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "fc2e348a91d1c70e3ac4e3ddfee35fe9",
+  "desc": "igraph C Library Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "b30771d22104e6fa0c30c41a6e27a355",
+  "desc": "guppy3 C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "8cb223af65148783692da63b774dcd74",
+  "desc": "python-isal C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "3e785bfe0bb322c0f2238338593a8be1",
+  "desc": "awkward-cpp C++ Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "69946454f13d5b4358b46352211bc6d7",
+  "desc": "python-igraph C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "fd3ffd45da791d43da15e4fd33866579",
+  "desc": "astropy C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "a52e184e6c6e730c0d7bcb6e95a6607d",
+  "desc": "nanobind C++ Binding Framework Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "db29dd5bbeba58b4f7fa051beb297d50",
+  "desc": "pybind11 Header-Only Library Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "d1af1242847101679cdb542eac8d0b45",
+  "desc": "CPython 3.14 tp_init / tp_new Safety Audit"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "b9ce99c1971afa418b6a24ca575c67c5",
+  "desc": "bottleneck C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "191b87e2d03e806f1868eecfe844e406",
+  "desc": "bitarray C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "5c7600153c8e76afee3ef1a2d516ad70",
+  "desc": "duckdb Python Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "7dd46860f6aebd9324e971231185f38c",
+  "desc": "ml-dtypes C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "70e0a996c666014e720174aca4ac3f69",
+  "desc": "msgspec C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "5afbad864934b165a2cc080f110aa720",
+  "desc": "zope.interface C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "e4c8158e02db0285461bd212d2d2fcb0",
+  "desc": "lz4 C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "8c8329e030e38f74207baa9845470a36",
+  "desc": "pymongo/bson C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "e1ac0c43dc4d4278ee82455da4859872",
+  "desc": "wrapt C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "2a79188c7a41a03b1476544c7dd775c1",
+  "desc": "matplotlib C/C++ Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "5e6e52e425558ae68a5caa7a1e78697f",
+  "desc": "greenlet C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "7ec1e87568d3ad9036ec9b24e32d5875",
+  "desc": "scipy C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "8293b36d668e8cd06d5e2804174f3860",
+  "desc": "cvxopt C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "db96bedb4e2ec6712fc6b71191ff4bd0",
+  "desc": "apsw C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "86694021ac18370c306e362cbd0f1263",
+  "desc": "enaml C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "3b4336138db60cc7193aef466507040b",
+  "desc": "atom C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "c997faaee7556ffc5cb991deca553966",
+  "desc": "ctraits Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "7402dc7349ab7e27deb95093c1ddb883",
+  "desc": "pycurl C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "b03f56255dd939d4ad1efc1d6b2d4e14",
+  "desc": "kiwisolver C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "5fba6e6001d5580e5568439506a52174",
+  "desc": "regex C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "c050bdb008c0f5351d3e78afd565f8f1",
+  "desc": "psutil C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "b0eca1ded22efac92de4efe928916d46",
+  "desc": "protobuf C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "cbdd5a7c6d1fecd71eecf532a38ad1fc",
+  "desc": "h5py C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "20dd441afc43301a69ec55f9c62c21f0",
+  "desc": "Cython Runtime Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "a36588ae7e2b73f0d85f8a925fb13b3d",
+  "desc": "multidict C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "5177bed6d3a261908ae9c1ebaa6ef594",
+  "desc": "Pillow C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "ab1bc54de260782c7560f9109fed7b27",
+  "desc": "memray C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "ccc2d9553ca1c90ab1835362ee21a40a",
+  "desc": "NumPy C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "7763084a47ca007ae4f7b301089dd835",
+  "desc": "cffi C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "971018615bcbaf33a8ed582c415400f8",
+  "desc": "pyhacl C Extension Analysis Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "afbb3b3ca5a0f27b1fc951465dd7eb0b",
+  "desc": "CPython Lib/ Audit: Lib/ IO/Archive Files Audit \u2014 5 Critical, 8 High"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "5efb4250abe22404c1d9de5eb5d84aba",
+  "desc": "CPython Lib/ Audit: Lib/ Large Files Audit (typing, argparse, inspect, subprocess, datacla"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "dd6785361bd757e8e3784e009f786649",
+  "desc": "CPython Lib/ Audit: Lib/importlib + Lib/logging Audit \u2014 5 Critical, 7 High"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "04cda5b0558a8b4f07a908eaf2ac25d3",
+  "desc": "CPython Lib/ Audit: Lib/http + multiprocessing + concurrent Audit \u2014 7 Critical, 9 High"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "a5e932cf5127bf5c1f35585c38f248f2",
+  "desc": "CPython Lib/ Audit: Lib/email + Lib/xml Audit \u2014 4 Critical, 6 High"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "09a5e4c7ead9b5ec88ba78915e3e8031",
+  "desc": "CPython Lib/ Audit: Lib/asyncio Audit \u2014 3 Critical, 8 High"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "6f4bcb9ea5ab0c87203cf07050fa9b50",
+  "desc": "CPython Lib/ Audit: Lib/ Directory Audit \u2014 Final Summary"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "3e52b67da93b7d9236e2b76a2fd04bc9",
+  "desc": "CPython Lib/ bug: subprocess.py: CalledProcessError.__str__ crashes with None returncode"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "1ca28223df592b7a09b16bb1edb182b2",
+  "desc": "CPython Audit: Python/ Directory Review \u2014 Final Summary"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "ea542721bddee3fc0bc22e88c4b7a171",
+  "desc": "CPython Audit: Small Python/ files batch | 4 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "23ff5f3714bf008931f1d1fdedede4b6",
+  "desc": "CPython Audit: optimizer + specialize + instrumentation | 3 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "df55170c768f202b0bb30c23fff5dcae",
+  "desc": "CPython Audit: pylifecycle.c + initconfig.c + fileutils.c | 6 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "b6656bb31e2e2fe9533a1311ad3fc761",
+  "desc": "CPython Audit: import.c + sysmodule.c | 2 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "6eb9eb290464caeda14a93fe47331b3c",
+  "desc": "CPython Audit: hamt.c + context.c + gc.c + getargs.c | 2 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "b2114938bd8ad3dbcf68bdc30f733e9f",
+  "desc": "CPython Audit: errors.c + _warnings.c + codecs.c + traceback.c + pythonrun.c | 1 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "09b6fce4118fad6f03ce363c1293763d",
+  "desc": "CPython Audit: crossinterp.c + pystate.c + marshal.c | 4 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "f10e68681b321be5a1dbfc706ccc2953",
+  "desc": "CPython Audit: Compiler Pipeline (codegen + compile + symtable + flowgraph + assemble) | 6"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "83c302dcb4918940796d3e6959c67cde",
+  "desc": "CPython Audit: ceval.c + bltinmodule.c | 3 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "6a7693e3a8d076b3b243a59b0db2f200",
+  "desc": "CPython Audit: unicodeobject.c (14,971 lines) | 0 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "f682fe5ffa9d31d1c7646aa28ca7a595",
+  "desc": "CPython Audit: typevarobject.c + floatobject.c + moduleobject.c + unicode_formatter.c | 0 "
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "21c4cc565cb67aab878631dd581aa5b7",
+  "desc": "CPython Audit: typeobject.c (12,843 lines) | 3 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "d1bc635ff013b8a657f7c12994488c37",
+  "desc": "CPython Audit: Objects/ Directory Review \u2014 Final Summary"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "f69e78a2b8cfd317592e3c02e9d5f29a",
+  "desc": "CPython Audit: obmalloc.c + unicode_format.c + unicode_writer.c + bytes_methods.c | 2 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "d2089a8caffc40464196153448d0f14d",
+  "desc": "CPython Audit: longobject.c (6,988 lines) | 0 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "58bbf12576295c3b29ac053b20be37a4",
+  "desc": "CPython Audit: listobject.c + setobject.c | 0 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "dec61eb766b4e5ccacd1c0232b97eeee",
+  "desc": "CPython Audit: genobject.c + funcobject.c + descrobject.c | 0 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "89aa0c8bc2c7bce03094142f87b2ec36",
+  "desc": "CPython Audit: exceptions.c + memoryobject.c | 2 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "bf1879f8c4cb905b77fb3d3c56578c4b",
+  "desc": "CPython Audit: dictobject.c (8,337 lines) | 0 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "9ede23e3350a7cdc5d034d051b8fc3cd",
+  "desc": "CPython Audit: codeobject.c + object.c | 4 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "67c80cc12914373472cda9e6b6c2e4c5",
+  "desc": "CPython Audit: bytesobject.c + bytearrayobject.c | 0 FIX (refcount), 2 non-refcount issues"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "d65d9f920586d1db57e3f7b5626b680c",
+  "desc": "CPython Audit: Objects/ Batch 4B \u2014 Small Files (11 files) | 0 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "b1a192b7276ce4c95ec12b3167738ee8",
+  "desc": "CPython Audit: Objects/ Batch 4A \u2014 Small-Medium Files | 4 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "f21a2516371467dfc1ca2a4a7c320354",
+  "desc": "CPython Audit: abstract.c + frameobject.c + odictobject.c | 3 FIX"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "9384159fc3e5e4aa597125422312c6db",
+  "desc": "CPython Audit: CPython C Code Exploration Report: socketmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "7d66e6ac9b1bc036c1cf182f3a5fb274",
+  "desc": "CPython Audit: signalmodule.c \u2014 2,088 lines | 2 FIX, 2 CONSIDER"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "2632d6beb699a012f0060193cd6e247d",
+  "desc": "CPython Audit: CPython C Code Exploration Report: selectmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "3b577f560254742f86fcf6200f16d5b4",
+  "desc": "CPython Audit: CPython C Code Exploration Report: pyexpat.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "e9ecb0227797bb94231a1b0d9af1c7f0",
+  "desc": "CPython Audit: CPython C Code Exploration Report: posixmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "ee43c3a713baa18fffd7c849afcf1e36",
+  "desc": "CPython Audit: CPython C Code Exploration Report: mmapmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "fdbe3261f4ce5078a7977f4a00c9c642",
+  "desc": "CPython Audit: CPython C Code Exploration Report: itertoolsmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "54484cab1fa8267c54536ce3ad0d3c87",
+  "desc": "CPython Audit: Batch 5 Small Modules \u2014 Combined Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "5fc1a506161efd246599edd07c485bda",
+  "desc": "CPython Audit: CPython C Code Exploration Report: arraymodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "1824d5f1a0e233fe9008a890e5db936e",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _zoneinfo.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "4226678a22b1546f5ac211484f66221c",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _threadmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "742eb4647c2f6ecd6c009af02c143f90",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _struct.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "fe06f7178d055a5cb83ed9608764b02a",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _ssl.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "2c0d5620ea1b2f0798bccb9c5e50b2b6",
+  "desc": "CPython Audit: _sre/sre.c \u2014 3,493 lines | 1 FIX, 2 CONSIDER"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "bcca1c2c5cdf649e161c3e1fc3d3144f",
+  "desc": "CPython Audit: CPython C Code Exploration Report: Modules/_sqlite/"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "02f2feb0b68ed531d3a1856737cd0405",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _json.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "57243e3a5995adf02675ab4ec88aef84",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _interpretersmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "b650bb4eebcbc70eb7171c88ba141257",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _interpqueuesmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "987498a95f52cf5e4e680f30cb99f761",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _interpchannelsmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "387ac2384b27ee84f826b3416814f1ce",
+  "desc": "CPython Audit: _functoolsmodule.c \u2014 2,017 lines | 2 FIX, 1 CONSIDER"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "ac4aae20ce7e9db925e6990c048a8b3d",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _datetimemodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "815e47a11fad1248744e9b8be6258136",
+  "desc": "CPython Audit: CPython C Code Exploration Report: _cursesmodule.c"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "b1261a6931456d8e28cdea892c24675a",
+  "desc": "CPython Audit: CPython C Code Exploration Report: Modules/_ctypes/"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "aa2bff987b8854cf83a2bdc3bf788423",
+  "desc": "CPython Audit: _collectionsmodule.c \u2014 2,894 lines | 3 FIX, 2 CONSIDER"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "41dfa633bc61c3f040540bbf2c15205b",
+  "desc": "CPython Audit Report: Python/ Directory Audit \u2014 Summary Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "c7b3e2e3cb46e4f74ffeb0ee33146e2a",
+  "desc": "CPython Audit Report: Objects/ Directory Audit \u2014 Summary Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "81140c5974ea7c3a4164267df2eeee21",
+  "desc": "CPython Audit Report: Modules/ Directory Audit \u2014 Summary Report"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "4d3ff8a79a32bf210e33024415d12341",
+  "desc": "CPython Audit Report: CPython C Code Audit \u2014 Overview & Methodology"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "546cf053a5b307dbe3ec9f6c6d916b87",
+  "desc": "_struct.c: Segfault and assertion failure on uninitialized Struct object"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "bc8816ef316b72e2baf401f42b209823",
+  "desc": "_ssl.c: Py_DECREF(NULL) crash in SNI callback when SSLObject wrapper is deleted"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "0c8004487c9eacddbd85b7b40d93c448",
+  "desc": "_sqlite/connection.c: Assertion failure replacing active collation + missing PyErr_NoMemor"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "9f1ce3fece9407aacef0e16cd419ffb2",
+  "desc": "socketmodule.c: Reference and buffer leaks via audit hook failures"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "6d7781857c2a0cd29b636cf759081888",
+  "desc": "pyexpat.c: Segfault in ExternalEntityParserCreate error path"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "572a616b51ded20b0494c1107a29e63c",
+  "desc": "_functoolsmodule.c: Assertion failure from PyDict_Contains returning -1"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "5624326e8ccc9632aa69ea7f930e310b",
+  "desc": "exceptions.c: BaseExceptionGroup repr OOB access \u2014 segfault from 3 lines of Python"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "efd3edd49aff97ed348c392bc6afe980",
+  "desc": "_csv.c: _set_str missing NULL check \u2192 segfault on OOM"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "69aff7ff2d64ce8c7c21622f7f36e84c",
+  "desc": "CPython bug: sqlite3 collation assertion failure + missing PyErr_NoMemory"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "dceaa8b70de035607d78025337af9798",
+  "desc": "CPython bug: ExceptionGroup repr segfault from 3 lines of Python"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "50f9880636df43efd3886f6bda2077b3",
+  "desc": "CPython bug: Py_DECREF(NULL) crash in _ssl.c SNI callback"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "f7b368d67fe816f79a9a9d47770c63d2",
+  "desc": "cpython-review-toolkit report for _asyncio"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "8463c1e5490803e7554e6bfe67506b44",
+  "desc": "cpython-review-toolkit report for _io"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "06e7270b785f80a2726aff3d2dfc8fb9",
+  "desc": "cpython-review-toolkit report for OrderedDict"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "b28f4f765525c3e287e231005800be52",
+  "desc": "cpython-review-toolkit report for _remote_debugging"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "a79f2375e64a6328addb11656ff9f0a8",
+  "desc": "CTracer report - cpython-review-toolkit"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "d42909109028968967f5892f63b18431",
+  "desc": "cpython-review-toolkit report for _elementtree"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "2a063b7d358ac213ba5590347b8011a1",
+  "desc": "cpython-review-toolkit report for _collections"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "f575a280450b38595d65bd79be9c8a3b",
+  "desc": "Report of an assertion failure in the JIT"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "a52d19711e2d968d3762541fc41778b9",
+  "desc": "A stubborn free-threading segfault."
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "a000ca0bae1794e43336bc134382dfe0",
+  "desc": "Post about lafleur"
+ },
+ {
+  "cat": "report-likely",
+  "public": true,
+  "id": "16aaf9ed5e9bc74a80a09f8b0036805f",
+  "desc": "Some output from fusil's feedback guided JIT fuzzing"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "8bae10c60e71a300cbe6a8611d3f1a48",
+  "desc": "Fuzzing h5py with fusil"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "21a8bbc46932e67badbd9f311077c606",
+  "desc": "SciPy fusil report"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "dc2ef895928fc5758ea66a1ccf2eedd2",
+  "desc": "Fuzzing polars with fusil"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "a922988484eb5430c4edcf06938338f9",
+  "desc": "Six (unimportant) Numpy crashes found by fusil"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "4208b2b63127eb5b9ab3b9739143258e",
+  "desc": "A fusil generated test case that surfaces an abort related to lists and free-threading"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "2e13e6ee1458cb3658733214012dbe70",
+  "desc": "A backtrace of a CPython segfault"
+ },
+ {
+  "cat": "report-likely",
+  "public": false,
+  "id": "c08c9c6b3158e1d79ea3ac0bd5a195ef",
+  "desc": "Some CPython free-threading crashes"
+ }
+]

@@ -1,0 +1,541 @@
+{
+  "bugs": [
+    {
+      "bug_id": "OOM-0001",
+      "title": "Segfault: `Py_DECREF` of a NULL `filename` in `do_warn` (`_warnings.c:1139`)",
+      "upstream_issue": "python/cpython#151673",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/464cef74ca8186843f33a38078476ac4",
+      "gist_id": "464cef74ca8186843f33a38078476ac4",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0002",
+      "title": "Segfault: `Py_DECREF(NULL)` in `PyContextVar_Set` (`context.c:367`)",
+      "upstream_issue": "python/cpython#151773",
+      "status": "fixed",
+      "gist": "https://gist.github.com/devdanzin/2dfeabe7508f8e98f27f6df7e381f1cf",
+      "gist_id": "2dfeabe7508f8e98f27f6df7e381f1cf",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0003",
+      "title": "Abort: uninitialized `_co_unique_id` assert in `code_dealloc` (`codeobject.c:2440`)",
+      "upstream_issue": "python/cpython#152034",
+      "status": "fixed",
+      "gist": "https://gist.github.com/devdanzin/b628c59722820b55c61a400a973771d5",
+      "gist_id": "b628c59722820b55c61a400a973771d5",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0004",
+      "title": "Abort/Segfault: corrupted object freelist in `clear_freelist` (`object.c:909`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/315e83b2da6a5809ce5ae1d748cdd0ae",
+      "gist_id": "315e83b2da6a5809ce5ae1d748cdd0ae",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0005",
+      "title": "[FOLDED \u2192 OOM-0036] Abort: negative-refcount over-decref in `_PyFrame_ClearLocals` (`frame.c:101`)",
+      "upstream_issue": null,
+      "status": "folded",
+      "gist": "https://gist.github.com/devdanzin/22b71f61343c81df5bea9b7fca798e87",
+      "gist_id": "22b71f61343c81df5bea9b7fca798e87",
+      "mode": "oom",
+      "folded_into": "OOM-0036",
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0006",
+      "title": "Abort/Segfault: `_PyObject_GC_UNTRACK` assert on untracked iterator in `dictiter_dealloc` (`dictobject.c:5532`)",
+      "upstream_issue": "python/cpython#152107",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/c809eb4072c0c787c0c890f54ba1c843",
+      "gist_id": "c809eb4072c0c787c0c890f54ba1c843",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0007",
+      "title": "Fatal: `context_tp_dealloc` clears the pending exception (`context.c:535`)",
+      "upstream_issue": "python/cpython#152083",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/bf9fec4554c58c2a279b05b7ff8e6d9b",
+      "gist_id": "bf9fec4554c58c2a279b05b7ff8e6d9b",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0008",
+      "title": "Abort: `assert(!PyErr_Occurred())` in `_PyType_LookupStackRefAndVersion` (`typeobject.c:6343`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/3c6690d0561acc62752a953e12b20197",
+      "gist_id": "3c6690d0561acc62752a953e12b20197",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0009",
+      "title": "Abort: stale `release1` flag trips an ownership assert in `replace` (`unicodeobject.c:10783`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/34b633230f6d2301ba17dec195ffe4b7",
+      "gist_id": "34b633230f6d2301ba17dec195ffe4b7",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0010",
+      "title": "Abort: `assert(_PyErr_Occurred(tstate))` in `_PyEval_EvalFrameDefault` (`generated_cases.c.h:13817`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/d3c1d06e95c006a320dbbfffcc210d52",
+      "gist_id": "d3c1d06e95c006a320dbbfffcc210d52",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0011",
+      "title": "[FOLDED \u2192 OOM-0008] Abort: `assert(!PyErr_Occurred())` in `specialize` (`specialize.c:364`)",
+      "upstream_issue": null,
+      "status": "folded",
+      "gist": "https://gist.github.com/devdanzin/892b61619c1b3c8c2018331b3f1f4983",
+      "gist_id": "892b61619c1b3c8c2018331b3f1f4983",
+      "mode": "oom",
+      "folded_into": "OOM-0008",
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0012",
+      "title": "Abort/Segfault: stale instrumentation in `get_tools_for_instruction` (`instrumentation.c:1106`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/610c147c8e2d42a576bab3c1c2713391",
+      "gist_id": "610c147c8e2d42a576bab3c1c2713391",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0013",
+      "title": "Abort: builtin breaks result/error contract in `_Py_BuiltinCallFastWithKeywords_StackRef` (`ceval.c:843`)",
+      "upstream_issue": "python/cpython#151968",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/1736971107bea3aa04ce19db21c90845",
+      "gist_id": "1736971107bea3aa04ce19db21c90845",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0014",
+      "title": "Abort/Segfault: unchecked NULL in `channelsmod__channel_id` (`_interpchannelsmodule.c:3487`)",
+      "upstream_issue": "python/cpython#151902",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/ceb4b16662d22b3dcb1b56cd8481c9e7",
+      "gist_id": "ceb4b16662d22b3dcb1b56cd8481c9e7",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0015",
+      "title": "Abort: stale exception in `cfunction_check_kwargs` (`methodobject.c:409`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/d40d39e6abfb746bd9d96de261205190",
+      "gist_id": "d40d39e6abfb746bd9d96de261205190",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0016",
+      "title": "Abort: `assert(!queue->alive)` in `_queue_clear` (`_interpqueuesmodule.c:559`)",
+      "upstream_issue": "python/cpython#152130",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/05be8efe6b08c2b3ac3e2c17c784da0c",
+      "gist_id": "05be8efe6b08c2b3ac3e2c17c784da0c",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0017",
+      "title": "Abort: negative `gc_refs` (\"refcount too small\") in `validate_gc_objects` (`gc_free_threading.c:1116`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/6e7a3a9487689e55d7dd4f70b1ce489f",
+      "gist_id": "6e7a3a9487689e55d7dd4f70b1ce489f",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0018",
+      "title": "Abort: ownership assert in `set_keys` (`dictobject.c:205`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/99b84915b197ae0ade7face262b8af66",
+      "gist_id": "99b84915b197ae0ade7face262b8af66",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0019",
+      "title": "Abort: double-free in `_PyPegen_raise_error_known_location` (`pegen_errors.c:363`)",
+      "upstream_issue": "python/cpython#151931",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/9bd9423256ea03c08231d1ebe542db89",
+      "gist_id": "9bd9423256ea03c08231d1ebe542db89",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0020",
+      "title": "Fatal: `_PyMem_DebugRawFree: bad ID` in `free_threadstate` (`pystate.c:1527`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/df523c79368baa0c44bd69e9d5ee0c7e",
+      "gist_id": "df523c79368baa0c44bd69e9d5ee0c7e",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": true
+    },
+    {
+      "bug_id": "OOM-0021",
+      "title": "Fatal: NULL returned without an exception set in `_Py_CheckFunctionResult` (`call.c:43`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/e113c48a4e249ae7e4d1e42020db65c4",
+      "gist_id": "e113c48a4e249ae7e4d1e42020db65c4",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0022",
+      "title": "Fatal: stale `MemoryError` trips `_Py_CheckSlotResult` in `reload_singlephase_extension` (`import.c:2011`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/0964a71a7038ee90137f11c2527aad3c",
+      "gist_id": "0964a71a7038ee90137f11c2527aad3c",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0023",
+      "title": "Fatal: dealloc clears the in-flight exception in `subtype_dealloc` (`typeobject.c:2719`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/dc5123e50ea0402292e841411a294d3d",
+      "gist_id": "dc5123e50ea0402292e841411a294d3d",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0024",
+      "title": "Segfault: dealloc of uninitialized iterator in `template_iter` (`templateobject.c:232`)",
+      "upstream_issue": "python/cpython#151815",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/acf15ad4117c6343b48ed8fdfe7ad167",
+      "gist_id": "acf15ad4117c6343b48ed8fdfe7ad167",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0025",
+      "title": "Abort: `assert(!PyErr_Occurred())` in `unspecialize` (`specialize.c:378`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/3aaffc18b68ca2ae5fffa72aa6cdb2ea",
+      "gist_id": "3aaffc18b68ca2ae5fffa72aa6cdb2ea",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0026",
+      "title": "Abort: err-code vs `PyErr` desync in `handle_channel_error` (`_interpchannelsmodule.c:398` / `:443`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/bf6f784d4bcd21acd471ea45b6f23c70",
+      "gist_id": "bf6f784d4bcd21acd471ea45b6f23c70",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0027",
+      "title": "Abort: `assert(PyStackRef_BoolCheck(cond))` in `POP_JUMP_IF_FALSE` (`generated_cases.c.h:11120`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/d5c602c29ac3881290269b444d77db3c",
+      "gist_id": "d5c602c29ac3881290269b444d77db3c",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0028",
+      "title": "Segfault: NULL deref in `os__path_normpath_impl` (`posixmodule.c:6149`)",
+      "upstream_issue": "python/cpython#152058",
+      "status": "fixed",
+      "gist": "https://gist.github.com/devdanzin/774867b89b3de8d36d7e2ac405034577",
+      "gist_id": "774867b89b3de8d36d7e2ac405034577",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0029",
+      "title": "[FOLDED \u2192 OOM-0036] Abort: negative refcount on a freed `str` (`tuple_dealloc`, `tupleobject.c:277`)",
+      "upstream_issue": null,
+      "status": "folded",
+      "gist": "https://gist.github.com/devdanzin/10e0fdaf3d89dbe394d94fbf765c70a1",
+      "gist_id": "10e0fdaf3d89dbe394d94fbf765c70a1",
+      "mode": "oom",
+      "folded_into": "OOM-0036",
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0030",
+      "title": "Abort: `Py_DECREF` of NULL-data unicode in `unicode_subtype_new` (`unicodeobject.c:13986`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/fbfb9d6cd5eeb518e4f9eeab44be3893",
+      "gist_id": "fbfb9d6cd5eeb518e4f9eeab44be3893",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0031",
+      "title": "Segfault: NULL `info` deref in `_excinfo_clear_type` (`crossinterp.c:1319`)",
+      "upstream_issue": "python/cpython#151842",
+      "status": "fixed",
+      "gist": "https://gist.github.com/devdanzin/44ffdf25538575e497fd80552ea5d467",
+      "gist_id": "44ffdf25538575e497fd80552ea5d467",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0032",
+      "title": "Abort: pending-exception assert from `warn_explicit` normalization (`_warnings.c:799/806`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/f7e483080647c7b76fbda79bfeb07e9c",
+      "gist_id": "f7e483080647c7b76fbda79bfeb07e9c",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0033",
+      "title": "[FOLDED \u2192 OOM-0036] Segfault / negative-refcount: over-decreffed `sys.path` entry in `PyType_IsSubtype` (`typeobject.c:2931`)",
+      "upstream_issue": null,
+      "status": "folded",
+      "gist": "https://gist.github.com/devdanzin/249032e1746d63406a5f68d7dfdedb79",
+      "gist_id": "249032e1746d63406a5f68d7dfdedb79",
+      "mode": "oom",
+      "folded_into": "OOM-0036",
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0034",
+      "title": "Segfault: unchecked `PyUnicode_AsUTF8` NULL deref in `pegen.c:33`",
+      "upstream_issue": "python/cpython#151798",
+      "status": "reported",
+      "gist": "https://gist.github.com/devdanzin/9871a21facf4c9c6a415e220f9d10762",
+      "gist_id": "9871a21facf4c9c6a415e220f9d10762",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0035",
+      "title": "Abort / malformed str: invalid `maxchar` in `_PyUnicode_FromUCS4` (`unicodeobject.c:2228`)",
+      "upstream_issue": null,
+      "status": "gisted",
+      "gist": "https://gist.github.com/devdanzin/8c86ca358f3711740a692eaac730b527",
+      "gist_id": "8c86ca358f3711740a692eaac730b527",
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0036",
+      "title": "Double-free / use-after-free: `list.append(x)` under OOM double-frees the item (`_CALL_LIST_APPEND` steals `arg`, then `ERROR_NO_POP`)",
+      "upstream_issue": "python/cpython#151818",
+      "status": "reported",
+      "gist": null,
+      "gist_id": null,
+      "mode": "oom-seq",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0037",
+      "title": "Segfault: NULL `UnraisableHookArgs` type-dict deref in `PyStructSequence_New`/`make_unraisable_hook_args` during sub-interpreter finalization under OOM (`structseq.c:30`)",
+      "upstream_issue": null,
+      "status": "drafted",
+      "gist": null,
+      "gist_id": null,
+      "mode": "oom",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0038",
+      "title": "Fatal/segv: `_PyIndexPool_AllocIndex` calls `PyErr_NoMemory()` with no active thread state while reserving a TLBC index during free-threaded sub-interpreter creation (`index_pool.c:167`)",
+      "upstream_issue": null,
+      "status": "drafted",
+      "gist": null,
+      "gist_id": null,
+      "mode": "oom-seq",
+      "folded_into": null,
+      "filing_hold": true
+    },
+    {
+      "bug_id": "OOM-0039",
+      "title": "Fatal: `deque_clear` clears the in-flight exception via its `newblock`-failure `PyErr_Clear()` (`_collectionsmodule.c:751`)",
+      "upstream_issue": null,
+      "status": "drafted",
+      "gist": null,
+      "gist_id": null,
+      "mode": "oom-seq",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0040",
+      "title": "SEGV: `_extensions_cache_set` hashes a NULL key under OOM (`hashtable_hash_str`, `import.c:1312`)",
+      "upstream_issue": null,
+      "status": "drafted",
+      "gist": null,
+      "gist_id": null,
+      "mode": "oom-seq",
+      "folded_into": null,
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0041",
+      "title": "[FOLDED \u2192 OOM-0036] Abort: `PyTraceBack_Here` appends to a non-traceback `__traceback__` under OOM (`traceback.c:313`)",
+      "upstream_issue": null,
+      "status": "folded",
+      "gist": null,
+      "gist_id": null,
+      "mode": "oom",
+      "folded_into": "OOM-0036",
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0042",
+      "title": "Abort: stale `MemoryError` trips `assert(!PyErr_Occurred())` in `import_run_extension` (`import.c:2301`)",
+      "upstream_issue": null,
+      "status": "folded",
+      "gist": null,
+      "gist_id": null,
+      "mode": "oom-seq",
+      "folded_into": "OOM-0040",
+      "filing_hold": false
+    },
+    {
+      "bug_id": "OOM-0043",
+      "title": "Fatal error / latent UB: `_blake2` `.copy()` under OOM decrefs a half-built object with uninitialized `impl` (`blake2module.c:997`)",
+      "upstream_issue": "python/cpython#152851",
+      "status": "reported",
+      "gist": null,
+      "gist_id": null,
+      "mode": "oom-foreign",
+      "folded_into": null,
+      "filing_hold": false
+    }
+  ],
+  "rollups": {
+    "total_bugs": 43,
+    "unique_bugs": 37,
+    "folded_duplicate_count": 6,
+    "filed_count": 15,
+    "unfiled_count": 28,
+    "gist_count": 35,
+    "status_breakdown": {
+      "drafted": 4,
+      "fixed": 4,
+      "folded": 6,
+      "gisted": 18,
+      "reported": 11
+    },
+    "distinct_upstream_issues": [
+      "python/cpython#151673",
+      "python/cpython#151773",
+      "python/cpython#151798",
+      "python/cpython#151815",
+      "python/cpython#151818",
+      "python/cpython#151842",
+      "python/cpython#151902",
+      "python/cpython#151931",
+      "python/cpython#151968",
+      "python/cpython#152034",
+      "python/cpython#152058",
+      "python/cpython#152083",
+      "python/cpython#152107",
+      "python/cpython#152130",
+      "python/cpython#152851"
+    ],
+    "umbrella": "python/cpython#151763",
+    "folded": [
+      {
+        "bug_id": "OOM-0005",
+        "folded_into": "OOM-0036"
+      },
+      {
+        "bug_id": "OOM-0011",
+        "folded_into": "OOM-0008"
+      },
+      {
+        "bug_id": "OOM-0029",
+        "folded_into": "OOM-0036"
+      },
+      {
+        "bug_id": "OOM-0033",
+        "folded_into": "OOM-0036"
+      },
+      {
+        "bug_id": "OOM-0041",
+        "folded_into": "OOM-0036"
+      },
+      {
+        "bug_id": "OOM-0042",
+        "folded_into": "OOM-0040"
+      }
+    ],
+    "filing_holds": [
+      "OOM-0020",
+      "OOM-0038"
+    ]
+  },
+  "notes": "Metadata-only ingest preview of the fusil OOM (allocation-failure) fuzzing catalog (cpython-oom-findings). 43 report dirs = OOM-0001..OOM-0043. 6 are folded duplicates (status 'folded', not distinct bugs): OOM-0005/0029/0033/0041 -> OOM-0036 (#151818), OOM-0011 -> OOM-0008, OOM-0042 -> OOM-0040 => 37 unique bugs (matches INDEX.md). No explicit 'mode' key in meta.json; mode inferred from notes: default 'oom' (--oom-fuzz); OOM-0036/0038/0039/0040/0042 via --oom-seq (stateful sequences); OOM-0043 via --oom-foreign (LD_PRELOAD C-malloc shim, first foreign find, = cpython#152851). 'filed' = meta.json has a non-null upstream_issue (its own CPython issue). Folded bugs carry no upstream_issue of their own so count as unfiled, though several fold into a filed bug. Umbrella issue python/cpython#151763 tracks OOM-0001..0035 (gists); it is NOT an upstream_issue value on any single meta.json. 2 bugs (OOM-0020, OOM-0038) are deliberate filing-holds (FT subinterpreter crashes de-prioritized upstream per #143232). status values: reported=issue open; fixed=landed upstream; gisted=gist published not yet filed; draft=not yet gisted/filed; folded=duplicate."
+}

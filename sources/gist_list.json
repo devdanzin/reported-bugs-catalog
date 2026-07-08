@@ -1,0 +1,1997 @@
+[
+ {
+  "id": "10536845b9ec874be0b9471258879b55",
+  "description": "cereggii \u2014 four bugs from free-threaded fuzzing",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/10536845b9ec874be0b9471258879b55",
+  "created_at": "2026-07-05T23:09:20Z"
+ },
+ {
+  "id": "8c86ca358f3711740a692eaac730b527",
+  "description": "OOM-0035: Abort / malformed str: invalid `maxchar` in `_PyUnicode_FromUCS4` (`unicodeobject.c:2228`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/8c86ca358f3711740a692eaac730b527",
+  "created_at": "2026-06-19T23:55:23Z"
+ },
+ {
+  "id": "9871a21facf4c9c6a415e220f9d10762",
+  "description": "OOM-0034: Segfault: unchecked `PyUnicode_AsUTF8` NULL deref in `pegen.c:33`",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9871a21facf4c9c6a415e220f9d10762",
+  "created_at": "2026-06-19T23:55:22Z"
+ },
+ {
+  "id": "249032e1746d63406a5f68d7dfdedb79",
+  "description": "[SUPERSEDED \u2014 duplicate of OOM-0036 / python/cpython#151818] OOM-0033: Segfault / negative-refcount: over-decreffed sys.path entry in PyType_IsSubtype (typeobject.c:2931)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/249032e1746d63406a5f68d7dfdedb79",
+  "created_at": "2026-06-19T23:55:21Z"
+ },
+ {
+  "id": "f7e483080647c7b76fbda79bfeb07e9c",
+  "description": "OOM-0032: Abort: pending-exception assert from `warn_explicit` normalization (`_warnings.c:799/806`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/f7e483080647c7b76fbda79bfeb07e9c",
+  "created_at": "2026-06-19T23:55:20Z"
+ },
+ {
+  "id": "44ffdf25538575e497fd80552ea5d467",
+  "description": "OOM-0031: Segfault: NULL `info` deref in `_excinfo_clear_type` (`crossinterp.c:1319`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/44ffdf25538575e497fd80552ea5d467",
+  "created_at": "2026-06-19T23:55:18Z"
+ },
+ {
+  "id": "fbfb9d6cd5eeb518e4f9eeab44be3893",
+  "description": "OOM-0030: Abort: `Py_DECREF` of NULL-data unicode in `unicode_subtype_new` (`unicodeobject.c:13986`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/fbfb9d6cd5eeb518e4f9eeab44be3893",
+  "created_at": "2026-06-19T23:55:17Z"
+ },
+ {
+  "id": "10e0fdaf3d89dbe394d94fbf765c70a1",
+  "description": "[SUPERSEDED \u2014 duplicate of OOM-0036 / python/cpython#151818] OOM-0029: Abort: negative refcount on a MemoryError (tuple_dealloc, tupleobject.c:277)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/10e0fdaf3d89dbe394d94fbf765c70a1",
+  "created_at": "2026-06-19T23:55:16Z"
+ },
+ {
+  "id": "774867b89b3de8d36d7e2ac405034577",
+  "description": "OOM-0028: Segfault: NULL deref in `os__path_normpath_impl` (`posixmodule.c:6149`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/774867b89b3de8d36d7e2ac405034577",
+  "created_at": "2026-06-19T23:55:15Z"
+ },
+ {
+  "id": "d5c602c29ac3881290269b444d77db3c",
+  "description": "OOM-0027: Abort: `assert(PyStackRef_BoolCheck(cond))` in `POP_JUMP_IF_FALSE` (`generated_cases.c.h:11120`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d5c602c29ac3881290269b444d77db3c",
+  "created_at": "2026-06-19T23:55:14Z"
+ },
+ {
+  "id": "bf6f784d4bcd21acd471ea45b6f23c70",
+  "description": "OOM-0026: Abort: err-code vs `PyErr` desync in `handle_channel_error` (`_interpchannelsmodule.c:398` / `:443`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/bf6f784d4bcd21acd471ea45b6f23c70",
+  "created_at": "2026-06-19T23:55:13Z"
+ },
+ {
+  "id": "3aaffc18b68ca2ae5fffa72aa6cdb2ea",
+  "description": "OOM-0025: Abort: `assert(!PyErr_Occurred())` in `unspecialize` (`specialize.c:378`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/3aaffc18b68ca2ae5fffa72aa6cdb2ea",
+  "created_at": "2026-06-19T23:55:12Z"
+ },
+ {
+  "id": "acf15ad4117c6343b48ed8fdfe7ad167",
+  "description": "OOM-0024: Segfault: dealloc of uninitialized iterator in `template_iter` (`templateobject.c:232`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/acf15ad4117c6343b48ed8fdfe7ad167",
+  "created_at": "2026-06-19T23:55:10Z"
+ },
+ {
+  "id": "dc5123e50ea0402292e841411a294d3d",
+  "description": "OOM-0023: Fatal: dealloc clears the in-flight exception in `subtype_dealloc` (`typeobject.c:2719`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/dc5123e50ea0402292e841411a294d3d",
+  "created_at": "2026-06-19T23:55:09Z"
+ },
+ {
+  "id": "0964a71a7038ee90137f11c2527aad3c",
+  "description": "OOM-0022: Fatal: stale `MemoryError` trips `_Py_CheckSlotResult` in `reload_singlephase_extension` (`import.c:2011`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/0964a71a7038ee90137f11c2527aad3c",
+  "created_at": "2026-06-19T23:55:07Z"
+ },
+ {
+  "id": "e113c48a4e249ae7e4d1e42020db65c4",
+  "description": "OOM-0021: Fatal: NULL returned without an exception set in `_Py_CheckFunctionResult` (`call.c:43`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/e113c48a4e249ae7e4d1e42020db65c4",
+  "created_at": "2026-06-19T23:55:06Z"
+ },
+ {
+  "id": "df523c79368baa0c44bd69e9d5ee0c7e",
+  "description": "OOM-0020: Fatal: `_PyMem_DebugRawFree: bad ID` in `free_threadstate` (`pystate.c:1527`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/df523c79368baa0c44bd69e9d5ee0c7e",
+  "created_at": "2026-06-19T23:55:05Z"
+ },
+ {
+  "id": "9bd9423256ea03c08231d1ebe542db89",
+  "description": "OOM-0019: Abort: double-free in `_PyPegen_raise_error_known_location` (`pegen_errors.c:363`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9bd9423256ea03c08231d1ebe542db89",
+  "created_at": "2026-06-19T23:55:04Z"
+ },
+ {
+  "id": "99b84915b197ae0ade7face262b8af66",
+  "description": "OOM-0018: Abort: ownership assert in `set_keys` (`dictobject.c:205`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/99b84915b197ae0ade7face262b8af66",
+  "created_at": "2026-06-19T23:55:03Z"
+ },
+ {
+  "id": "6e7a3a9487689e55d7dd4f70b1ce489f",
+  "description": "OOM-0017: Abort: negative `gc_refs` (\"refcount too small\") in `validate_gc_objects` (`gc_free_threading.c:1116`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/6e7a3a9487689e55d7dd4f70b1ce489f",
+  "created_at": "2026-06-19T23:55:02Z"
+ },
+ {
+  "id": "05be8efe6b08c2b3ac3e2c17c784da0c",
+  "description": "OOM-0016: Abort: `assert(!queue->alive)` in `_queue_clear` (`_interpqueuesmodule.c:559`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/05be8efe6b08c2b3ac3e2c17c784da0c",
+  "created_at": "2026-06-19T23:55:01Z"
+ },
+ {
+  "id": "d40d39e6abfb746bd9d96de261205190",
+  "description": "OOM-0015: Abort: stale exception in `cfunction_check_kwargs` (`methodobject.c:409`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d40d39e6abfb746bd9d96de261205190",
+  "created_at": "2026-06-19T23:55:00Z"
+ },
+ {
+  "id": "ceb4b16662d22b3dcb1b56cd8481c9e7",
+  "description": "OOM-0014: Abort/Segfault: unchecked NULL in `channelsmod__channel_id` (`_interpchannelsmodule.c:3487`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/ceb4b16662d22b3dcb1b56cd8481c9e7",
+  "created_at": "2026-06-19T23:54:58Z"
+ },
+ {
+  "id": "1736971107bea3aa04ce19db21c90845",
+  "description": "OOM-0013: Abort: builtin breaks result/error contract in `_Py_BuiltinCallFastWithKeywords_StackRef` (`ceval.c:843`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/1736971107bea3aa04ce19db21c90845",
+  "created_at": "2026-06-19T23:54:57Z"
+ },
+ {
+  "id": "610c147c8e2d42a576bab3c1c2713391",
+  "description": "OOM-0012: Abort/Segfault: stale instrumentation in `get_tools_for_instruction` (`instrumentation.c:1106`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/610c147c8e2d42a576bab3c1c2713391",
+  "created_at": "2026-06-19T23:54:56Z"
+ },
+ {
+  "id": "892b61619c1b3c8c2018331b3f1f4983",
+  "description": "[SUPERSEDED \u2014 duplicate of OOM-0008] OOM-0011: Abort: assert(!PyErr_Occurred()) in specialize (specialize.c:364)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/892b61619c1b3c8c2018331b3f1f4983",
+  "created_at": "2026-06-19T23:54:55Z"
+ },
+ {
+  "id": "d3c1d06e95c006a320dbbfffcc210d52",
+  "description": "OOM-0010: Abort: `assert(_PyErr_Occurred(tstate))` in `_PyEval_EvalFrameDefault` (`generated_cases.c.h:13817`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d3c1d06e95c006a320dbbfffcc210d52",
+  "created_at": "2026-06-19T23:54:54Z"
+ },
+ {
+  "id": "34b633230f6d2301ba17dec195ffe4b7",
+  "description": "OOM-0009: Abort: stale `release1` flag trips an ownership assert in `replace` (`unicodeobject.c:10783`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/34b633230f6d2301ba17dec195ffe4b7",
+  "created_at": "2026-06-19T23:54:53Z"
+ },
+ {
+  "id": "3c6690d0561acc62752a953e12b20197",
+  "description": "OOM-0008: Abort: `assert(!PyErr_Occurred())` in `_PyType_LookupStackRefAndVersion` (`typeobject.c:6343`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/3c6690d0561acc62752a953e12b20197",
+  "created_at": "2026-06-19T23:54:52Z"
+ },
+ {
+  "id": "bf9fec4554c58c2a279b05b7ff8e6d9b",
+  "description": "OOM-0007: Fatal: `context_tp_dealloc` clears the pending exception (`context.c:535`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/bf9fec4554c58c2a279b05b7ff8e6d9b",
+  "created_at": "2026-06-19T23:54:51Z"
+ },
+ {
+  "id": "c809eb4072c0c787c0c890f54ba1c843",
+  "description": "OOM-0006: Abort/Segfault: `_PyObject_GC_UNTRACK` assert on untracked iterator in `dictiter_dealloc` (`dictobject.c:5532`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/c809eb4072c0c787c0c890f54ba1c843",
+  "created_at": "2026-06-19T23:54:50Z"
+ },
+ {
+  "id": "22b71f61343c81df5bea9b7fca798e87",
+  "description": "[SUPERSEDED \u2014 duplicate of OOM-0036 / python/cpython#151818] OOM-0005: Abort: negative-refcount over-decref in `_PyFrame_ClearLocals` (frame.c:101)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/22b71f61343c81df5bea9b7fca798e87",
+  "created_at": "2026-06-19T23:54:49Z"
+ },
+ {
+  "id": "315e83b2da6a5809ce5ae1d748cdd0ae",
+  "description": "OOM-0004: Abort/Segfault: corrupted object freelist in `clear_freelist` (`object.c:909`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/315e83b2da6a5809ce5ae1d748cdd0ae",
+  "created_at": "2026-06-19T23:54:47Z"
+ },
+ {
+  "id": "b628c59722820b55c61a400a973771d5",
+  "description": "OOM-0003: Abort: uninitialized `_co_unique_id` assert in `code_dealloc` (`codeobject.c:2440`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/b628c59722820b55c61a400a973771d5",
+  "created_at": "2026-06-19T23:54:46Z"
+ },
+ {
+  "id": "2dfeabe7508f8e98f27f6df7e381f1cf",
+  "description": "OOM-0002: Segfault: `Py_DECREF(NULL)` in `PyContextVar_Set` (`context.c:367`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/2dfeabe7508f8e98f27f6df7e381f1cf",
+  "created_at": "2026-06-19T23:54:45Z"
+ },
+ {
+  "id": "464cef74ca8186843f33a38078476ac4",
+  "description": "OOM-0001: Segfault: `Py_DECREF` of a NULL `filename` in `do_warn` (`_warnings.c:1139`)",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/464cef74ca8186843f33a38078476ac4",
+  "created_at": "2026-06-19T23:54:44Z"
+ },
+ {
+  "id": "9c16992b7e91f973265883e8eed9da2b",
+  "description": "lxml Reanalysis Actionable Items",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/9c16992b7e91f973265883e8eed9da2b",
+  "created_at": "2026-06-15T09:34:13Z"
+ },
+ {
+  "id": "a16b55d7a24c7e5fc3ac8d58d3106440",
+  "description": "cryptography Review",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a16b55d7a24c7e5fc3ac8d58d3106440",
+  "created_at": "2026-05-18T09:14:36Z"
+ },
+ {
+  "id": "0b288534254959a52b39f8d551140cdd",
+  "description": "pytsk C Extension Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/0b288534254959a52b39f8d551140cdd",
+  "created_at": "2026-05-02T14:37:08Z"
+ },
+ {
+  "id": "6fca29b90a7fa97c5d2a114e9946f77f",
+  "description": "ijson C Extension Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/6fca29b90a7fa97c5d2a114e9946f77f",
+  "created_at": "2026-04-29T11:26:11Z"
+ },
+ {
+  "id": "41532552e33b5f06d2cc8ce520b8476a",
+  "description": "ujson C Extension Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/41532552e33b5f06d2cc8ce520b8476a",
+  "created_at": "2026-04-28T10:49:17Z"
+ },
+ {
+  "id": "00dac82d9f5f024d04d0ce0b3b3274f5",
+  "description": "uvloop C Extension Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/00dac82d9f5f024d04d0ce0b3b3274f5",
+  "created_at": "2026-04-28T01:23:41Z"
+ },
+ {
+  "id": "0bb91763272182eeb274ae19c6dfa262",
+  "description": "Blosc2 C Extension Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/0bb91763272182eeb274ae19c6dfa262",
+  "created_at": "2026-04-27T19:29:16Z"
+ },
+ {
+  "id": "e1c05b48ef37b293a5c13d2e25c8c251",
+  "description": "pyskein C Extension Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/e1c05b48ef37b293a5c13d2e25c8c251",
+  "created_at": "2026-04-27T04:00:35Z"
+ },
+ {
+  "id": "06c2e34dac411d9a5f3cf4525d26a03d",
+  "description": "Feasibility of making the tools standalone",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/06c2e34dac411d9a5f3cf4525d26a03d",
+  "created_at": "2026-04-23T08:48:29Z"
+ },
+ {
+  "id": "bb73cbfce9e421fd853c53652804ac68",
+  "description": "VTK full analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/bb73cbfce9e421fd853c53652804ac68",
+  "created_at": "2026-04-23T08:40:30Z"
+ },
+ {
+  "id": "8d0c5d7f04099b0de56cb043ca98341c",
+  "description": "frozendict Review",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/8d0c5d7f04099b0de56cb043ca98341c",
+  "created_at": "2026-04-22T03:40:02Z"
+ },
+ {
+  "id": "4b7f882d068e3a551f18f11905e9d818",
+  "description": "Palestra Python Brasil 2026",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/4b7f882d068e3a551f18f11905e9d818",
+  "created_at": "2026-04-20T09:28:45Z"
+ },
+ {
+  "id": "fa00e03ef041c030660f083116a7e1b6",
+  "description": "multidict Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/fa00e03ef041c030660f083116a7e1b6",
+  "created_at": "2026-04-19T14:14:56Z"
+ },
+ {
+  "id": "1ba9105822a39ec360df998a7017cb32",
+  "description": "lxml `ft_python` Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/1ba9105822a39ec360df998a7017cb32",
+  "created_at": "2026-04-19T01:43:14Z"
+ },
+ {
+  "id": "b86039ac097141579590c1a0f3a43605",
+  "description": "zstandard C Extension Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/b86039ac097141579590c1a0f3a43605",
+  "created_at": "2026-04-18T22:36:03Z"
+ },
+ {
+  "id": "c440ff4c2e9d2c8e1b5d08ce4a39b865",
+  "description": "couchbase-python-client C Extension Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/c440ff4c2e9d2c8e1b5d08ce4a39b865",
+  "created_at": "2026-04-16T19:40:35Z"
+ },
+ {
+  "id": "d6b2d907a3cf8dbf26e1a8c97b3998d8",
+  "description": "guppy3 Re-analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/d6b2d907a3cf8dbf26e1a8c97b3998d8",
+  "created_at": "2026-04-15T03:42:53Z"
+ },
+ {
+  "id": "e25a72134b33b57d0423cbd072c3842e",
+  "description": "wrapt \u2014 Actionable Items",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/e25a72134b33b57d0423cbd072c3842e",
+  "created_at": "2026-04-12T13:19:44Z"
+ },
+ {
+  "id": "34c9fad09694958b83fbbea19ea30e69",
+  "description": "wrapt C Extension Analysis Report v2",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/34c9fad09694958b83fbbea19ea30e69",
+  "created_at": "2026-04-10T10:58:06Z"
+ },
+ {
+  "id": "8f97138562bbca7265672a36ef777ad1",
+  "description": "wrapt Python Source Exploration Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/8f97138562bbca7265672a36ef777ad1",
+  "created_at": "2026-04-10T10:49:30Z"
+ },
+ {
+  "id": "a4287a475683d41238da1e8bb6b22542",
+  "description": "wrapt 2.2.0rc2 \u2014 Free-Threading Re-Analysis",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a4287a475683d41238da1e8bb6b22542",
+  "created_at": "2026-04-10T09:17:21Z"
+ },
+ {
+  "id": "917aa6c675d74f873eb833409c8e7ce9",
+  "description": "Pillow Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/917aa6c675d74f873eb833409c8e7ce9",
+  "created_at": "2026-04-08T16:19:57Z"
+ },
+ {
+  "id": "0726d4f7939bfe193ee494370fe8b0d3",
+  "description": "Pillow C Extension Reanalysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/0726d4f7939bfe193ee494370fe8b0d3",
+  "created_at": "2026-04-08T13:12:04Z"
+ },
+ {
+  "id": "ddbcdf1bb41194e2f81a0feab6c15616",
+  "description": "time-machine C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/ddbcdf1bb41194e2f81a0feab6c15616",
+  "created_at": "2026-04-07T23:26:08Z"
+ },
+ {
+  "id": "4cd3234a5ede15c7688b590d95b0dfe9",
+  "description": "tprof C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/4cd3234a5ede15c7688b590d95b0dfe9",
+  "created_at": "2026-04-07T23:24:22Z"
+ },
+ {
+  "id": "7f1e9d05849cea565b39e5eaaee207b5",
+  "description": "icu4py C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/7f1e9d05849cea565b39e5eaaee207b5",
+  "created_at": "2026-04-07T23:22:42Z"
+ },
+ {
+  "id": "012439d5e589c69deebd505dbd5f9a45",
+  "description": "wrapt Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/012439d5e589c69deebd505dbd5f9a45",
+  "created_at": "2026-04-06T19:48:18Z"
+ },
+ {
+  "id": "be2bea00e879ed44e273eec1a0715f00",
+  "description": "simplejson Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/be2bea00e879ed44e273eec1a0715f00",
+  "created_at": "2026-04-06T18:53:02Z"
+ },
+ {
+  "id": "e8a25ea988dc0461c2fd378efd84a8a3",
+  "description": "simplejson C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/e8a25ea988dc0461c2fd378efd84a8a3",
+  "created_at": "2026-04-05T17:06:30Z"
+ },
+ {
+  "id": "bbe7197dede8557a2c306ed1985d40e9",
+  "description": "Systematically finding bugs in Python C extensions (560+ confirmed so far)",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/bbe7197dede8557a2c306ed1985d40e9",
+  "created_at": "2026-04-04T22:45:40Z"
+ },
+ {
+  "id": "1f3d76d0fa083429906291901b99d7d5",
+  "description": "greenlet: Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/1f3d76d0fa083429906291901b99d7d5",
+  "created_at": "2026-04-04T14:45:04Z"
+ },
+ {
+  "id": "16400e820e0fdd754a99f2a9454a3a72",
+  "description": "pyerfa Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/16400e820e0fdd754a99f2a9454a3a72",
+  "created_at": "2026-04-04T14:12:27Z"
+ },
+ {
+  "id": "60672184d31713866902adc964e2289b",
+  "description": "pyerfa C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/60672184d31713866902adc964e2289b",
+  "created_at": "2026-04-04T14:07:08Z"
+ },
+ {
+  "id": "c48c793bc1c08a3dc8c30c969dbe20ee",
+  "description": "python-isal Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/c48c793bc1c08a3dc8c30c969dbe20ee",
+  "created_at": "2026-04-03T18:57:35Z"
+ },
+ {
+  "id": "06fc813184bd21a44c7b94eafc49b297",
+  "description": "regex Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/06fc813184bd21a44c7b94eafc49b297",
+  "created_at": "2026-04-03T15:10:17Z"
+ },
+ {
+  "id": "38246591e423c703f575b8e816d8ab55",
+  "description": "python-igraph C Extension Analysis Report (v2)",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/38246591e423c703f575b8e816d8ab55",
+  "created_at": "2026-04-03T13:32:30Z"
+ },
+ {
+  "id": "c430e676ac2c27b30af644847af9aa1b",
+  "description": "guppy3 Free-Threading Synchronization Guide",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/c430e676ac2c27b30af644847af9aa1b",
+  "created_at": "2026-04-03T12:03:55Z"
+ },
+ {
+  "id": "c668905424a9aee0f392a5d72b11e071",
+  "description": "zope.interface Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/c668905424a9aee0f392a5d72b11e071",
+  "created_at": "2026-04-03T10:45:10Z"
+ },
+ {
+  "id": "71fe004f9312c6924fbb9fa239b73d50",
+  "description": "cereggii Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/71fe004f9312c6924fbb9fa239b73d50",
+  "created_at": "2026-04-03T10:22:24Z"
+ },
+ {
+  "id": "d53c60a0f0a5a22f745d5569dda6f066",
+  "description": "bitarray Free-Threading Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/d53c60a0f0a5a22f745d5569dda6f066",
+  "created_at": "2026-04-03T03:22:32Z"
+ },
+ {
+  "id": "3459f4cf2e1a32baacc36d09c8293e9c",
+  "description": "mypyc Codebase Exploration Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/3459f4cf2e1a32baacc36d09c8293e9c",
+  "created_at": "2026-04-01T20:40:36Z"
+ },
+ {
+  "id": "4d825741d94fd7c4c93b18f0a8a1a071",
+  "description": "zlib-ng C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/4d825741d94fd7c4c93b18f0a8a1a071",
+  "created_at": "2026-03-31T14:27:00Z"
+ },
+ {
+  "id": "fc2e348a91d1c70e3ac4e3ddfee35fe9",
+  "description": "igraph C Library Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/fc2e348a91d1c70e3ac4e3ddfee35fe9",
+  "created_at": "2026-03-31T14:05:37Z"
+ },
+ {
+  "id": "b30771d22104e6fa0c30c41a6e27a355",
+  "description": "guppy3 C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/b30771d22104e6fa0c30c41a6e27a355",
+  "created_at": "2026-03-31T09:13:11Z"
+ },
+ {
+  "id": "8cb223af65148783692da63b774dcd74",
+  "description": "python-isal C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/8cb223af65148783692da63b774dcd74",
+  "created_at": "2026-03-31T03:49:18Z"
+ },
+ {
+  "id": "3e785bfe0bb322c0f2238338593a8be1",
+  "description": "awkward-cpp C++ Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/3e785bfe0bb322c0f2238338593a8be1",
+  "created_at": "2026-03-31T02:35:06Z"
+ },
+ {
+  "id": "69946454f13d5b4358b46352211bc6d7",
+  "description": "python-igraph C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/69946454f13d5b4358b46352211bc6d7",
+  "created_at": "2026-03-31T00:18:57Z"
+ },
+ {
+  "id": "fd3ffd45da791d43da15e4fd33866579",
+  "description": "astropy C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/fd3ffd45da791d43da15e4fd33866579",
+  "created_at": "2026-03-30T22:21:47Z"
+ },
+ {
+  "id": "a52e184e6c6e730c0d7bcb6e95a6607d",
+  "description": "nanobind C++ Binding Framework Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a52e184e6c6e730c0d7bcb6e95a6607d",
+  "created_at": "2026-03-30T10:29:04Z"
+ },
+ {
+  "id": "db29dd5bbeba58b4f7fa051beb297d50",
+  "description": "pybind11 Header-Only Library Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/db29dd5bbeba58b4f7fa051beb297d50",
+  "created_at": "2026-03-30T03:11:37Z"
+ },
+ {
+  "id": "d6e07e090944cba01010dbbf3b03d469",
+  "description": "CPython Modules/ tp_init Re-Init and Partial-State Safety Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/d6e07e090944cba01010dbbf3b03d469",
+  "created_at": "2026-03-30T00:01:04Z"
+ },
+ {
+  "id": "cbb90c2adec4d17219ebfebacbc1fc4f",
+  "description": "CPython Stdlib: Python Wrapper `__new__`-Without-`__init__` Safety Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/cbb90c2adec4d17219ebfebacbc1fc4f",
+  "created_at": "2026-03-29T17:28:10Z"
+ },
+ {
+  "id": "d1af1242847101679cdb542eac8d0b45",
+  "description": "CPython 3.14 tp_init / tp_new Safety Audit",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/d1af1242847101679cdb542eac8d0b45",
+  "created_at": "2026-03-29T17:26:48Z"
+ },
+ {
+  "id": "1956ae9191936c01fff071bf34df6468",
+  "description": "tp_init Re-Init Safety Scan: Cross-Extension Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/1956ae9191936c01fff071bf34df6468",
+  "created_at": "2026-03-29T15:53:41Z"
+ },
+ {
+  "id": "b9ce99c1971afa418b6a24ca575c67c5",
+  "description": "bottleneck C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/b9ce99c1971afa418b6a24ca575c67c5",
+  "created_at": "2026-03-29T04:14:33Z"
+ },
+ {
+  "id": "191b87e2d03e806f1868eecfe844e406",
+  "description": "bitarray C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/191b87e2d03e806f1868eecfe844e406",
+  "created_at": "2026-03-29T03:39:19Z"
+ },
+ {
+  "id": "5c7600153c8e76afee3ef1a2d516ad70",
+  "description": "duckdb Python Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/5c7600153c8e76afee3ef1a2d516ad70",
+  "created_at": "2026-03-29T02:49:15Z"
+ },
+ {
+  "id": "7dd46860f6aebd9324e971231185f38c",
+  "description": "ml-dtypes C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/7dd46860f6aebd9324e971231185f38c",
+  "created_at": "2026-03-29T02:41:37Z"
+ },
+ {
+  "id": "70e0a996c666014e720174aca4ac3f69",
+  "description": "msgspec C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/70e0a996c666014e720174aca4ac3f69",
+  "created_at": "2026-03-28T23:12:28Z"
+ },
+ {
+  "id": "5afbad864934b165a2cc080f110aa720",
+  "description": "zope.interface C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/5afbad864934b165a2cc080f110aa720",
+  "created_at": "2026-03-28T19:24:59Z"
+ },
+ {
+  "id": "e4c8158e02db0285461bd212d2d2fcb0",
+  "description": "lz4 C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/e4c8158e02db0285461bd212d2d2fcb0",
+  "created_at": "2026-03-28T18:13:43Z"
+ },
+ {
+  "id": "8c8329e030e38f74207baa9845470a36",
+  "description": "pymongo/bson C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/8c8329e030e38f74207baa9845470a36",
+  "created_at": "2026-03-28T13:53:14Z"
+ },
+ {
+  "id": "e1ac0c43dc4d4278ee82455da4859872",
+  "description": "wrapt C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/e1ac0c43dc4d4278ee82455da4859872",
+  "created_at": "2026-03-28T12:53:48Z"
+ },
+ {
+  "id": "2a79188c7a41a03b1476544c7dd775c1",
+  "description": "matplotlib C/C++ Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/2a79188c7a41a03b1476544c7dd775c1",
+  "created_at": "2026-03-28T12:26:30Z"
+ },
+ {
+  "id": "5e6e52e425558ae68a5caa7a1e78697f",
+  "description": "greenlet C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/5e6e52e425558ae68a5caa7a1e78697f",
+  "created_at": "2026-03-28T02:21:07Z"
+ },
+ {
+  "id": "7ec1e87568d3ad9036ec9b24e32d5875",
+  "description": "scipy C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/7ec1e87568d3ad9036ec9b24e32d5875",
+  "created_at": "2026-03-28T01:58:01Z"
+ },
+ {
+  "id": "8293b36d668e8cd06d5e2804174f3860",
+  "description": "cvxopt C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/8293b36d668e8cd06d5e2804174f3860",
+  "created_at": "2026-03-27T18:09:16Z"
+ },
+ {
+  "id": "db96bedb4e2ec6712fc6b71191ff4bd0",
+  "description": "apsw C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/db96bedb4e2ec6712fc6b71191ff4bd0",
+  "created_at": "2026-03-27T16:39:16Z"
+ },
+ {
+  "id": "86694021ac18370c306e362cbd0f1263",
+  "description": "enaml C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/86694021ac18370c306e362cbd0f1263",
+  "created_at": "2026-03-27T13:36:43Z"
+ },
+ {
+  "id": "3b4336138db60cc7193aef466507040b",
+  "description": "atom C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/3b4336138db60cc7193aef466507040b",
+  "created_at": "2026-03-27T10:21:27Z"
+ },
+ {
+  "id": "c997faaee7556ffc5cb991deca553966",
+  "description": "ctraits Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/c997faaee7556ffc5cb991deca553966",
+  "created_at": "2026-03-27T08:29:13Z"
+ },
+ {
+  "id": "7402dc7349ab7e27deb95093c1ddb883",
+  "description": "pycurl C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/7402dc7349ab7e27deb95093c1ddb883",
+  "created_at": "2026-03-27T02:19:23Z"
+ },
+ {
+  "id": "b03f56255dd939d4ad1efc1d6b2d4e14",
+  "description": "kiwisolver C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/b03f56255dd939d4ad1efc1d6b2d4e14",
+  "created_at": "2026-03-27T01:29:01Z"
+ },
+ {
+  "id": "5fba6e6001d5580e5568439506a52174",
+  "description": "regex C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/5fba6e6001d5580e5568439506a52174",
+  "created_at": "2026-03-27T01:01:23Z"
+ },
+ {
+  "id": "c050bdb008c0f5351d3e78afd565f8f1",
+  "description": "psutil C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/c050bdb008c0f5351d3e78afd565f8f1",
+  "created_at": "2026-03-27T00:17:57Z"
+ },
+ {
+  "id": "b0eca1ded22efac92de4efe928916d46",
+  "description": "protobuf C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/b0eca1ded22efac92de4efe928916d46",
+  "created_at": "2026-03-26T22:11:06Z"
+ },
+ {
+  "id": "cbdd5a7c6d1fecd71eecf532a38ad1fc",
+  "description": "h5py C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/cbdd5a7c6d1fecd71eecf532a38ad1fc",
+  "created_at": "2026-03-25T08:29:29Z"
+ },
+ {
+  "id": "20dd441afc43301a69ec55f9c62c21f0",
+  "description": "Cython Runtime Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/20dd441afc43301a69ec55f9c62c21f0",
+  "created_at": "2026-03-24T17:25:23Z"
+ },
+ {
+  "id": "a36588ae7e2b73f0d85f8a925fb13b3d",
+  "description": "multidict C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a36588ae7e2b73f0d85f8a925fb13b3d",
+  "created_at": "2026-03-24T09:35:46Z"
+ },
+ {
+  "id": "5177bed6d3a261908ae9c1ebaa6ef594",
+  "description": "Pillow C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/5177bed6d3a261908ae9c1ebaa6ef594",
+  "created_at": "2026-03-23T16:35:01Z"
+ },
+ {
+  "id": "869a609ce67d9d12be3cfb1645adb8a5",
+  "description": "NumPy Python Codebase Exploration Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/869a609ce67d9d12be3cfb1645adb8a5",
+  "created_at": "2026-03-22T12:50:39Z"
+ },
+ {
+  "id": "9e55e898b161041beb51e46cbabd73eb",
+  "description": "",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/9e55e898b161041beb51e46cbabd73eb",
+  "created_at": "2026-03-22T11:13:02Z"
+ },
+ {
+  "id": "ab1bc54de260782c7560f9109fed7b27",
+  "description": "memray C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/ab1bc54de260782c7560f9109fed7b27",
+  "created_at": "2026-03-22T10:37:01Z"
+ },
+ {
+  "id": "ccc2d9553ca1c90ab1835362ee21a40a",
+  "description": "NumPy C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/ccc2d9553ca1c90ab1835362ee21a40a",
+  "created_at": "2026-03-22T04:08:29Z"
+ },
+ {
+  "id": "7763084a47ca007ae4f7b301089dd835",
+  "description": "cffi C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/7763084a47ca007ae4f7b301089dd835",
+  "created_at": "2026-03-22T04:01:07Z"
+ },
+ {
+  "id": "971018615bcbaf33a8ed582c415400f8",
+  "description": "pyhacl C Extension Analysis Report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/971018615bcbaf33a8ed582c415400f8",
+  "created_at": "2026-03-22T03:19:28Z"
+ },
+ {
+  "id": "afbb3b3ca5a0f27b1fc951465dd7eb0b",
+  "description": "CPython Lib/ Audit: Lib/ IO/Archive Files Audit \u2014 5 Critical, 8 High",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/afbb3b3ca5a0f27b1fc951465dd7eb0b",
+  "created_at": "2026-03-18T11:25:58Z"
+ },
+ {
+  "id": "5efb4250abe22404c1d9de5eb5d84aba",
+  "description": "CPython Lib/ Audit: Lib/ Large Files Audit (typing, argparse, inspect, subprocess, dataclasses) \u2014 5 Critical, 8 High",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/5efb4250abe22404c1d9de5eb5d84aba",
+  "created_at": "2026-03-18T11:25:57Z"
+ },
+ {
+  "id": "dd6785361bd757e8e3784e009f786649",
+  "description": "CPython Lib/ Audit: Lib/importlib + Lib/logging Audit \u2014 5 Critical, 7 High",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/dd6785361bd757e8e3784e009f786649",
+  "created_at": "2026-03-18T11:25:55Z"
+ },
+ {
+  "id": "04cda5b0558a8b4f07a908eaf2ac25d3",
+  "description": "CPython Lib/ Audit: Lib/http + multiprocessing + concurrent Audit \u2014 7 Critical, 9 High",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/04cda5b0558a8b4f07a908eaf2ac25d3",
+  "created_at": "2026-03-18T11:25:54Z"
+ },
+ {
+  "id": "a5e932cf5127bf5c1f35585c38f248f2",
+  "description": "CPython Lib/ Audit: Lib/email + Lib/xml Audit \u2014 4 Critical, 6 High",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/a5e932cf5127bf5c1f35585c38f248f2",
+  "created_at": "2026-03-18T11:25:53Z"
+ },
+ {
+  "id": "09a5e4c7ead9b5ec88ba78915e3e8031",
+  "description": "CPython Lib/ Audit: Lib/asyncio Audit \u2014 3 Critical, 8 High",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/09a5e4c7ead9b5ec88ba78915e3e8031",
+  "created_at": "2026-03-18T11:25:52Z"
+ },
+ {
+  "id": "6f4bcb9ea5ab0c87203cf07050fa9b50",
+  "description": "CPython Lib/ Audit: Lib/ Directory Audit \u2014 Final Summary",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/6f4bcb9ea5ab0c87203cf07050fa9b50",
+  "created_at": "2026-03-18T11:25:51Z"
+ },
+ {
+  "id": "6e09b9ff9e22c69ff62acecd30d7651b",
+  "description": "CPython Lib/ bug: typing.py: Multiple `except Exception` too broad for annotation/attribute access",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/6e09b9ff9e22c69ff62acecd30d7651b",
+  "created_at": "2026-03-18T11:25:43Z"
+ },
+ {
+  "id": "f8af359770ff200eac8474de5644be82",
+  "description": "CPython Lib/ bug: tarfile.py: `raise e` loses traceback in next()",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/f8af359770ff200eac8474de5644be82",
+  "created_at": "2026-03-18T11:25:42Z"
+ },
+ {
+  "id": "16851d0fac79f09066dc7f22a0194ee7",
+  "description": "CPython Lib/ bug: tarfile.py: PAX header numeric fields silently coerced to zero \u2014 security-relevant",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/16851d0fac79f09066dc7f22a0194ee7",
+  "created_at": "2026-03-18T11:25:40Z"
+ },
+ {
+  "id": "3e52b67da93b7d9236e2b76a2fd04bc9",
+  "description": "CPython Lib/ bug: subprocess.py: CalledProcessError.__str__ crashes with None returncode",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/3e52b67da93b7d9236e2b76a2fd04bc9",
+  "created_at": "2026-03-18T11:25:39Z"
+ },
+ {
+  "id": "d547036ee3c672aa341e548a35882cc4",
+  "description": "CPython Lib/ bug: xml/sax/expatreader.py: Bare `except:` in entity resolution catches KeyboardInterrupt",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d547036ee3c672aa341e548a35882cc4",
+  "created_at": "2026-03-18T11:25:38Z"
+ },
+ {
+  "id": "96d3097a672a95a87ca477ab3ef4d8f6",
+  "description": "CPython Lib/ bug: multiprocessing/queues.py: Queue feeder silently drops unpicklable objects",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/96d3097a672a95a87ca477ab3ef4d8f6",
+  "created_at": "2026-03-18T11:25:33Z"
+ },
+ {
+  "id": "a992295b19c8fa3750662d6463a11d24",
+  "description": "CPython Lib/ bug: multiprocessing/managers.py: Client hangs forever on dead manager connection",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/a992295b19c8fa3750662d6463a11d24",
+  "created_at": "2026-03-18T11:25:32Z"
+ },
+ {
+  "id": "4516509b150304f9f42b875c6c8a3f2f",
+  "description": "CPython Lib/ bug: logging/handlers.py: SocketHandler.send() silently drops log records",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/4516509b150304f9f42b875c6c8a3f2f",
+  "created_at": "2026-03-18T11:25:30Z"
+ },
+ {
+  "id": "5a65898833ff0540e402a13d1f33ae2c",
+  "description": "CPython Lib/ bug: logging/config.py: Config listener partial handler clearing on error",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/5a65898833ff0540e402a13d1f33ae2c",
+  "created_at": "2026-03-18T11:25:29Z"
+ },
+ {
+  "id": "5bb1a9f229394b05922a5508918c112f",
+  "description": "CPython Lib/ bug: email/_header_value_parser.py: Bare `except: pass` in header parsing",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/5bb1a9f229394b05922a5508918c112f",
+  "created_at": "2026-03-18T11:25:28Z"
+ },
+ {
+  "id": "fc0d23fafc4a54b52174f2da43c94bf8",
+  "description": "CPython Lib/ bug: http/cookiejar.py: Single malformed cookie drops entire batch",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/fc0d23fafc4a54b52174f2da43c94bf8",
+  "created_at": "2026-03-18T11:25:27Z"
+ },
+ {
+  "id": "9978d79ecc7ca4ab2864bff0355d7fb2",
+  "description": "CPython Lib/ bug: configparser.py: read() silently skips permission-denied files",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9978d79ecc7ca4ab2864bff0355d7fb2",
+  "created_at": "2026-03-18T11:25:26Z"
+ },
+ {
+  "id": "ec9c565d826827c35010d0f829e5688f",
+  "description": "CPython Lib/ bug: asyncio: Error reporting gated behind debug mode \u2014 production errors invisible",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/ec9c565d826827c35010d0f829e5688f",
+  "created_at": "2026-03-18T11:25:24Z"
+ },
+ {
+  "id": "4245c2a9fb2656a39fe267c0496ce8d5",
+  "description": "CPython Lib/ bug: argparse.py: _print_message silently swallows write failures",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/4245c2a9fb2656a39fe267c0496ce8d5",
+  "created_at": "2026-03-18T11:25:23Z"
+ },
+ {
+  "id": "1ca28223df592b7a09b16bb1edb182b2",
+  "description": "CPython Audit: Python/ Directory Review \u2014 Final Summary",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/1ca28223df592b7a09b16bb1edb182b2",
+  "created_at": "2026-03-18T10:20:27Z"
+ },
+ {
+  "id": "ea542721bddee3fc0bc22e88c4b7a171",
+  "description": "CPython Audit: Small Python/ files batch | 4 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/ea542721bddee3fc0bc22e88c4b7a171",
+  "created_at": "2026-03-18T10:20:26Z"
+ },
+ {
+  "id": "23ff5f3714bf008931f1d1fdedede4b6",
+  "description": "CPython Audit: optimizer + specialize + instrumentation | 3 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/23ff5f3714bf008931f1d1fdedede4b6",
+  "created_at": "2026-03-18T10:20:24Z"
+ },
+ {
+  "id": "df55170c768f202b0bb30c23fff5dcae",
+  "description": "CPython Audit: pylifecycle.c + initconfig.c + fileutils.c | 6 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/df55170c768f202b0bb30c23fff5dcae",
+  "created_at": "2026-03-18T10:20:23Z"
+ },
+ {
+  "id": "b6656bb31e2e2fe9533a1311ad3fc761",
+  "description": "CPython Audit: import.c + sysmodule.c | 2 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/b6656bb31e2e2fe9533a1311ad3fc761",
+  "created_at": "2026-03-18T10:20:22Z"
+ },
+ {
+  "id": "6eb9eb290464caeda14a93fe47331b3c",
+  "description": "CPython Audit: hamt.c + context.c + gc.c + getargs.c | 2 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/6eb9eb290464caeda14a93fe47331b3c",
+  "created_at": "2026-03-18T10:20:21Z"
+ },
+ {
+  "id": "b2114938bd8ad3dbcf68bdc30f733e9f",
+  "description": "CPython Audit: errors.c + _warnings.c + codecs.c + traceback.c + pythonrun.c | 1 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/b2114938bd8ad3dbcf68bdc30f733e9f",
+  "created_at": "2026-03-18T10:20:20Z"
+ },
+ {
+  "id": "09b6fce4118fad6f03ce363c1293763d",
+  "description": "CPython Audit: crossinterp.c + pystate.c + marshal.c | 4 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/09b6fce4118fad6f03ce363c1293763d",
+  "created_at": "2026-03-18T10:20:19Z"
+ },
+ {
+  "id": "f10e68681b321be5a1dbfc706ccc2953",
+  "description": "CPython Audit: Compiler Pipeline (codegen + compile + symtable + flowgraph + assemble) | 6 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/f10e68681b321be5a1dbfc706ccc2953",
+  "created_at": "2026-03-18T10:20:18Z"
+ },
+ {
+  "id": "83c302dcb4918940796d3e6959c67cde",
+  "description": "CPython Audit: ceval.c + bltinmodule.c | 3 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/83c302dcb4918940796d3e6959c67cde",
+  "created_at": "2026-03-18T10:20:16Z"
+ },
+ {
+  "id": "6a7693e3a8d076b3b243a59b0db2f200",
+  "description": "CPython Audit: unicodeobject.c (14,971 lines) | 0 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/6a7693e3a8d076b3b243a59b0db2f200",
+  "created_at": "2026-03-18T10:20:15Z"
+ },
+ {
+  "id": "f682fe5ffa9d31d1c7646aa28ca7a595",
+  "description": "CPython Audit: typevarobject.c + floatobject.c + moduleobject.c + unicode_formatter.c | 0 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/f682fe5ffa9d31d1c7646aa28ca7a595",
+  "created_at": "2026-03-18T10:20:14Z"
+ },
+ {
+  "id": "21c4cc565cb67aab878631dd581aa5b7",
+  "description": "CPython Audit: typeobject.c (12,843 lines) | 3 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/21c4cc565cb67aab878631dd581aa5b7",
+  "created_at": "2026-03-18T10:20:13Z"
+ },
+ {
+  "id": "d1bc635ff013b8a657f7c12994488c37",
+  "description": "CPython Audit: Objects/ Directory Review \u2014 Final Summary",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d1bc635ff013b8a657f7c12994488c37",
+  "created_at": "2026-03-18T10:20:12Z"
+ },
+ {
+  "id": "f69e78a2b8cfd317592e3c02e9d5f29a",
+  "description": "CPython Audit: obmalloc.c + unicode_format.c + unicode_writer.c + bytes_methods.c | 2 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/f69e78a2b8cfd317592e3c02e9d5f29a",
+  "created_at": "2026-03-18T10:20:10Z"
+ },
+ {
+  "id": "d2089a8caffc40464196153448d0f14d",
+  "description": "CPython Audit: longobject.c (6,988 lines) | 0 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d2089a8caffc40464196153448d0f14d",
+  "created_at": "2026-03-18T10:20:09Z"
+ },
+ {
+  "id": "58bbf12576295c3b29ac053b20be37a4",
+  "description": "CPython Audit: listobject.c + setobject.c | 0 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/58bbf12576295c3b29ac053b20be37a4",
+  "created_at": "2026-03-18T10:20:08Z"
+ },
+ {
+  "id": "dec61eb766b4e5ccacd1c0232b97eeee",
+  "description": "CPython Audit: genobject.c + funcobject.c + descrobject.c | 0 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/dec61eb766b4e5ccacd1c0232b97eeee",
+  "created_at": "2026-03-18T10:20:07Z"
+ },
+ {
+  "id": "89aa0c8bc2c7bce03094142f87b2ec36",
+  "description": "CPython Audit: exceptions.c + memoryobject.c | 2 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/89aa0c8bc2c7bce03094142f87b2ec36",
+  "created_at": "2026-03-18T10:20:06Z"
+ },
+ {
+  "id": "bf1879f8c4cb905b77fb3d3c56578c4b",
+  "description": "CPython Audit: dictobject.c (8,337 lines) | 0 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/bf1879f8c4cb905b77fb3d3c56578c4b",
+  "created_at": "2026-03-18T10:20:04Z"
+ },
+ {
+  "id": "9ede23e3350a7cdc5d034d051b8fc3cd",
+  "description": "CPython Audit: codeobject.c + object.c | 4 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9ede23e3350a7cdc5d034d051b8fc3cd",
+  "created_at": "2026-03-18T10:20:03Z"
+ },
+ {
+  "id": "67c80cc12914373472cda9e6b6c2e4c5",
+  "description": "CPython Audit: bytesobject.c + bytearrayobject.c | 0 FIX (refcount), 2 non-refcount issues noted",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/67c80cc12914373472cda9e6b6c2e4c5",
+  "created_at": "2026-03-18T10:20:02Z"
+ },
+ {
+  "id": "d65d9f920586d1db57e3f7b5626b680c",
+  "description": "CPython Audit: Objects/ Batch 4B \u2014 Small Files (11 files) | 0 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d65d9f920586d1db57e3f7b5626b680c",
+  "created_at": "2026-03-18T10:20:01Z"
+ },
+ {
+  "id": "b1a192b7276ce4c95ec12b3167738ee8",
+  "description": "CPython Audit: Objects/ Batch 4A \u2014 Small-Medium Files | 4 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/b1a192b7276ce4c95ec12b3167738ee8",
+  "created_at": "2026-03-18T10:19:59Z"
+ },
+ {
+  "id": "f21a2516371467dfc1ca2a4a7c320354",
+  "description": "CPython Audit: abstract.c + frameobject.c + odictobject.c | 3 FIX",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/f21a2516371467dfc1ca2a4a7c320354",
+  "created_at": "2026-03-18T10:19:58Z"
+ },
+ {
+  "id": "9384159fc3e5e4aa597125422312c6db",
+  "description": "CPython Audit: CPython C Code Exploration Report: socketmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9384159fc3e5e4aa597125422312c6db",
+  "created_at": "2026-03-18T10:19:57Z"
+ },
+ {
+  "id": "7d66e6ac9b1bc036c1cf182f3a5fb274",
+  "description": "CPython Audit: signalmodule.c \u2014 2,088 lines | 2 FIX, 2 CONSIDER",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/7d66e6ac9b1bc036c1cf182f3a5fb274",
+  "created_at": "2026-03-18T10:19:56Z"
+ },
+ {
+  "id": "2632d6beb699a012f0060193cd6e247d",
+  "description": "CPython Audit: CPython C Code Exploration Report: selectmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/2632d6beb699a012f0060193cd6e247d",
+  "created_at": "2026-03-18T10:19:54Z"
+ },
+ {
+  "id": "3b577f560254742f86fcf6200f16d5b4",
+  "description": "CPython Audit: CPython C Code Exploration Report: pyexpat.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/3b577f560254742f86fcf6200f16d5b4",
+  "created_at": "2026-03-18T10:19:53Z"
+ },
+ {
+  "id": "e9ecb0227797bb94231a1b0d9af1c7f0",
+  "description": "CPython Audit: CPython C Code Exploration Report: posixmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/e9ecb0227797bb94231a1b0d9af1c7f0",
+  "created_at": "2026-03-18T10:19:52Z"
+ },
+ {
+  "id": "ee43c3a713baa18fffd7c849afcf1e36",
+  "description": "CPython Audit: CPython C Code Exploration Report: mmapmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/ee43c3a713baa18fffd7c849afcf1e36",
+  "created_at": "2026-03-18T10:19:51Z"
+ },
+ {
+  "id": "fdbe3261f4ce5078a7977f4a00c9c642",
+  "description": "CPython Audit: CPython C Code Exploration Report: itertoolsmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/fdbe3261f4ce5078a7977f4a00c9c642",
+  "created_at": "2026-03-18T10:19:50Z"
+ },
+ {
+  "id": "54484cab1fa8267c54536ce3ad0d3c87",
+  "description": "CPython Audit: Batch 5 Small Modules \u2014 Combined Report",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/54484cab1fa8267c54536ce3ad0d3c87",
+  "created_at": "2026-03-18T10:19:49Z"
+ },
+ {
+  "id": "5fc1a506161efd246599edd07c485bda",
+  "description": "CPython Audit: CPython C Code Exploration Report: arraymodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/5fc1a506161efd246599edd07c485bda",
+  "created_at": "2026-03-18T10:19:47Z"
+ },
+ {
+  "id": "1824d5f1a0e233fe9008a890e5db936e",
+  "description": "CPython Audit: CPython C Code Exploration Report: _zoneinfo.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/1824d5f1a0e233fe9008a890e5db936e",
+  "created_at": "2026-03-18T10:19:46Z"
+ },
+ {
+  "id": "4226678a22b1546f5ac211484f66221c",
+  "description": "CPython Audit: CPython C Code Exploration Report: _threadmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/4226678a22b1546f5ac211484f66221c",
+  "created_at": "2026-03-18T10:19:45Z"
+ },
+ {
+  "id": "742eb4647c2f6ecd6c009af02c143f90",
+  "description": "CPython Audit: CPython C Code Exploration Report: _struct.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/742eb4647c2f6ecd6c009af02c143f90",
+  "created_at": "2026-03-18T10:19:44Z"
+ },
+ {
+  "id": "fe06f7178d055a5cb83ed9608764b02a",
+  "description": "CPython Audit: CPython C Code Exploration Report: _ssl.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/fe06f7178d055a5cb83ed9608764b02a",
+  "created_at": "2026-03-18T10:19:43Z"
+ },
+ {
+  "id": "2c0d5620ea1b2f0798bccb9c5e50b2b6",
+  "description": "CPython Audit: _sre/sre.c \u2014 3,493 lines | 1 FIX, 2 CONSIDER",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/2c0d5620ea1b2f0798bccb9c5e50b2b6",
+  "created_at": "2026-03-18T10:19:42Z"
+ },
+ {
+  "id": "bcca1c2c5cdf649e161c3e1fc3d3144f",
+  "description": "CPython Audit: CPython C Code Exploration Report: Modules/_sqlite/",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/bcca1c2c5cdf649e161c3e1fc3d3144f",
+  "created_at": "2026-03-18T10:19:40Z"
+ },
+ {
+  "id": "02f2feb0b68ed531d3a1856737cd0405",
+  "description": "CPython Audit: CPython C Code Exploration Report: _json.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/02f2feb0b68ed531d3a1856737cd0405",
+  "created_at": "2026-03-18T10:19:39Z"
+ },
+ {
+  "id": "57243e3a5995adf02675ab4ec88aef84",
+  "description": "CPython Audit: CPython C Code Exploration Report: _interpretersmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/57243e3a5995adf02675ab4ec88aef84",
+  "created_at": "2026-03-18T10:19:38Z"
+ },
+ {
+  "id": "b650bb4eebcbc70eb7171c88ba141257",
+  "description": "CPython Audit: CPython C Code Exploration Report: _interpqueuesmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/b650bb4eebcbc70eb7171c88ba141257",
+  "created_at": "2026-03-18T10:19:37Z"
+ },
+ {
+  "id": "987498a95f52cf5e4e680f30cb99f761",
+  "description": "CPython Audit: CPython C Code Exploration Report: _interpchannelsmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/987498a95f52cf5e4e680f30cb99f761",
+  "created_at": "2026-03-18T10:19:35Z"
+ },
+ {
+  "id": "387ac2384b27ee84f826b3416814f1ce",
+  "description": "CPython Audit: _functoolsmodule.c \u2014 2,017 lines | 2 FIX, 1 CONSIDER",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/387ac2384b27ee84f826b3416814f1ce",
+  "created_at": "2026-03-18T10:19:34Z"
+ },
+ {
+  "id": "ac4aae20ce7e9db925e6990c048a8b3d",
+  "description": "CPython Audit: CPython C Code Exploration Report: _datetimemodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/ac4aae20ce7e9db925e6990c048a8b3d",
+  "created_at": "2026-03-18T10:19:33Z"
+ },
+ {
+  "id": "815e47a11fad1248744e9b8be6258136",
+  "description": "CPython Audit: CPython C Code Exploration Report: _cursesmodule.c",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/815e47a11fad1248744e9b8be6258136",
+  "created_at": "2026-03-18T10:19:31Z"
+ },
+ {
+  "id": "b1261a6931456d8e28cdea892c24675a",
+  "description": "CPython Audit: CPython C Code Exploration Report: Modules/_ctypes/",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/b1261a6931456d8e28cdea892c24675a",
+  "created_at": "2026-03-18T10:19:30Z"
+ },
+ {
+  "id": "aa2bff987b8854cf83a2bdc3bf788423",
+  "description": "CPython Audit: _collectionsmodule.c \u2014 2,894 lines | 3 FIX, 2 CONSIDER",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/aa2bff987b8854cf83a2bdc3bf788423",
+  "created_at": "2026-03-18T10:19:29Z"
+ },
+ {
+  "id": "41dfa633bc61c3f040540bbf2c15205b",
+  "description": "CPython Audit Report: Python/ Directory Audit \u2014 Summary Report",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/41dfa633bc61c3f040540bbf2c15205b",
+  "created_at": "2026-03-18T10:19:27Z"
+ },
+ {
+  "id": "c7b3e2e3cb46e4f74ffeb0ee33146e2a",
+  "description": "CPython Audit Report: Objects/ Directory Audit \u2014 Summary Report",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/c7b3e2e3cb46e4f74ffeb0ee33146e2a",
+  "created_at": "2026-03-18T10:19:26Z"
+ },
+ {
+  "id": "81140c5974ea7c3a4164267df2eeee21",
+  "description": "CPython Audit Report: Modules/ Directory Audit \u2014 Summary Report",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/81140c5974ea7c3a4164267df2eeee21",
+  "created_at": "2026-03-18T10:19:25Z"
+ },
+ {
+  "id": "4d3ff8a79a32bf210e33024415d12341",
+  "description": "CPython Audit Report: CPython C Code Audit \u2014 Overview & Methodology",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/4d3ff8a79a32bf210e33024415d12341",
+  "created_at": "2026-03-18T10:19:24Z"
+ },
+ {
+  "id": "9f0a3f2a08edc37b8369d7f5db8d5854",
+  "description": "_zoneinfo.c: SEGV in get_weak_cache when ZoneInfo subclass overrides __new__",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9f0a3f2a08edc37b8369d7f5db8d5854",
+  "created_at": "2026-03-18T10:07:32Z"
+ },
+ {
+  "id": "701746869975be8c3fa673f52ef0e315",
+  "description": "_zoneinfo.c: Missing PyErr_NoMemory in load_data / ts_to_local",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/701746869975be8c3fa673f52ef0e315",
+  "created_at": "2026-03-18T10:07:31Z"
+ },
+ {
+  "id": "ada54523342276bbdb66228de2ec863e",
+  "description": "zlibmodule.c: Missing NULL check on PyErr_NewException during init",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/ada54523342276bbdb66228de2ec863e",
+  "created_at": "2026-03-18T10:07:29Z"
+ },
+ {
+  "id": "f7d0c7694b2be2345f4cf85f4eedc3ee",
+  "description": "weakrefobject.c: WRAP_BINARY ref leak with dead proxy",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/f7d0c7694b2be2345f4cf85f4eedc3ee",
+  "created_at": "2026-03-18T10:07:28Z"
+ },
+ {
+  "id": "577421b083bad6802aa391b909d1a725",
+  "description": "unicode_format.c: formatfloat wrong return + PY_SSIZE_T_MIN negate UB",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/577421b083bad6802aa391b909d1a725",
+  "created_at": "2026-03-18T10:07:27Z"
+ },
+ {
+  "id": "551cace22f112ef0ff4ed3fdbe54d235",
+  "description": "typeobject.c: Missing return -1 after PyErr_Format in type_ready_post_checks",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/551cace22f112ef0ff4ed3fdbe54d235",
+  "created_at": "2026-03-18T10:07:26Z"
+ },
+ {
+  "id": "6119b9d13c24bb30a07a44b75384e8ff",
+  "description": "typeobject.c: Buffer leak in slot_bf_getbuffer error path",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/6119b9d13c24bb30a07a44b75384e8ff",
+  "created_at": "2026-03-18T10:07:25Z"
+ },
+ {
+  "id": "829b08903c28f8e345052256cb1b7cb4",
+  "description": "termios.c: tcsetwinsize passes NULL to PyLong_AsLong",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/829b08903c28f8e345052256cb1b7cb4",
+  "created_at": "2026-03-18T10:07:24Z"
+ },
+ {
+  "id": "1c1e9ba549c26332c387b23406c84ad5",
+  "description": "exceptions.c: SyntaxError.__init__ ref leaks on re-initialization",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/1c1e9ba549c26332c387b23406c84ad5",
+  "created_at": "2026-03-18T10:07:23Z"
+ },
+ {
+  "id": "4fe9c3299dd2269bd849bba147ade0b4",
+  "description": "structseq.c: NULL dereference in get_type_attr_as_size",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/4fe9c3299dd2269bd849bba147ade0b4",
+  "created_at": "2026-03-18T10:07:22Z"
+ },
+ {
+  "id": "546cf053a5b307dbe3ec9f6c6d916b87",
+  "description": "_struct.c: Segfault and assertion failure on uninitialized Struct object",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/546cf053a5b307dbe3ec9f6c6d916b87",
+  "created_at": "2026-03-18T10:07:21Z"
+ },
+ {
+  "id": "bc8816ef316b72e2baf401f42b209823",
+  "description": "_ssl.c: Py_DECREF(NULL) crash in SNI callback when SSLObject wrapper is deleted",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/bc8816ef316b72e2baf401f42b209823",
+  "created_at": "2026-03-18T10:07:19Z"
+ },
+ {
+  "id": "0c8004487c9eacddbd85b7b40d93c448",
+  "description": "_sqlite/connection.c: Assertion failure replacing active collation + missing PyErr_NoMemory",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/0c8004487c9eacddbd85b7b40d93c448",
+  "created_at": "2026-03-18T10:07:18Z"
+ },
+ {
+  "id": "9f1ce3fece9407aacef0e16cd419ffb2",
+  "description": "socketmodule.c: Reference and buffer leaks via audit hook failures",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9f1ce3fece9407aacef0e16cd419ffb2",
+  "created_at": "2026-03-18T10:07:17Z"
+ },
+ {
+  "id": "63348fc11425730393ef0d601078cbe2",
+  "description": "selectmodule.c: errno < 0 comparison is always false",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/63348fc11425730393ef0d601078cbe2",
+  "created_at": "2026-03-18T10:07:16Z"
+ },
+ {
+  "id": "60aed55f44fba133ee2d34d46aa8d197",
+  "description": "readline.c: Missing NULL check on PyLong_FromLong in setup_readline",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/60aed55f44fba133ee2d34d46aa8d197",
+  "created_at": "2026-03-18T10:07:15Z"
+ },
+ {
+  "id": "86eda5ca53243ef667773991312c2e74",
+  "description": "pythonrun.c: Leaked main_module ref in _PyRun_SimpleStringFlagsWithName",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/86eda5ca53243ef667773991312c2e74",
+  "created_at": "2026-03-18T10:07:14Z"
+ },
+ {
+  "id": "b022ff2d1304a4b2b8d3d8750abd8da5",
+  "description": "pylifecycle.c: Multiple init/fini cleanup bugs",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/b022ff2d1304a4b2b8d3d8750abd8da5",
+  "created_at": "2026-03-18T10:07:13Z"
+ },
+ {
+  "id": "6d7781857c2a0cd29b636cf759081888",
+  "description": "pyexpat.c: Segfault in ExternalEntityParserCreate error path",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/6d7781857c2a0cd29b636cf759081888",
+  "created_at": "2026-03-18T10:07:12Z"
+ },
+ {
+  "id": "14a5663604e1d7fb930d121b4e0c8d25",
+  "description": "optimizer_symbols.c: make_bottom NULL deref when arena full",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/14a5663604e1d7fb930d121b4e0c8d25",
+  "created_at": "2026-03-18T10:07:11Z"
+ },
+ {
+  "id": "9015c335e324a94ea06932bdd643a7dc",
+  "description": "odictobject.c: Spurious PyErr_Clear in mutablemapping_add_pairs",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9015c335e324a94ea06932bdd643a7dc",
+  "created_at": "2026-03-18T10:07:10Z"
+ },
+ {
+  "id": "196f041a81611b2fbff22684b2f7166e",
+  "description": "object.c: PyObject_Print missing _Py_LeaveRecursiveCall",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/196f041a81611b2fbff22684b2f7166e",
+  "created_at": "2026-03-18T10:07:08Z"
+ },
+ {
+  "id": "9b0cc09a0ec2dd055b9b117115842f0b",
+  "description": "modsupport.c: Missing va_end in _abiinfo_raise",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/9b0cc09a0ec2dd055b9b117115842f0b",
+  "created_at": "2026-03-18T10:07:07Z"
+ },
+ {
+  "id": "60b787bfa22651ba6a18aef3b6e1439d",
+  "description": "marshal.c: 8 refs leaked on corrupt TYPE_CODE marshal stream",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/60b787bfa22651ba6a18aef3b6e1439d",
+  "created_at": "2026-03-18T10:07:06Z"
+ },
+ {
+  "id": "ed7691a99c26ede561a549ab1dba00b2",
+  "description": "_lsprof.c: Profiler.enable() clobbers exception from use_tool_id",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/ed7691a99c26ede561a549ab1dba00b2",
+  "created_at": "2026-03-18T10:07:05Z"
+ },
+ {
+  "id": "d1a6ab9f62970be0cae139366ce3c482",
+  "description": "legacy_tracing.c: Unchecked PyLong_AsInt in tracing callbacks",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d1a6ab9f62970be0cae139366ce3c482",
+  "created_at": "2026-03-18T10:07:04Z"
+ },
+ {
+  "id": "edc4c140cb2eb4d3b64ce886b1bb1c65",
+  "description": "_interpretersmodule.c: SEGV during interpreter creation under OOM",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/edc4c140cb2eb4d3b64ce886b1bb1c65",
+  "created_at": "2026-03-18T10:07:03Z"
+ },
+ {
+  "id": "03c462108168cf6b35054fb0b85bf775",
+  "description": "_interpqueuesmodule.c: Use-after-free from dangling items.last pointer",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/03c462108168cf6b35054fb0b85bf775",
+  "created_at": "2026-03-18T10:07:02Z"
+ },
+ {
+  "id": "d9975354c27e57f2589acfd0a777a2f1",
+  "description": "_interpchannelsmodule.c: Missing PyErr_NoMemory in channel creation",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d9975354c27e57f2589acfd0a777a2f1",
+  "created_at": "2026-03-18T10:07:01Z"
+ },
+ {
+  "id": "330026d6a4c40048c771a61f706ac75e",
+  "description": "instrumentation.c: Use-after-Py_DECREF comparison in call_one_instrument",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/330026d6a4c40048c771a61f706ac75e",
+  "created_at": "2026-03-18T10:07:00Z"
+ },
+ {
+  "id": "a29b3efc400d564b195f09dc94fb6b1e",
+  "description": "instrumentation.c: PyLong leaked per C API monitoring call",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/a29b3efc400d564b195f09dc94fb6b1e",
+  "created_at": "2026-03-18T10:06:59Z"
+ },
+ {
+  "id": "1a61f5e30036bc6aa5eac154626e4870",
+  "description": "initconfig.c: SET_ITEM macro leaks dict on expression failure",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/1a61f5e30036bc6aa5eac154626e4870",
+  "created_at": "2026-03-18T10:06:58Z"
+ },
+ {
+  "id": "432d9af1a8833bef53bc9ae342310622",
+  "description": "import.c: Wrong interpreter on return + double lock release",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/432d9af1a8833bef53bc9ae342310622",
+  "created_at": "2026-03-18T10:06:56Z"
+ },
+ {
+  "id": "332a120e4c7750e8a7aff47419311696",
+  "description": "hamt.c: sub_node leaked in bitmap_assoc and bitmap_without",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/332a120e4c7750e8a7aff47419311696",
+  "created_at": "2026-03-18T10:06:55Z"
+ },
+ {
+  "id": "266ca45099796a2373866a07447d5ebf",
+  "description": "genericaliasobject.c: Two NULL dereference bugs",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/266ca45099796a2373866a07447d5ebf",
+  "created_at": "2026-03-18T10:06:54Z"
+ },
+ {
+  "id": "572a616b51ded20b0494c1107a29e63c",
+  "description": "_functoolsmodule.c: Assertion failure from PyDict_Contains returning -1",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/572a616b51ded20b0494c1107a29e63c",
+  "created_at": "2026-03-18T10:06:53Z"
+ },
+ {
+  "id": "0a3dd4f8fb0fb144efcc02c3e86665a5",
+  "description": "frameobject.c: FrameLocalsProxy swallows and overwrites real errors",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/0a3dd4f8fb0fb144efcc02c3e86665a5",
+  "created_at": "2026-03-18T10:06:52Z"
+ },
+ {
+  "id": "5624326e8ccc9632aa69ea7f930e310b",
+  "description": "exceptions.c: BaseExceptionGroup repr OOB access \u2014 segfault from 3 lines of Python",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/5624326e8ccc9632aa69ea7f930e310b",
+  "created_at": "2026-03-18T10:06:51Z"
+ },
+ {
+  "id": "c0e661ad36a12581333740414e20098e",
+  "description": "_collectionsmodule.c: deque.copy() ref corruption on OOM",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/c0e661ad36a12581333740414e20098e",
+  "created_at": "2026-03-18T10:06:50Z"
+ },
+ {
+  "id": "efd3edd49aff97ed348c392bc6afe980",
+  "description": "_csv.c: _set_str missing NULL check \u2192 segfault on OOM",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/efd3edd49aff97ed348c392bc6afe980",
+  "created_at": "2026-03-18T10:06:49Z"
+ },
+ {
+  "id": "a56b8cb579b1950b4206e8a42d6be650",
+  "description": "crossinterp.c: Use-after-free + leaked exception + shadowed variable",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/a56b8cb579b1950b4206e8a42d6be650",
+  "created_at": "2026-03-18T10:06:48Z"
+ },
+ {
+  "id": "1053175c252bf8430cc2c2b96671d15f",
+  "description": "codegen.c + compile.c + assemble.c: Ref leaks and error handling bugs in compiler",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/1053175c252bf8430cc2c2b96671d15f",
+  "created_at": "2026-03-18T10:06:47Z"
+ },
+ {
+  "id": "768b5163f0f743bd940c5d96ca9e9981",
+  "description": "codeobject.c: co_tlbc NULL deref + replacement_locations leak",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/768b5163f0f743bd940c5d96ca9e9981",
+  "created_at": "2026-03-18T10:06:45Z"
+ },
+ {
+  "id": "d602d174ce2b8959759c94729a35c54e",
+  "description": "codeobject.c: code_richcompare swallows __eq__ errors",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/d602d174ce2b8959759c94729a35c54e",
+  "created_at": "2026-03-18T10:06:44Z"
+ },
+ {
+  "id": "55ed5cf0d452eb6ce881e7a8fad30ddb",
+  "description": "ceval.c: Missing PyErr_NoMemory in _PyObjectArray_FromStackRefArray + PyEval_GetLocals NULL deref",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/55ed5cf0d452eb6ce881e7a8fad30ddb",
+  "created_at": "2026-03-18T10:06:43Z"
+ },
+ {
+  "id": "cc84f43d7a5c774b47551060c061391f",
+  "description": "bltinmodule.c: __lazy_import__ NULL deref without Python frame",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/cc84f43d7a5c774b47551060c061391f",
+  "created_at": "2026-03-18T10:06:42Z"
+ },
+ {
+  "id": "7636db063c4b2af5da66389171121bfc",
+  "description": "ast.c: Missing LEAVE_RECURSIVE on 30 early-return paths",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/7636db063c4b2af5da66389171121bfc",
+  "created_at": "2026-03-18T10:06:41Z"
+ },
+ {
+  "id": "69aff7ff2d64ce8c7c21622f7f36e84c",
+  "description": "CPython bug: sqlite3 collation assertion failure + missing PyErr_NoMemory",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/69aff7ff2d64ce8c7c21622f7f36e84c",
+  "created_at": "2026-03-18T09:33:44Z"
+ },
+ {
+  "id": "dceaa8b70de035607d78025337af9798",
+  "description": "CPython bug: ExceptionGroup repr segfault from 3 lines of Python",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/dceaa8b70de035607d78025337af9798",
+  "created_at": "2026-03-18T09:33:15Z"
+ },
+ {
+  "id": "50f9880636df43efd3886f6bda2077b3",
+  "description": "CPython bug: Py_DECREF(NULL) crash in _ssl.c SNI callback",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/50f9880636df43efd3886f6bda2077b3",
+  "created_at": "2026-03-18T09:32:57Z"
+ },
+ {
+  "id": "6622a1f997e7c4861023d38a7002396d",
+  "description": "test",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/6622a1f997e7c4861023d38a7002396d",
+  "created_at": "2026-03-17T15:48:47Z"
+ },
+ {
+  "id": "f7b368d67fe816f79a9a9d47770c63d2",
+  "description": "cpython-review-toolkit report for _asyncio",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/f7b368d67fe816f79a9a9d47770c63d2",
+  "created_at": "2026-03-17T15:18:09Z"
+ },
+ {
+  "id": "8463c1e5490803e7554e6bfe67506b44",
+  "description": "cpython-review-toolkit report for _io",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/8463c1e5490803e7554e6bfe67506b44",
+  "created_at": "2026-03-17T15:04:34Z"
+ },
+ {
+  "id": "06e7270b785f80a2726aff3d2dfc8fb9",
+  "description": "cpython-review-toolkit report for OrderedDict",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/06e7270b785f80a2726aff3d2dfc8fb9",
+  "created_at": "2026-03-17T14:30:07Z"
+ },
+ {
+  "id": "b28f4f765525c3e287e231005800be52",
+  "description": "cpython-review-toolkit report for _remote_debugging",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/b28f4f765525c3e287e231005800be52",
+  "created_at": "2026-03-17T13:59:02Z"
+ },
+ {
+  "id": "a79f2375e64a6328addb11656ff9f0a8",
+  "description": "CTracer report - cpython-review-toolkit",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a79f2375e64a6328addb11656ff9f0a8",
+  "created_at": "2026-03-17T13:15:02Z"
+ },
+ {
+  "id": "34c4242b6d02acf7f2807187f0c30c22",
+  "description": "cpython-toolkit-report for _pickle",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/34c4242b6d02acf7f2807187f0c30c22",
+  "created_at": "2026-03-17T12:44:36Z"
+ },
+ {
+  "id": "d42909109028968967f5892f63b18431",
+  "description": "cpython-review-toolkit report for _elementtree",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/d42909109028968967f5892f63b18431",
+  "created_at": "2026-03-17T11:05:10Z"
+ },
+ {
+  "id": "2a063b7d358ac213ba5590347b8011a1",
+  "description": "cpython-review-toolkit report for _collections",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/2a063b7d358ac213ba5590347b8011a1",
+  "created_at": "2026-03-17T10:42:57Z"
+ },
+ {
+  "id": "0b1236a08d647e18098c2b83a04ec235",
+  "description": "sys.monitoring Probe & Test Generator for coveragepy",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/0b1236a08d647e18098c2b83a04ec235",
+  "created_at": "2026-03-14T16:16:41Z"
+ },
+ {
+  "id": "e936b15c22a3abb05163d938a6d8d49d",
+  "description": "PYREPL code quality report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/e936b15c22a3abb05163d938a6d8d49d",
+  "created_at": "2026-03-12T19:44:57Z"
+ },
+ {
+  "id": "c8ea9e0ea3e2247b729031b8179f860d",
+  "description": "`pprint` code quality report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/c8ea9e0ea3e2247b729031b8179f860d",
+  "created_at": "2026-03-12T19:24:15Z"
+ },
+ {
+  "id": "628f1eb0e4b9faeab975b814c646db1b",
+  "description": "Claude non-tool sysmon testing strategy",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/628f1eb0e4b9faeab975b814c646db1b",
+  "created_at": "2026-03-12T12:35:52Z"
+ },
+ {
+  "id": "ea845113531c4d21d7ad093753560607",
+  "description": "Claude Code sysmon testing strategy",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/ea845113531c4d21d7ad093753560607",
+  "created_at": "2026-03-12T11:22:16Z"
+ },
+ {
+  "id": "3db2e889c7e2ef440dd25142c72cf96b",
+  "description": "",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/3db2e889c7e2ef440dd25142c72cf96b",
+  "created_at": "2026-03-12T07:27:07Z"
+ },
+ {
+  "id": "47f95e878cc27872675c1d3951c41b95",
+  "description": "C Extension Compatibility Report for Python 3.15",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/47f95e878cc27872675c1d3951c41b95",
+  "created_at": "2026-03-03T10:29:39Z"
+ },
+ {
+  "id": "63528343df98779b5fedf657bf8286cd",
+  "description": "labeille coveragepy benchmark",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/63528343df98779b5fedf657bf8286cd",
+  "created_at": "2026-02-28T11:14:36Z"
+ },
+ {
+  "id": "f575a280450b38595d65bd79be9c8a3b",
+  "description": "Report of an assertion failure in the JIT",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/f575a280450b38595d65bd79be9c8a3b",
+  "created_at": "2026-01-04T12:20:11Z"
+ },
+ {
+  "id": "a52d19711e2d968d3762541fc41778b9",
+  "description": "A stubborn free-threading segfault.",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a52d19711e2d968d3762541fc41778b9",
+  "created_at": "2025-12-24T16:13:21Z"
+ },
+ {
+  "id": "a000ca0bae1794e43336bc134382dfe0",
+  "description": "Post about lafleur",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a000ca0bae1794e43336bc134382dfe0",
+  "created_at": "2025-08-16T18:32:09Z"
+ },
+ {
+  "id": "16aaf9ed5e9bc74a80a09f8b0036805f",
+  "description": "Some output from fusil's feedback guided JIT fuzzing",
+  "public": true,
+  "html_url": "https://gist.github.com/devdanzin/16aaf9ed5e9bc74a80a09f8b0036805f",
+  "created_at": "2025-07-09T23:50:06Z"
+ },
+ {
+  "id": "8bae10c60e71a300cbe6a8611d3f1a48",
+  "description": "Fuzzing h5py with fusil",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/8bae10c60e71a300cbe6a8611d3f1a48",
+  "created_at": "2025-05-27T09:43:04Z"
+ },
+ {
+  "id": "86f6f47056979a3941f0ede1280c9e0d",
+  "description": "CPython report draft",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/86f6f47056979a3941f0ede1280c9e0d",
+  "created_at": "2025-05-07T23:41:21Z"
+ },
+ {
+  "id": "21a8bbc46932e67badbd9f311077c606",
+  "description": "SciPy fusil report",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/21a8bbc46932e67badbd9f311077c606",
+  "created_at": "2025-04-29T04:23:10Z"
+ },
+ {
+  "id": "dc2ef895928fc5758ea66a1ccf2eedd2",
+  "description": "Fuzzing polars with fusil",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/dc2ef895928fc5758ea66a1ccf2eedd2",
+  "created_at": "2025-04-27T19:11:54Z"
+ },
+ {
+  "id": "a922988484eb5430c4edcf06938338f9",
+  "description": "Six (unimportant) Numpy crashes found by fusil",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a922988484eb5430c4edcf06938338f9",
+  "created_at": "2025-04-20T20:30:31Z"
+ },
+ {
+  "id": "4208b2b63127eb5b9ab3b9739143258e",
+  "description": "A fusil generated test case that surfaces an abort related to lists and free-threading",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/4208b2b63127eb5b9ab3b9739143258e",
+  "created_at": "2025-04-18T17:20:26Z"
+ },
+ {
+  "id": "2e13e6ee1458cb3658733214012dbe70",
+  "description": "A backtrace of a CPython segfault",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/2e13e6ee1458cb3658733214012dbe70",
+  "created_at": "2025-04-13T11:46:48Z"
+ },
+ {
+  "id": "c08c9c6b3158e1d79ea3ac0bd5a195ef",
+  "description": "Some CPython free-threading crashes",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/c08c9c6b3158e1d79ea3ac0bd5a195ef",
+  "created_at": "2025-04-07T04:59:27Z"
+ },
+ {
+  "id": "81c52f379d481c4754bb7d89ccb83582",
+  "description": "Animated stars that look like approaching the screen",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/81c52f379d481c4754bb7d89ccb83582",
+  "created_at": "2024-12-19T13:02:30Z"
+ },
+ {
+  "id": "a5bd3630855def3b5c71c69d5bbc507c",
+  "description": "Animation of falling colored stars, with random colors, sizes and number of points, using py5/Processing.",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/a5bd3630855def3b5c71c69d5bbc507c",
+  "created_at": "2024-12-18T14:37:25Z"
+ },
+ {
+  "id": "07164fe993b3a2fb2be06839e5f5209b",
+  "description": "pyp5js-based star animation",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/07164fe993b3a2fb2be06839e5f5209b",
+  "created_at": "2024-12-18T01:29:22Z"
+ },
+ {
+  "id": "717f6f67856987d67d464ad0dfc3738b",
+  "description": "Security Python",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/717f6f67856987d67d464ad0dfc3738b",
+  "created_at": "2024-10-24T00:33:07Z"
+ },
+ {
+  "id": "591394b798b38a332ec3ecdef0f6f082",
+  "description": "A trivial Python C extension to map character positions to line numbers",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/591394b798b38a332ec3ecdef0f6f082",
+  "created_at": "2024-07-02T01:06:54Z"
+ },
+ {
+  "id": "111006b6a885417e8fb31ea9ecd8e370",
+  "description": "Display bar graphs for results of coverage benchmark runs",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/111006b6a885417e8fb31ea9ecd8e370",
+  "created_at": "2024-06-18T19:29:10Z"
+ },
+ {
+  "id": "1a1e63a073f7c1fc008771495dfa864b",
+  "description": "Conditionally displaying DEBUG log messages in Python",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/1a1e63a073f7c1fc008771495dfa864b",
+  "created_at": "2024-02-29T12:02:22Z"
+ },
+ {
+  "id": "513dfb256686a5d33f727f8247a87184",
+  "description": "Create wily reports and graphs for every python file ever tracked in the given repository",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/513dfb256686a5d33f727f8247a87184",
+  "created_at": "2023-07-07T16:51:27Z"
+ },
+ {
+  "id": "fa4a9e2921deca242b15657d96ab1404",
+  "description": "Quick and dirty way to collect most of Mu's shortcuts",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/fa4a9e2921deca242b15657d96ab1404",
+  "created_at": "2020-12-19T05:48:15Z"
+ },
+ {
+  "id": "be6eeab95bf592bc630cc66b70cec5b7",
+  "description": "Install wheels in Mu when Python doesn't have SSL enabled",
+  "public": false,
+  "html_url": "https://gist.github.com/devdanzin/be6eeab95bf592bc630cc66b70cec5b7",
+  "created_at": "2020-12-09T15:43:21Z"
+ }
+]

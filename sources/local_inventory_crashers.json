@@ -1,0 +1,418 @@
+{
+  "_meta": {
+    "generated": "2026-07-08",
+    "scan_type": "metadata-only local inventory (read-only)",
+    "sources_scanned": [
+      "/home/danzin/crashers/**/*.md",
+      "/home/danzin/.claude/projects/-home-danzin-projects-fusil/memory/*.md"
+    ],
+    "normalization": "repo#number | gist:id | bpo:number | raw URL",
+    "tool_guess_values": ["fusil", "fusil-oom", "fusil-plugin-cereggii", "fusil-plugin-h5py", "lafleur", "manual"]
+  },
+
+  "references": [
+
+    {
+      "ref": "python/cpython#151763",
+      "source_file": ".claude/.../memory/ft-setkeys-managed-dict-oom.md, repro-simplification-handoffs.md, reported-bugs-catalog-project.md, fleet-triage-dispositions.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM umbrella issue; 14 findings filed upstream, 4 fixed"
+    },
+    {
+      "ref": "python/cpython#151818",
+      "source_file": "crashers/fleet8_gc_candidate/FINDING.md, RESUME-fleet8-gc-producer.md, MEMORY.md, fleet-triage-dispositions.md, upstream-filing-policy-ft-subinterp.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0036 list.append double-free under MemoryError in _CALL_LIST_APPEND"
+    },
+    {
+      "ref": "python/cpython#151673",
+      "source_file": ".claude/.../memory/fleet-triage-dispositions.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0001 warnings do_warn negref-under-OOM, filed distinct"
+    },
+    {
+      "ref": "python/cpython#151773",
+      "source_file": ".claude/.../memory/repro-simplification-handoffs.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0002 sub-issue of umbrella, FIXED"
+    },
+    {
+      "ref": "python/cpython#151842",
+      "source_file": ".claude/.../memory/repro-simplification-handoffs.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0031 sub-issue of umbrella, FIXED"
+    },
+    {
+      "ref": "python/cpython#151931",
+      "source_file": ".claude/.../memory/fleet-triage-dispositions.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0019 pegen, filed as PR #151931 (distinct mechanism)"
+    },
+    {
+      "ref": "python/cpython#152034",
+      "source_file": ".claude/.../memory/repro-simplification-handoffs.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0003 sub-issue, FIXED + 3.13/14/15 backports"
+    },
+    {
+      "ref": "python/cpython#152058",
+      "source_file": ".claude/.../memory/repro-simplification-handoffs.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0028 sub-issue of umbrella, FIXED"
+    },
+    {
+      "ref": "python/cpython#152107",
+      "source_file": ".claude/.../memory/repro-simplification-handoffs.md, MEMORY.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0006 our sub-issue filed from umbrella, repro acked by author"
+    },
+    {
+      "ref": "python/cpython#152851",
+      "source_file": "crashers/... , .claude/.../memory/fleet3-triage-and-blake2-find.md, MEMORY.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "filed",
+      "context": "OOM-0043 _blake2 copy-under-OOM Py_UNREACHABLE, first --oom-foreign find"
+    },
+    {
+      "ref": "python/cpython#153354",
+      "source_file": ".claude/.../memory/reported-bugs-catalog-project.md (anchor); local draft crashers/wsgiref_types-cpu_load-assertion/ISSUE_DRAFT.md",
+      "tool_guess": "fusil",
+      "filed_status": "filed",
+      "context": "wsgiref.types.__annotate__ COMPARE_OP without bool flag -> POP_JUMP_IF_FALSE assert"
+    },
+    {
+      "ref": "python/cpython#132461",
+      "source_file": ".claude/.../memory/fleet-triage-dispositions.md",
+      "tool_guess": "fusil",
+      "filed_status": "filed",
+      "context": "OrderedDict.setdefault assert (ours, Apr-2025), fix PR gh-132462; non-OOM find"
+    },
+    {
+      "ref": "python/cpython#132462",
+      "source_file": ".claude/.../memory/fleet-triage-dispositions.md",
+      "tool_guess": "fusil",
+      "filed_status": "merged",
+      "context": "fix PR for our #132461 OrderedDict.setdefault bug"
+    },
+    {
+      "ref": "python/cpython#145197",
+      "source_file": "crashers/session_crash_20260105_093730_9015/labeille_prompts.md",
+      "tool_guess": "lafleur",
+      "filed_status": "filed",
+      "context": "labeille/lafleur JIT: only crash found so far running PyPI test suites under JIT"
+    },
+    {
+      "ref": "python/cpython#146102",
+      "source_file": ".claude/.../memory/reported-bugs-catalog-project.md",
+      "tool_guess": "manual",
+      "filed_status": "filed",
+      "context": "cpython-review-toolkit umbrella issue (review-toolkit find, not fusil)"
+    },
+    {
+      "ref": "python/cpython#146443",
+      "source_file": ".claude/.../memory/reported-bugs-catalog-project.md",
+      "tool_guess": "manual",
+      "filed_status": "filed",
+      "context": "cpython-review-toolkit fix PR paired with umbrella #146102"
+    },
+
+    {
+      "ref": "dpdani/cereggii#149",
+      "source_file": "crashers/cereggii_prs/INDEX.md, umbrella_issue.md, cereggii-gethandle-oom-find.md",
+      "tool_guess": "fusil-plugin-cereggii",
+      "filed_status": "filed",
+      "context": "cereggii umbrella ISSUE (4 bugs from allocation-failure fuzzing), posted 2026-07-07"
+    },
+    {
+      "ref": "dpdani/cereggii#145",
+      "source_file": "crashers/cereggii_prs/INDEX.md, umbrella_issue.md",
+      "tool_guess": "fusil-plugin-cereggii",
+      "filed_status": "filed",
+      "context": "PR bug1 CompareAndSet double-DECREF on colliding key __eq__ raise; posted 2026-07-07"
+    },
+    {
+      "ref": "dpdani/cereggii#146",
+      "source_file": "crashers/cereggii_prs/INDEX.md, umbrella_issue.md",
+      "tool_guess": "fusil-plugin-cereggii",
+      "filed_status": "filed",
+      "context": "PR bug3 reduce/reduce_count NULL-deref (reduce-flush-null-current); posted"
+    },
+    {
+      "ref": "dpdani/cereggii#147",
+      "source_file": "crashers/cereggii_prs/INDEX.md, umbrella_issue.md",
+      "tool_guess": "fusil-plugin-cereggii",
+      "filed_status": "filed",
+      "context": "PR bug4 get_handle() unchecked alloc (3 sites); posted"
+    },
+    {
+      "ref": "dpdani/cereggii#148",
+      "source_file": "crashers/cereggii_prs/INDEX.md, umbrella_issue.md",
+      "tool_guess": "fusil-plugin-cereggii",
+      "filed_status": "filed",
+      "context": "PR bug2 real GC double-count of shared pages across resize; posted (rr-pinned)"
+    },
+
+    {
+      "ref": "gist:10536845b9ec874be0b9471258879b55",
+      "source_file": "crashers/cereggii_prs/INDEX.md, umbrella_issue.md, cereggii-gethandle-oom-find.md",
+      "tool_guess": "fusil-plugin-cereggii",
+      "filed_status": "filed",
+      "context": "gist backing cereggii umbrella #149 with 4 bug write-ups + reproducers"
+    },
+    {
+      "ref": "gist:fd3ffd45da791d43da15e4fd33866579",
+      "source_file": "crashers/astropy C Extension Analysis Report.md",
+      "tool_guess": "manual",
+      "filed_status": "draft",
+      "context": "cext-review-toolkit astropy C-extension review report; offered issues/PRs, not yet filed"
+    },
+    {
+      "ref": "gist:c8ea9e0ea3e2247b729031b8179f860d",
+      "source_file": "crashers/session_crash_20260105_093730_9015/visual.md",
+      "tool_guess": "manual",
+      "filed_status": "unknown",
+      "context": "gisted code-review report (getpending Event.raw data-corruption bug); review-toolkit style"
+    },
+    {
+      "ref": "gist:3db2e889c7e2ef440dd25142c72cf96b",
+      "source_file": "crashers/session_crash_20260105_093730_9015/labeille_prompts.md",
+      "tool_guess": "lafleur",
+      "filed_status": "unknown",
+      "context": "labeille package-registry enrichment action-plan gist (tooling, NOT a bug)"
+    },
+
+    {
+      "ref": "python/cpython#127081",
+      "source_file": "crashers/profiling_sampling___main__-cpu_load-addresssanitizer/report_from_zero.md",
+      "tool_guess": "fusil",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: existing setlocale-thread-safety issue; our FT crash may be noise/dup of it"
+    },
+    {
+      "ref": "python/cpython#126312",
+      "source_file": "crashers/report_gc_abort_source.md",
+      "tool_guess": "fusil",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: 'seems related to #126312 but abort differs'; report Found using fusil by @vstinner"
+    },
+    {
+      "ref": "python/cpython#139071",
+      "source_file": "crashers/report_set_crash.md",
+      "tool_guess": "fusil",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: our repro found while simplifying the MRE in existing #139071"
+    },
+    {
+      "ref": "python/cpython#105234",
+      "source_file": "crashers/session_crash_20260105_093730_9015/visual.md",
+      "tool_guess": "lafleur",
+      "filed_status": "unknown",
+      "context": "CROSS-REF (known_issues.json curation): existing FIXED JIT crash _Py_uop_analyze_and_optimize"
+    },
+    {
+      "ref": "python/cpython#143232",
+      "source_file": ".claude/.../memory/upstream-filing-policy-ft-subinterp.md, oom-crash-investigation-state.md, fleet-triage-dispositions.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF/policy: colesbury de-prioritized FT-subinterp fuzzing; some OOM finds held (no-file)"
+    },
+    {
+      "ref": "python/cpython#129824",
+      "source_file": ".claude/.../memory/upstream-filing-policy-ft-subinterp.md",
+      "tool_guess": "fusil",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: FT-subinterpreter related existing issue (filing-policy context)"
+    },
+    {
+      "ref": "python/cpython#126644",
+      "source_file": ".claude/.../memory/oom-crash-investigation-state.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF (others'): _interpreters not thread-safe, closed NOT_PLANNED; nearest prior art to OOM-0038"
+    },
+    {
+      "ref": "python/cpython#126696",
+      "source_file": ".claude/.../memory/oom-crash-investigation-state.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF (others'): fix PR for #126644, closed UNMERGED"
+    },
+    {
+      "ref": "python/cpython#151905",
+      "source_file": ".claude/.../memory/repro-simplification-handoffs.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: upstream issue UNMAPPED to our catalog (maybe others') _PyType_LookupStackRef, closed"
+    },
+    {
+      "ref": "python/cpython#152125",
+      "source_file": ".claude/.../memory/repro-simplification-handoffs.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: upstream issue UNMAPPED to our catalog (maybe others') clear_freelist, open"
+    },
+    {
+      "ref": "python/cpython#152537",
+      "source_file": ".claude/.../memory/fleet-triage-dispositions.md",
+      "tool_guess": "fusil",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: different FT OrderedDict bug, closed (not ours; distinguished from #132461)"
+    },
+    {
+      "ref": "python/cpython#135838",
+      "source_file": ".claude/.../memory/fleet3-triage-and-blake2-find.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: gh-135532/#135838 reworked _blake2 copy path (origin context for OOM-0043)"
+    },
+    {
+      "ref": "bpo:25135",
+      "source_file": ".claude/.../memory/oom-0039-deque-clear-pyerr-clear.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: origin of deque_clear newblock+PyErr_Clear (2015), OOM-0039 ~10yr latent defect"
+    },
+    {
+      "ref": "bpo:33713",
+      "source_file": ".claude/.../memory/oom-0039-deque-clear-pyerr-clear.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF: same bug-class (PyErr save/restore) fixed elsewhere; prior art for OOM-0039"
+    },
+    {
+      "ref": "python/cpython#131173",
+      "source_file": ".claude/.../memory/oom-0039-deque-clear-pyerr-clear.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF (gh-131173): same exception-clobber bug-class fixed elsewhere; OOM-0039 prior art"
+    },
+    {
+      "ref": "python/cpython#145966",
+      "source_file": ".claude/.../memory/oom-0039-deque-clear-pyerr-clear.md",
+      "tool_guess": "fusil-oom",
+      "filed_status": "unknown",
+      "context": "CROSS-REF (gh-145966): same exception-clobber bug-class fixed elsewhere; OOM-0039 prior art"
+    },
+
+    {
+      "ref": "devdanzin/fusil#96",
+      "source_file": ".claude/.../memory/oom-crash-investigation-state.md",
+      "tool_guess": "fusil",
+      "filed_status": "merged",
+      "context": "TOOLING (not a bug): harness fix — install set_nomemory hook once; issue #96/PR #97"
+    },
+
+    {
+      "ref": "devdanzin/lafleur#304..#328",
+      "source_file": "crashers/session_crash_20260105_093730_9015/visual.md",
+      "tool_guess": "lafleur",
+      "filed_status": "filed",
+      "context": "TOOLING (not upstream bugs): lafleur repo project issues #304-#316,#328 (fleet mgmt, CI, fingerprinting)"
+    }
+  ],
+
+  "fusil_internal_tooling_prs": {
+    "note": "devdanzin/fusil own development PRs/issues (NOT upstream bug finds) referenced across memory notes; catalog these as tool-development artifacts, not bugs. Distinct numbers observed:",
+    "repo": "devdanzin/fusil",
+    "numbers": [77, 91, 95, 96, 97, 98, 99, 101, 104, 105, 106, 112, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 138, 139, 140, 142, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 176, 178, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197],
+    "ambiguity_warning": "Bare '#145'..'#149' are AMBIGUOUS: in fusil-tech-debt notes they are devdanzin/fusil tooling PRs (indentation migration etc.), while in cereggii files #145-148 are dpdani/cereggii bug-fix PRs and #149 the cereggii umbrella issue. Disambiguate by source_file/repo."
+  },
+
+  "lafleur_internal_tooling_prs": {
+    "note": "devdanzin/lafleur own development PRs (JIT-seed generation work); NOT upstream bug finds.",
+    "repo": "devdanzin/lafleur",
+    "numbers": [856, 858, 860, 862, 864, 866, 867, 868, 869, 870, 872]
+  },
+
+  "drafts": [
+    {
+      "slug": "h5py_get_name_oom_nullderef",
+      "description": "h5py h5i.get_name() unchecked malloc -> PyBytes_FromString(NULL) segv/abort under OOM (G-1, ~35% of all crashes, dominant). FIX VERIFIED locally (fix.patch on h5i.templ.pyx).",
+      "target_repo": "h5py/h5py",
+      "why_unfiled": "Report DRAFTED not filed (user reviewing); found via fusil --oom-foreign plugin"
+    },
+    {
+      "slug": "hdf5_property_list_oom_family",
+      "description": "HDF5 H5P/H5SL/H5S property-list + skip-list + dataspace machinery not allocation-failure safe; 4 ASan manifestations (heap-buffer-overflow, 2x NULL-deref, UAF), H5Pset_layout corrupts DCPL skip-list -> H5P_close crashes.",
+      "target_repo": "The HDF Group (libhdf5) — hdfgroup",
+      "why_unfiled": "Report DRAFTED not filed; found via fusil --oom-foreign plugin (h5py 3.16 / libhdf5 1.14.6)"
+    },
+    {
+      "slug": "hdf5_h5sl_insert_oom_overflow",
+      "description": "ASan repro isolating the H5SL__insert_common heap-buffer-overflow (HC-1) inside the hdf5_property_list_oom_family report.",
+      "target_repo": "The HDF Group (libhdf5)",
+      "why_unfiled": "Supporting ASan repro for the drafted (unfiled) HDF5 report"
+    },
+    {
+      "slug": "h5py_g12_with_phil",
+      "description": "h5py @with_phil exception-path Py_INCREF(NULL) segv; root-caused as Cython-generated __exit__ (likely upstream Cython), secondary in h5py report.",
+      "target_repo": "h5py/h5py or cython/cython",
+      "why_unfiled": "Secondary finding in the drafted (unfiled) h5py report"
+    },
+    {
+      "slug": "astropy_cext_review",
+      "description": "cext-review-toolkit astropy C-extension review: WCS wrapper error-path bugs (leaked refs, missing NULL checks), FITS compression missing safety checks, IterParser dealloc omissions. Gist sent to maintainers; offered umbrella issue + per-finding issues/PRs.",
+      "target_repo": "astropy/astropy",
+      "why_unfiled": "Gist report sent, awaiting maintainer go-ahead; issues/PRs not yet filed"
+    },
+    {
+      "slug": "coveragepy_ctracer_review",
+      "description": "coveragepy CTracer review drafts (ctracer_review_*.md) — named in catalog plan as known drafts, not present as artifacts in this crashers scan.",
+      "target_repo": "nedbat/coveragepy",
+      "why_unfiled": "Explicitly excluded as draft in reported-bugs-catalog plan (drafts excluded until filed)"
+    },
+    {
+      "slug": "numpy_oom_contract_violation",
+      "description": "numpy ufunc 'less'/datetime_as_string returned NULL without setting an exception under OOM (surfaced via h5py MultiBlockSlice). Flagged as separate potential numpy report.",
+      "target_repo": "numpy/numpy",
+      "why_unfiled": "Optional/potential report only; not drafted or filed (h5py inventory notes it as excluded numpy noise)"
+    }
+  ],
+
+  "cereggii_artifacts": [
+    {"ref": "dpdani/cereggii#149", "type": "issue", "role": "umbrella", "state": "posted 2026-07-07 (open)", "bug": "overview of 4 allocation-failure/FT bugs; points to gist"},
+    {"ref": "dpdani/cereggii#145", "type": "PR", "role": "fix", "state": "posted 2026-07-07 (open/ready)", "bug": "bug1 CompareAndSet double-DECREF (fix/compareandset-double-decref)"},
+    {"ref": "dpdani/cereggii#146", "type": "PR", "role": "fix", "state": "posted 2026-07-07 (open/ready)", "bug": "bug3 reduce/reduce_count NULL-deref (fix/reduce-flush-null-current)"},
+    {"ref": "dpdani/cereggii#147", "type": "PR", "role": "fix", "state": "posted 2026-07-07 (open/ready)", "bug": "bug4 get_handle() unchecked alloc, 3 sites (fix/get-handle-null-args)"},
+    {"ref": "dpdani/cereggii#148", "type": "PR", "role": "fix", "state": "posted 2026-07-07 (open/ready, rr-verified)", "bug": "bug2 real fix: GC double-count of pages shared across resize (fix/shared-page-gc-traversal)"},
+    {"ref": "gist:10536845b9ec874be0b9471258879b55", "type": "gist", "role": "report", "state": "published", "bug": "backs #149; all 4 write-ups + reproducers"},
+    {"note": "A superseded draft branch fix/deferred-refcount-key (PR_bug2_deferred_DRAFT.md) was NOT pushed — dropped in favor of #148. test_racy_deletes flakiness mentioned in #149 but held from separate filing pending dpdani."}
+  ],
+
+  "maintainer_or_contributor_filed": [
+    {
+      "ref": "python/cpython#151763 (OOM-0023 sub-thread)",
+      "note": "Contributor Abhi210 filing (separately) the FT set_keys managed-dict OOM assert we root-caused for them (dictobject.c:205 ASSERT_OWNED_OR_SHARED); ~/crashers/ft_setkeys_managed_dict_oom/repro.py. Filed BY the contributor, not us.",
+      "source_file": ".claude/.../memory/ft-setkeys-managed-dict-oom.md"
+    },
+    {
+      "ref": "python/cpython#126312, #127081, #139071, #105234, #126644/#126696, #151905, #152125, #152537",
+      "note": "Existing upstream issues (maintainers'/others') referenced as cross-refs or prior-art, NOT our finds.",
+      "source_file": "various crashers/*.md + memory notes"
+    }
+  ],
+
+  "lafleur_findings": [
+    {
+      "ref": "python/cpython#145197",
+      "note": "The one upstream JIT crash found by labeille/lafleur (running PyPI test suites under JIT-enabled CPython). FILED. This is the only lafleur-attributed upstream bug find in these sources.",
+      "source_file": "crashers/session_crash_20260105_093730_9015/labeille_prompts.md"
+    },
+    {
+      "ref": "devdanzin/lafleur#304-#328",
+      "note": "lafleur's OWN repo issues (feature/enhancement/bug about the tool itself), not upstream bug finds.",
+      "source_file": "crashers/session_crash_20260105_093730_9015/visual.md"
+    }
+  ],
+
+  "notes": "Two large lafleur session transcripts (crashers/session_crash_20260105_093730_9015/visual.md and labeille_prompts.md) contain most non-bug references (lafleur repo issues #304-#328, known_issues.json curation of existing CPython JIT bugs, and CSS hex colors like #166534 that the naive #NNNN regex catches — excluded as noise). ~30 crashers/report_trigger_*.md + report_crash_*.md + session_crash_*/report_*.md files describe fusil finds (asyncio futureiter, csv, exceptiongroup repr OOB, functools.partial, pyexpat, sqlite collation, ssl SNI decref, termios PyLong, zoneinfo x2, pickle frozenset, imp, et/elementtree, tracemalloc, os/sys/ssl ASan cpu_load, packaging, unicodedata, mypy, ipyt segv, trace_length segv) that carry NO embedded issue/PR reference — they are candidate findings whose filed-status is not recorded in these local artifacts and must be reconciled against GitHub live. The wsgiref find has a local ISSUE_DRAFT.md but was filed as python/cpython#153354 (per catalog anchor). OOM findings use an OOM-00NN internal id scheme (catalog cpython-oom-findings); the umbrella is #151763 with per-finding sub-issues. cereggii bugs came from fusil OOM/FT fuzzing while building the fusil_cereggii_plugin. h5py/HDF5 came from fusil --oom-foreign (fusil_h5py_plugin). Distinct upstream/extension BUG references (excluding tooling PRs and pure cross-refs): cpython filed = #151763,#151818,#151673,#151773,#151842,#151931,#152034,#152058,#152107,#152851,#153354,#132461(+#132462),#145197,#146102(+#146443); cereggii filed = #145,#146,#147,#148,#149. Total DISTINCT references catalogued in this file (all categories incl. cross-refs, gists, bpo): ~55 (plus the compact fusil ~75-number and lafleur ~11-number tooling-PR lists and the lafleur #304-#328 issue range)."
+}

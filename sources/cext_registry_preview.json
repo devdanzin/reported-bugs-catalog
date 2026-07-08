@@ -1,0 +1,3092 @@
+{
+  "registry_extensions": [
+    {
+      "extension": "h5py",
+      "issues_ours": "16",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "9",
+      "open": "6",
+      "closed_merged": "19",
+      "status": "fixes_merged",
+      "channel": "Mastodon DM",
+      "contact": "Clément Robert (@neutrinoceros)",
+      "detailed": {
+        "umbrella": "https://github.com/h5py/h5py/issues/2825",
+        "links": [
+          {
+            "url": "https://github.com/h5py/h5py/issues/2825",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2826",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2827",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2828",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2829",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2830",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2831",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2832",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2833",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2834",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2835",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2836",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2837",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2838",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2839",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/issues/2840",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2841",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2842",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2843",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2844",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2845",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2846",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2847",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2848",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/h5py/h5py/pull/2852",
+            "state_claimed": "MERGED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "bottleneck",
+      "issues_ours": "15",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "9",
+      "open": "9",
+      "closed_merged": "15",
+      "status": "fixes_merged",
+      "channel": "Mastodon DM",
+      "contact": "Clément Robert (@neutrinoceros)",
+      "detailed": {
+        "umbrella": "https://github.com/pydata/bottleneck/issues/518",
+        "links": [
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/518",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/519",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/520",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/521",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/522",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/523",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/524",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/525",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/526",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/527",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/528",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/529",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/530",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/531",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/issues/532",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/533",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/534",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/535",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/536",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/537",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/543",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/544",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/545",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pydata/bottleneck/pull/547",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "kiwisolver",
+      "issues_ours": "9",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "9",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "Email",
+      "contact": "Matthieu C. Dartiailh",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/223",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/224",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/225",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/226",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/227",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/228",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/229",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/230",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/kiwi/issues/231",
+            "state_claimed": null
+          }
+        ]
+      }
+    },
+    {
+      "extension": "atom",
+      "issues_ours": "9",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "9",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "Email",
+      "contact": "Matthieu C. Dartiailh",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/nucleic/atom/issues/254",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/atom/issues/255",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/atom/issues/256",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/atom/issues/257",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/atom/issues/258",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/atom/issues/259",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/atom/issues/260",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/atom/issues/261",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/atom/issues/262",
+            "state_claimed": null
+          }
+        ]
+      }
+    },
+    {
+      "extension": "enaml",
+      "issues_ours": "8",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "8",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "Email",
+      "contact": "Matthieu C. Dartiailh",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/nucleic/enaml/issues/598",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/599",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/600",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/601",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/602",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/603",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/604",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/605",
+            "state_claimed": null
+          }
+        ]
+      }
+    },
+    {
+      "extension": "zope.interface",
+      "issues_ours": "0",
+      "issues_maintainer": "7",
+      "prs_ours": "0",
+      "prs_maintainer": "2",
+      "open": "9",
+      "closed_merged": "0",
+      "status": "maintainer_acting",
+      "channel": "Mastodon DM",
+      "contact": "Jens W. Klein (@jensens)",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/issues/357",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/issues/358",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/issues/359",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/issues/360",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/issues/361",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/issues/362",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/issues/363",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/pull/364",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/zopefoundation/zope.interface/pull/365",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "lz4",
+      "issues_ours": "0",
+      "issues_maintainer": "0",
+      "prs_ours": "6",
+      "prs_maintainer": "0",
+      "open": "6",
+      "closed_merged": "0",
+      "status": "prs_submitted",
+      "channel": "Email",
+      "contact": "Jonathan Underwood",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/python-lz4/python-lz4/pull/330",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/python-lz4/python-lz4/pull/331",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/python-lz4/python-lz4/pull/332",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/python-lz4/python-lz4/pull/333",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/python-lz4/python-lz4/pull/334",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/python-lz4/python-lz4/pull/335",
+            "state_claimed": null
+          }
+        ]
+      }
+    },
+    {
+      "extension": "scipy",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "2",
+      "prs_maintainer": "0",
+      "open": "3",
+      "closed_merged": "0",
+      "status": "prs_submitted",
+      "channel": "Slack",
+      "contact": "(SciPy team)",
+      "detailed": {
+        "umbrella": "https://github.com/scipy/scipy/issues/24927",
+        "links": [
+          {
+            "url": "https://github.com/scipy/scipy/issues/24927",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/scipy/scipy/pull/24928",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/scipy/scipy/pull/24929",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "memray",
+      "issues_ours": "0",
+      "issues_maintainer": "0",
+      "prs_ours": "2",
+      "prs_maintainer": "0",
+      "open": "2",
+      "closed_merged": "0",
+      "status": "prs_submitted",
+      "channel": "Discord DM",
+      "contact": "Matt Wozniski (@godlygeek)",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/bloomberg/memray/pull/894",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/bloomberg/memray/pull/895",
+            "state_claimed": null
+          }
+        ]
+      }
+    },
+    {
+      "extension": "cython",
+      "issues_ours": "0",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "4",
+      "open": "1",
+      "closed_merged": "3",
+      "status": "fixes_merged",
+      "channel": "Discourse DM",
+      "contact": "Da Woods (@da-woods)",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/cython/cython/pull/7594",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/cython/cython/pull/7597",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/cython/cython/pull/7600",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/cython/cython/pull/7605",
+            "state_claimed": "MERGED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "bitarray",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "1",
+      "open": "0",
+      "closed_merged": "2",
+      "status": "fixes_merged",
+      "channel": "Email",
+      "contact": "Ilan Schnell",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/ilanschnell/bitarray/issues/270",
+            "state_claimed": "CLOSED"
+          },
+          {
+            "url": "https://github.com/ilanschnell/bitarray/pull/249",
+            "state_claimed": "MERGED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "multidict",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "1",
+      "open": "2",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "GitHub issue",
+      "contact": "—",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/aio-libs/multidict/issues/1306",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/aio-libs/multidict/pull/1310",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "guppy3",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "0",
+      "closed_merged": "1",
+      "status": "fixes_merged",
+      "channel": "Email",
+      "contact": "YiFei Zhu",
+      "detailed": {
+        "umbrella": "https://github.com/zhuyifei1999/guppy3/issues/51",
+        "links": [
+          {
+            "url": "https://github.com/zhuyifei1999/guppy3/issues/51",
+            "state_claimed": "CLOSED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "igraph",
+      "issues_ours": "0",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "1",
+      "open": "0",
+      "closed_merged": "1",
+      "status": "fixes_merged",
+      "channel": "Discourse",
+      "contact": "szhorvat",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/igraph/python-igraph/pull/879",
+            "state_claimed": "MERGED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "matplotlib",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "1",
+      "closed_merged": "0",
+      "status": "contacted",
+      "channel": "Discourse chat",
+      "contact": "Scott Shambaugh",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/matplotlib/matplotlib/issues/31424",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "protobuf",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "1",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "Email (Google Groups)",
+      "contact": "Em Rauch",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/protocolbuffers/protobuf/issues/26596",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "psutil",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "1",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "Email",
+      "contact": "Giampaolo Rodola",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/giampaolo/psutil/issues/2792",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "numpy",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "1",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "Discord DM",
+      "contact": "Nathan Goldbaum",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/numpy/numpy/issues/31046",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "Pillow",
+      "issues_ours": "0",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "13",
+      "open": "0",
+      "closed_merged": "13",
+      "status": "fixes_merged",
+      "channel": "Mastodon DM",
+      "contact": "Hugo van Kemenade (@hugovk)",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9487",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9488",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9489",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9493",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9494",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9498",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9500",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9501",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9502",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9503",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9508",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9527",
+            "state_claimed": "MERGED"
+          },
+          {
+            "url": "https://github.com/python-pillow/Pillow/pull/9539",
+            "state_claimed": "MERGED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "lxml",
+      "issues_ours": "0",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "—",
+      "closed_merged": "~16 commits",
+      "status": "fixes_committed",
+      "channel": "Email",
+      "contact": "Stefan Behnel",
+      "detailed": {
+        "umbrella": null,
+        "links": []
+      }
+    },
+    {
+      "extension": "greenlet",
+      "issues_ours": "0",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "1",
+      "open": "0",
+      "closed_merged": "1",
+      "status": "fixes_merged",
+      "channel": "Email",
+      "contact": "Jason Madden (@jamadden)",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/python-greenlet/greenlet/pull/502",
+            "state_claimed": "MERGED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "pycurl",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "1",
+      "open": "1",
+      "closed_merged": "1",
+      "status": "fixes_merged",
+      "channel": "GitHub issue",
+      "contact": "@swt2c",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/pycurl/pycurl/issues/960",
+            "state_claimed": "OPEN"
+          },
+          {
+            "url": "https://github.com/pycurl/pycurl/pull/961",
+            "state_claimed": "MERGED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "enaml (updated)",
+      "issues_ours": "8",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "5",
+      "open": "8",
+      "closed_merged": "5",
+      "status": "fixes_merged",
+      "channel": "Email",
+      "contact": "Matthieu C. Dartiailh / @frmdstryr",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/nucleic/enaml/issues/598",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/599",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/600",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/601",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/602",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/603",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/604",
+            "state_claimed": null
+          },
+          {
+            "url": "https://github.com/nucleic/enaml/issues/605",
+            "state_claimed": null
+          }
+        ]
+      }
+    },
+    {
+      "extension": "duckdb",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "1",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "GitHub issue",
+      "contact": "—",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/duckdb/duckdb-python/issues/408",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "apsw",
+      "issues_ours": "0",
+      "issues_maintainer": "1",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "0",
+      "closed_merged": "1",
+      "status": "maintainer_acting",
+      "channel": "Email",
+      "contact": "Roger Binns",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/rogerbinns/apsw/issues/609",
+            "state_claimed": "CLOSED"
+          }
+        ]
+      }
+    },
+    {
+      "extension": "regex",
+      "issues_ours": "0",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "—",
+      "closed_merged": "~6 commits",
+      "status": "fixes_committed",
+      "channel": "Email",
+      "contact": "Matthew Barnett",
+      "detailed": {
+        "umbrella": null,
+        "links": []
+      }
+    },
+    {
+      "extension": "traits",
+      "issues_ours": "1",
+      "issues_maintainer": "0",
+      "prs_ours": "0",
+      "prs_maintainer": "0",
+      "open": "1",
+      "closed_merged": "0",
+      "status": "issues_filed",
+      "channel": "Discourse DM",
+      "contact": "Mark Dickinson",
+      "detailed": {
+        "umbrella": null,
+        "links": [
+          {
+            "url": "https://github.com/enthought/traits/issues/1881",
+            "state_claimed": "OPEN"
+          }
+        ]
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "ext": "apsw",
+      "type": "issue",
+      "number": 609,
+      "repo": "rogerbinns/apsw",
+      "state": "CLOSED",
+      "title": "Investigate linter report",
+      "author": "rogerbinns",
+      "url": "https://github.com/rogerbinns/apsw/issues/609",
+      "createdAt": "2026-03-28T00:00:33Z",
+      "closedAt": "2026-04-03T00:17:23Z",
+      "tool_guess": "cext",
+      "_file": "apsw_issue_609.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 254,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "All 13 heap type deallocs missing Py_DECREF(Py_TYPE(self)) + DefaultAtomDict::Ready missing Py_INCREF",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/254",
+      "createdAt": "2026-03-27T13:27:25Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "atom_issue_254.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 255,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "AtomMethodWrapper tp_basicsize uses sizeof(MethodWrapper) instead of sizeof(AtomMethodWrapper)",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/255",
+      "createdAt": "2026-03-27T13:27:40Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "atom_issue_255.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 256,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "PyObject_RichCompareBool error treated as truthy in range_handler + safe_richcompare swallows KeyboardInterrupt",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/256",
+      "createdAt": "2026-03-27T13:28:03Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "atom_issue_256.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 257,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "add_long() leaks one reference per enum value (pyint.release() after PyDict_SetItemString)",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/257",
+      "createdAt": "2026-03-27T13:28:17Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "atom_issue_257.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 258,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "Missing PyErr_Occurred() after PyIter_Next in 3 functions + CAtom_getstate error handling gaps",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/258",
+      "createdAt": "2026-03-27T13:28:37Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "atom_issue_258.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 259,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "SortedMap_new: 4 bugs — double-incref leak, PyDict_Items leak, self leak on error, unchecked PySequence_GetItem segfault",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/259",
+      "createdAt": "2026-03-27T13:29:04Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "atom_issue_259.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 260,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "Segfault in atomdict setdefault and DefaultAtomDict __missing__ with key coercion",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/260",
+      "createdAt": "2026-03-27T13:29:22Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "atom_issue_260.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 261,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "Copy-paste bug in init_containerlistchange + unchecked PyModule_AddObject x10 + cached_property stores NULL",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/261",
+      "createdAt": "2026-03-27T13:29:39Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "atom_issue_261.json"
+    },
+    {
+      "ext": "atom",
+      "type": "issue",
+      "number": 262,
+      "repo": "nucleic/atom",
+      "state": "OPEN",
+      "title": "Modernization notes: dead version guards, deprecated APIs, private APIs, free-threading gaps",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/atom/issues/262",
+      "createdAt": "2026-03-27T13:30:05Z",
+      "closedAt": null,
+      "tool_guess": "cext-or-ft",
+      "_file": "atom_issue_262.json"
+    },
+    {
+      "ext": "bitarray",
+      "type": "issue",
+      "number": 250,
+      "repo": "ilanschnell/bitarray",
+      "state": "CLOSED",
+      "title": "Umbrella issue: bitarray C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/ilanschnell/bitarray/issues/250",
+      "createdAt": "2026-04-01T00:28:12Z",
+      "closedAt": "2026-04-02T20:06:26Z",
+      "tool_guess": "cext",
+      "_file": "issue_250.json"
+    },
+    {
+      "ext": "bitarray",
+      "type": "pr",
+      "number": 249,
+      "repo": "ilanschnell/bitarray",
+      "state": "MERGED",
+      "title": "fix reference counts in bitarray_encode()",
+      "author": "ilanschnell",
+      "url": "https://github.com/ilanschnell/bitarray/pull/249",
+      "createdAt": "2026-03-31T21:25:30Z",
+      "closedAt": "2026-03-31T21:26:35Z",
+      "tool_guess": "cext",
+      "_file": "pr_249.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 518,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "Umbrella issue: bottleneck C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/518",
+      "createdAt": "2026-03-29T12:33:34Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_518.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 519,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "move_median MEMORY_ERR without return — segfault under OOM",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/519",
+      "createdAt": "2026-03-29T12:33:49Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_519.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 520,
+      "repo": "pydata/bottleneck",
+      "state": "CLOSED",
+      "title": "partition/argpartition leak ~80 KB per invalid-kth error",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/520",
+      "createdAt": "2026-03-29T12:34:05Z",
+      "closedAt": "2026-03-31T07:44:22Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_520.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 521,
+      "repo": "pydata/bottleneck",
+      "state": "CLOSED",
+      "title": "rankdata/nanrankdata leak 1 reference per call on non-C-contiguous arrays",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/521",
+      "createdAt": "2026-03-29T12:34:23Z",
+      "closedAt": "2026-03-31T09:04:29Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_521.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 522,
+      "repo": "pydata/bottleneck",
+      "state": "CLOSED",
+      "title": "nonreducer_axis RUNTIME_ERR without return — falls through to NULL dereference",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/522",
+      "createdAt": "2026-03-29T12:34:34Z",
+      "closedAt": "2026-03-31T07:44:05Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_522.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 523,
+      "repo": "pydata/bottleneck",
+      "state": "CLOSED",
+      "title": "rankdata/nanrankdata: unchecked PyArray_ArgSort and PyArray_EMPTY — NULL dereference",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/523",
+      "createdAt": "2026-03-29T12:34:46Z",
+      "closedAt": "2026-03-31T07:43:47Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_523.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 524,
+      "repo": "pydata/bottleneck",
+      "state": "CLOSED",
+      "title": "push: unchecked PyArray_Copy — NULL dereference on OOM",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/524",
+      "createdAt": "2026-03-29T12:34:56Z",
+      "closedAt": "2026-03-31T07:43:32Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_524.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 525,
+      "repo": "pydata/bottleneck",
+      "state": "CLOSED",
+      "title": "INIT and INIT_ONE macros: unchecked PyArray_EMPTY — NULL dereference in ~46 functions",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/525",
+      "createdAt": "2026-03-29T12:35:15Z",
+      "closedAt": "2026-04-03T08:31:16Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_525.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 526,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "mm_new/mm_new_nan: three unchecked malloc calls — segfault on OOM",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/526",
+      "createdAt": "2026-03-29T12:35:30Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_526.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 527,
+      "repo": "pydata/bottleneck",
+      "state": "CLOSED",
+      "title": "Missing pystr_kth in intern_strings return check",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/527",
+      "createdAt": "2026-03-29T12:35:43Z",
+      "closedAt": "2026-04-02T20:42:40Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_527.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 528,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "PyArray_Ravel unchecked in iterators.h init_iter_all — NULL dereference and ref leak",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/528",
+      "createdAt": "2026-03-29T12:35:57Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_528.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 529,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "BUFFER_NEW macro: unchecked malloc inside GIL-released region",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/529",
+      "createdAt": "2026-03-29T12:36:08Z",
+      "closedAt": null,
+      "tool_guess": "cext-or-ft",
+      "_file": "bottleneck_issue_529.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 530,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "Module object leaked on import_array/intern_strings failure in all PyInit functions",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/530",
+      "createdAt": "2026-03-29T12:36:25Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_530.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 531,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "error_converting + TYPE_ERR clobbers original exception (~15 sites)",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/531",
+      "createdAt": "2026-03-29T12:36:38Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "bottleneck_issue_531.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "issue",
+      "number": 532,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "Py_MOD_GIL_NOT_USED declared but global state unprotected for free-threading",
+      "author": "devdanzin",
+      "url": "https://github.com/pydata/bottleneck/issues/532",
+      "createdAt": "2026-03-29T12:36:51Z",
+      "closedAt": null,
+      "tool_guess": "cext-or-ft",
+      "_file": "bottleneck_issue_532.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 533,
+      "repo": "pydata/bottleneck",
+      "state": "MERGED",
+      "title": "BUG: fix memory leaks on error in `partition` and `argpartition`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/533",
+      "createdAt": "2026-03-30T14:19:41Z",
+      "closedAt": "2026-03-31T07:44:21Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_533.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 534,
+      "repo": "pydata/bottleneck",
+      "state": "MERGED",
+      "title": "BUG: fix memory leaks in `rankdata` when called on non C-contiguous arrays",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/534",
+      "createdAt": "2026-03-30T14:43:31Z",
+      "closedAt": "2026-03-31T09:04:27Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_534.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 535,
+      "repo": "pydata/bottleneck",
+      "state": "MERGED",
+      "title": "BUG: future proof `nonreducer_axis` against a potential segfault",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/535",
+      "createdAt": "2026-03-30T14:48:49Z",
+      "closedAt": "2026-03-31T07:44:03Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_535.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 536,
+      "repo": "pydata/bottleneck",
+      "state": "MERGED",
+      "title": "BUG: add missing checks for nullptr in `rankdata` and `nanrankdata`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/536",
+      "createdAt": "2026-03-30T16:24:39Z",
+      "closedAt": "2026-03-31T07:43:46Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_536.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 537,
+      "repo": "pydata/bottleneck",
+      "state": "MERGED",
+      "title": "BUG: add missing check for nullptr in `push`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/537",
+      "createdAt": "2026-03-30T16:39:07Z",
+      "closedAt": "2026-03-31T07:43:31Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_537.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 543,
+      "repo": "pydata/bottleneck",
+      "state": "MERGED",
+      "title": "BUG: add missing checks for nullptr in `INIT` and `INIT_ONE` macros",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/543",
+      "createdAt": "2026-04-02T20:21:38Z",
+      "closedAt": "2026-04-03T08:31:16Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_543.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 544,
+      "repo": "pydata/bottleneck",
+      "state": "MERGED",
+      "title": "BUG: add missing check in `intern_strings`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/544",
+      "createdAt": "2026-04-02T20:30:09Z",
+      "closedAt": "2026-04-02T20:42:39Z",
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_544.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 545,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "BUG: fix memory leaks in `init_iter_all` when called on non C-contiguous arrays",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/545",
+      "createdAt": "2026-04-02T20:38:46Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_545.json"
+    },
+    {
+      "ext": "bottleneck",
+      "type": "pr",
+      "number": 547,
+      "repo": "pydata/bottleneck",
+      "state": "OPEN",
+      "title": "BUG: add missing checks for nullptr in `mm_new(|_nan)`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/pydata/bottleneck/pull/547",
+      "createdAt": "2026-04-03T13:40:25Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "bottleneck_pr_547.json"
+    },
+    {
+      "ext": "cython",
+      "type": "pr",
+      "number": 7594,
+      "repo": "cython/cython",
+      "state": "MERGED",
+      "title": "Fix a couple of cyfunction ref-counting errors",
+      "author": "da-woods",
+      "url": "https://github.com/cython/cython/pull/7594",
+      "createdAt": "2026-03-27T21:07:45Z",
+      "closedAt": "2026-03-28T06:09:28Z",
+      "tool_guess": "cext",
+      "_file": "pr_7594.json"
+    },
+    {
+      "ext": "cython",
+      "type": "pr",
+      "number": 7597,
+      "repo": "cython/cython",
+      "state": "MERGED",
+      "title": "Fix reference leak in Generator_Replace_StopIteration",
+      "author": "da-woods",
+      "url": "https://github.com/cython/cython/pull/7597",
+      "createdAt": "2026-03-28T08:45:43Z",
+      "closedAt": "2026-03-31T21:18:34Z",
+      "tool_guess": "cext",
+      "_file": "pr_7597.json"
+    },
+    {
+      "ext": "cython",
+      "type": "pr",
+      "number": 7600,
+      "repo": "cython/cython",
+      "state": "OPEN",
+      "title": "Try to avoid unguarded PyErr_Clear",
+      "author": "da-woods",
+      "url": "https://github.com/cython/cython/pull/7600",
+      "createdAt": "2026-03-28T11:05:56Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "pr_7600.json"
+    },
+    {
+      "ext": "cython",
+      "type": "pr",
+      "number": 7605,
+      "repo": "cython/cython",
+      "state": "MERGED",
+      "title": "[3.2] Fix reference leak in Generator_Replace_StopIteration (#7597)",
+      "author": "matusvalo",
+      "url": "https://github.com/cython/cython/pull/7605",
+      "createdAt": "2026-03-31T21:21:33Z",
+      "closedAt": "2026-04-01T06:40:57Z",
+      "tool_guess": "cext",
+      "_file": "pr_7605.json"
+    },
+    {
+      "ext": "duckdb",
+      "type": "issue",
+      "number": 408,
+      "repo": "duckdb/duckdb-python",
+      "state": "OPEN",
+      "title": "duckdb Python Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/duckdb/duckdb-python/issues/408",
+      "createdAt": "2026-03-29T03:01:00Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "duckdb_issue_408.json"
+    },
+    {
+      "ext": "enaml",
+      "type": "issue",
+      "number": 598,
+      "repo": "nucleic/enaml",
+      "state": "OPEN",
+      "title": "All 13+ heap type deallocs missing Py_DECREF(Py_TYPE(self)) + DFunc missing GC_UnTrack + SubscriptionObserver traverse …",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/enaml/issues/598",
+      "createdAt": "2026-03-27T13:33:32Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "enaml_issue_598.json"
+    },
+    {
+      "ext": "enaml",
+      "type": "issue",
+      "number": 599,
+      "repo": "nucleic/enaml",
+      "state": "OPEN",
+      "title": "Segfaults from PyUnicode_AsUTF8 NULL passed to strcmp in DynamicScope hot path + repr functions",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/enaml/issues/599",
+      "createdAt": "2026-03-27T13:33:54Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "enaml_issue_599.json"
+    },
+    {
+      "ext": "enaml",
+      "type": "issue",
+      "number": 600,
+      "repo": "nucleic/enaml",
+      "state": "OPEN",
+      "title": "PyObject_RichCompareBool and PyObject_IsTrue error-as-truthy in signal disconnect, compare, and observer call",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/enaml/issues/600",
+      "createdAt": "2026-03-27T13:34:13Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "enaml_issue_600.json"
+    },
+    {
+      "ext": "enaml",
+      "type": "issue",
+      "number": 601,
+      "repo": "nucleic/enaml",
+      "state": "OPEN",
+      "title": "set_dynamic_attr: missing return -1 after read-only error + return -1 without exception + DICT_SUBCLASS flag",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/enaml/issues/601",
+      "createdAt": "2026-03-27T13:34:30Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "enaml_issue_601.json"
+    },
+    {
+      "ext": "enaml",
+      "type": "issue",
+      "number": 602,
+      "repo": "nucleic/enaml",
+      "state": "OPEN",
+      "title": "declarative_function: super_disallowed ref leak per call + _Invoke cascading NULL + DFunc_new leaks self on bad args",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/enaml/issues/602",
+      "createdAt": "2026-03-27T13:34:51Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "enaml_issue_602.json"
+    },
+    {
+      "ext": "enaml",
+      "type": "issue",
+      "number": 603,
+      "repo": "nucleic/enaml",
+      "state": "OPEN",
+      "title": "load_obj_dict unchecked PyDict_New + fontext copy-paste bug + unchecked PyModule_AddObject for UserKeyError",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/enaml/issues/603",
+      "createdAt": "2026-03-27T13:35:10Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "enaml_issue_603.json"
+    },
+    {
+      "ext": "enaml",
+      "type": "issue",
+      "number": 604,
+      "repo": "nucleic/enaml",
+      "state": "OPEN",
+      "title": "SubscriptionObserver_set_ref returns PyObject* instead of int (setter silently swallows errors)",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/enaml/issues/604",
+      "createdAt": "2026-03-27T13:35:25Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "enaml_issue_604.json"
+    },
+    {
+      "ext": "enaml",
+      "type": "issue",
+      "number": 605,
+      "repo": "nucleic/enaml",
+      "state": "OPEN",
+      "title": "Modernization notes: dead version guards, deprecated/private APIs, PyDict_GetItem exception swallowing, free-threading …",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/enaml/issues/605",
+      "createdAt": "2026-03-27T13:35:54Z",
+      "closedAt": null,
+      "tool_guess": "cext-or-ft",
+      "_file": "enaml_issue_605.json"
+    },
+    {
+      "ext": "greenlet",
+      "type": "pr",
+      "number": 502,
+      "repo": "python-greenlet/greenlet",
+      "state": "MERGED",
+      "title": "Address automated code audit results",
+      "author": "jamadden",
+      "url": "https://github.com/python-greenlet/greenlet/pull/502",
+      "createdAt": "2026-04-04T14:19:37Z",
+      "closedAt": "2026-04-04T20:15:31Z",
+      "tool_guess": "cext",
+      "_file": "greenlet_pr_502.json"
+    },
+    {
+      "ext": "guppy3",
+      "type": "issue",
+      "number": 51,
+      "repo": "zhuyifei1999/guppy3",
+      "state": "CLOSED",
+      "title": "Umbrella issue: guppy3 C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/zhuyifei1999/guppy3/issues/51",
+      "createdAt": "2026-03-31T17:07:27Z",
+      "closedAt": "2026-04-03T10:41:30Z",
+      "tool_guess": "cext",
+      "_file": "guppy3_issue_51.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2825,
+      "repo": "h5py/h5py",
+      "state": "OPEN",
+      "title": "Umbrella issue: h5py C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2825",
+      "createdAt": "2026-03-25T08:44:26Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2825.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2826,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "`check_compound_complex` leaks 4 HDF5 type handles per call",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2826",
+      "createdAt": "2026-03-25T10:05:40Z",
+      "closedAt": "2026-03-28T16:02:37Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2826.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2827,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "`h5_vlen_string` never closed in `dset_rw_vlen_strings`",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2827",
+      "createdAt": "2026-03-25T10:05:59Z",
+      "closedAt": "2026-03-26T09:40:34Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2827.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2828,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "`_npystrings_pack` missing try/finally",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2828",
+      "createdAt": "2026-03-25T10:08:44Z",
+      "closedAt": "2026-03-26T09:03:58Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2828.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2829,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "Space handle leak in `write_direct_chunk` on validation error",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2829",
+      "createdAt": "2026-03-25T10:09:03Z",
+      "closedAt": "2026-03-28T09:59:25Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2829.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2830,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "Space handle + buffer leak in `get_chunk_info` on error",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2830",
+      "createdAt": "2026-03-25T10:09:22Z",
+      "closedAt": "2026-03-27T18:06:51Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2830.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2831,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "`H5FD_fileobj_open` has unchecked malloc + immediate deref",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2831",
+      "createdAt": "2026-03-25T10:09:39Z",
+      "closedAt": "2026-03-28T18:02:10Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2831.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2832,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "`h5i.get_name` has unchecked malloc",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2832",
+      "createdAt": "2026-03-25T10:09:54Z",
+      "closedAt": "2026-03-28T11:22:27Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2832.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2833,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "`h5r.get_name` has unchecked malloc",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2833",
+      "createdAt": "2026-03-25T10:10:09Z",
+      "closedAt": "2026-03-28T11:22:27Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2833.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2834,
+      "repo": "h5py/h5py",
+      "state": "OPEN",
+      "title": "`build_fancy_hyperslab` leaks `space2` on exception.",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2834",
+      "createdAt": "2026-03-25T10:10:30Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2834.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2835,
+      "repo": "h5py/h5py",
+      "state": "OPEN",
+      "title": "`readinto` return value unchecked in VFD driver",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2835",
+      "createdAt": "2026-03-25T10:10:48Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2835.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2836,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "`temptype` leak in `make_reduced_type` loop iteration",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2836",
+      "createdAt": "2026-03-25T10:11:05Z",
+      "closedAt": "2026-03-27T17:23:22Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2836.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2837,
+      "repo": "h5py/h5py",
+      "state": "CLOSED",
+      "title": "`ObjectID._dealloc` doesn't zero `self.id` after `H5Idec_ref`",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2837",
+      "createdAt": "2026-03-25T10:11:20Z",
+      "closedAt": "2026-03-27T18:03:29Z",
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2837.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2838,
+      "repo": "h5py/h5py",
+      "state": "OPEN",
+      "title": "`Reader` holds raw `hid_t` without HDF5 refcount increment",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2838",
+      "createdAt": "2026-03-25T10:11:43Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2838.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2839,
+      "repo": "h5py/h5py",
+      "state": "OPEN",
+      "title": "Unbalanced `Py_INCREF(elem_dtype)` in vlen conversion",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2839",
+      "createdAt": "2026-03-25T10:12:10Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "h5py_issue_2839.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "issue",
+      "number": 2840,
+      "repo": "h5py/h5py",
+      "state": "OPEN",
+      "title": "Static `_error_handler` data race under free-threading",
+      "author": "devdanzin",
+      "url": "https://github.com/h5py/h5py/issues/2840",
+      "createdAt": "2026-03-25T10:12:29Z",
+      "closedAt": null,
+      "tool_guess": "cext-or-ft",
+      "_file": "h5py_issue_2840.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2841,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "BUG: ensure resources are cleaned up if `H5Diterate` raises",
+      "author": "neutrinoceros",
+      "url": "https://github.com/h5py/h5py/pull/2841",
+      "createdAt": "2026-03-25T11:50:34Z",
+      "closedAt": "2026-03-26T09:03:56Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2841.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2842,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "CLN: cleanup redundant nullptr check",
+      "author": "neutrinoceros",
+      "url": "https://github.com/h5py/h5py/pull/2842",
+      "createdAt": "2026-03-25T15:05:09Z",
+      "closedAt": "2026-03-27T16:41:53Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2842.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2843,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "BUG: add missing nullptr checks following malloc calls",
+      "author": "neutrinoceros",
+      "url": "https://github.com/h5py/h5py/pull/2843",
+      "createdAt": "2026-03-25T15:06:53Z",
+      "closedAt": "2026-03-28T11:22:25Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2843.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2844,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "BUG: avoid zombie identifiers arising in `ObjectID.__dealloc__`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/h5py/h5py/pull/2844",
+      "createdAt": "2026-03-25T17:22:13Z",
+      "closedAt": "2026-03-27T18:03:28Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2844.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2845,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "RFC: avoid uninit values and in-between-loops leaks in `_proxy.make_reduced_type`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/h5py/h5py/pull/2845",
+      "createdAt": "2026-03-25T17:32:42Z",
+      "closedAt": "2026-03-27T17:23:21Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2845.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2846,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "BUG: correctly release resources in `dset_rw_vlen_strings`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/h5py/h5py/pull/2846",
+      "createdAt": "2026-03-25T18:59:08Z",
+      "closedAt": "2026-03-26T09:40:32Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2846.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2847,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "BUG: correctly release resources in `DatasetID.write_direct_chunk` before raising",
+      "author": "neutrinoceros",
+      "url": "https://github.com/h5py/h5py/pull/2847",
+      "createdAt": "2026-03-26T11:25:26Z",
+      "closedAt": "2026-03-28T09:59:24Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2847.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2848,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "BUG: always release resources in `DatasetID.get_chunk_info`",
+      "author": "neutrinoceros",
+      "url": "https://github.com/h5py/h5py/pull/2848",
+      "createdAt": "2026-03-26T15:06:30Z",
+      "closedAt": "2026-03-27T18:06:50Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2848.json"
+    },
+    {
+      "ext": "h5py",
+      "type": "pr",
+      "number": 2852,
+      "repo": "h5py/h5py",
+      "state": "MERGED",
+      "title": "Fix type handles leaking in check_compound_complex",
+      "author": "takluyver",
+      "url": "https://github.com/h5py/h5py/pull/2852",
+      "createdAt": "2026-03-28T13:18:47Z",
+      "closedAt": "2026-03-28T16:02:36Z",
+      "tool_guess": "cext",
+      "_file": "h5py_pr_2852.json"
+    },
+    {
+      "ext": "igraph",
+      "type": "pr",
+      "number": 879,
+      "repo": "igraph/python-igraph",
+      "state": "MERGED",
+      "title": "fix: correct error handling in some OOM cases",
+      "author": "szhorvat",
+      "url": "https://github.com/igraph/python-igraph/pull/879",
+      "createdAt": "2026-03-31T22:57:52Z",
+      "closedAt": "2026-04-01T18:29:11Z",
+      "tool_guess": "cext",
+      "_file": "igraph_pr_879.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 223,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "All 6 heap type deallocs missing Py_DECREF(Py_TYPE(self))",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/223",
+      "createdAt": "2026-03-27T08:54:43Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "kiwi_issue_223.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 224,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "Destructor called on unconstructed C++ object in Variable_new, Constraint_new, makecn",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/224",
+      "createdAt": "2026-03-27T08:58:38Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "kiwi_issue_224.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 225,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "convert_pystr_to_str crashes on lone surrogates (std::string(NULL) UB)",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/225",
+      "createdAt": "2026-03-27T08:58:56Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "kiwi_issue_225.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 226,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "Exception-unsafe ACQUIRE_GLOBAL_LOCK/RELEASE_GLOBAL_LOCK in solver try/catch blocks",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/226",
+      "createdAt": "2026-03-27T08:59:24Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "kiwi_issue_226.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 227,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "Unchecked PyModule_AddObject for exceptions + Solver_dump NULL deref",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/227",
+      "createdAt": "2026-03-27T08:59:39Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "kiwi_issue_227.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 228,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "Solver and strength types missing tp_traverse for heap type; repr methods vulnerable to GC-clear",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/228",
+      "createdAt": "2026-03-27T09:01:51Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "kiwi_issue_228.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 229,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "Global state cleanup: leaked refs on re-exec, borrowed type pointers, partial failure leaks",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/229",
+      "createdAt": "2026-03-27T09:02:09Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "kiwi_issue_229.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 230,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "Performance and cleanup: GIL held during solver ops, lock churn, dead version guards",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/230",
+      "createdAt": "2026-03-27T09:03:09Z",
+      "closedAt": null,
+      "tool_guess": "cext-or-ft",
+      "_file": "kiwi_issue_230.json"
+    },
+    {
+      "ext": "kiwi",
+      "type": "issue",
+      "number": 231,
+      "repo": "nucleic/kiwi",
+      "state": "OPEN",
+      "title": "Modernization notes: Py_TPFLAGS_IMMUTABLETYPE, global state vs subinterpreters, richcompare convention",
+      "author": "devdanzin",
+      "url": "https://github.com/nucleic/kiwi/issues/231",
+      "createdAt": "2026-03-27T09:05:23Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "kiwi_issue_231.json"
+    },
+    {
+      "ext": "lz4",
+      "type": "pr",
+      "number": 330,
+      "repo": "python-lz4/python-lz4",
+      "state": "OPEN",
+      "title": "Fix memory and buffer leaks on error paths",
+      "author": "devdanzin",
+      "url": "https://github.com/python-lz4/python-lz4/pull/330",
+      "createdAt": "2026-04-01T01:56:02Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "lz4_pr_330.json"
+    },
+    {
+      "ext": "lz4",
+      "type": "pr",
+      "number": 331,
+      "repo": "python-lz4/python-lz4",
+      "state": "OPEN",
+      "title": "Fix PyArg_ParseTuple format mismatch and non-NULL return with exception in stream module",
+      "author": "devdanzin",
+      "url": "https://github.com/python-lz4/python-lz4/pull/331",
+      "createdAt": "2026-04-01T01:58:22Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "lz4_pr_331.json"
+    },
+    {
+      "ext": "lz4",
+      "type": "pr",
+      "number": 332,
+      "repo": "python-lz4/python-lz4",
+      "state": "OPEN",
+      "title": "Fix error handling in frame context creation, reset, and destruction",
+      "author": "devdanzin",
+      "url": "https://github.com/python-lz4/python-lz4/pull/332",
+      "createdAt": "2026-04-01T02:00:31Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "lz4_pr_332.json"
+    },
+    {
+      "ext": "lz4",
+      "type": "pr",
+      "number": 333,
+      "repo": "python-lz4/python-lz4",
+      "state": "OPEN",
+      "title": "Fix module init error handling in block and stream modules",
+      "author": "devdanzin",
+      "url": "https://github.com/python-lz4/python-lz4/pull/333",
+      "createdAt": "2026-04-01T02:05:49Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "lz4_pr_333.json"
+    },
+    {
+      "ext": "lz4",
+      "type": "pr",
+      "number": 334,
+      "repo": "python-lz4/python-lz4",
+      "state": "OPEN",
+      "title": "Remove dead Python 2.6/MSVC 2008 compat code, use METH_NOARGS for version functions",
+      "author": "devdanzin",
+      "url": "https://github.com/python-lz4/python-lz4/pull/334",
+      "createdAt": "2026-04-01T02:10:45Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "lz4_pr_334.json"
+    },
+    {
+      "ext": "lz4",
+      "type": "pr",
+      "number": 335,
+      "repo": "python-lz4/python-lz4",
+      "state": "OPEN",
+      "title": "Remove duplicate blockMode assignment in compress_begin",
+      "author": "devdanzin",
+      "url": "https://github.com/python-lz4/python-lz4/pull/335",
+      "createdAt": "2026-04-01T02:14:55Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "lz4_pr_335.json"
+    },
+    {
+      "ext": "matplotlib",
+      "type": "issue",
+      "number": 31424,
+      "repo": "matplotlib/matplotlib",
+      "state": "OPEN",
+      "title": "[Bug]: Umbrella issue: matplotlib C/C++ Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/matplotlib/matplotlib/issues/31424",
+      "createdAt": "2026-03-29T22:43:33Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "issue_31424.json"
+    },
+    {
+      "ext": "memray",
+      "type": "pr",
+      "number": 894,
+      "repo": "bloomberg/memray",
+      "state": "OPEN",
+      "title": "Fix GIL double-release in SocketSource constructor",
+      "author": "devdanzin",
+      "url": "https://github.com/bloomberg/memray/pull/894",
+      "createdAt": "2026-04-01T03:18:38Z",
+      "closedAt": null,
+      "tool_guess": "cext-or-ft",
+      "_file": "memray_pr_894.json"
+    },
+    {
+      "ext": "memray",
+      "type": "pr",
+      "number": 895,
+      "repo": "bloomberg/memray",
+      "state": "OPEN",
+      "title": "Fix list leak in Py_GetNativeStackFrame",
+      "author": "devdanzin",
+      "url": "https://github.com/bloomberg/memray/pull/895",
+      "createdAt": "2026-04-01T03:22:13Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "memray_pr_895.json"
+    },
+    {
+      "ext": "multidict",
+      "type": "issue",
+      "number": 1306,
+      "repo": "aio-libs/multidict",
+      "state": "OPEN",
+      "title": "multidict C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/aio-libs/multidict/issues/1306",
+      "createdAt": "2026-03-24T09:40:44Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "multidict_issue_1306.json"
+    },
+    {
+      "ext": "multidict",
+      "type": "pr",
+      "number": 1310,
+      "repo": "aio-libs/multidict",
+      "state": "OPEN",
+      "title": "fix format error that leads to segfaults",
+      "author": "Vizonex",
+      "url": "https://github.com/aio-libs/multidict/pull/1310",
+      "createdAt": "2026-03-28T18:32:29Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "multidict_pr_1310.json"
+    },
+    {
+      "ext": "numpy",
+      "type": "issue",
+      "number": 31046,
+      "repo": "numpy/numpy",
+      "state": "OPEN",
+      "title": "BUG: NumPy C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/numpy/numpy/issues/31046",
+      "createdAt": "2026-03-22T11:55:31Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "issue_31046.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9487,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Fix `_getxy` refcount leaks",
+      "author": "hugovk",
+      "url": "https://github.com/python-pillow/Pillow/pull/9487",
+      "createdAt": "2026-03-24T14:46:43Z",
+      "closedAt": "2026-03-25T12:00:18Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9487.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9488,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Check all allocs in the Arrow tree",
+      "author": "wiredfool",
+      "url": "https://github.com/python-pillow/Pillow/pull/9488",
+      "createdAt": "2026-03-24T21:19:09Z",
+      "closedAt": "2026-04-01T11:56:16Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9488.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9489,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Fix missing null dereference checks",
+      "author": "wiredfool",
+      "url": "https://github.com/python-pillow/Pillow/pull/9489",
+      "createdAt": "2026-03-24T22:06:02Z",
+      "closedAt": "2026-03-27T04:23:01Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9489.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9493,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Add error messages before returning NULL when encoding",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9493",
+      "createdAt": "2026-03-25T12:14:10Z",
+      "closedAt": "2026-03-25T12:25:43Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9493.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9494,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Check if PyObject_CallMethod result is NULL",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9494",
+      "createdAt": "2026-03-25T13:23:48Z",
+      "closedAt": "2026-03-26T21:43:32Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9494.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9498,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Use critical sections to protect FontObject",
+      "author": "colesbury",
+      "url": "https://github.com/python-pillow/Pillow/pull/9498",
+      "createdAt": "2026-03-25T18:52:32Z",
+      "closedAt": "2026-03-31T18:54:29Z",
+      "tool_guess": "cext-or-ft",
+      "_file": "pillow_pr_9498.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9500,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Release reference to encoder on error",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9500",
+      "createdAt": "2026-03-26T07:36:32Z",
+      "closedAt": "2026-03-26T21:46:33Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9500.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9501,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Fixed AVIF and WEBP dealloc",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9501",
+      "createdAt": "2026-03-26T07:39:09Z",
+      "closedAt": "2026-03-26T21:45:41Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9501.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9502,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Check PyType_Ready return values",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9502",
+      "createdAt": "2026-03-26T07:45:04Z",
+      "closedAt": "2026-03-26T21:45:02Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9502.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9503,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Use PyModule_AddObjectRef",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9503",
+      "createdAt": "2026-03-26T09:10:29Z",
+      "closedAt": "2026-03-26T21:47:58Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9503.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9504,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Allow None extents in C setimage()",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9504",
+      "createdAt": "2026-03-26T09:52:09Z",
+      "closedAt": "2026-03-31T19:02:41Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9504.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9505,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Catch struct.error",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9505",
+      "createdAt": "2026-03-26T12:44:30Z",
+      "closedAt": "2026-03-27T10:22:28Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9505.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9508,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Check PyCapsule_GetPointer and PyBytes_FromStringAndSize return values",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9508",
+      "createdAt": "2026-03-27T04:28:56Z",
+      "closedAt": "2026-03-27T09:40:20Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9508.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9510,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Add PERF to lint and fix findings",
+      "author": "hugovk",
+      "url": "https://github.com/python-pillow/Pillow/pull/9510",
+      "createdAt": "2026-03-27T12:20:13Z",
+      "closedAt": "2026-03-28T10:56:07Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9510.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9517,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Cleanup .spider extension in the same test where it is added",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9517",
+      "createdAt": "2026-03-31T11:13:13Z",
+      "closedAt": "2026-03-31T12:55:31Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9517.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9519,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Raise an error if the trailer chain loops back on itself",
+      "author": "hugovk",
+      "url": "https://github.com/python-pillow/Pillow/pull/9519",
+      "createdAt": "2026-03-31T18:40:59Z",
+      "closedAt": "2026-03-31T21:03:16Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9519.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9520,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Avoid overflow by not adding extents together",
+      "author": "hugovk",
+      "url": "https://github.com/python-pillow/Pillow/pull/9520",
+      "createdAt": "2026-03-31T18:43:06Z",
+      "closedAt": "2026-04-01T02:45:31Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9520.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9525,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Move variable declaration inside define",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9525",
+      "createdAt": "2026-03-31T23:40:13Z",
+      "closedAt": "2026-04-01T03:35:33Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9525.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9526,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Reject non-numeric elements inside list coords",
+      "author": "hugovk",
+      "url": "https://github.com/python-pillow/Pillow/pull/9526",
+      "createdAt": "2026-04-01T08:21:11Z",
+      "closedAt": "2026-04-01T11:50:45Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9526.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9527,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Check calloc return value",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9527",
+      "createdAt": "2026-04-01T12:00:18Z",
+      "closedAt": "2026-04-01T12:11:01Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9527.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9535,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Drop experimental Python 3.13 free-threaded wheels",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9535",
+      "createdAt": "2026-04-03T06:22:22Z",
+      "closedAt": "2026-04-03T12:54:14Z",
+      "tool_guess": "cext-or-ft",
+      "_file": "pillow_pr_9535.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9536,
+      "repo": "python-pillow/Pillow",
+      "state": "OPEN",
+      "title": "Raise error if PNG transparency has incorrect type or length when saving",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9536",
+      "createdAt": "2026-04-03T11:21:01Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9536.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9539,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Close PdfParser if error occurs during init",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9539",
+      "createdAt": "2026-04-04T09:08:27Z",
+      "closedAt": "2026-04-04T19:30:11Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9539.json"
+    },
+    {
+      "ext": "pillow",
+      "type": "pr",
+      "number": 9540,
+      "repo": "python-pillow/Pillow",
+      "state": "MERGED",
+      "title": "Skip test if FreeType is not available",
+      "author": "radarhere",
+      "url": "https://github.com/python-pillow/Pillow/pull/9540",
+      "createdAt": "2026-04-05T06:14:10Z",
+      "closedAt": "2026-04-05T10:04:13Z",
+      "tool_guess": "cext",
+      "_file": "pillow_pr_9540.json"
+    },
+    {
+      "ext": "protobuf",
+      "type": "issue",
+      "number": 26596,
+      "repo": "protocolbuffers/protobuf",
+      "state": "OPEN",
+      "title": "Umbrella issue: protobuf Python C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/protocolbuffers/protobuf/issues/26596",
+      "createdAt": "2026-03-26T22:27:37Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "issue_26596.json"
+    },
+    {
+      "ext": "psutil",
+      "type": "issue",
+      "number": 2792,
+      "repo": "giampaolo/psutil",
+      "state": "OPEN",
+      "title": "Umbrella issue: psutil C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/giampaolo/psutil/issues/2792",
+      "createdAt": "2026-03-27T00:54:27Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "issue_2792.json"
+    },
+    {
+      "ext": "pycurl",
+      "type": "issue",
+      "number": 960,
+      "repo": "pycurl/pycurl",
+      "state": "OPEN",
+      "title": "pycurl C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/pycurl/pycurl/issues/960",
+      "createdAt": "2026-03-27T02:20:02Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "issue_960.json"
+    },
+    {
+      "ext": "scipy",
+      "type": "issue",
+      "number": 24927,
+      "repo": "scipy/scipy",
+      "state": "OPEN",
+      "title": "BUG: umbrella issue for SciPy C Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/scipy/scipy/issues/24927",
+      "createdAt": "2026-03-28T19:11:29Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "scipy_issue_24927.json"
+    },
+    {
+      "ext": "scipy",
+      "type": "pr",
+      "number": 24928,
+      "repo": "scipy/scipy",
+      "state": "OPEN",
+      "title": "BUG: special: fix leaked py_SpecialFunctionWarning in sf_error_v",
+      "author": "devdanzin",
+      "url": "https://github.com/scipy/scipy/pull/24928",
+      "createdAt": "2026-03-28T20:35:12Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "scipy_pr_24928.json"
+    },
+    {
+      "ext": "scipy",
+      "type": "pr",
+      "number": 24929,
+      "repo": "scipy/scipy",
+      "state": "OPEN",
+      "title": "BUG: use CMPLX()/CMPLXF() instead of real + imag * I in 4 headers",
+      "author": "devdanzin",
+      "url": "https://github.com/scipy/scipy/pull/24929",
+      "createdAt": "2026-03-28T20:47:33Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "scipy_pr_24929.json"
+    },
+    {
+      "ext": "traits",
+      "type": "issue",
+      "number": 1881,
+      "repo": "enthought/traits",
+      "state": "OPEN",
+      "title": "ctraits Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/enthought/traits/issues/1881",
+      "createdAt": "2026-03-27T08:34:48Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "issue_1881.json"
+    },
+    {
+      "ext": "traits",
+      "type": "issue",
+      "number": 1881,
+      "repo": "enthought/traits",
+      "state": "OPEN",
+      "title": "ctraits Extension Analysis Report",
+      "author": "devdanzin",
+      "url": "https://github.com/enthought/traits/issues/1881",
+      "createdAt": "2026-03-27T08:34:48Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "traits_issue_1881.json",
+      "duplicate_of": "issue_1881.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "issue",
+      "number": 357,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "copt: PyDict_GetItem silently swallows exceptions in SB_extends and IB__adapt__",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/issues/357",
+      "createdAt": "2026-03-30T00:40:25Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_issue_357.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "issue",
+      "number": 358,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "copt: unguarded PyErr_Clear swallows KeyboardInterrupt/MemoryError at 4 sites",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/issues/358",
+      "createdAt": "2026-03-30T00:40:47Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_issue_358.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "issue",
+      "number": 359,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "copt: NULL-without-exception returns in SB_extends, IB__adapt__, CPB_descr_get",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/issues/359",
+      "createdAt": "2026-03-30T00:41:07Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_issue_359.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "issue",
+      "number": 360,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "copt: reference leaks in getObjectSpecification on error and fallthrough paths",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/issues/360",
+      "createdAt": "2026-03-30T00:41:27Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_issue_360.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "issue",
+      "number": 361,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "copt: PyObject_IsTrue error treated as truthy in IB__adapt__",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/issues/361",
+      "createdAt": "2026-03-30T00:41:43Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_issue_361.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "issue",
+      "number": 362,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "copt: missing NULL checks for PyTuple_New and _get_adapter_hooks",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/issues/362",
+      "createdAt": "2026-03-30T00:42:00Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_issue_362.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "issue",
+      "number": 363,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "copt: refcount leaks in declaration import and module init error paths",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/issues/363",
+      "createdAt": "2026-03-30T00:42:22Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_issue_363.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "pr",
+      "number": 364,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "Replace all PyDict_GetItem with exception-safe alternatives",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/pull/364",
+      "createdAt": "2026-03-30T00:54:49Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_pr_364.json"
+    },
+    {
+      "ext": "zope_interface",
+      "type": "pr",
+      "number": 365,
+      "repo": "zopefoundation/zope.interface",
+      "state": "OPEN",
+      "title": "Guard 4 unprotected PyErr_Clear calls with exception type checks",
+      "author": "jensens",
+      "url": "https://github.com/zopefoundation/zope.interface/pull/365",
+      "createdAt": "2026-03-30T01:27:18Z",
+      "closedAt": null,
+      "tool_guess": "cext",
+      "_file": "zope_interface_pr_365.json"
+    }
+  ],
+  "rollups": {
+    "total_artifact_files_under_issues_prs": 148,
+    "artifact_records_true_issue_pr": 139,
+    "unique_artifact_records": 138,
+    "duplicate_records": 1,
+    "nonartifact_files_search_commits": [
+      "astropy/issues_prs/search_2026-03-31.json",
+      "atom/issues_prs/atom_search_results.json",
+      "cereggii/issues_prs/search_2026-03-31.json",
+      "enaml/issues_prs/enaml_search_results.json",
+      "kiwi/issues_prs/kiwi_search_results.json",
+      "lxml/issues_prs/lxml_recent_commits.json",
+      "pyhacl/issues_prs/search_2026-03-31.json",
+      "regex/issues_prs/regex_commits_since_march21.json",
+      "traits/issues_prs/traits_search_results.json"
+    ],
+    "count_by_type": {
+      "issue": 77,
+      "pr": 62
+    },
+    "count_by_state": {
+      "CLOSED": 20,
+      "OPEN": 74,
+      "MERGED": 45
+    },
+    "count_by_repo": {
+      "h5py/h5py": 25,
+      "pydata/bottleneck": 24,
+      "python-pillow/Pillow": 24,
+      "nucleic/atom": 9,
+      "nucleic/kiwi": 9,
+      "zopefoundation/zope.interface": 9,
+      "nucleic/enaml": 8,
+      "python-lz4/python-lz4": 6,
+      "cython/cython": 4,
+      "scipy/scipy": 3,
+      "ilanschnell/bitarray": 2,
+      "bloomberg/memray": 2,
+      "aio-libs/multidict": 2,
+      "enthought/traits": 2,
+      "rogerbinns/apsw": 1,
+      "duckdb/duckdb-python": 1,
+      "python-greenlet/greenlet": 1,
+      "zhuyifei1999/guppy3": 1,
+      "igraph/python-igraph": 1,
+      "matplotlib/matplotlib": 1,
+      "numpy/numpy": 1,
+      "protocolbuffers/protobuf": 1,
+      "giampaolo/psutil": 1,
+      "pycurl/pycurl": 1
+    },
+    "count_by_ext": {
+      "h5py": 25,
+      "bottleneck": 24,
+      "pillow": 24,
+      "atom": 9,
+      "kiwi": 9,
+      "zope_interface": 9,
+      "enaml": 8,
+      "lz4": 6,
+      "cython": 4,
+      "scipy": 3,
+      "bitarray": 2,
+      "memray": 2,
+      "multidict": 2,
+      "traits": 2,
+      "apsw": 1,
+      "duckdb": 1,
+      "greenlet": 1,
+      "guppy3": 1,
+      "igraph": 1,
+      "matplotlib": 1,
+      "numpy": 1,
+      "protobuf": 1,
+      "psutil": 1,
+      "pycurl": 1
+    },
+    "count_by_tool_guess": {
+      "cext": 130,
+      "cext-or-ft": 9
+    },
+    "count_by_author": {
+      "devdanzin": 79,
+      "neutrinoceros": 17,
+      "radarhere": 16,
+      "jensens": 9,
+      "hugovk": 5,
+      "da-woods": 3,
+      "wiredfool": 2,
+      "rogerbinns": 1,
+      "ilanschnell": 1,
+      "matusvalo": 1,
+      "jamadden": 1,
+      "takluyver": 1,
+      "szhorvat": 1,
+      "Vizonex": 1,
+      "colesbury": 1
+    },
+    "filed_by_split_registry_claimed": {
+      "issues_ours": 76,
+      "issues_maintainer": 8,
+      "prs_ours": 10,
+      "prs_maintainer": 47
+    },
+    "filed_by_split_on_disk_by_author": {
+      "ours_devdanzin": 79,
+      "maintainers_others": 60
+    },
+    "extensions_with_filed_activity_on_disk": 24,
+    "duplicates_detail": [
+      {
+        "url": "https://github.com/enthought/traits/issues/1881",
+        "files": [
+          "issue_1881.json",
+          "traits_issue_1881.json"
+        ]
+      }
+    ],
+    "parse_errors": [],
+    "foreign_repo_artifacts": [],
+    "registry_grand_summary_claimed": {
+      "total_issues": 82,
+      "issues_ours": 74,
+      "issues_maintainer": 8,
+      "issues_open": 61,
+      "issues_closed": 21,
+      "total_prs": 56,
+      "prs_ours": 10,
+      "prs_maintainer": 46,
+      "prs_open": 11,
+      "prs_merged": 45,
+      "total_items": 138,
+      "total_open": 72,
+      "total_closed_merged": 66,
+      "extensions_with_activity": 26
+    }
+  },
+  "notes": "STALE SOURCE: registry md dated ~April 2026 (reconciliation pass 2026-04-05); its open/closed counts are NOT ground truth. This preview is metadata-only (no bodies/comments dumped). 148 JSON files live under comms/*/issues_prs/: 139 are per-artifact issue/PR records (dicts with number/state/title/url) and 9 are search-result/commit-dump files (JSON lists or NDJSON) that are NOT per-artifact and were excluded from `artifacts` (listed in rollups.nonartifact_files_search_commits). The 9 excluded: astropy/atom/cereggii/enaml/kiwi/pyhacl search_results, lxml_recent_commits, regex_commits_since_march21, traits_search_results. traits #1881 is DUPLICATED across two filenames (issue_1881.json + traits_issue_1881.json) -> 139 records but 138 unique URLs (see duplicates_detail). tool_guess: source lives in cext-review-toolkit/comms and the registry is the cext campaign registry, so default is 'cext'; artifacts whose TITLE references free-threading/data-race/GIL/atomic/thread-safety are marked 'cext-or-ft' (the registry unifies the cext + ft campaigns and carries no per-artifact tool tag). `ext` = on-disk comms/ directory name (dir 'kiwi' == registry 'kiwisolver'; 'zope_interface' == 'zope.interface'; 'pillow'=='Pillow'; 'cython'=='Cython'). `repo` derived from each artifact's url. Extensions present on disk with NO issues_prs (communicated only, per registry): astropy, cereggii, cffi, cvxopt, isal, ml-dtypes, msgspec, mypyc, nanobind, pybind, pyerfa, pymongo, wrapt, awkward-cpp."
+}
