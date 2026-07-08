@@ -1,8 +1,8 @@
 {
  "bug_id": "cpython-47944",
  "title": "Undetected error in _struct.pack_into",
- "tool": "manual",
- "mode": "",
+ "tool": "fusil",
+ "mode": "general",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [

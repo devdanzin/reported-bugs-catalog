@@ -229,7 +229,9 @@ def load_bpo_overrides():
         key = ("python/cpython", r["number"])
         BPO_SELF.add(key)
         if r["category"] == "bug":
-            OVERRIDES[key] = ("manual", "", "high", "bpo-ajaksu2")
+            tool = r.get("tool", "manual")   # 5 user-confirmed early-fusil finds
+            reason = "bpo-ajaksu2-fusil" if tool == "fusil" else "bpo-ajaksu2"
+            OVERRIDES[key] = (tool, "general" if tool == "fusil" else "", "high", reason)
         else:
             OVERRIDES[key] = ("non-bug", "", "high", "bpo-ajaksu2-nonbug")
 

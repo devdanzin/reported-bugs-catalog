@@ -11,10 +11,10 @@
 
 | tool | bugs | issues | PR-artifacts | fixes | backports | synthetic |
 |---|---|---|---|---|---|---|
-| fusil | 141 | 112 | 191 | 107 | 84 | 22 |
+| fusil | 146 | 117 | 191 | 107 | 84 | 22 |
 | cext-review-toolkit | 138 | 90 | 77 | 75 | 1 | 0 |
-| manual | 59 | 44 | 75 | 53 | 22 | 0 |
 | cpython-review-toolkit | 55 | 40 | 91 | 47 | 44 | 13 |
+| manual | 54 | 39 | 75 | 53 | 22 | 0 |
 | ft-review-toolkit | 29 | 23 | 12 | 12 | 0 | 0 |
 | lafleur | 28 | 28 | 33 | 27 | 6 | 0 |
 | fusil-plugin-cereggii | 14 | 10 | 13 | 12 | 0 | 0 |

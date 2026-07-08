@@ -1,8 +1,8 @@
 {
  "bug_id": "cpython-47916",
  "title": "atexit.register with bad input segfaults on exit",
- "tool": "manual",
- "mode": "",
+ "tool": "fusil",
+ "mode": "general",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [

@@ -21,13 +21,17 @@
   "number": 47912,
   "title": "_fileio._FileIO segfaults",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "fusil",
+  "note": "early fusil (comments confirm) \u2014 user-confirmed"
  },
  {
   "number": 47916,
   "title": "atexit.register with bad input segfaults on exit",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "fusil",
+  "note": "early fusil (comments confirm) \u2014 user-confirmed"
  },
  {
   "number": 43537,
@@ -39,7 +43,8 @@
   "number": 47911,
   "title": "sys.call_tracing segfaults",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "manual"
  },
  {
   "number": 50230,
@@ -63,7 +68,8 @@
   "number": 47805,
   "title": "Regression: nested exceptions crash (Cannot recover from stack overflow)",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "manual"
  },
  {
   "number": 48094,
@@ -75,7 +81,9 @@
   "number": 47914,
   "title": "Pickler.dump from a badly initialized Pickler segfaults",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "fusil",
+  "note": "early fusil (comments confirm) \u2014 user-confirmed"
  },
  {
   "number": 48983,
@@ -87,25 +95,31 @@
   "number": 46928,
   "title": "email/message.py [Message.get_content_type]: Trivial regex hangs on pathological input",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "manual"
  },
  {
   "number": 47958,
   "title": "os.urandom(1.1): infinite loop",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "manual"
  },
  {
   "number": 47903,
   "title": "segfault calling sys.excepthook with non-Exception argument",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "fusil",
+  "note": "early fusil (comments confirm) \u2014 user-confirmed"
  },
  {
   "number": 47944,
   "title": "Undetected error in _struct.pack_into",
   "state": "closed",
-  "category": "bug"
+  "category": "bug",
+  "tool": "fusil",
+  "note": "early fusil (comments confirm) \u2014 user-confirmed"
  },
  {
   "number": 49191,

@@ -1,0 +1,79 @@
+{
+ "bugs": 255,
+ "by_tool": {
+  "cpython-review-toolkit": [
+   55,
+   40,
+   91,
+   47,
+   44
+  ],
+  "fusil": [
+   126,
+   97,
+   190,
+   106,
+   84
+  ],
+  "lafleur": [
+   28,
+   28,
+   33,
+   27,
+   6
+  ],
+  "manual": [
+   43,
+   36,
+   66,
+   44,
+   22
+  ],
+  "ft-review-toolkit": [
+   3,
+   3,
+   1,
+   1,
+   0
+  ]
+ },
+ "status": {
+  "unfiled": 11,
+  "closed/fixed": 182,
+  "gisted": 18,
+  "open": 38,
+  "drafted": 4,
+  "fixed-in-commit": 2
+ },
+ "filed_by": {
+  "self": 66,
+  "self+maintainer": 114,
+  "none": 22,
+  "maintainer": 51,
+  "self+commit": 2
+ },
+ "top_labels": {
+  "type-crash": 146,
+  "interpreter-core": 109,
+  "extension-modules": 64,
+  "skip news": 59,
+  "3.14": 56,
+  "3.13": 50,
+  "type-bug": 48,
+  "awaiting review": 40,
+  "topic-JIT": 35,
+  "topic-free-threading": 32,
+  "3.12": 16,
+  "stdlib": 16,
+  "3.15": 15,
+  "topic-subinterpreters": 13,
+  "awaiting core review": 12
+ },
+ "by_year": {
+  "2008": 9,
+  "2021": 1,
+  "2024": 52,
+  "2025": 62,
+  "2026": 96
+ }
+}

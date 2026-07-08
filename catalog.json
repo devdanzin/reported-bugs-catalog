@@ -43,8 +43,8 @@
    "synthetic": 0
   },
   "fusil": {
-   "bugs": 141,
-   "issues": 112,
+   "bugs": 146,
+   "issues": 117,
    "fix_prs": 107,
    "backports": 84,
    "shared_fixes": 0,
@@ -73,8 +73,8 @@
    "synthetic": 0
   },
   "manual": {
-   "bugs": 59,
-   "issues": 44,
+   "bugs": 54,
+   "issues": 39,
    "fix_prs": 53,
    "backports": 22,
    "shared_fixes": 0,
