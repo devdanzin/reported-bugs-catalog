@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-151906",
+ "title": "gh-151905: fix assert(!PyErr_Occurred()) in _PyType_LookupStackRefAndVersion",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#151906"
+ ],
+ "gists": [
+  "3c6690d0561acc62752a953e12b20197"
+ ],
+ "labels": [
+  "interpreter-core"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "prakashsellathurai"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-151906.json"
+ ],
+ "n_artifacts": 1
+}

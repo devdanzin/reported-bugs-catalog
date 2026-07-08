@@ -1,0 +1,32 @@
+{
+ "bug_id": "bottleneck-527",
+ "title": "Missing pystr_kth in intern_strings return check",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pydata/bottleneck",
+ "is_umbrella": false,
+ "issues": [
+  "pydata/bottleneck#527"
+ ],
+ "prs": [
+  "pydata/bottleneck#544"
+ ],
+ "gists": [],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "neutrinoceros"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pydata__bottleneck/issue-527.json",
+  "raw/pydata__bottleneck/pull-544.json"
+ ],
+ "n_artifacts": 2
+}

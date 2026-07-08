@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-127235",
+ "title": "Failed assertion in `Python/legacy_tracing.c:431` on a free-threading build",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#127235"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-127235.json"
+ ],
+ "n_artifacts": 1
+}

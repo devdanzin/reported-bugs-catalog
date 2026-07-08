@@ -1,0 +1,25 @@
+{
+ "bug_id": "h5py-2835",
+ "title": "`readinto` return value unchecked in VFD driver",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "h5py/h5py",
+ "is_umbrella": false,
+ "issues": [
+  "h5py/h5py#2835"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/h5py__h5py/issue-2835.json"
+ ],
+ "n_artifacts": 1
+}

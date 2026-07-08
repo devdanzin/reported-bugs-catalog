@@ -1,0 +1,40 @@
+{
+ "bug_id": "pypy-4962",
+ "title": "Some small missing items when compared to CPython",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [
+  "pypy/pypy#4962"
+ ],
+ "prs": [
+  "pypy/pypy#4963",
+  "pypy/pypy#4964",
+  "pypy/pypy#4965",
+  "pypy/pypy#4966",
+  "pypy/pypy#4968",
+  "pypy/pypy#4970",
+  "pypy/pypy#4971"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/issue-4962.json",
+  "raw/pypy__pypy/pull-4963.json",
+  "raw/pypy__pypy/pull-4964.json",
+  "raw/pypy__pypy/pull-4965.json",
+  "raw/pypy__pypy/pull-4966.json",
+  "raw/pypy__pypy/pull-4968.json",
+  "raw/pypy__pypy/pull-4970.json",
+  "raw/pypy__pypy/pull-4971.json"
+ ],
+ "n_artifacts": 8
+}

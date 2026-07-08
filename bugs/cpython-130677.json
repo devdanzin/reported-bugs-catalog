@@ -1,0 +1,27 @@
+{
+ "bug_id": "cpython-130677",
+ "title": "gh-130328: Faster Windows new REPL paste",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#130677"
+ ],
+ "gists": [],
+ "labels": [
+  "DO-NOT-MERGE"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-130677.json"
+ ],
+ "n_artifacts": 1
+}

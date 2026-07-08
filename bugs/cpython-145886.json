@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-145886",
+ "title": "`Event.raw` being added to itself instead of to another event's `.raw` in `UnixConsole.getpending`",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#145886"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "stdlib",
+  "topic-repl",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-145886.json"
+ ],
+ "n_artifacts": 1
+}

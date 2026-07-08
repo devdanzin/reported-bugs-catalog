@@ -1,0 +1,25 @@
+{
+ "bug_id": "pypy-5132",
+ "title": "Segfault in `_locale.nl_langinfo` in a process started by `os.execvpe`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [
+  "pypy/pypy#5132"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/issue-5132.json"
+ ],
+ "n_artifacts": 1
+}

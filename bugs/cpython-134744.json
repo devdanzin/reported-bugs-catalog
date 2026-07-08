@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-134744",
+ "title": "Abort in `_PyEval_EvalFrameDefault` originating on calling `fcntl.ioctl`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#134744"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-134744.json"
+ ],
+ "n_artifacts": 1
+}

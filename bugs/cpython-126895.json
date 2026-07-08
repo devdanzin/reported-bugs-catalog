@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-126895",
+ "title": "Segfault/aborts calling `readline.set_completer_delims` in threads in a free-threaded build",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126895"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "extension-modules",
+  "stdlib",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126895.json"
+ ],
+ "n_artifacts": 1
+}

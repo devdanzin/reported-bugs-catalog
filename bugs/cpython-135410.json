@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-135410",
+ "title": "Segfault from calling `StringIO` methods in threads on free-threading debug build",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#135410"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "3.15",
+  "extension-modules",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-135410.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-143020",
+ "title": "JIT: Segfaults from binary ops in code abusing descriptors",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#143020"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-143020.json"
+ ],
+ "n_artifacts": 1
+}

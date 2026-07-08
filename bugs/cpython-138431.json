@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-138431",
+ "title": "JIT: failed assertion in `_POP_TOP_NOP` calling `str()` on variable due to wrong reference information",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#138431"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-138431.json"
+ ],
+ "n_artifacts": 1
+}

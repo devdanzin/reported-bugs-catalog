@@ -1,0 +1,25 @@
+{
+ "bug_id": "pypy-5129",
+ "title": "SIGFPE raised by `__pypy__.intop.int_mod` with invalid values",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [
+  "pypy/pypy#5129"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/issue-5129.json"
+ ],
+ "n_artifacts": 1
+}

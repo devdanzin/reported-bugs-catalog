@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-127192",
+ "title": "Segfault or abort in free-threaded build calling methods from exception in threads",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#127192"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "interpreter-core",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-127192.json"
+ ],
+ "n_artifacts": 1
+}

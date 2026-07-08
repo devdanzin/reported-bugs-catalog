@@ -1,0 +1,25 @@
+{
+ "bug_id": "cereggii-147",
+ "title": "Fix `get_handle()` crashing on allocation failure",
+ "tool": "fusil-plugin-cereggii",
+ "mode": "general",
+ "target_repo": "dpdani/cereggii",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "dpdani/cereggii#147"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/dpdani__cereggii/pull-147.json"
+ ],
+ "n_artifacts": 1
+}

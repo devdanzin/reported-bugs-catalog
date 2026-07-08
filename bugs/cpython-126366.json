@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-126366",
+ "title": "Abort in free-threaded build due to mutation of `ChainMap` of a `Counter` in threads",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126366"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "interpreter-core",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126366.json"
+ ],
+ "n_artifacts": 1
+}

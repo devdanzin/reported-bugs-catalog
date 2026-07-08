@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-132474",
+ "title": "Speed up `int.__round__` for large negative `ndigits`",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#132474"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "performance",
+  "type-feature"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-132474.json"
+ ],
+ "n_artifacts": 1
+}

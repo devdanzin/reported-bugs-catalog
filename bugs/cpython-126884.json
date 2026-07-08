@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-126884",
+ "title": "Calling `cProfile.runctx` in threads on a free-threading build segfaults",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126884"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "extension-modules",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126884.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,25 @@
+{
+ "bug_id": "enaml-605",
+ "title": "Modernization notes: dead version guards, deprecated/private APIs, PyDict_GetItem exception swallowing, free-threading g",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/enaml",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/enaml#605"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__enaml/issue-605.json"
+ ],
+ "n_artifacts": 1
+}

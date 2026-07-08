@@ -1,0 +1,28 @@
+{
+ "bug_id": "cereggii-78",
+ "title": "Re-initializing an `AtomicDict` in threads segfaults",
+ "tool": "fusil-plugin-cereggii",
+ "mode": "general",
+ "target_repo": "dpdani/cereggii",
+ "is_umbrella": false,
+ "issues": [
+  "dpdani/cereggii#78"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "AtomicDict",
+  "fusil-fuzzer"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/dpdani__cereggii/issue-78.json"
+ ],
+ "n_artifacts": 1
+}

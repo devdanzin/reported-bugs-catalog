@@ -1,0 +1,33 @@
+{
+ "bug_id": "cpython-131878",
+ "title": "New REPL on Windows exits when accented character is pasted/typed",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#131878"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "OS-windows",
+  "release-blocker",
+  "stdlib",
+  "topic-repl",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-131878.json"
+ ],
+ "n_artifacts": 1
+}

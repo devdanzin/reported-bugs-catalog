@@ -1,0 +1,30 @@
+{
+ "bug_id": "matplotlib-31424",
+ "title": "[Bug]: Umbrella issue: matplotlib C/C++ Extension Analysis Report",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "matplotlib/matplotlib",
+ "is_umbrella": true,
+ "issues": [
+  "matplotlib/matplotlib#31424"
+ ],
+ "prs": [],
+ "gists": [
+  "2a79188c7a41a03b1476544c7dd775c1"
+ ],
+ "labels": [
+  "Maintenance",
+  "first-contribution"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/matplotlib__matplotlib/issue-31424.json"
+ ],
+ "n_artifacts": 1
+}

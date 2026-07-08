@@ -1,0 +1,27 @@
+{
+ "bug_id": "pillow-9488",
+ "title": "Check all allocs in the Arrow tree",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python-pillow/Pillow",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python-pillow/Pillow#9488"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "wiredfool"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python-pillow__Pillow/pull-9488.json"
+ ],
+ "n_artifacts": 1
+}

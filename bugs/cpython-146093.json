@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-146093",
+ "title": "`_set_str` missing `NULL` check after `PyUnicode_DecodeASCII` in `_csv.c`",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146093"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.14",
+  "3.15",
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146093.json"
+ ],
+ "n_artifacts": 1
+}

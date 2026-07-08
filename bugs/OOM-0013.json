@@ -1,0 +1,27 @@
+{
+ "bug_id": "OOM-0013",
+ "title": "gh-151763: Fix OOM-0013 crash when the parser or compiler fails to allocate",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#151968"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "tonghuaroot"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-151968.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,29 @@
+{
+ "bug_id": "scipy-24927",
+ "title": "BUG: umbrella issue for SciPy C Extension Analysis Report",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "scipy/scipy",
+ "is_umbrella": true,
+ "issues": [
+  "scipy/scipy#24927"
+ ],
+ "prs": [],
+ "gists": [
+  "7ec1e87568d3ad9036ec9b24e32d5875"
+ ],
+ "labels": [
+  "defect"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/scipy__scipy/issue-24927.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,30 @@
+{
+ "bug_id": "simplejson-353",
+ "title": "NULL dereferences on OOM in module init and static string initialization",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "simplejson/simplejson",
+ "is_umbrella": false,
+ "issues": [
+  "simplejson/simplejson#353"
+ ],
+ "prs": [
+  "simplejson/simplejson#359"
+ ],
+ "gists": [
+  "e8a25ea988dc0461c2fd378efd84a8a3"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/simplejson__simplejson/issue-353.json",
+  "raw/simplejson__simplejson/pull-359.json"
+ ],
+ "n_artifacts": 2
+}

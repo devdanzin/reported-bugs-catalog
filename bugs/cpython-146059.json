@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-146059",
+ "title": "`Fatal Python error` when using `_pickle` with many `frozenset` objects",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146059"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146059.json"
+ ],
+ "n_artifacts": 1
+}

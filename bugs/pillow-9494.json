@@ -1,0 +1,27 @@
+{
+ "bug_id": "pillow-9494",
+ "title": "Check if PyObject_CallMethod result is NULL",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python-pillow/Pillow",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python-pillow/Pillow#9494"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "radarhere"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python-pillow__Pillow/pull-9494.json"
+ ],
+ "n_artifacts": 1
+}

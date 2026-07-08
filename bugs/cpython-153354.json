@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-153354",
+ "title": "Generated `__annotate__` uses `COMPARE_OP` without the bool-conversion flag, feeding a non-bool to `POP_JUMP_IF_FALSE`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#153354"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-typing",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-153354.json"
+ ],
+ "n_artifacts": 1
+}

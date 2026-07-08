@@ -1,0 +1,25 @@
+{
+ "bug_id": "kiwi-223",
+ "title": "All 6 heap type deallocs missing Py_DECREF(Py_TYPE(self))",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/kiwi",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/kiwi#223"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__kiwi/issue-223.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,25 @@
+{
+ "bug_id": "atom-258",
+ "title": "Missing PyErr_Occurred() after PyIter_Next in 3 functions + CAtom_getstate error handling gaps",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/atom",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/atom#258"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__atom/issue-258.json"
+ ],
+ "n_artifacts": 1
+}

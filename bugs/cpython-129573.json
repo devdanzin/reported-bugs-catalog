@@ -1,0 +1,40 @@
+{
+ "bug_id": "cpython-129573",
+ "title": "Failed assertion in `_PyUnicode_Equal` from `calculate_suggestions` with non-string candidate",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#129573"
+ ],
+ "prs": [
+  "python/cpython#129574",
+  "python/cpython#130997"
+ ],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "3.15",
+  "awaiting review",
+  "interpreter-core",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
+  "needs backport to 3.15",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-129573.json",
+  "raw/python__cpython/pull-129574.json",
+  "raw/python__cpython/pull-130997.json"
+ ],
+ "n_artifacts": 3
+}

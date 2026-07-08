@@ -1,0 +1,33 @@
+{
+ "bug_id": "cpython-152156",
+ "title": "Fix error handling in `Modules/_interpchannelsmodule.c`",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#152156"
+ ],
+ "prs": [],
+ "gists": [
+  "bf6f784d4bcd21acd471ea45b6f23c70"
+ ],
+ "labels": [
+  "extension-modules",
+  "topic-subinterpreters",
+  "type-crash"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "sobolevn"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-152156.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,25 @@
+{
+ "bug_id": "bottleneck-519",
+ "title": "move_median MEMORY_ERR without return \u2014 segfault under OOM",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pydata/bottleneck",
+ "is_umbrella": false,
+ "issues": [
+  "pydata/bottleneck#519"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pydata__bottleneck/issue-519.json"
+ ],
+ "n_artifacts": 1
+}

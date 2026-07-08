@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-140104",
+ "title": "JIT (correctness): Different `UnboundLocalError` for same code with JIT on or off",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#140104"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.14",
+  "interpreter-core",
+  "topic-JIT",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-140104.json"
+ ],
+ "n_artifacts": 1
+}

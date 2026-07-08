@@ -1,0 +1,25 @@
+{
+ "bug_id": "enaml-602",
+ "title": "declarative_function: super_disallowed ref leak per call + _Invoke cascading NULL + DFunc_new leaks self on bad args",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/enaml",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/enaml#602"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__enaml/issue-602.json"
+ ],
+ "n_artifacts": 1
+}

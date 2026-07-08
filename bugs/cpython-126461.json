@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-126461",
+ "title": "Calling `_pickle.load` with a `MagicMock` results in `SystemError`/aborts",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126461"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "3.13",
+  "3.14",
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126461.json"
+ ],
+ "n_artifacts": 1
+}

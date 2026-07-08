@@ -1,0 +1,29 @@
+{
+ "bug_id": "pillow-9510",
+ "title": "Add PERF to lint and fix findings",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python-pillow/Pillow",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python-pillow/Pillow#9510"
+ ],
+ "gists": [],
+ "labels": [
+  "Performance"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "hugovk"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python-pillow__Pillow/pull-9510.json"
+ ],
+ "n_artifacts": 1
+}

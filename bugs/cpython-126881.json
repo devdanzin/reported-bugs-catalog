@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-126881",
+ "title": "Segfault with `asyncio.base_events.BaseEventLoop` when passed a small float to `set_debug`.",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126881"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "3.13",
+  "3.14",
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126881.json"
+ ],
+ "n_artifacts": 1
+}

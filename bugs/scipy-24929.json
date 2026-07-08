@@ -1,0 +1,31 @@
+{
+ "bug_id": "scipy-24929",
+ "title": "BUG: use `CMPLX()`/`CMPLXF()` instead of `real + imag * I`",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "scipy/scipy",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "scipy/scipy#24929"
+ ],
+ "gists": [],
+ "labels": [
+  "C/C++",
+  "defect",
+  "scipy.integrate",
+  "scipy.linalg",
+  "scipy.sparse.linalg"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/scipy__scipy/pull-24929.json"
+ ],
+ "n_artifacts": 1
+}

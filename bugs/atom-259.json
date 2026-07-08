@@ -1,0 +1,25 @@
+{
+ "bug_id": "atom-259",
+ "title": "SortedMap_new: 4 bugs \u2014 double-incref leak, PyDict_Items leak, self leak on error, unchecked PySequence_GetItem segfault",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/atom",
+ "is_umbrella": true,
+ "issues": [
+  "nucleic/atom#259"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__atom/issue-259.json"
+ ],
+ "n_artifacts": 1
+}

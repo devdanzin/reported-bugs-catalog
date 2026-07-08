@@ -1,0 +1,29 @@
+{
+ "bug_id": "apsw-609",
+ "title": "Investigate linter report",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "rogerbinns/apsw",
+ "is_umbrella": false,
+ "issues": [
+  "rogerbinns/apsw#609"
+ ],
+ "prs": [],
+ "gists": [
+  "db96bedb4e2ec6712fc6b71191ff4bd0"
+ ],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "rogerbinns"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/rogerbinns__apsw/issue-609.json"
+ ],
+ "n_artifacts": 1
+}

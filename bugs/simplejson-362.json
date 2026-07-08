@@ -1,0 +1,34 @@
+{
+ "bug_id": "simplejson-362",
+ "title": "Free-threading safety: lazy-init races, borrowed refs, unprotected per-instance dicts",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "simplejson/simplejson",
+ "is_umbrella": false,
+ "issues": [
+  "simplejson/simplejson#362"
+ ],
+ "prs": [
+  "simplejson/simplejson#363",
+  "simplejson/simplejson#364",
+  "simplejson/simplejson#365"
+ ],
+ "gists": [
+  "be2bea00e879ed44e273eec1a0715f00"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/simplejson__simplejson/issue-362.json",
+  "raw/simplejson__simplejson/pull-363.json",
+  "raw/simplejson__simplejson/pull-364.json",
+  "raw/simplejson__simplejson/pull-365.json"
+ ],
+ "n_artifacts": 4
+}

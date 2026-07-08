@@ -1,0 +1,116 @@
+{
+ "repo": "python/cpython",
+ "number": 151773,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/151773",
+ "title": "Segfault: Py_DECREF(NULL) in PyContextVar_Set (context.c:367)",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "prakashsellathurai",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2026-06-20T08:00:25Z",
+ "closed_at": "2026-06-23T14:15:17Z",
+ "body": "# Crash report\n\n### What happened?\n\n# Segfault: `Py_DECREF(NULL)` in `PyContextVar_Set` (`context.c:367`)\n\n*`PyContextVar_Set` doesn't NULL-check `token_new()`; under OOM the `contextvar_set()` error path then `Py_DECREF`s the NULL token.*\n\n_AI Disclaimer: this gist was drafted by Claude Code, which also generated the reduced reproducer._\n\n## Crash report\n\n`PyContextVar_Set` does not NULL-check the result of `token_new()`. Under memory pressure `token_new()` returns NULL; if the following `contextvar_set()` also fails, the error path runs `Py_DECREF(tok)` on the NULL token and segfaults.\n\n## Reproducer\n\n```python\nimport contextvars\nfrom _testcapi import set_nomemory, remove_mem_hooks\ncv = contextvars.ContextVar(\"x\")\nfor start in range(16):            # crashes at start=2\n    set_nomemory(start, 0)\n    try:\n        try:\n            cv.set(object())\n        finally:\n            remove_mem_hooks()\n    except MemoryError:\n        pass\n```\n\nA single `set_nomemory(0, 0); cv.set(object())` does *not* crash \u2014 `PyContextVar_Set`'s own early `context_get()` fails first and returns cleanly. The crash needs a budget where the early allocations succeed but `token_new()` and `contextvar_set()` then fail, hence the short sweep.\n\n## Backtrace\n\n```\n#0 _Py_atomic_load_uint32_relaxed\n#1 Py_DECREF              Include/refcount.h:345    (op == 0x0)\n#2 PyContextVar_Set       Python/context.c:367      (Py_DECREF(tok), tok == NULL)\n```\n\n## Root cause\n\n`Python/context.c`, `PyContextVar_Set` (L346):\n\n```c\n    PyContextToken *tok = token_new(ctx, var, old_val);  /* L363: may return NULL, UNCHECKED */\n    Py_XDECREF(old_val);\n    if (contextvar_set(var, val)) {                      /* L366: fails under OOM (_PyHamt_Assoc -> NULL) */\n        Py_DECREF(tok);                                  /* L367: tok == NULL -> SIGSEGV */\n        return NULL;\n    }\n    return (PyObject *)tok;\n```\n\n`token_new()` allocates (`PyObject_GC_New`) and can return NULL on failure, but `tok` is not checked before the `Py_DECREF(tok)` on the `contextvar_set()` failure path. (On the success path the function also returns `tok` unchecked \u2014 harmless NULL-with-exception, but the modification still happened.)\n\n## Suggested fix\n\n```c\n    PyContextToken *tok = token_new(ctx, var, old_val);\n    Py_XDECREF(old_val);\n    if (tok == NULL) {\n        return NULL;\n    }\n```\n\n(or `Py_XDECREF(tok)` on the error path).\n\n## Notes\n\nFound by OOM-injection fuzzing (`set_nomemory`). Same pattern as gh-146080 (`Py_DECREF(NULL)` in an `_ssl.c` error label). **Not** free-threading-specific: reproduces on free-threaded and default (GIL) builds, debug and release. (A `_py_warnings`/`ContextVar` vehicle reaches this only when `context_aware_warnings` is enabled \u2014 the default on free-threaded builds \u2014 but the C bug is build-agnostic.)\n\n## Versions\n\n- main (3.16.0a0); reproduced on free-threaded debug+ASan, free-threaded release, and GIL release builds.\n\n---\n\n*Part of [python/cpython#151763](https://github.com/python/cpython/issues/151763) \u2014 an umbrella tracking 35 OOM-related crash findings.*\n\n### CPython versions tested on:\n\n3.16, CPython main branch\n\n### Operating systems tested on:\n\nWindows\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.9.23 (main, Jun  4 2025, 08:55:39) [GCC 13.3.0]\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151836\n* gh-152009\n* gh-152010\n* gh-152011\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "zangjiucheng",
+   "created_at": "2026-06-20T16:15:42Z",
+   "body": "Hey @prakashsellathurai \n\nI can reproduce this crash on the Linux distribution, and the suggested fix makes it work and LGTM!! (But wait for core dev people to come in to review) \n\nI will suggest the following test for the feature PR:\n\n```py\n  # Python built with Py_TRACE_REFS fail with a fatal error in\n  # _PyRefchain_Trace() on memory allocation error.\n  @unittest.skipIf(support.Py_TRACE_REFS, 'cannot test Py_TRACE_REFS build')\n  @unittest.skipUnless(support.check_impl_detail(cpython=True), 'CPython only')\n  def test_contextvar_set_oom(self):\n      # gh-151773: PyContextVar_Set() called token_new(), which can return\n      # NULL on OOM. The NULL was not checked, so a subsequent failure in\n      # contextvar_set() ran Py_DECREF(NULL) and crashed. Scan the memory\n      # allocation indexes around token_new() to make sure setting a\n      # ContextVar under OOM raises MemoryError instead of segfaulting.\n      _testcapi = import_helper.import_module('_testcapi')\n      var = contextvars.ContextVar('test_contextvar_set_oom', default=None)\n      for i in range(1, 20):\n          try:\n              _testcapi.set_nomemory(i, i + 1)\n              var.set(42)\n          except MemoryError:\n              pass\n          finally:\n              _testcapi.remove_mem_hooks()\n```\n\nPlease take a look at this make sure, thx :) "
+  },
+  {
+   "author": "picnixz",
+   "created_at": "2026-06-20T16:17:18Z",
+   "body": "No need for such test. We now decided not to test MemoryError issues in general. As long as we have a reproducer that is verified by core dev with a before/after check it's enough. Otherwise, we'll need to change constants sometimes."
+  },
+  {
+   "author": "zangjiucheng",
+   "created_at": "2026-06-20T16:19:06Z",
+   "body": "Oh, kk thanks for updating :)"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "prakashsellathurai"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151836",
+   "commit": null,
+   "actor": "bhuvi27"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151843",
+   "commit": null,
+   "actor": "amruthamodela06"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b77c4d6b9357fee7c1cd525fed7c2287ffd0b222",
+   "actor": "bhuvi27"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d35b1719a58c8682a22ef698e070e97661af8d14",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152009",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152010",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152011",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "a1f31af280a5c56c9eb85e2de5251c3c1b0e8bd3",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b471b4a6bad62f0b237aa4cb86bf8f20481c129c",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "7b765a47b83d9f5155c8fc7a6e54ab86e5e61600",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "38f0c51c8337bcd2b4738070b6e8a9a73b01d624",
+   "actor": "pyctrl"
+  }
+ ],
+ "fetch_errors": null
+}

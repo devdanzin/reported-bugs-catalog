@@ -1,0 +1,34 @@
+{
+ "bug_id": "cpython-126018",
+ "title": "`sys.audit(0)` aborts due to an assertion in debug build",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126018"
+ ],
+ "prs": [
+  "python/cpython#126020"
+ ],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "extension-modules",
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126018.json",
+  "raw/python__cpython/pull-126020.json"
+ ],
+ "n_artifacts": 2
+}

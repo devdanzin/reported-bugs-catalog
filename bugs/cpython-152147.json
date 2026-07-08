@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-152147",
+ "title": "Use-after-free under MemoryError: opcode error path leaves stale stackref that `_PyFrame_ClearLocals` over-decrefs",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#152147"
+ ],
+ "prs": [],
+ "gists": [
+  "22b71f61343c81df5bea9b7fca798e87"
+ ],
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-152147.json"
+ ],
+ "n_artifacts": 1
+}

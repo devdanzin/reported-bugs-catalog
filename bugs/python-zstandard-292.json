@@ -1,0 +1,27 @@
+{
+ "bug_id": "python-zstandard-292",
+ "title": "Segfault: 4+ unchecked `PyBytes_AsStringAndSize` on user `read()` return uses uninitialized memory",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "indygreg/python-zstandard",
+ "is_umbrella": false,
+ "issues": [
+  "indygreg/python-zstandard#292"
+ ],
+ "prs": [],
+ "gists": [
+  "b86039ac097141579590c1a0f3a43605"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/indygreg__python-zstandard/issue-292.json"
+ ],
+ "n_artifacts": 1
+}

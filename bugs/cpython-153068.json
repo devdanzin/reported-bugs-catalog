@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-153068",
+ "title": "_lsprof.c: Profiler.enable() clobbers exception from use_tool_id",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#153068"
+ ],
+ "prs": [],
+ "gists": [
+  "ed7691a99c26ede561a549ab1dba00b2"
+ ],
+ "labels": [
+  "extension-modules",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "aisk"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-153068.json"
+ ],
+ "n_artifacts": 1
+}

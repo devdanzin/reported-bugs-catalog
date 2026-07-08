@@ -1,0 +1,25 @@
+{
+ "bug_id": "bottleneck-531",
+ "title": "error_converting + TYPE_ERR clobbers original exception (~15 sites)",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pydata/bottleneck",
+ "is_umbrella": false,
+ "issues": [
+  "pydata/bottleneck#531"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pydata__bottleneck/issue-531.json"
+ ],
+ "n_artifacts": 1
+}

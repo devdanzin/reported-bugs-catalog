@@ -1,0 +1,86 @@
+{
+ "repo": "python/cpython",
+ "number": 151968,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151968",
+ "title": "gh-151763: Fix OOM-0013 crash when the parser or compiler fails to allocate",
+ "state": "closed",
+ "state_reason": null,
+ "author": "tonghuaroot",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-06-23T07:17:29Z",
+ "closed_at": "2026-07-02T00:34:16Z",
+ "body": "This fixes OOM-0013 from the gh-151763 umbrella.\n\n`compile()`, `exec()`, `eval()` and `ast.parse()` can return NULL without\nsetting an exception when an allocation fails, breaking the result/error\ncontract every consumer relies on and crashing on the assertion that checks it\n(for example the `(res != NULL) ^ (PyErr_Occurred())` check reached from the\nevaluation loop, and `assert(!PyErr_Occurred())` at the top of\n`_PyAST_Validate`).\n\nThree points returned NULL silently under a failed allocation:\n\n- `new_compiler()` returned NULL without calling `PyErr_NoMemory()` when its\n  initial `PyMem_Calloc` failed -- the dominant `compile()`/`exec()`/`eval()`\n  path.\n- `_PyPegen_run_parser()` could return a valid result while leaving a stale\n  exception pending.\n- The tokenizer-init helpers could fail silently.\n\nSetting the error indicator at each point makes a failed allocation surface as\n`MemoryError` instead of a NULL-without-exception crash.\n\n## Reproduction (debug build, `_testcapi.set_nomemory`)\n\n- `ast.parse(...)` under `set_nomemory` aborted with \"a function returned NULL\n  without setting an exception\"; a clean `MemoryError` is raised after the fix.\n- `compile()` / `exec()` / `eval()` under `set_nomemory` aborted at the\n  result/error contract assertion; clean after the fix.\n- Reverting either guard reproduces the corresponding abort (negative control).\n\nNo test is added, following the convention for these OOM crash fixes.\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-07-02T00:34:20Z",
+   "body": "Thanks @tonghuaroot for the PR, and @pablogsal for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.13, 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-02T00:34:33Z",
+   "body": "[GH-152836](https://github.com/python/cpython/pull/152836) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-07-02T00:34:36Z",
+   "body": "Sorry, @tonghuaroot and @pablogsal, I could not cleanly backport this to `3.13` due to a conflict.\nPlease backport using [cherry_picker](https://pypi.org/project/cherry-picker/) on command line.\n```\ncherry_picker 669299b62f6c2176d4bedcf550fb9baaabd6a9d6 3.13\n```\n"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-02T00:34:39Z",
+   "body": "[GH-152837](https://github.com/python/cpython/pull/152837) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-02T01:50:36Z",
+   "body": "[GH-152840](https://github.com/python/cpython/pull/152840) is a backport of this pull request to the [3.13 branch](https://github.com/python/cpython/tree/3.13)."
+  },
+  {
+   "author": "tonghuaroot",
+   "created_at": "2026-07-02T01:51:04Z",
+   "body": "GH-152840 does the 3.13 backport. The conflict was only the `_PyPegen_raise_tokenizer_init_error` \u2192 `_PyTokenizer_raise_init_error` rename plus the `struct compiler` context in `new_compiler`; the fix itself is identical. Built 3.13 and ran `test_compile`/`test_exceptions`/`test_tokenize`/`test_syntax`/`test_builtin` \u2014 all green."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "669299b62f6c2176d4bedcf550fb9baaabd6a9d6",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "cdc1472dfd1c105a827535bdde73126af7eef12a",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "74c8d5ce0f7ba5eb0f9d299f30ac7c6468a59ef5",
+   "actor": "pablogsal"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "d13f5b27c8e1af059304c857986eec91de9146c8",
+   "actor": "pablogsal"
+  }
+ ],
+ "fetch_errors": null
+}

@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-132472",
+ "title": "Speed up `Fraction.__round__` for large negative `ndigits`",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#132472"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "performance",
+  "stdlib",
+  "type-feature"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-132472.json"
+ ],
+ "n_artifacts": 1
+}

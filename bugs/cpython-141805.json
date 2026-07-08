@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-141805",
+ "title": "Segfault from `repr()` of a corrupted set",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#141805"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "3.15",
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-141805.json"
+ ],
+ "n_artifacts": 1
+}

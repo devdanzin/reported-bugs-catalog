@@ -1,0 +1,25 @@
+{
+ "bug_id": "enaml-600",
+ "title": "PyObject_RichCompareBool and PyObject_IsTrue error-as-truthy in signal disconnect, compare, and observer call",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/enaml",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/enaml#600"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__enaml/issue-600.json"
+ ],
+ "n_artifacts": 1
+}

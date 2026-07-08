@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-145070",
+ "title": "Teach `pprint` about `frozendict`",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#145070"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "easy",
+  "stdlib",
+  "type-feature"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-145070.json"
+ ],
+ "n_artifacts": 1
+}

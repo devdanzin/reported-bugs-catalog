@@ -1,0 +1,31 @@
+{
+ "bug_id": "multidict-1310",
+ "title": "fix format error that leads to segfaults",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "aio-libs/multidict",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "aio-libs/multidict#1310"
+ ],
+ "gists": [
+  "a36588ae7e2b73f0d85f8a925fb13b3d"
+ ],
+ "labels": [
+  "bot:chronographer:provided"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "Vizonex"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/aio-libs__multidict/pull-1310.json"
+ ],
+ "n_artifacts": 1
+}

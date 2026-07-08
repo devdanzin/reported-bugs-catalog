@@ -1,0 +1,30 @@
+{
+ "bug_id": "simplejson-352",
+ "title": "Reference leaks in dict encoder: variable shadowing and skipkeys",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "simplejson/simplejson",
+ "is_umbrella": false,
+ "issues": [
+  "simplejson/simplejson#352"
+ ],
+ "prs": [
+  "simplejson/simplejson#358"
+ ],
+ "gists": [
+  "e8a25ea988dc0461c2fd378efd84a8a3"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/simplejson__simplejson/issue-352.json",
+  "raw/simplejson__simplejson/pull-358.json"
+ ],
+ "n_artifacts": 2
+}

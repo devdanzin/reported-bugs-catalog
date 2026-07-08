@@ -1,0 +1,27 @@
+{
+ "repo": "python/cpython",
+ "number": 152058,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/152058",
+ "title": "Segfault: NULL deref in `os__path_normpath_impl` (`posixmodule.c:6149`)",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "lpyu001",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug"
+ ],
+ "created_at": "2026-06-24T08:56:11Z",
+ "closed_at": "2026-06-24T09:16:56Z",
+ "body": "# Bug report\n\n### Bug description:\n\n# Segfault: NULL deref in `os__path_normpath_impl` (`posixmodule.c:6149`)\n\n*`os__path_normpath_impl` doesn't NULL-check the `PyUnicode_From*` result; on a `bytes` path under OOM it feeds NULL to `PyUnicode_EncodeFSDefault`, which dereferences it in `unicode_encode_utf8` (`unicodeobject.c:5681`).*\n\n_AI Disclaimer: this gist was drafted by Claude Code, which also generated the reduced reproducer._\n\n## Crash report\n\n`os__path_normpath_impl` builds the normalized path with `PyUnicode_FromOrdinal('.')`\nor `PyUnicode_FromWideChar(...)`, either of which can return `NULL` under memory\npressure. When the input path was `bytes`, it then re-encodes with\n`Py_SETREF(result, PyUnicode_EncodeFSDefault(result))` **without checking `result` for\nNULL**. `PyUnicode_EncodeFSDefault(NULL)` reaches `unicode_encode_utf8(NULL, \u2026)`, whose\n`PyUnicode_Check(unicode)` dereferences the NULL `ob_type` \u2192 SIGSEGV. Reproduces on all\nbuild configurations (it is a plain NULL dereference, not a debug-only assert).\n\n## Reproducer\n\nMinimal, stdlib-only:\n\n```python\nimport posix\nfrom _testcapi import set_nomemory, remove_mem_hooks\n\nfor start in range(1, 2000):\n    set_nomemory(start, 0)\n    try:\n        try:\n            posix._path_normpath(b\"foo//bar/../baz\")   # bytes path -> EncodeFSDefault branch\n        finally:\n            remove_mem_hooks()\n    except BaseException:\n        pass\n```\n\n(`posix._path_normpath` is the C accelerator behind `ntpath.normpath`; on POSIX it is\nreachable as `posix._path_normpath`. A `bytes` argument is required to take the\n`PyBytes_Check` re-encode branch.)\n\n## Backtrace\n\n```\nProgram received signal SIGSEGV, Segmentation fault.\n#0  unicode_encode_utf8 (unicode=0x0, ...)   Objects/unicodeobject.c:5681   # PyUnicode_Check(NULL)->ob_type\n#1  os__path_normpath_impl (module, path)    Modules/posixmodule.c:6149     # Py_SETREF(result, EncodeFSDefault(result)), result==NULL\n#2  os__path_normpath                        Modules/clinic/posixmodule.c.h:2701\n#3  _Py_BuiltinCallFastWithKeywords_StackRef Python/ceval.c:841\n#4  _PyEval_EvalFrameDefault                 Python/generated_cases.c.h:2603\n```\n\n`unicode == 0x0` confirmed in gdb: the `result` produced just above is NULL and flows\nstraight into the encoder.\n\n## Root cause\n\n`Modules/posixmodule.c`, `os__path_normpath_impl` (L6134-6152):\n\n```c\n    PyObject *result;\n    ...\n    if (!norm_len) {\n        result = PyUnicode_FromOrdinal('.');          /* may return NULL under OOM */\n    }\n    else {\n        result = PyUnicode_FromWideChar(norm_path, norm_len);  /* may return NULL under OOM */\n    }\n    if (PyBytes_Check(path->object)) {\n        Py_SETREF(result, PyUnicode_EncodeFSDefault(result));  /* L6149: result unchecked */\n    }\n    return result;\n```\n\nThe two `PyUnicode_From*` constructors allocate and can fail; `result` is never\nNULL-checked before the `bytes`-path re-encode. `PyUnicode_EncodeFSDefault(NULL)`\nforwards NULL to `unicode_encode_utf8`, which assumes a valid object.\n\n## Suggested fix\n\nGuard the re-encode (and the function already returns `result==NULL` correctly to\npropagate the error):\n\n```c\n    if (result != NULL && PyBytes_Check(path->object)) {\n        Py_SETREF(result, PyUnicode_EncodeFSDefault(result));\n    }\n    return result;\n```\n\n(Equivalently, `if (result == NULL) return NULL;` before the `PyBytes_Check`.)\nHardening `PyUnicode_EncodeFSDefault` / `unicode_encode_utf8` to reject NULL would\nconvert the crash into a clean error elsewhere, but the missing check belongs here.\n\n## Notes\n\nFound via OOM-injection fuzzing (`_testcapi.set_nomemory`); surfaced by the catalog\ningest as a new site (`unicode_encode_utf8`) distinct from OOM-0009 (`replace`,\nunicodeobject.c:10783). Clean NULL dereference \u2014 **reproduces on every build**\n(ft_debug_asan, ft_release, jit, upstream), unlike the debug-only assert/ASan-only\nfindings. Original vehicle `python-7/profiling_sampling_cli-segmentation_fault` reached\nit via an `os.path` operation on a bytes path; reduced to the 3-line trigger above.\n\n## Versions\n\n- main (3.16.0a0), commit 15d7406. Reproduces (SIGSEGV) on all four local builds\n  (free-threaded debug+ASan, free-threaded release, JIT, upstream release).\n\n---\n\n*Part of [python/cpython#151763](https://github.com/python/cpython/issues/151763) \u2014 an umbrella tracking 35 OOM-related crash findings.*\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nWindows",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "lpyu001"
+  }
+ ],
+ "fetch_errors": null
+}

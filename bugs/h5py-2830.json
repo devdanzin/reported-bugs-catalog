@@ -1,0 +1,32 @@
+{
+ "bug_id": "h5py-2830",
+ "title": "Space handle + buffer leak in `get_chunk_info` on error",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "h5py/h5py",
+ "is_umbrella": false,
+ "issues": [
+  "h5py/h5py#2830"
+ ],
+ "prs": [
+  "h5py/h5py#2848"
+ ],
+ "gists": [],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "neutrinoceros"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/h5py__h5py/issue-2830.json",
+  "raw/h5py__h5py/pull-2848.json"
+ ],
+ "n_artifacts": 2
+}

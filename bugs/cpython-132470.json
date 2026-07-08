@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-132470",
+ "title": "Building a `ctypes.CField` with wrong `byte_size` aborts",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#132470"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.14",
+  "extension-modules",
+  "topic-ctypes",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-132470.json"
+ ],
+ "n_artifacts": 1
+}

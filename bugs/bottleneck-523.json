@@ -1,0 +1,32 @@
+{
+ "bug_id": "bottleneck-523",
+ "title": "rankdata/nanrankdata: unchecked PyArray_ArgSort and PyArray_EMPTY \u2014 NULL dereference",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pydata/bottleneck",
+ "is_umbrella": false,
+ "issues": [
+  "pydata/bottleneck#523"
+ ],
+ "prs": [
+  "pydata/bottleneck#536"
+ ],
+ "gists": [],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "neutrinoceros"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pydata__bottleneck/issue-523.json",
+  "raw/pydata__bottleneck/pull-536.json"
+ ],
+ "n_artifacts": 2
+}

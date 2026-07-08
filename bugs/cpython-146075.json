@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-146075",
+ "title": "Assertion failure from `functools.partial` using a `str` subclass that raises on `__eq__`",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146075"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.15",
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146075.json"
+ ],
+ "n_artifacts": 1
+}

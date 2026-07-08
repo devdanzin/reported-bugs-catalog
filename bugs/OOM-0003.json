@@ -1,0 +1,27 @@
+{
+ "bug_id": "OOM-0003",
+ "title": "gh-151763: Fix possible crash on `CodeType` deallocation",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#152034"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "sobolevn"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-152034.json"
+ ],
+ "n_artifacts": 1
+}

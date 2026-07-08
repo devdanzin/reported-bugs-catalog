@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-146613",
+ "title": "`itertools._grouper.__next__` has the same re-entrant use-after-free that was fixed in `groupby.__next__`",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146613"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146613.json"
+ ],
+ "n_artifacts": 1
+}

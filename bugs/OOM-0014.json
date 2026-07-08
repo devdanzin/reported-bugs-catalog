@@ -1,0 +1,29 @@
+{
+ "bug_id": "OOM-0014",
+ "title": "gh-151763: Fix OOM-0014 crash in _interpchannels._channel_id",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#151902"
+ ],
+ "gists": [],
+ "labels": [
+  "awaiting review"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "zainnadeem786"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-151902.json"
+ ],
+ "n_artifacts": 1
+}

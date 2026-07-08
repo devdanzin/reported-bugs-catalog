@@ -1,0 +1,27 @@
+{
+ "bug_id": "cereggii-86",
+ "title": "Binary ops in `AtomicInt64` segfault when done on a `ThreadHandle`",
+ "tool": "fusil-plugin-cereggii",
+ "mode": "general",
+ "target_repo": "dpdani/cereggii",
+ "is_umbrella": false,
+ "issues": [
+  "dpdani/cereggii#86"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "fusil-fuzzer"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/dpdani__cereggii/issue-86.json"
+ ],
+ "n_artifacts": 1
+}

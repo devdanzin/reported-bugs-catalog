@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-122353",
+ "title": "Import errors with loo long entry in sys.path or PYTHONPATH in Windows",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#122353"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "3.13",
+  "3.14",
+  "OS-windows",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-122353.json"
+ ],
+ "n_artifacts": 1
+}

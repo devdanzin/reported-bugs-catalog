@@ -1,0 +1,27 @@
+{
+ "bug_id": "h5py-2840",
+ "title": "Static `_error_handler` data race under free-threading",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "h5py/h5py",
+ "is_umbrella": false,
+ "issues": [
+  "h5py/h5py#2840"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "threading"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/h5py__h5py/issue-2840.json"
+ ],
+ "n_artifacts": 1
+}

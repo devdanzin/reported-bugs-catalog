@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-144567",
+ "title": "`heap-use-after-free` running functions from `profiling.sampling` in free-threaded build",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#144567"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "stdlib",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-144567.json"
+ ],
+ "n_artifacts": 1
+}

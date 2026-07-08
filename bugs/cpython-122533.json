@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-122533",
+ "title": "New REPL will exit the interpreter due to errors from substituting builtins.__import__",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#122533"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "stdlib",
+  "topic-repl",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-122533.json"
+ ],
+ "n_artifacts": 1
+}

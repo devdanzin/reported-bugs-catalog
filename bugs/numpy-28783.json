@@ -1,0 +1,27 @@
+{
+ "bug_id": "numpy-28783",
+ "title": "BUG: Failed `!PyErr_Occurred()` assertion",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "numpy/numpy",
+ "is_umbrella": false,
+ "issues": [
+  "numpy/numpy#28783"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "00 - Bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/numpy__numpy/issue-28783.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,25 @@
+{
+ "bug_id": "python-lz4-332",
+ "title": "Fix error handling in frame context creation, reset, and destruction",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python-lz4/python-lz4",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python-lz4/python-lz4#332"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python-lz4__python-lz4/pull-332.json"
+ ],
+ "n_artifacts": 1
+}

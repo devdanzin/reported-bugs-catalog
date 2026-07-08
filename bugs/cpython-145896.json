@@ -1,0 +1,34 @@
+{
+ "bug_id": "cpython-145896",
+ "title": "Typos and stale docstrings in `Lib/traceback.py`",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#145896"
+ ],
+ "prs": [
+  "python/cpython#145897"
+ ],
+ "gists": [],
+ "labels": [
+  "docs",
+  "skip news",
+  "stale",
+  "stdlib",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-145896.json",
+  "raw/python__cpython/pull-145897.json"
+ ],
+ "n_artifacts": 2
+}

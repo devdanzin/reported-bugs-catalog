@@ -1,0 +1,65 @@
+{
+ "repo": "python/cpython",
+ "number": 152034,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/152034",
+ "title": "gh-151763: Fix possible crash on `CodeType` deallocation",
+ "state": "closed",
+ "state_reason": null,
+ "author": "sobolevn",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-06-23T20:49:50Z",
+ "closed_at": "2026-06-24T11:46:40Z",
+ "body": "\n\n<!-- gh-issue-number: gh-151763 -->\n* Issue: gh-151763\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-06-24T11:46:43Z",
+   "body": "Thanks @sobolevn for the PR \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T11:46:56Z",
+   "body": "[GH-152069](https://github.com/python/cpython/pull/152069) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-06-24T11:47:03Z",
+   "body": "[GH-152070](https://github.com/python/cpython/pull/152070) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "22dd5b5b374c8eb4def7d55bb8de5928e345c73a",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "1b25c79af4ccd6ad7b883f1ed22d5c597dd8f601",
+   "actor": "sobolevn"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "e8b34391e557b44a6f836dff2bfb61769f7b2e39",
+   "actor": "sobolevn"
+  }
+ ],
+ "fetch_errors": null
+}

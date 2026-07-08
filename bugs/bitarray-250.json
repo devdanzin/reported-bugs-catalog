@@ -1,0 +1,27 @@
+{
+ "bug_id": "bitarray-250",
+ "title": "Umbrella issue: bitarray C Extension Analysis Report",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "ilanschnell/bitarray",
+ "is_umbrella": true,
+ "issues": [
+  "ilanschnell/bitarray#250"
+ ],
+ "prs": [],
+ "gists": [
+  "191b87e2d03e806f1868eecfe844e406"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/ilanschnell__bitarray/issue-250.json"
+ ],
+ "n_artifacts": 1
+}

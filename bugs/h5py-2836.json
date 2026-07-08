@@ -1,0 +1,30 @@
+{
+ "bug_id": "h5py-2836",
+ "title": "`temptype` leak in `make_reduced_type` loop iteration",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "h5py/h5py",
+ "is_umbrella": false,
+ "issues": [
+  "h5py/h5py#2836"
+ ],
+ "prs": [
+  "h5py/h5py#2845"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "neutrinoceros"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/h5py__h5py/issue-2836.json",
+  "raw/h5py__h5py/pull-2845.json"
+ ],
+ "n_artifacts": 2
+}

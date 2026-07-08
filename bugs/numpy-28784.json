@@ -1,0 +1,28 @@
+{
+ "bug_id": "numpy-28784",
+ "title": "BUG: segfault from `random_raw` from instance initialized from invalid value",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "numpy/numpy",
+ "is_umbrella": false,
+ "issues": [
+  "numpy/numpy#28784"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "00 - Bug",
+  "component: numpy.random"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/numpy__numpy/issue-28784.json"
+ ],
+ "n_artifacts": 1
+}

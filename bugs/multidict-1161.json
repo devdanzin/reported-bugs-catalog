@@ -1,0 +1,25 @@
+{
+ "bug_id": "multidict-1161",
+ "title": "Segfault on repr of instances of `_ItemsView`, `_KeysView` or `_ValuesView`",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "aio-libs/multidict",
+ "is_umbrella": false,
+ "issues": [
+  "aio-libs/multidict#1161"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/aio-libs__multidict/issue-1161.json"
+ ],
+ "n_artifacts": 1
+}

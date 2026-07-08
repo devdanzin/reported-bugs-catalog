@@ -1,0 +1,32 @@
+{
+ "bug_id": "multidict-1328",
+ "title": "Fix `__repr__` race (Free-Threaded)",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "aio-libs/multidict",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "aio-libs/multidict#1328"
+ ],
+ "gists": [
+  "fa00e03ef041c030660f083116a7e1b6"
+ ],
+ "labels": [
+  "bot:chronographer:provided",
+  "free-threading"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "Vizonex"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/aio-libs__multidict/pull-1328.json"
+ ],
+ "n_artifacts": 1
+}

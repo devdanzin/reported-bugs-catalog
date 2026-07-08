@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-137007",
+ "title": "JIT: assertion failure in _PyObject_GC_UNTRACK",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#137007"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.14",
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-137007.json"
+ ],
+ "n_artifacts": 1
+}

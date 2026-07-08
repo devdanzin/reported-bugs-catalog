@@ -1,0 +1,27 @@
+{
+ "bug_id": "pillow-9493",
+ "title": "Add error messages before returning NULL when encoding",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python-pillow/Pillow",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python-pillow/Pillow#9493"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "radarhere"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python-pillow__Pillow/pull-9493.json"
+ ],
+ "n_artifacts": 1
+}

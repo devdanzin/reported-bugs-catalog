@@ -1,0 +1,33 @@
+{
+ "bug_id": "cpython-152228",
+ "title": "`str.replace` can crash under memory pressure",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#152228"
+ ],
+ "prs": [],
+ "gists": [
+  "34b633230f6d2301ba17dec195ffe4b7"
+ ],
+ "labels": [
+  "interpreter-core",
+  "topic-unicode",
+  "type-crash"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "sobolevn"
+ ],
+ "status": "open",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-152228.json"
+ ],
+ "n_artifacts": 1
+}

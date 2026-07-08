@@ -69,6 +69,31 @@ Sub-passes:
 - [ ] Verify #146443 vs #146124 (cpython-review PR).
 - [ ] Old bpo / ajaksu2 long-tail.
 
+## Phase 3 — Classify / dedup / reconcile  🟡 IN PROGRESS (2026-07-08)
+`tools/classify.py` (per-artifact tool/mode/filed_by/links + evidence OVERRIDES +
+OOM-catalog overrides) → `sources/classification.json`; `tools/group.py`
+(union-find on issue↔PR links, umbrella-protected, tool propagation) →
+**`bugs/<id>.json` (410 bug clusters)** from 461 artifacts (51 PRs merged).
+
+**Per-tool bugs (confirmed + tentative):** cext-review 146 · **fusil 128 (+12)** ·
+ft-review 31 · **lafleur 28 (+6)** · cpython-review 17 · cereggii 15 · manual 18 (+9).
+filed_by: self 297 · maintainer/contributor 97 · self+maintainer 16. Umbrellas 20.
+
+**Mid-phase fixes:** (a) harvested 9 missing OOM issues by number — **12 of 15 filed
+OOM issues were authored by CONTRIBUTORS** (sobolevn ×3, prakashsellathurai…) from
+umbrella #151763, not devdanzin; added OOM-catalog overrides so they tag fusil/oom.
+(b) dropped the `>=4 links` umbrella heuristic (46 false positives) → 20 real umbrellas.
+**Contributor/maintainer impact: 113 bugs have a non-devdanzin filer** (radarhere 16,
+neutrinoceros 16, GrahamDumpleton 15, sobolevn 6, hugovk 5…).
+
+**Remaining Phase 3:**
+- [ ] **Review queue: 27 bugs** (`sources/review_queue.md`) — untagged CPython
+      artifacts needing user tool sign-off (12 fusil-guess / 6 lafleur-guess /
+      9 manual-guess; mostly PyREPL work vs fusil crashes vs JIT).
+- [ ] Findings rollup (umbrella bodies + OOM 37 + cext 690) → the *findings* number;
+      **gist-comb for the reproduced-count** (per user — 575 may = reproduced).
+- [ ] Then Phase 4 index (catalog.json + INDEX.md).
+
 ## Open decisions (block Phase 3, not Phase 2) — SCOPING_REPORT §5 + §10
 - Own-repo (1471) EXCLUDE? OTHER_OSS (120) EXCLUDE? pypy/simplejson → `manual`?
 - `ajaksu2` long-tail method (not `author:`-searchable). Unit framing for deck.

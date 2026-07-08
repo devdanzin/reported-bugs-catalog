@@ -1,0 +1,27 @@
+{
+ "bug_id": "traits-1881",
+ "title": "ctraits Extension Analysis Report",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "enthought/traits",
+ "is_umbrella": true,
+ "issues": [
+  "enthought/traits#1881"
+ ],
+ "prs": [],
+ "gists": [
+  "c997faaee7556ffc5cb991deca553966"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/enthought__traits/issue-1881.json"
+ ],
+ "n_artifacts": 1
+}

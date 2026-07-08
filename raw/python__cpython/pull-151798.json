@@ -1,0 +1,33 @@
+{
+ "repo": "python/cpython",
+ "number": 151798,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151798",
+ "title": "gh-151763: Fix OOM-0034 tokenizer offset error handling",
+ "state": "open",
+ "state_reason": null,
+ "author": "zainnadeem786",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-20T13:29:54Z",
+ "closed_at": null,
+ "body": "# Summary\r\n\r\nThis PR addresses **[OOM-0034](https://gist.github.com/devdanzin/9871a21facf4c9c6a415e220f9d10762)** from gh-151763.\r\n\r\nIt fixes an out-of-memory (OOM) failure path in the tokenizer offset conversion logic that could lead to:\r\n\r\n* a NULL pointer dereference (access violation), or\r\n* a tokenizer result being returned while a `MemoryError` was still pending.\r\n\r\n# Issue\r\n\r\n`_PyPegen_byte_offset_to_character_offset_line()` in `Parser/pegen.c` calls `PyUnicode_AsUTF8()` and immediately dereferences the returned pointer.\r\n\r\nUnder memory-allocation failure, `PyUnicode_AsUTF8()` can return `NULL` with a pending `MemoryError`. The existing code did not check for this condition before accessing the returned buffer.\r\n\r\nExample crash path:\r\n\r\n```text\r\ntokenizeriter_next()\r\n\u2514\u2500\u2500 _get_col_offsets()\r\n    \u2514\u2500\u2500 _PyPegen_byte_offset_to_character_offset_line()\r\n        \u2514\u2500\u2500 PyUnicode_AsUTF8()\r\n            \u2514\u2500\u2500 returns NULL under OOM\r\n                \u2514\u2500\u2500 NULL dereference\r\n```\r\n\r\nThe issue was reproducible with `_testcapi.set_nomemory()` using non-ASCII source lines that require byte-offset to character-offset conversion.\r\n\r\n# Reproduction\r\n\r\nUsing a CPython debug build and OOM injection:\r\n\r\n```python\r\nimport _testcapi\r\nimport _tokenize\r\n\r\nsource = \"if True:\\n  \\u00e9 = 1\\n\"\r\n\r\nit = _tokenize.TokenizerIter(\r\n    iter(source.splitlines(True)).__next__,\r\n    extra_tokens=False,\r\n)\r\n\r\nfor _ in range(5):\r\n    next(it)\r\n\r\n_testcapi.set_nomemory(2, 3)\r\nnext(it)\r\n```\r\n\r\nObserved result before the fix:\r\n\r\n```text\r\nWindows fatal exception: access violation\r\nRC 3221225477\r\n```\r\n\r\nFurther investigation showed that a helper-only NULL check was not sufficient.\r\n\r\n`_get_col_offsets()` ignored failure returns from offset-conversion helpers, allowing `tokenizeriter_next()` to continue execution with a pending `MemoryError`.\r\n\r\nThis could also result in:\r\n\r\n```text\r\nSystemError:\r\n<built-in function next> returned a result with an exception set\r\n```\r\n\r\n# Root Cause\r\n\r\nTwo independent problems existed:\r\n\r\n1. `_PyPegen_byte_offset_to_character_offset_line()` did not check whether `PyUnicode_AsUTF8()` failed.\r\n\r\n2. `_get_col_offsets()` ignored failures from:\r\n\r\n   * `_PyPegen_byte_offset_to_character_offset_line()`\r\n   * `_PyPegen_byte_offset_to_character_offset_raw()`\r\n\r\n   As a result, tokenizer execution could continue after offset conversion had already failed.\r\n\r\n# Fix\r\n\r\nThis PR:\r\n\r\n* Adds a NULL check after `PyUnicode_AsUTF8()`.\r\n* Returns `-1` when UTF-8 conversion fails.\r\n* Changes `_get_col_offsets()` from `void` to `int`.\r\n* Propagates failures from both offset-conversion helpers.\r\n* Stops token generation immediately when offset conversion fails.\r\n* Preserves the pending `MemoryError`.\r\n* Avoids modifying tokenizer state when offset computation fails.\r\n\r\n# Regression Tests\r\n\r\nAdds regression coverage in `Lib/test/test_tokenize.py`.\r\n\r\nThe test:\r\n\r\n* Uses `_testcapi.set_nomemory()` in a subprocess.\r\n* Exercises the non-ASCII tokenizer path.\r\n* Exercises the raw offset-conversion path.\r\n* Sweeps allocation-failure indexes rather than relying on a single build-specific allocation point.\r\n* Verifies that OOM conditions produce `MemoryError` instead of crashes or invalid tokenizer results.\r\n\r\n# Validation\r\n\r\nBuilt and tested using a CPython debug build:\r\n\r\n```text\r\nPCbuild\\build.bat -p x64 -c Debug\r\n```\r\n\r\nExecuted:\r\n\r\n```text\r\nPCbuild/amd64/python_d.exe -m test test_tokenize\r\n```\r\n\r\nResult:\r\n\r\n```text\r\n131 tests passed\r\n```\r\n\r\nAlso verified:\r\n\r\n```text\r\ngit diff --check\r\n```\r\n\r\nNo whitespace errors were reported.\r\n\r\n# Impact\r\n\r\nThis change converts tokenizer OOM crash paths into correct exception propagation and ensures that allocation failures during column-offset conversion are handled safely and consistently.\r\n\r\nAddresses OOM-0034 from gh-151763.\r\n",
+ "comments": [
+  {
+   "author": "zainnadeem786",
+   "created_at": "2026-06-20T14:07:42Z",
+   "body": "The failing TSan free-threading job appears to fail in `test_abc`, which is unrelated to this tokenizer/pegen change. All other relevant checks, including `test_tokenize`, lint, ASAN, UBSAN, normal TSan, Windows, macOS, and Ubuntu jobs are passing. Happy to rerun the failed job if needed.\r\n"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

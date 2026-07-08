@@ -1,0 +1,25 @@
+{
+ "bug_id": "atom-262",
+ "title": "Modernization notes: dead version guards, deprecated APIs, private APIs, free-threading gaps",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/atom",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/atom#262"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__atom/issue-262.json"
+ ],
+ "n_artifacts": 1
+}

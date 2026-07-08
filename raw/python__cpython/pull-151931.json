@@ -1,0 +1,28 @@
+{
+ "repo": "python/cpython",
+ "number": 151931,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151931",
+ "title": "gh-151763: Fix double decref in _PyPegen_raise_error_known_location()",
+ "state": "open",
+ "state_reason": null,
+ "author": "manoj-marimuthu",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review",
+  "skip news"
+ ],
+ "created_at": "2026-06-22T16:57:49Z",
+ "closed_at": null,
+ "body": "The following PR addresses [OOM-00019](https://gist.github.com/devdanzin/9bd9423256ea03c08231d1ebe542db89) from [issue-151763](https://github.com/python/cpython/issues/151763).\r\n\r\n## Issue:\r\nThe ```_PyPegen_raise_error_known_location()``` in ```pegen_errors.c``` uses the ```Py_BuildValue``` function on a ```PyObject*``` called ```error_line``` with reference-stealing N format.\r\n```c\r\ntmp = Py_BuildValue(\"(OnnNnn)\", p->tok->filename, lineno, col_number, error_line, end_lineno, end_col_number);\r\n```\r\nwhen ```Py_BuildValue``` fails it returns ```NULL``` (ie ```tmp``` becomes ```NULL```). when ```tmp == NULL```, we do:\r\n```c\r\nif (!tmp) {\r\n        goto error;\r\n    }\r\n```\r\nand ```goto error``` does:\r\n```c\r\nerror:\r\n    Py_XDECREF(errstr);\r\n    Py_XDECREF(error_line);\r\n    return NULL;\r\n```\r\nThis means that even if ```Py_BuildValue``` has decref'd ```error_line``` already, ```goto error``` repeats it which in turn trips ```_Py_NegativeRefcount: ``` on debug builds.\r\n\r\n## Reproduced using:\r\n```python\r\nimport ast, _testcapi, faulthandler\r\nfaulthandler.enable()\r\nsrc = \"x y z\\n\"                 # generic invalid syntax -> located SyntaxError\r\n_testcapi.set_nomemory(55, 0)   # fail every allocation from #55 onward\r\ntry:\r\n    ast.parse(src)              # error_line built OK, then Py_BuildValue fails\r\n                                # -> N-arg already consumed -> error: decrefs it again\r\nfinally:\r\n    _testcapi.remove_mem_hooks()\r\n```\r\n- In debug build (tested on windows), it gives:\r\n```c\r\n_Py_NegativeRefcount: Assertion failed: object has negative ref count\r\n<object at 000001FC999C04F0 is freed>\r\nFatal Python error: _PyObject_AssertFailed: _PyObject_AssertFailed\r\nPython runtime state: initialized\r\nobject address  : 000001FC9931C4B0\r\nobject refcount : 1\r\nobject type     : 00007FF875688D10\r\nobject type name: MemoryError\r\nobject repr     : \r\nlost sys.stderr\r\n\r\nCurrent thread 0x00003d48 (most recent call first):\r\n  File \"D:\\open source\\cpython\\Lib\\ast.py\", line 46 in parse\r\n  File \"D:\\open source\\cpython\\PCBuild\\amd64\\reproducer.py\", line 6 in <module>\r\n\r\nExtension modules: _testcapi (total: 1)\r\n```\r\n## Fix\r\nwe can fix this by setting error_line to ```NULL``` just after ```tmp```'s declaration so that ``` Py_XDECREF(error_line);``` neglects it when Py_BuildValue() fails.\r\n\r\n```c\r\nerror_line = NULL;\r\n```\r\nIt now raises a ```MemoryError``` correctly.\r\n### Tested on - windows\r\n### branch - 3.16.0a0\r\n\r\n\r\n<!-- gh-issue-number: gh-151763 -->\r\n* Issue: gh-151763\r\n<!-- /gh-issue-number -->\r\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

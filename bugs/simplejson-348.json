@@ -1,0 +1,27 @@
+{
+ "bug_id": "simplejson-348",
+ "title": "C extension (_speedups.c) analysis: 15 bugs found",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "simplejson/simplejson",
+ "is_umbrella": true,
+ "issues": [
+  "simplejson/simplejson#348"
+ ],
+ "prs": [],
+ "gists": [
+  "e8a25ea988dc0461c2fd378efd84a8a3"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/simplejson__simplejson/issue-348.json"
+ ],
+ "n_artifacts": 1
+}

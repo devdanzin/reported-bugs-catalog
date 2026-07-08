@@ -1,0 +1,28 @@
+{
+ "bug_id": "pygame-ce-2380",
+ "title": "Use Union[FRect, Rect] in places where only Rect was allowed in sprite.pyi (fix #2300)",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pygame-community/pygame-ce",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "pygame-community/pygame-ce#2380"
+ ],
+ "gists": [],
+ "labels": [
+  "rect",
+  "type hints"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pygame-community__pygame-ce/pull-2380.json"
+ ],
+ "n_artifacts": 1
+}

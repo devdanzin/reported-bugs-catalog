@@ -1,0 +1,25 @@
+{
+ "bug_id": "enaml-601",
+ "title": "set_dynamic_attr: missing return -1 after read-only error + return -1 without exception + DICT_SUBCLASS flag",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/enaml",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/enaml#601"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__enaml/issue-601.json"
+ ],
+ "n_artifacts": 1
+}

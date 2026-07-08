@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-148181",
+ "title": "`itertools.zip_longest` stores NULL in GC-tracked `ittuple` when iterators exhaust",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#148181"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-148181.json"
+ ],
+ "n_artifacts": 1
+}

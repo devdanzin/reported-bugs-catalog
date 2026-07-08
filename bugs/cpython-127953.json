@@ -1,0 +1,33 @@
+{
+ "bug_id": "cpython-127953",
+ "title": "sys.settrace suffers quadratic behavior for large dictionary literals on 3.12+",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#127953"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "3.13",
+  "3.14",
+  "interpreter-core",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "nedbat"
+ ],
+ "status": "open",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-127953.json"
+ ],
+ "n_artifacts": 1
+}

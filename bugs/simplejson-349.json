@@ -1,0 +1,30 @@
+{
+ "bug_id": "simplejson-349",
+ "title": "Crash: use-after-free and leak in encoder ident handling",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "simplejson/simplejson",
+ "is_umbrella": false,
+ "issues": [
+  "simplejson/simplejson#349"
+ ],
+ "prs": [
+  "simplejson/simplejson#355"
+ ],
+ "gists": [
+  "e8a25ea988dc0461c2fd378efd84a8a3"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/simplejson__simplejson/issue-349.json",
+  "raw/simplejson__simplejson/pull-355.json"
+ ],
+ "n_artifacts": 2
+}

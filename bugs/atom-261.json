@@ -1,0 +1,25 @@
+{
+ "bug_id": "atom-261",
+ "title": "Copy-paste bug in init_containerlistchange + unchecked PyModule_AddObject x10 + cached_property stores NULL",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/atom",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/atom#261"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__atom/issue-261.json"
+ ],
+ "n_artifacts": 1
+}

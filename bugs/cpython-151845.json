@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-151845",
+ "title": "formatfloat wrong return in unicode_format.c",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#151845"
+ ],
+ "prs": [],
+ "gists": [
+  "577421b083bad6802aa391b909d1a725"
+ ],
+ "labels": [
+  "interpreter-core",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "aisk"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-151845.json"
+ ],
+ "n_artifacts": 1
+}

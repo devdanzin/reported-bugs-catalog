@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-136996",
+ "title": "JIT: `executor->vm_data.valid` assertion failure in `unlink_executor`",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#136996"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.14",
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-136996.json"
+ ],
+ "n_artifacts": 1
+}

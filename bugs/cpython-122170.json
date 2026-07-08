@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-122170",
+ "title": "Interpreter exits on Windows due to ValueError raised in linecache.py",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#122170"
+ ],
+ "prs": [
+  "python/cpython#122175"
+ ],
+ "gists": [],
+ "labels": [
+  "OS-windows",
+  "awaiting review",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-122170.json",
+  "raw/python__cpython/pull-122175.json"
+ ],
+ "n_artifacts": 2
+}

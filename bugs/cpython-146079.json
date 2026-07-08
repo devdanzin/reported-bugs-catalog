@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-146079",
+ "title": "NULL dereference in `pyexpat` `clear_handlers`",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146079"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "topic-XML",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146079.json"
+ ],
+ "n_artifacts": 1
+}

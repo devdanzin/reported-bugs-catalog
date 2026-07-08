@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-151475",
+ "title": "`faulthandler`: data races in `enable()`/`disable()` and `dump_traceback_later()` under free threading",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#151475"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-151475.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,25 @@
+{
+ "bug_id": "atom-254",
+ "title": "All 13 heap type deallocs missing Py_DECREF(Py_TYPE(self)) + DefaultAtomDict::Ready missing Py_INCREF",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/atom",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/atom#254"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__atom/issue-254.json"
+ ],
+ "n_artifacts": 1
+}

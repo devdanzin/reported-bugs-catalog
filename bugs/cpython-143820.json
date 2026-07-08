@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-143820",
+ "title": "JIT: Assertion `next_instr->op.code == STORE_FAST` failed in `_PyEval_EvalFrameDefault`",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#143820"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-143820.json"
+ ],
+ "n_artifacts": 1
+}

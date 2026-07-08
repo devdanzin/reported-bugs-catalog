@@ -1,0 +1,31 @@
+{
+ "bug_id": "OOM-0031",
+ "title": "Segfault: NULL info deref in _excinfo_clear_type via _PyXI_FreeExcInfo(NULL) (Python/crossinterp.c:1319)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#151842"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-subinterpreters",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "amruthamodela06"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-151842.json"
+ ],
+ "n_artifacts": 1
+}

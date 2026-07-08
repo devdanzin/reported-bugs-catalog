@@ -1,0 +1,28 @@
+{
+ "bug_id": "multidict-1159",
+ "title": "Segfault calling `MultiDict().setdefault()`",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "aio-libs/multidict",
+ "is_umbrella": false,
+ "issues": [
+  "aio-libs/multidict#1159"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "bug",
+  "reproducer: present"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/aio-libs__multidict/issue-1159.json"
+ ],
+ "n_artifacts": 1
+}

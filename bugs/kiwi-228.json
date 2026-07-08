@@ -1,0 +1,25 @@
+{
+ "bug_id": "kiwi-228",
+ "title": "Solver and strength types missing tp_traverse for heap type; repr methods vulnerable to GC-clear",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/kiwi",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/kiwi#228"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__kiwi/issue-228.json"
+ ],
+ "n_artifacts": 1
+}

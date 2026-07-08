@@ -1,0 +1,25 @@
+{
+ "bug_id": "memray-894",
+ "title": "Fix GIL double-release in SocketSource constructor",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "bloomberg/memray",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "bloomberg/memray#894"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/bloomberg__memray/pull-894.json"
+ ],
+ "n_artifacts": 1
+}

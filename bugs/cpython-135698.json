@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-135698",
+ "title": "Abort in `_interpqueuesmodule` due to queue being created with negative `maxsize`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#135698"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-135698.json"
+ ],
+ "n_artifacts": 1
+}

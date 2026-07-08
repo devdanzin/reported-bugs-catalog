@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-126219",
+ "title": "`tkinter.Tk` segfault with invalid `className`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126219"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "3.13",
+  "3.14",
+  "extension-modules",
+  "topic-tkinter",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126219.json"
+ ],
+ "n_artifacts": 1
+}

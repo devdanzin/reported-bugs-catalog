@@ -1,0 +1,27 @@
+{
+ "bug_id": "cpython-129766",
+ "title": "Fatal Python error from `warnings._release_lock()`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#129766"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-129766.json"
+ ],
+ "n_artifacts": 1
+}

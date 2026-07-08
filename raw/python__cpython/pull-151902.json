@@ -1,0 +1,27 @@
+{
+ "repo": "python/cpython",
+ "number": 151902,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/151902",
+ "title": "gh-151763: Fix OOM-0014 crash in _interpchannels._channel_id",
+ "state": "open",
+ "state_reason": null,
+ "author": "zainnadeem786",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "awaiting review"
+ ],
+ "created_at": "2026-06-22T04:57:35Z",
+ "closed_at": null,
+ "body": "## Summary\r\n\r\nThis PR addresses **OOM-0014** from **gh-151763**.\r\n\r\nIt fixes a crash in `_interpchannels._channel_id()` when memory allocation fails while looking up module state.\r\n\r\n## Issue\r\n\r\n`channelsmod__channel_id()` obtains the owning module with:\r\n\r\n```c\r\nPyObject *mod = get_module_from_owned_type(cls);\r\nassert(mod == self);\r\nPy_DECREF(mod);\r\n```\r\n\r\n`get_module_from_owned_type()` eventually calls `_get_current_module()`, which allocates the module name using:\r\n\r\n```c\r\nPyUnicode_FromString(MODULE_NAME_STR)\r\n```\r\n\r\nUnder out-of-memory conditions this allocation can fail and return `NULL` with a pending `MemoryError`.\r\n\r\nBefore this change, `channelsmod__channel_id()` assumed the helper could never fail.\r\n\r\nAs a result:\r\n\r\n- **Debug builds** abort at:\r\n\r\n```c\r\nassert(mod == self);\r\n```\r\n\r\nbecause `mod == NULL`.\r\n\r\n- **Release builds** compile out the assertion and continue to:\r\n\r\n```c\r\nPy_DECREF(mod);\r\n```\r\n\r\nwhich dereferences `NULL` and results in an access violation / segmentation fault.\r\n\r\n## Root Cause\r\n\r\nThe helper `get_module_from_owned_type(cls)` returns a new reference on success but can legitimately return `NULL` when `_get_current_module()` fails during module-name allocation.\r\n\r\n`channelsmod__channel_id()` did not check for that failure before using the returned object.\r\n\r\n## Fix\r\n\r\nAdd an explicit NULL check immediately after obtaining the module:\r\n\r\n```c\r\nPyObject *mod = get_module_from_owned_type(cls);\r\nif (mod == NULL) {\r\n    return NULL;\r\n}\r\nassert(mod == self);\r\nPy_DECREF(mod);\r\n```\r\n\r\nThis preserves the existing invariant check while correctly propagating the pending `MemoryError` instead of aborting or crashing.\r\n\r\n## Validation\r\n\r\nI reproduced the issue locally on both debug and release builds.\r\n\r\n### Before the fix\r\n\r\nDebug build:\r\n\r\n```text\r\nAssertion failed: mod == self\r\nModules/_interpchannelsmodule.c\r\nFatal Python error: Aborted\r\n```\r\n\r\nRelease build:\r\n\r\n```text\r\nWindows fatal exception: access violation\r\n```\r\n\r\n### After the fix\r\n\r\nThe same OOM path now returns a clean `MemoryError` and no longer aborts or crashes.\r\n\r\n## Regression Test\r\n\r\nAdded a focused subprocess regression test in:\r\n\r\n```\r\nLib/test/test__interpchannels.py\r\n```\r\n\r\nThe test:\r\n\r\n- uses `_testcapi.set_nomemory(0, 1)`\r\n- exercises `_interpchannels._channel_id(0)`\r\n- verifies that the subprocess exits normally\r\n- verifies that `MemoryError` is propagated instead of aborting or crashing\r\n\r\nThe test is skipped under `Py_TRACE_REFS`, matching the existing limitations of `_testcapi.set_nomemory()`.\r\n\r\n## Tests\r\n\r\nExecuted:\r\n\r\n```text\r\nPCbuild/amd64/python_d.exe -m test test__interpchannels\r\n```\r\n\r\nResult:\r\n\r\n```text\r\n== Tests result: SUCCESS ==\r\n\r\n1 test OK.\r\n\r\nTotal tests: run=74 skipped=5\r\n```\r\n\r\nI also verified:\r\n\r\n```text\r\ngit diff --check\r\n```\r\n\r\nwhich reports no patch formatting issues (only existing LF/CRLF working-copy warnings).\r\n\r\n## NEWS\r\n\r\nAdded a NEWS fragment describing the crash fix and `MemoryError` propagation.\r\n\r\nAddresses **OOM-0014** from **gh-151763**.",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  }
+ ],
+ "fetch_errors": null
+}

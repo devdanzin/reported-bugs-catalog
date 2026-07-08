@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-151578",
+ "title": "gh-146102\uff1aFix cross-interpreter NotShareableError ref handling",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#151578"
+ ],
+ "gists": [
+  "a56b8cb579b1950b4206e8a42d6be650"
+ ],
+ "labels": [
+  "awaiting review"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "lpyu001"
+ ],
+ "status": "open",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-151578.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,27 @@
+{
+ "bug_id": "cython-7600",
+ "title": "Try to avoid unguarded PyErr_Clear",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "cython/cython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "cython/cython#7600"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "da-woods"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/cython__cython/pull-7600.json"
+ ],
+ "n_artifacts": 1
+}

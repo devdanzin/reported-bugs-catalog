@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-142629",
+ "title": "JIT: Global buffer overflow in `_PyUOpPrint` when running with `PYTHON_LLTRACE=4`",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#142629"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-jit-crash(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-142629.json"
+ ],
+ "n_artifacts": 1
+}

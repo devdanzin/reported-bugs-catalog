@@ -1,0 +1,29 @@
+{
+ "bug_id": "OOM-0028",
+ "title": "Segfault: NULL deref in `os__path_normpath_impl` (`posixmodule.c:6149`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#152058"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "lpyu001"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-152058.json"
+ ],
+ "n_artifacts": 1
+}

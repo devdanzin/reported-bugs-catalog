@@ -1,0 +1,25 @@
+{
+ "bug_id": "pypy-5128",
+ "title": "` __pypy__.intop.int_mulmod(1,0,0)` will abort with a Fatal RPython error",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [
+  "pypy/pypy#5128"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/issue-5128.json"
+ ],
+ "n_artifacts": 1
+}

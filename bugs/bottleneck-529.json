@@ -1,0 +1,25 @@
+{
+ "bug_id": "bottleneck-529",
+ "title": "BUFFER_NEW macro: unchecked malloc inside GIL-released region",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pydata/bottleneck",
+ "is_umbrella": false,
+ "issues": [
+  "pydata/bottleneck#529"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pydata__bottleneck/issue-529.json"
+ ],
+ "n_artifacts": 1
+}

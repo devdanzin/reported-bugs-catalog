@@ -1,0 +1,32 @@
+{
+ "bug_id": "zopeinterface-357",
+ "title": "copt: PyDict_GetItem silently swallows exceptions in SB_extends and IB__adapt__",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "zopefoundation/zope.interface",
+ "is_umbrella": false,
+ "issues": [
+  "zopefoundation/zope.interface#357"
+ ],
+ "prs": [
+  "zopefoundation/zope.interface#364"
+ ],
+ "gists": [
+  "5afbad864934b165a2cc080f110aa720"
+ ],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "jensens"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/zopefoundation__zope.interface/issue-357.json",
+  "raw/zopefoundation__zope.interface/pull-364.json"
+ ],
+ "n_artifacts": 2
+}

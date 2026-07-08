@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-127085",
+ "title": "Calling `ShareableList.count` in threads aborts: `Assertion 'self->exports == 0' failed`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#127085"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "interpreter-core",
+  "topic-free-threading",
+  "topic-multiprocessing",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-127085.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-152254",
+ "title": "Crash because of ownership assert in `PyObject_ClearManagedDict`",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#152254"
+ ],
+ "prs": [],
+ "gists": [
+  "99b84915b197ae0ade7face262b8af66"
+ ],
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "sobolevn"
+ ],
+ "status": "open",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-152254.json"
+ ],
+ "n_artifacts": 1
+}

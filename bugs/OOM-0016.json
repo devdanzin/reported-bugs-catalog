@@ -1,0 +1,33 @@
+{
+ "bug_id": "OOM-0016",
+ "title": "Abort: `assert(!queue->alive)` in `_queue_clear` in `_interpqueuesmodule.c`",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#152130"
+ ],
+ "prs": [],
+ "gists": [
+  "05be8efe6b08c2b3ac3e2c17c784da0c"
+ ],
+ "labels": [
+  "extension-modules",
+  "topic-subinterpreters",
+  "type-crash"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "sobolevn"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-152130.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,29 @@
+{
+ "bug_id": "wrapt-320",
+ "title": "C extension swallows non-AttributeError exceptions during optional attribute lookups",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "GrahamDumpleton/wrapt",
+ "is_umbrella": false,
+ "issues": [
+  "GrahamDumpleton/wrapt#320"
+ ],
+ "prs": [],
+ "gists": [
+  "e1ac0c43dc4d4278ee82455da4859872"
+ ],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "GrahamDumpleton"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/GrahamDumpleton__wrapt/issue-320.json"
+ ],
+ "n_artifacts": 1
+}

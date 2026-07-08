@@ -1,0 +1,29 @@
+{
+ "bug_id": "wrapt-333",
+ "title": "Fix missing NULL guards in C extension call and descriptor slots",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "GrahamDumpleton/wrapt",
+ "is_umbrella": false,
+ "issues": [
+  "GrahamDumpleton/wrapt#333"
+ ],
+ "prs": [],
+ "gists": [
+  "34c9fad09694958b83fbbea19ea30e69"
+ ],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "GrahamDumpleton"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/GrahamDumpleton__wrapt/issue-333.json"
+ ],
+ "n_artifacts": 1
+}

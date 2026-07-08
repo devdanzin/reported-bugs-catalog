@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-142975",
+ "title": "Abort in free-threading `validate_refcounts`: \"tracked objects must have a reference count > 0\"",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#142975"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-142975.json"
+ ],
+ "n_artifacts": 1
+}

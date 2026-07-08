@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-148180",
+ "title": "`functools.lru_cache` critical section locks `self` but `_LockHeld` dict APIs assert `self->cache` is locked",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#148180"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-148180.json"
+ ],
+ "n_artifacts": 1
+}

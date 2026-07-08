@@ -1,0 +1,27 @@
+{
+ "bug_id": "cpython-122145",
+ "title": "Exception raised in traceback.StackSummary._should_show_carets exits interpreter: IndexError on tree.body[0]",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#122145"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-122145.json"
+ ],
+ "n_artifacts": 1
+}

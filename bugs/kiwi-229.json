@@ -1,0 +1,25 @@
+{
+ "bug_id": "kiwi-229",
+ "title": "Global state cleanup: leaked refs on re-exec, borrowed type pointers, partial failure leaks",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/kiwi",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/kiwi#229"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__kiwi/issue-229.json"
+ ],
+ "n_artifacts": 1
+}

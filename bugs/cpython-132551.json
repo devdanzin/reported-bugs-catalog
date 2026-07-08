@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-132551",
+ "title": "Segfault/abort from calling `BytesIO` `unshare_buffer` in threads on a free-threaded build",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#132551"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "extension-modules",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-132551.json"
+ ],
+ "n_artifacts": 1
+}

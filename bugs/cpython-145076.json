@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-145076",
+ "title": "`__lazy_import__` throws a `SystemError` if `globals` is not any dict",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#145076"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-importlib",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-145076.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-127165",
+ "title": "Segfault in invalid `concurrent.futures.interpreter.WorkerContext`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#127165"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "extension-modules",
+  "topic-subinterpreters",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-127165.json"
+ ],
+ "n_artifacts": 1
+}

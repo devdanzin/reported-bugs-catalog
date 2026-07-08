@@ -1,0 +1,27 @@
+{
+ "bug_id": "cpython-143610",
+ "title": "Assertion `_tstate->jit_tracer_state.initial_state.func != NULL` failed in `_PyOptimizer_Optimize`",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#143610"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-143610.json"
+ ],
+ "n_artifacts": 1
+}

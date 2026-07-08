@@ -1,0 +1,36 @@
+{
+ "bug_id": "cpython-149630",
+ "title": "pylifecycle.c: Multiple init/fini cleanup bugs",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#149630"
+ ],
+ "prs": [
+  "python/cpython#149631"
+ ],
+ "gists": [
+  "b022ff2d1304a4b2b8d3d8750abd8da5"
+ ],
+ "labels": [
+  "awaiting review",
+  "interpreter-core",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "Wulian233"
+ ],
+ "status": "open",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-149630.json",
+  "raw/python__cpython/pull-149631.json"
+ ],
+ "n_artifacts": 2
+}

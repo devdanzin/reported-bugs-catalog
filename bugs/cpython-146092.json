@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-146092",
+ "title": "Missing `PyErr_NoMemory` in `_zoneinfo` `load_data` and `ts_to_local`",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146092"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.13",
+  "3.14",
+  "3.15",
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146092.json"
+ ],
+ "n_artifacts": 1
+}

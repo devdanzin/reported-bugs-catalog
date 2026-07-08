@@ -1,0 +1,31 @@
+{
+ "bug_id": "pyerfa-225",
+ "title": "Fixes found by automated analysis",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "liberfa/pyerfa",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "liberfa/pyerfa#225"
+ ],
+ "gists": [
+  "60672184d31713866902adc964e2289b"
+ ],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "mhvk"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/liberfa__pyerfa/pull-225.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,28 @@
+{
+ "bug_id": "OOM-0036",
+ "title": "Double free / use-after-free in `list.append()` when the list grows under `MemoryError` (`_CALL_LIST_APPEND`)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#151818"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-151818.json"
+ ],
+ "n_artifacts": 1
+}

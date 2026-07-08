@@ -1,0 +1,32 @@
+{
+ "bug_id": "zopeinterface-358",
+ "title": "copt: unguarded PyErr_Clear swallows KeyboardInterrupt/MemoryError at 4 sites",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "zopefoundation/zope.interface",
+ "is_umbrella": false,
+ "issues": [
+  "zopefoundation/zope.interface#358"
+ ],
+ "prs": [
+  "zopefoundation/zope.interface#365"
+ ],
+ "gists": [
+  "5afbad864934b165a2cc080f110aa720"
+ ],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "jensens"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/zopefoundation__zope.interface/issue-358.json",
+  "raw/zopefoundation__zope.interface/pull-365.json"
+ ],
+ "n_artifacts": 2
+}

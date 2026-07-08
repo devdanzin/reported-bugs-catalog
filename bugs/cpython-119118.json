@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-119118",
+ "title": "`tokenize.generate_tokens()` performance regression in 3.12",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#119118"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "performance",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-119118.json"
+ ],
+ "n_artifacts": 1
+}

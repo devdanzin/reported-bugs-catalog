@@ -1,0 +1,28 @@
+{
+ "bug_id": "numpy-28791",
+ "title": "BUG: ASAN detects heap-buffer-overflow from `numpy.strings.find`",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "numpy/numpy",
+ "is_umbrella": false,
+ "issues": [
+  "numpy/numpy#28791"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "00 - Bug",
+  "component: numpy.strings"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/numpy__numpy/issue-28791.json"
+ ],
+ "n_artifacts": 1
+}

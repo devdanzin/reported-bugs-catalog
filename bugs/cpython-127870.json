@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-127870",
+ "title": "Segfaults in ctypes _as_parameter_ handling when called with `MagicMock`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#127870"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "topic-ctypes",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-127870.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,25 @@
+{
+ "bug_id": "enaml-604",
+ "title": "SubscriptionObserver_set_ref returns PyObject* instead of int (setter silently swallows errors)",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/enaml",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/enaml#604"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__enaml/issue-604.json"
+ ],
+ "n_artifacts": 1
+}

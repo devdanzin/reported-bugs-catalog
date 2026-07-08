@@ -1,0 +1,30 @@
+{
+ "bug_id": "OOM-0024",
+ "title": "Segfault: dealloc of uninitialized iterator in template_iter (Objects/templateobject.c:232)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#151815"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "amruthamodela06"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-151815.json"
+ ],
+ "n_artifacts": 1
+}

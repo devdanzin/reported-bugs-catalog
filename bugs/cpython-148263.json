@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-148263",
+ "title": "weakrefobject.c:  UNWRAP ref leak with dead proxy",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#148263"
+ ],
+ "prs": [],
+ "gists": [
+  "f7d0c7694b2be2345f4cf85f4eedc3ee"
+ ],
+ "labels": [
+  "interpreter-core",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "prakashsellathurai"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-148263.json"
+ ],
+ "n_artifacts": 1
+}

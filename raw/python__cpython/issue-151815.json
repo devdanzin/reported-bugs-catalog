@@ -1,0 +1,82 @@
+{
+ "repo": "python/cpython",
+ "number": 151815,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/151815",
+ "title": "Segfault: dealloc of uninitialized iterator in template_iter (Objects/templateobject.c:232)",
+ "state": "open",
+ "state_reason": null,
+ "author": "amruthamodela06",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "created_at": "2026-06-20T18:41:56Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n## Segfault: dealloc of uninitialized iterator in `template_iter` (`Objects/templateobject.c:232`)\n\n`template_iter()` allocates the t-string iterator with `PyObject_GC_New` (which does **not** zero the new object) and only assigns `iter->stringsiter` and `iter->interpolationsiter` *after* both `PyObject_GetIter` calls succeed. If either `PyObject_GetIter` fails under memory pressure, the error-path `Py_DECREF(iter)` runs `templateiter_dealloc` \u2192 `templateiter_clear`, which `Py_CLEAR`s the still-uninitialized (garbage / ASan-poisoned) pointers, causing a segfault.\n\n### Reproducer\n\n(needs CPython 3.14+ for t-string / PEP 750 syntax)\n\n```python\nfrom _testcapi import set_nomemory, remove_mem_hooks\n\nt = t\"x{1}y{2}z\"\n\nfor start in range(1, 1000):\n    set_nomemory(start, 0)\n    try:\n        try:\n            iter(t)\n        finally:\n            remove_mem_hooks()\n    except MemoryError:\n        pass\n```\n\n### Backtrace\n\n```\n#0  _Py_atomic_load_uint32_relaxed\n#1  Py_DECREF\n#2  templateiter_clear           Objects/templateobject.c:53   # Py_CLEAR(self->stringsiter), uninitialized\n#3  templateiter_dealloc         Objects/templateobject.c:45\n#4  _Py_Dealloc\n#5  Py_DECREF\n#6  template_iter                Objects/templateobject.c:232  # Py_DECREF(iter) on the error path\n#7  PyObject_GetIter\n```\n\nCrashes deterministically on debug+ASan and JIT debug+ASan builds. On non-ASan release builds it usually exits cleanly within the swept budget (the uninitialized memory often happens to be zero), but the underlying access of uninitialized fields is still incorrect.\n\n### Root cause\n\n[Objects/templateobject.c](https://github.com/python/cpython/blob/main/Objects/templateobject.c), `template_iter`:\n\n```c\ntemplateiterobject *iter = PyObject_GC_New(templateiterobject, &_PyTemplateIter_Type);  /* no zeroing */\nif (iter == NULL) {\n    return NULL;\n}\n\nPyObject *stringsiter = PyObject_GetIter(self->strings);\nif (stringsiter == NULL) {\n    Py_DECREF(iter);   /* iter->stringsiter / ->interpolationsiter are uninitialized */\n    return NULL;\n}\n\nPyObject *interpolationsiter = PyObject_GetIter(self->interpolations);\nif (interpolationsiter == NULL) {\n    Py_DECREF(iter);   /* same: iter->interpolationsiter is uninitialized */\n    Py_DECREF(stringsiter);\n    return NULL;\n}\n```\n\n### Suggested fix\n\nInitialize `iter->stringsiter` and `iter->interpolationsiter` to `NULL` immediately after `PyObject_GC_New`, so the partial-construction error paths can safely run `templateiter_clear` (which uses `Py_CLEAR`, NULL-safe):\n\n```c\ntemplateiterobject *iter = PyObject_GC_New(templateiterobject, &_PyTemplateIter_Type);\nif (iter == NULL) {\n    return NULL;\n}\niter->stringsiter = NULL;\niter->interpolationsiter = NULL;\n```\n\n### Notes\n\nPart of #151763 (umbrella tracking 35 OOM-related crash findings); OOM-0024 in that table.\n\n### CPython versions tested on:\n\nCPython main branch (3.16.0a0)\n\n### Operating systems tested on:\n\nLinux, Windows\n\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151821\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "StanFromIreland"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151821",
+   "commit": null,
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "52a2325efcae6211f3f9c53b4985440dd1e38044",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "482f01452feaeabba01090a255edbe0f72de0b37",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "645d1c2a3a7d6ca8170e14ac41bc38c3e9e9a6cc",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "41d672793502cfd889077ee24a825c90dc5ea869",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "aa005aa3d560f4ba4f13a37d32bf7610f1b9a2b7",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "565355535ea666ad888a53048de93c6e157facd2",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "b6dc145a2266f6de1b5cba00579823ff685923c7",
+   "actor": "timurmamedov1"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "8e5d35c96edea86606b74a4baafed75a8b533e03",
+   "actor": "timurmamedov1"
+  }
+ ],
+ "fetch_errors": null
+}

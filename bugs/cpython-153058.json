@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-153058",
+ "title": "weakrefobject.c: binary, ternary, or comparison operations ref leak with dead proxy",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#153058"
+ ],
+ "prs": [],
+ "gists": [
+  "f7d0c7694b2be2345f4cf85f4eedc3ee"
+ ],
+ "labels": [
+  "extension-modules",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "aisk"
+ ],
+ "status": "open",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-153058.json"
+ ],
+ "n_artifacts": 1
+}

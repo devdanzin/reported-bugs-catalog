@@ -1,0 +1,30 @@
+{
+ "bug_id": "multidict-1321",
+ "title": "multidict Free-Threading Analysis Report",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "aio-libs/multidict",
+ "is_umbrella": true,
+ "issues": [
+  "aio-libs/multidict#1321"
+ ],
+ "prs": [],
+ "gists": [
+  "fa00e03ef041c030660f083116a7e1b6"
+ ],
+ "labels": [
+  "bug",
+  "reproducer: present"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/aio-libs__multidict/issue-1321.json"
+ ],
+ "n_artifacts": 1
+}

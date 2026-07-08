@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-135608",
+ "title": "Segfault/abort in `_Py_uop_sym_new_const` on a JIT build",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#135608"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.14",
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-135608.json"
+ ],
+ "n_artifacts": 1
+}

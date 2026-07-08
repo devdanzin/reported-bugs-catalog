@@ -1,0 +1,25 @@
+{
+ "bug_id": "pypy-4951",
+ "title": "Repeated `__import__` is much slower than on CPython",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [
+  "pypy/pypy#4951"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/issue-4951.json"
+ ],
+ "n_artifacts": 1
+}

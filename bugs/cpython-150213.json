@@ -1,0 +1,33 @@
+{
+ "bug_id": "cpython-150213",
+ "title": "`_interpchannels`: missing `PyErr_NoMemory()` causes `SystemErroron` OOM in `{create,close}()`",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#150213"
+ ],
+ "prs": [],
+ "gists": [
+  "d9975354c27e57f2589acfd0a777a2f1"
+ ],
+ "labels": [
+  "extension-modules",
+  "topic-subinterpreters",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "lpyu001"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-150213.json"
+ ],
+ "n_artifacts": 1
+}

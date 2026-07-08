@@ -1,0 +1,27 @@
+{
+ "bug_id": "bitarray-249",
+ "title": "fix reference counts in bitarray_encode()",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "ilanschnell/bitarray",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "ilanschnell/bitarray#249"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "ilanschnell"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/ilanschnell__bitarray/pull-249.json"
+ ],
+ "n_artifacts": 1
+}

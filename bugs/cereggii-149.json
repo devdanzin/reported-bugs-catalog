@@ -1,0 +1,31 @@
+{
+ "bug_id": "cereggii-149",
+ "title": "Four bugs from allocation-failure fuzzing (get_handle, reduce, __setitem__, concurrent resize)",
+ "tool": "fusil-plugin-cereggii",
+ "mode": "general",
+ "target_repo": "dpdani/cereggii",
+ "is_umbrella": true,
+ "issues": [
+  "dpdani/cereggii#149"
+ ],
+ "prs": [],
+ "gists": [
+  "10536845b9ec874be0b9471258879b55"
+ ],
+ "labels": [
+  "AtomicDict",
+  "bug",
+  "fusil-fuzzer"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/dpdani__cereggii/issue-149.json"
+ ],
+ "n_artifacts": 1
+}

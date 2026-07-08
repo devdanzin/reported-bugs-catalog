@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-126032",
+ "title": "gh-126019 Fix inspect.getsource for classes created in PyREPL",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#126032"
+ ],
+ "gists": [],
+ "labels": [
+  "awaiting review",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
+  "needs backport to 3.15",
+  "topic-repl"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-126032.json"
+ ],
+ "n_artifacts": 1
+}

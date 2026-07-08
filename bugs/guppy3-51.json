@@ -1,0 +1,27 @@
+{
+ "bug_id": "guppy3-51",
+ "title": "Umbrella issue: guppy3 C Extension Analysis Report",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "zhuyifei1999/guppy3",
+ "is_umbrella": true,
+ "issues": [
+  "zhuyifei1999/guppy3#51"
+ ],
+ "prs": [],
+ "gists": [
+  "b30771d22104e6fa0c30c41a6e27a355"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/zhuyifei1999__guppy3/issue-51.json"
+ ],
+ "n_artifacts": 1
+}

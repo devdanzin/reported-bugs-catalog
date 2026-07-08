@@ -1,0 +1,33 @@
+{
+ "bug_id": "cpython-122273",
+ "title": "Support command history in PyREPL on Windows",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#122273"
+ ],
+ "prs": [
+  "python/cpython#122274"
+ ],
+ "gists": [],
+ "labels": [
+  "OS-windows",
+  "awaiting review",
+  "topic-repl",
+  "type-feature"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-122273.json",
+  "raw/python__cpython/pull-122274.json"
+ ],
+ "n_artifacts": 2
+}

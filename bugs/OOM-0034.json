@@ -1,0 +1,31 @@
+{
+ "bug_id": "OOM-0034",
+ "title": "gh-151763: Fix OOM-0034 tokenizer offset error handling",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#151798"
+ ],
+ "gists": [
+  "9871a21facf4c9c6a415e220f9d10762"
+ ],
+ "labels": [
+  "awaiting review"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "zainnadeem786"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-151798.json"
+ ],
+ "n_artifacts": 1
+}

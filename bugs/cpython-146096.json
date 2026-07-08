@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-146096",
+ "title": "Out-of-bounds tuple access in `BaseExceptionGroup_repr`",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146096"
+ ],
+ "prs": [],
+ "gists": [
+  "dceaa8b70de035607d78025337af9798"
+ ],
+ "labels": [
+  "3.15",
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146096.json"
+ ],
+ "n_artifacts": 1
+}

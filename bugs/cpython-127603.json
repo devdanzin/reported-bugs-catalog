@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-127603",
+ "title": "Abort from `GenericAlias.__sizeof__`: `ob->ob_type != &PyLong_Type`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#127603"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-127603.json"
+ ],
+ "n_artifacts": 1
+}

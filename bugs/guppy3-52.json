@@ -1,0 +1,27 @@
+{
+ "bug_id": "guppy3-52",
+ "title": "Free-threading support: StopTheWorld synchronization + per-object locking",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "zhuyifei1999/guppy3",
+ "is_umbrella": false,
+ "issues": [
+  "zhuyifei1999/guppy3#52"
+ ],
+ "prs": [],
+ "gists": [
+  "c430e676ac2c27b30af644847af9aa1b"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/zhuyifei1999__guppy3/issue-52.json"
+ ],
+ "n_artifacts": 1
+}

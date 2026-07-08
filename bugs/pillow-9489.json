@@ -1,0 +1,27 @@
+{
+ "bug_id": "pillow-9489",
+ "title": "Fix missing null dereference checks",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python-pillow/Pillow",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python-pillow/Pillow#9489"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "wiredfool"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python-pillow__Pillow/pull-9489.json"
+ ],
+ "n_artifacts": 1
+}

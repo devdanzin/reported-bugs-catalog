@@ -1,0 +1,31 @@
+{
+ "bug_id": "numpy-31314",
+ "title": "BUG: Fix segfault in nditer.multi_index when __getitem__ raises",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "numpy/numpy",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "numpy/numpy#31314"
+ ],
+ "gists": [
+  "ccc2d9553ca1c90ab1835362ee21a40a"
+ ],
+ "labels": [
+  "00 - Bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "Breno-Favaretto"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/numpy__numpy/pull-31314.json"
+ ],
+ "n_artifacts": 1
+}

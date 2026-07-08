@@ -1,0 +1,27 @@
+{
+ "bug_id": "numpy-28829",
+ "title": "BUG: crashes found by fuzzing with fusil",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "numpy/numpy",
+ "is_umbrella": false,
+ "issues": [
+  "numpy/numpy#28829"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "sprintable - C"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/numpy__numpy/issue-28829.json"
+ ],
+ "n_artifacts": 1
+}

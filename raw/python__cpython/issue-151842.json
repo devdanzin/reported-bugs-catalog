@@ -1,0 +1,83 @@
+{
+ "repo": "python/cpython",
+ "number": 151842,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/151842",
+ "title": "Segfault: NULL info deref in _excinfo_clear_type via _PyXI_FreeExcInfo(NULL) (Python/crossinterp.c:1319)",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "amruthamodela06",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "interpreter-core",
+  "topic-subinterpreters"
+ ],
+ "created_at": "2026-06-21T12:44:00Z",
+ "closed_at": "2026-06-23T21:41:07Z",
+ "body": "# Crash report\n\n## Segfault: NULL `info` deref in `_excinfo_clear_type` via `_PyXI_FreeExcInfo(NULL)`\n\n`_interpreters.capture_exception()` builds a `_PyXI_excinfo` via `_PyXI_NewExcInfo()`. Under memory pressure that allocation can fail and return `NULL`. The cleanup path in `_interpreters_capture_exception_impl` then unconditionally calls `_PyXI_FreeExcInfo(info)` with `info == NULL`. `_PyXI_FreeExcInfo` has no NULL guard, so `_PyXI_excinfo_clear` \u2192 `_excinfo_clear_type` dereferences `&NULL->type` (offset 0) at `Python/crossinterp.c:1319` \u2192 SIGSEGV.\n\nThis reproduces on all build configurations (a NULL dereference, not a debug-only assert).\n\n### Reproducer\n\n```python\nimport faulthandler, _interpreters\nfaulthandler.enable()\nfrom _testcapi import set_nomemory, remove_mem_hooks\nfor start in range(0, 40):\n    try:\n        set_nomemory(start, 0)\n        try:\n            _interpreters.capture_exception(Exception())\n        finally:\n            remove_mem_hooks()\n    except BaseException:\n        pass\n    finally:\n        try: remove_mem_hooks()\n        except Exception: pass\n```\n\n### Backtrace\n\n```\n#0  _excinfo_clear_type                  Python/crossinterp.c:1319   # info == 0x0 -> offset-0 deref\n#1  _PyXI_excinfo_clear                  Python/crossinterp.c:1374\n#2  _PyXI_FreeExcInfo                    Python/crossinterp.c:1712   # called with info == NULL, no guard\n#3  _interpreters_capture_exception_impl Modules/_interpretersmodule.c:1544\n#4  cfunction_vectorcall_FASTCALL_KEYWORDS Objects/methodobject.c:465\n```\n\n### Root cause\n\n`Modules/_interpretersmodule.c`, `_interpreters_capture_exception_impl` (\u2248L1522-1544):\n\n```c\n_PyXI_excinfo *info = _PyXI_NewExcInfo(exc);   /* returns NULL under OOM */\nif (info == NULL) {\n    goto finally;\n}\n/* ... */\nfinally:\n    _PyXI_FreeExcInfo(info);                   /* L1544: runs even when info == NULL */\n```\n\n`_PyXI_NewExcInfo` (`crossinterp.c:1683`) does `PyMem_RawCalloc` for its struct and, on any failure, `PyMem_RawFree`s it and returns `NULL` \u2014 so `info` here is a clean `NULL`, not a dangling half-built struct.\n\n`_PyXI_FreeExcInfo` (`crossinterp.c:1710`) has no NULL guard:\n\n```c\nvoid\n_PyXI_FreeExcInfo(_PyXI_excinfo *info)\n{\n    _PyXI_excinfo_clear(info);   /* dereferences info */\n    PyMem_RawFree(info);\n}\n```\n\n### Suggested fix\n\nMake `_PyXI_FreeExcInfo` NULL-safe, matching the surrounding `PyMem_RawFree(NULL)` idiom (and `Py_XDECREF`, `free()`, etc.):\n\n```c\nvoid\n_PyXI_FreeExcInfo(_PyXI_excinfo *info)\n{\n    if (info == NULL) {\n        return;\n    }\n    _PyXI_excinfo_clear(info);\n    PyMem_RawFree(info);\n}\n```\n\nThis is more defensive than guarding only the one call site, since the function is part of the cross-interpreter exception ABI and any future caller would otherwise have the same hazard.\n\n### Notes\n\nPart of #151763 (umbrella tracking 35 OOM-related crash findings); OOM-0031 in that table.\n\n### CPython versions tested on:\n\nCPython main branch (3.16.0a0)\n\n### Operating systems tested on:\n\nLinux, Windows\n\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-151843\n* gh-152031\n* gh-152032\n<!-- /gh-linked-prs -->\n",
+ "comments": [],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/151843",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/151763",
+   "commit": null,
+   "actor": "amruthamodela06"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5e0747db2f5a063657a117e88b58a20624c848d1",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152031",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/152032",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "33b5aebfd4bf81361720bc533120a267db23ccc4",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "415e218ed5ff1d541803aa46ea1e69ddcda03062",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "64ebde30dde2d3fc75f723e85322ff6a4838a308",
+   "actor": "pyctrl"
+  }
+ ],
+ "fetch_errors": null
+}

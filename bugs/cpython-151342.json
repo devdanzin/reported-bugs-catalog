@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-151342",
+ "title": "gh-146102: Catch PyErr_NewException() failure in zlib",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#151342"
+ ],
+ "gists": [],
+ "labels": [
+  "awaiting core review",
+  "skip news"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "vstinner"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-151342.json"
+ ],
+ "n_artifacts": 1
+}

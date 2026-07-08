@@ -1,0 +1,25 @@
+{
+ "bug_id": "pypy-5119",
+ "title": "`_pyrepl._minimal_curses.tigetstr` segfaults",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [
+  "pypy/pypy#5119"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/issue-5119.json"
+ ],
+ "n_artifacts": 1
+}

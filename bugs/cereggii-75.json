@@ -1,0 +1,27 @@
+{
+ "bug_id": "cereggii-75",
+ "title": "Abort after getting `approx_len` of an `AtomicDict`",
+ "tool": "fusil-plugin-cereggii",
+ "mode": "general",
+ "target_repo": "dpdani/cereggii",
+ "is_umbrella": false,
+ "issues": [
+  "dpdani/cereggii#75"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "fusil-fuzzer"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/dpdani__cereggii/issue-75.json"
+ ],
+ "n_artifacts": 1
+}

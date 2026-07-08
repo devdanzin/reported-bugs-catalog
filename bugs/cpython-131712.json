@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-131712",
+ "title": "`_suggestions` module missing on Windows, untested",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#131712"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "OS-windows",
+  "extension-modules",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-131712.json"
+ ],
+ "n_artifacts": 1
+}

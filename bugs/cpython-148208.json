@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-148208",
+ "title": "object.c: recursion depth leak in `PyObject_Print`",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#148208"
+ ],
+ "prs": [],
+ "gists": [
+  "196f041a81611b2fbff22684b2f7166e"
+ ],
+ "labels": [
+  "interpreter-core",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "Wulian233"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-148208.json"
+ ],
+ "n_artifacts": 1
+}

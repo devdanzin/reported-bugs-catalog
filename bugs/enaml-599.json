@@ -1,0 +1,25 @@
+{
+ "bug_id": "enaml-599",
+ "title": "Segfaults from PyUnicode_AsUTF8 NULL passed to strcmp in DynamicScope hot path + repr functions",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "nucleic/enaml",
+ "is_umbrella": false,
+ "issues": [
+  "nucleic/enaml#599"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/nucleic__enaml/issue-599.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,33 @@
+{
+ "bug_id": "cpython-151510",
+ "title": "bltinmodule.c: lazy_import NULL deref without Python frame",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#151510"
+ ],
+ "prs": [],
+ "gists": [
+  "cc84f43d7a5c774b47551060c061391f"
+ ],
+ "labels": [
+  "interpreter-core",
+  "topic-lazy-imports",
+  "type-crash"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "aisk"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-151510.json"
+ ],
+ "n_artifacts": 1
+}

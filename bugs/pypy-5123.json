@@ -1,0 +1,25 @@
+{
+ "bug_id": "pypy-5123",
+ "title": "Calling `_dealloc_warn` on a detached `TextIOWrapper` segfaults",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [
+  "pypy/pypy#5123"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/issue-5123.json"
+ ],
+ "n_artifacts": 1
+}

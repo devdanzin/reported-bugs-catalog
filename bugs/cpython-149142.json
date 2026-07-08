@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-149142",
+ "title": "_decimal: `mpd_context_t::status`/`traps` mutated non-atomically leading to data race",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#149142"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "docs",
+  "extension-modules",
+  "topic-free-threading",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-149142.json"
+ ],
+ "n_artifacts": 1
+}

@@ -1,0 +1,29 @@
+{
+ "bug_id": "protobuf-26596",
+ "title": "Umbrella issue: protobuf Python C Extension Analysis Report",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "protocolbuffers/protobuf",
+ "is_umbrella": true,
+ "issues": [
+  "protocolbuffers/protobuf#26596"
+ ],
+ "prs": [],
+ "gists": [
+  "b0eca1ded22efac92de4efe928916d46"
+ ],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/protocolbuffers__protobuf/issue-26596.json"
+ ],
+ "n_artifacts": 1
+}

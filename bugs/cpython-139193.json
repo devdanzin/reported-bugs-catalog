@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-139193",
+ "title": "JIT (interpreter): running hot code with `PYTHON_LLTRACE=4` segfaults",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#139193"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-jit-crash(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-139193.json"
+ ],
+ "n_artifacts": 1
+}

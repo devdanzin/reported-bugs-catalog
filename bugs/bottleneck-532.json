@@ -1,0 +1,25 @@
+{
+ "bug_id": "bottleneck-532",
+ "title": "Py_MOD_GIL_NOT_USED declared but global state unprotected for free-threading",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pydata/bottleneck",
+ "is_umbrella": false,
+ "issues": [
+  "pydata/bottleneck#532"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pydata__bottleneck/issue-532.json"
+ ],
+ "n_artifacts": 1
+}

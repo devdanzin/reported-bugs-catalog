@@ -1,0 +1,33 @@
+{
+ "bug_id": "polars-22469",
+ "title": "fix: Return input instead of panicking if empty subset in `drop_nulls()` and `drop_nans()`",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pola-rs/polars",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "pola-rs/polars#22469"
+ ],
+ "gists": [
+  "dc2ef895928fc5758ea66a1ccf2eedd2"
+ ],
+ "labels": [
+  "fix",
+  "python",
+  "rust"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "etiennebacher"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pola-rs__polars/pull-22469.json"
+ ],
+ "n_artifacts": 1
+}

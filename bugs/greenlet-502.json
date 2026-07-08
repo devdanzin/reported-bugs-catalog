@@ -1,0 +1,29 @@
+{
+ "bug_id": "greenlet-502",
+ "title": "Address automated code audit results",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python-greenlet/greenlet",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python-greenlet/greenlet#502"
+ ],
+ "gists": [
+  "5e6e52e425558ae68a5caa7a1e78697f"
+ ],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "jamadden"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python-greenlet__greenlet/pull-502.json"
+ ],
+ "n_artifacts": 1
+}

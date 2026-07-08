@@ -1,0 +1,35 @@
+{
+ "bug_id": "cpython-121016",
+ "title": "`PYTHON_BASIC_REPL` is not currently tested",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#121016"
+ ],
+ "prs": [
+  "python/cpython#121017",
+  "python/cpython#121064"
+ ],
+ "gists": [],
+ "labels": [
+  "skip news",
+  "tests",
+  "topic-repl",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-121016.json",
+  "raw/python__cpython/pull-121017.json",
+  "raw/python__cpython/pull-121064.json"
+ ],
+ "n_artifacts": 3
+}

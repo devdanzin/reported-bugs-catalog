@@ -1,0 +1,29 @@
+{
+ "bug_id": "wrapt-334",
+ "title": "Fix missing NULL guard for `other` operand in inplace operators (SIGSEGV)",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "GrahamDumpleton/wrapt",
+ "is_umbrella": false,
+ "issues": [
+  "GrahamDumpleton/wrapt#334"
+ ],
+ "prs": [],
+ "gists": [
+  "34c9fad09694958b83fbbea19ea30e69"
+ ],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "GrahamDumpleton"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/GrahamDumpleton__wrapt/issue-334.json"
+ ],
+ "n_artifacts": 1
+}

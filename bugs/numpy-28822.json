@@ -1,0 +1,29 @@
+{
+ "bug_id": "numpy-28822",
+ "title": "BUG: Segfault/stack-overflow from initializing `numpy.random._mt19937.MT19937` with recursive list",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "numpy/numpy",
+ "is_umbrella": false,
+ "issues": [
+  "numpy/numpy#28822"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "00 - Bug",
+  "Priority: low",
+  "component: numpy.random"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/numpy__numpy/issue-28822.json"
+ ],
+ "n_artifacts": 1
+}

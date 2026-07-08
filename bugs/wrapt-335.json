@@ -1,0 +1,29 @@
+{
+ "bug_id": "wrapt-335",
+ "title": "Replace deprecated `PyObject_HasAttrString()` in inplace operators with exception-safe alternative",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "GrahamDumpleton/wrapt",
+ "is_umbrella": false,
+ "issues": [
+  "GrahamDumpleton/wrapt#335"
+ ],
+ "prs": [],
+ "gists": [
+  "34c9fad09694958b83fbbea19ea30e69"
+ ],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "GrahamDumpleton"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/GrahamDumpleton__wrapt/issue-335.json"
+ ],
+ "n_artifacts": 1
+}

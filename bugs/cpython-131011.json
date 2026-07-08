@@ -1,0 +1,27 @@
+{
+ "bug_id": "cpython-131011",
+ "title": "gh-128067: Add newline to new REPL output when needed to avoid chopping characters",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#131011"
+ ],
+ "gists": [],
+ "labels": [
+  "awaiting review"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-131011.json"
+ ],
+ "n_artifacts": 1
+}

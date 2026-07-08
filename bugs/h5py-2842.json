@@ -1,0 +1,27 @@
+{
+ "bug_id": "h5py-2842",
+ "title": "CLN: cleanup redundant nullptr check",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "h5py/h5py",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "h5py/h5py#2842"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "maintainer",
+ "filers": [
+  "neutrinoceros"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/h5py__h5py/pull-2842.json"
+ ],
+ "n_artifacts": 1
+}

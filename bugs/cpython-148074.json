@@ -1,0 +1,33 @@
+{
+ "bug_id": "cpython-148074",
+ "title": "typeobject.c: Missing return -1 after PyErr_Format in type_ready_post_checks",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#148074"
+ ],
+ "prs": [],
+ "gists": [
+  "551cace22f112ef0ff4ed3fdbe54d235"
+ ],
+ "labels": [
+  "interpreter-core",
+  "topic-typing",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "Wulian233"
+ ],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-148074.json"
+ ],
+ "n_artifacts": 1
+}

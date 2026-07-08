@@ -1,0 +1,34 @@
+{
+ "bug_id": "cpython-146090",
+ "title": "Assertion failure in `free_callback_context` via `create_collation` and missing `PyErr_NoMemory` in `create_callback_con",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146090"
+ ],
+ "prs": [],
+ "gists": [
+  "69aff7ff2d64ce8c7c21622f7f36e84c"
+ ],
+ "labels": [
+  "3.13",
+  "3.14",
+  "3.15",
+  "extension-modules",
+  "topic-sqlite3",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146090.json"
+ ],
+ "n_artifacts": 1
+}

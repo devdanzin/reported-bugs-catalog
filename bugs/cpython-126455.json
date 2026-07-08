@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-126455",
+ "title": "Calling many methods on `_ssl._SSLSocket()` segfaults",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126455"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "3.13",
+  "3.14",
+  "extension-modules",
+  "topic-SSL",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126455.json"
+ ],
+ "n_artifacts": 1
+}

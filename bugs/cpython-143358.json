@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-143358",
+ "title": "JIT: Assertion `exc && PyExceptionInstance_Check(exc)` failed in `*_PyEval_EvalFrameDefault`",
+ "tool": "lafleur",
+ "mode": "jit",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#143358"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-JIT",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-143358.json"
+ ],
+ "n_artifacts": 1
+}

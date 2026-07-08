@@ -1,0 +1,30 @@
+{
+ "bug_id": "OOM-0002",
+ "title": "Segfault: Py_DECREF(NULL) in PyContextVar_Set (context.c:367)",
+ "tool": "fusil",
+ "mode": "oom",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#151773"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "prakashsellathurai"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-151773.json"
+ ],
+ "n_artifacts": 1
+}

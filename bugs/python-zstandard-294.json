@@ -1,0 +1,27 @@
+{
+ "bug_id": "python-zstandard-294",
+ "title": "Heap-type refcount imbalance: 19 dealloc sites miss `Py_DECREF(Py_TYPE(self))` + 4 factories bypass `tp_alloc` (type-obj",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "indygreg/python-zstandard",
+ "is_umbrella": false,
+ "issues": [
+  "indygreg/python-zstandard#294"
+ ],
+ "prs": [],
+ "gists": [
+  "b86039ac097141579590c1a0f3a43605"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/indygreg__python-zstandard/issue-294.json"
+ ],
+ "n_artifacts": 1
+}

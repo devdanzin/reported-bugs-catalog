@@ -1,0 +1,25 @@
+{
+ "bug_id": "cpython-122692",
+ "title": "gh-123572: Fix key codes in VK_MAP in windows_console.py",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#122692"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-122692.json"
+ ],
+ "n_artifacts": 1
+}

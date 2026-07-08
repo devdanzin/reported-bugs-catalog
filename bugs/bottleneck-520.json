@@ -1,0 +1,32 @@
+{
+ "bug_id": "bottleneck-520",
+ "title": "partition/argpartition leak ~80 KB per invalid-kth error",
+ "tool": "cext-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "pydata/bottleneck",
+ "is_umbrella": false,
+ "issues": [
+  "pydata/bottleneck#520"
+ ],
+ "prs": [
+  "pydata/bottleneck#533"
+ ],
+ "gists": [],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "neutrinoceros"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pydata__bottleneck/issue-520.json",
+  "raw/pydata__bottleneck/pull-533.json"
+ ],
+ "n_artifacts": 2
+}

@@ -1,0 +1,29 @@
+{
+ "bug_id": "psutil-2792",
+ "title": "Umbrella issue: psutil C Extension Analysis Report",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "giampaolo/psutil",
+ "is_umbrella": true,
+ "issues": [
+  "giampaolo/psutil#2792"
+ ],
+ "prs": [],
+ "gists": [
+  "c050bdb008c0f5351d3e78afd565f8f1"
+ ],
+ "labels": [
+  "bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/giampaolo__psutil/issue-2792.json"
+ ],
+ "n_artifacts": 1
+}

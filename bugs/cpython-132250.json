@@ -1,0 +1,28 @@
+{
+ "bug_id": "cpython-132250",
+ "title": "`_ccall_callback` method of `_lsprof.Profiler` causes Fatal Python error",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#132250"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "extension-modules",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-132250.json"
+ ],
+ "n_artifacts": 1
+}

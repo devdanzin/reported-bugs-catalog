@@ -1,0 +1,32 @@
+{
+ "bug_id": "cpython-145887",
+ "title": "Use `write` instead of `stream.write` in `PrettyPrinter._pprint_frozendict`",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#145887"
+ ],
+ "prs": [
+  "python/cpython#145894"
+ ],
+ "gists": [],
+ "labels": [
+  "skip news",
+  "stdlib",
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-145887.json",
+  "raw/python__cpython/pull-145894.json"
+ ],
+ "n_artifacts": 2
+}

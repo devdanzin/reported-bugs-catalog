@@ -1,0 +1,30 @@
+{
+ "bug_id": "cpython-119574",
+ "title": "Some environment variables are missing from `--help-env`",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#119574"
+ ],
+ "prs": [
+  "python/cpython#120006"
+ ],
+ "gists": [],
+ "labels": [
+  "docs"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-119574.json",
+  "raw/python__cpython/pull-120006.json"
+ ],
+ "n_artifacts": 2
+}

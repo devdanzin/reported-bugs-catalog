@@ -1,0 +1,38 @@
+{
+ "bug_id": "cpython-122461",
+ "title": "Incorrect information about exception raised if source contains null bytes for ast.parse() and compile()",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#122461"
+ ],
+ "prs": [
+  "python/cpython#122462"
+ ],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "3.13",
+  "3.14",
+  "awaiting review",
+  "docs",
+  "needs backport to 3.13",
+  "needs backport to 3.14",
+  "needs backport to 3.15",
+  "skip news"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-122461.json",
+  "raw/python__cpython/pull-122462.json"
+ ],
+ "n_artifacts": 2
+}

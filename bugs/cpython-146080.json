@@ -1,0 +1,34 @@
+{
+ "bug_id": "cpython-146080",
+ "title": "Segfault from `Py_DECREF(NULL)` in `_servername_callback` error label in `_ssl.c`",
+ "tool": "cpython-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#146080"
+ ],
+ "prs": [],
+ "gists": [
+  "50f9880636df43efd3886f6bda2077b3"
+ ],
+ "labels": [
+  "3.13",
+  "3.14",
+  "3.15",
+  "extension-modules",
+  "topic-SSL",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-146080.json"
+ ],
+ "n_artifacts": 1
+}

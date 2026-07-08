@@ -1,0 +1,25 @@
+{
+ "bug_id": "pypy-5110",
+ "title": "`_pypyjson.raw_encode_basestring_ascii` segfaults",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [
+  "pypy/pypy#5110"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/issue-5110.json"
+ ],
+ "n_artifacts": 1
+}

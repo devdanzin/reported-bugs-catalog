@@ -1,0 +1,27 @@
+{
+ "bug_id": "cpython-125852",
+ "title": "`sys.addaudithook(None)` breaks the REPL",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#125852"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "type-bug"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-125852.json"
+ ],
+ "n_artifacts": 1
+}

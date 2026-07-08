@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-30135",
+ "title": "gh-90117: handle dict and mapping views in pprint",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "python/cpython#30135"
+ ],
+ "gists": [],
+ "labels": [
+  "3.15",
+  "stdlib",
+  "type-feature"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": true,
+ "review_reason": "cpython-untagged(REVIEW)",
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/pull-30135.json"
+ ],
+ "n_artifacts": 1
+}

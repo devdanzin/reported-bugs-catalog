@@ -1,0 +1,31 @@
+{
+ "bug_id": "cpython-126594",
+ "title": "Failed assertion in typeobject.c::wrap_buffer for `b\"\".__buffer__(-2**31 - 1)`",
+ "tool": "fusil",
+ "mode": "general",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#126594"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "3.12",
+  "3.13",
+  "3.14",
+  "interpreter-core",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-126594.json"
+ ],
+ "n_artifacts": 1
+}

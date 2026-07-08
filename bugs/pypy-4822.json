@@ -1,0 +1,25 @@
+{
+ "bug_id": "pypy-4822",
+ "title": "Replace Heptapod and Mercurial mentions with GitHub and git",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "pypy/pypy",
+ "is_umbrella": false,
+ "issues": [],
+ "prs": [
+  "pypy/pypy#4822"
+ ],
+ "gists": [],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "closed/fixed",
+ "confidence": "low",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/pypy__pypy/pull-4822.json"
+ ],
+ "n_artifacts": 1
+}

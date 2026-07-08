@@ -1,0 +1,29 @@
+{
+ "bug_id": "cpython-148589",
+ "title": "`PyThreadState_GetFrame()` thread-safety is unclear (and inconsistent with `sys._current_frames()`)",
+ "tool": "ft-review-toolkit",
+ "mode": "static-analysis",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#148589"
+ ],
+ "prs": [],
+ "gists": [],
+ "labels": [
+  "docs",
+  "interpreter-core",
+  "topic-free-threading"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "medium",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-148589.json"
+ ],
+ "n_artifacts": 1
+}
