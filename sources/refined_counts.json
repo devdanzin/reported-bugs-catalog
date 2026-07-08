@@ -1,0 +1,58 @@
+{
+  "_note": "Refined live total_count searches, 2026-07-08. Supersedes the capped github_inventory histogram. author:devdanzin unless stated.",
+  "raw_author": {"issues": 1078, "prs": 907},
+  "external_minus_own": {
+    "_filter": "-owner:devdanzin (INCLUDES python/cpython, owned by 'python')",
+    "issues": 352, "prs": 154
+  },
+  "cpython": {
+    "all": {"issues": 157, "prs": 18},
+    "by_tool_keyword": {
+      "fusil": {"issues": 77, "prs": 2},
+      "lafleur": {"issues": 27, "prs": 0},
+      "cpython-review-toolkit": {"issues": 17, "prs": 0},
+      "oom_keyword": {"issues": 8, "_note": "undercount; 15 filed per meta.json — many OOM issues say fusil/allocation not 'oom'"},
+      "untagged_estimate": {"issues": 36}
+    }
+  },
+  "non_cpython_external": {
+    "by_tool_keyword": {
+      "fusil": {"issues": 36, "prs": 4},
+      "cext-review-toolkit": {"issues": 63, "prs": 16},
+      "ft-review-toolkit": {"issues": 7, "prs": 3},
+      "lafleur": {"issues": 0}
+    },
+    "per_repo_authored": {
+      "pypy/pypy": {"issues": 23, "prs": 8, "tool": "fusil", "fusil_issues": 20, "manual_issues": 3},
+      "simplejson/simplejson": {"issues": 8, "prs": 9, "tool": "review-toolkit", "note": "2 umbrellas, 1 ft rest cext"},
+      "h5py/h5py": {"issues": 16, "prs": 0, "tool": "cext-review-toolkit"},
+      "pydata/bottleneck": {"issues": 15, "prs": 0, "tool": "cext-review-toolkit"},
+      "indygreg/python-zstandard": {"issues": 12, "prs": 0, "tool": "cext-review-toolkit"},
+      "dpdani/cereggii": {"issues": 11, "prs": 4, "tool": "fusil-plugin"},
+      "numpy/numpy": {"issues": 10, "prs": 0, "tool": "cext-review-toolkit"},
+      "nucleic/atom": {"issues": 9, "prs": 0, "tool": "cext-review-toolkit"},
+      "nucleic/kiwi": {"issues": 9, "prs": 0, "tool": "cext-review-toolkit"},
+      "nucleic/enaml": {"issues": 8, "prs": 0, "tool": "cext-review-toolkit"},
+      "python-lz4/python-lz4": {"issues": 0, "prs": 6, "tool": "cext-review-toolkit"},
+      "aio-libs/multidict": {"issues": 4, "prs": 0, "tool": "cext-review-toolkit"},
+      "bloomberg/memray": {"issues": 0, "prs": 2, "tool": "cext-review-toolkit"}
+    }
+  },
+  "citation_vectors": {
+    "gist_url_cited_upstream_issues": {"count": 75, "q": "\"gist.github.com/devdanzin\" -owner:devdanzin type:issue", "use": "strong maintainer-filed + untagged vector"},
+    "keyword_devdanzin_non_cpython_non_own": {"issues": 111, "prs": 500, "note": "cite-me; PR 500 is mostly changelog/review noise"},
+    "involves_not_author_non_own": {"issues": 621, "note": "mention-noise; needs hand filtering, NOT a headline"}
+  },
+  "in_scope_estimate": {
+    "authored_issues": 317, "authored_prs": 51,
+    "maintainer_authored_cext": 60,
+    "total_filed_artifacts": 430,
+    "note": "~317+51 authored (external minus OTHER_OSS) + ~60 maintainer-authored cext"
+  },
+  "decisions_applied": {
+    "own_repo": "EXCLUDE",
+    "other_oss": "EXCLUDE",
+    "pypy": "fusil (was manual)",
+    "simplejson": "review-toolkit (was manual)"
+  }
+}

@@ -31,6 +31,12 @@ Completed:
       (1907 → 316 TARGET / 120 OTHER_OSS / 1471 OWN).
 - [x] Cross-reference / coverage map (SCOPING_REPORT §6) + own-vs-external split.
 - [x] WebFetch 3 discuss threads (SCOPING_REPORT §9).
+- [x] **Refined counts pass (2026-07-08, user-guided)** → `refined_counts.json`.
+      `total_count` searches (uncapped) + `-owner:devdanzin` + per-tool keyword.
+      CPython = 157i+18p (not 129); fusil 113i / lafleur 27i / cext-rt 63i+16p /
+      ft-rt 7i+3p / crtk 17i. In-scope ≈ 430 filed artifacts. pypy→fusil,
+      simplejson→review-toolkit (both corrected from "manual"). 75 upstream
+      issues cite a devdanzin gist (Phase-2 vector). §1/§2/§5/§6/§7 updated.
 
 ## Phase 2 — Raw harvest / import  ← NEXT
 Worklist in SCOPING_REPORT §7. Highlights: import 139 cext JSON + refresh

@@ -23,53 +23,97 @@ real — e.g. the cext campaign has **~690 FIX-level findings** (milestone_6,
 bugs** but only **15 filed**. *(Discourse's "575" is an older April-6 snapshot —
 §8 milestones supersede it.)*
 
-**Scale of externally-filed artifacts** (the catalog's true scope, after
-stripping own-repo noise): **~316 authored artifacts in external target repos
-+ ~60 maintainer-authored cext artifacts ≈ ~370–380 filed artifacts**, against
-**~25 external projects**. This matches the PLAN's "few-hundred filed" estimate
-and is dwarfed by the **1907 raw authored artifacts** (77% of which are
-own-repo internal tracking — see §2).
+**Scale of externally-filed artifacts** (refined via `total_count` searches, not
+the capped list — see §2). Using `-owner:devdanzin` to strip own repos:
+**authored external = 352 issues + 154 PRs**. Dropping OTHER_OSS contributions
+(~35 issues + ~103 PRs, per the exclude decision) leaves **~317 in-scope
+authored issues + ~51 in-scope authored PRs ≈ ~368 authored artifacts**, plus
+**~60 maintainer-authored cext artifacts** (not in the author set) ⇒ **~430
+in-scope filed artifacts** across **~25 external projects**. (Up from the first
+estimate because CPython was undercounted by the 1000-cap: it is **157 issues +
+18 PRs = 175**, not 129.) Dwarfed by the **1907 raw authored artifacts** — 77%
+own-repo internal tracking (§2).
 
 ---
 
-## 1. Per-tool rough counts (the money table)
+## 1. Per-tool counts (the money table)
 
-| Tool | Findings (confirmed) | Bugs (deduped) | Issues filed | Fix PRs | Merged/fixed | Source of numbers |
+**Table A — authored artifacts, from live `total_count` searches**
+(`author:devdanzin <tool> …`; uncapped). Keyword counts are a **lower bound** —
+a bug issue that describes the crash and links a gist without naming the tool
+won't match, so the campaign totals (Table B) sit above these.
+
+| Tool | Issues (authored+kw) | PRs | Where | Notes |
+|---|---|---|---|---|
+| **fusil** (all) | **113** | 6 | 77i+2p CPython, 36i+4p non-CPython | biggest tool; incl. OOM + pypy 20 |
+| ├ fusil → CPython | 77 | 2 | python/cpython | supersedes Discourse "52"; incl. ~15 OOM |
+| └ fusil → non-CPython | 36 | 4 | pypy 20, h5py/numpy/cereggii/… 16 | |
+| **lafleur** (JIT) | **27** | 0 | python/cpython only | #136996/007/728/762 (2025) + #145197 |
+| **cext-review-toolkit** | **63** | 16 | ~24 C-ext repos | kw lower bound (campaign 106+) |
+| **ft-review-toolkit** | **7** | 3 | C-ext repos | kw lower bound (campaign 13+) |
+| **cpython-review-toolkit** | **17** | 0 | python/cpython | umbrella #146102; #146092→PR #146124; #148181 |
+| **code-review-toolkit** | 0 | 0 | — | pure-Python tool, none filed |
+| **pyo3 / rust-ext-review-toolkit** | **0** | 0 | — | CONFIRMED 0 filed (5+2 unfiled runs) |
+| **manual / untagged** | ~36 CPython + ~3 pypy + tail | ? | python/cpython, pypy | issues naming no tool; Phase-3 classify |
+
+*Cross-checks:* CPython authored = **157 issues + 18 PRs**; fusil 77 + lafleur 27
++ crtk 17 = **121 tag-attributed**, leaving ~36 untagged (some OOM without the
+word "fusil", some manual). fusil-cpython **77 ≈ 52 (2025) + 15 OOM + wsgiref +
+OrderedDict + tail** — reconciles. Negation (`-fusil`/`NOT fusil`) is **unreliable
+in the search API** (returned 20 not 3 on pypy) — list-and-filter instead.
+
+**Table B — campaign findings** (milestones/Discourse; *findings*, the larger
+unit — never sum with Table A):
+
+| Campaign | Findings | Bugs | Issues | PRs | Merged | Source |
 |---|---|---|---|---|---|---|
-| **fusil → CPython** (pre-OOM, 2024–25) | — | ~52 | **52** | 98 (community) | Victor fixed 14 | Discourse #91737 (May 2025) |
-| **fusil OOM** (2026) | 43 dirs | **37 unique** (6 folded) | **15** | 1 (OOM-0019 = #151931) | 4 fixed + more | cpython-oom-findings meta.json; umbrella #151763 |
-| **fusil plugins** | cereggii 4; h5py G-1/G-12/H-family | cereggii 4 | cereggii **#149** | cereggii #145–148 | open (filed 2026-07-07) | crashers scan; h5py = **drafts** |
-| **lafleur** (Tier-2 JIT) | — | ~5 | **#136996, #137007, #137728, #137762** (2025) + **#145197** (2026) | — | — | Discourse #103452 + crashers scan |
-| **cext-review-toolkit** (correctness) | **~690 FIX-level** (215+ reproduced) | TBD dedup | **106+** | **64+** | 14 extensions landed | milestone_report_6 (2026-04-22); registry = 139 artifacts on disk |
-| **ft-review-toolkit** | 4,556+ races, 30+ live crashes | TBD dedup | **13+** | ujson #689 + more | 2 ext FT-validated | ft milestone_report_3 (2026-04-30) |
-| **cpython-review-toolkit** | TBD | TBD | **#146102** (umbrella), **#146092**, **#148181** | **#146124** (fixes #146092) | #146092 fixed | reports scan — ⚠️ #146443 NOT found, verify |
-| **code-review-toolkit** | TBD | TBD | **0 found** (pending GitHub check) | — | — | reports scan (pure-Python tool) |
-| **pyo3 / rust-ext-review-toolkit** | drafts only | 0 | **0 filed** (CONFIRMED) | 0 | — | reports scan: 5 pyo3 + 2 rust unfiled runs |
-| **manual / bpo (ajaksu2 era)** | — | TBD long-tail | TBD | — | — | 589 body-mentions of `ajaksu2` in cpython (triage-heavy; needs filtering) |
+| fusil OOM | 43 dirs | **37 unique** | 15 | 1 (#151931) | 4+ fixed | oom meta.json; umbrella #151763 |
+| fusil plugins (cereggii) | 4 | 4 | #149 | #145–148 | open 2026-07-07 | crashers; h5py = drafts |
+| cext-review-toolkit | **~690 FIX** (215+ reproduced) | TBD | **106+** | **64+** | 14 ext landed | milestone_6 (2026-04-22) |
+| ft-review-toolkit | 4,556+ races, 30+ crashes | TBD | **13+** | ujson #689+ | 2 ext validated | ft milestone_3 (2026-04-30) |
 
-**Unit caveat for the deck:** "fusil found 52" and "cext found 575" are **not
-the same unit** — 52 = *filed issues*, 575 = *confirmed findings*. Always label
-which. A defensible combined headline: *"~370 issues/PRs filed across ~25
-projects; 600+ confirmed findings; NN CPython crashes."*
+**Unit caveat for the deck:** never sum *findings* and *artifacts*. Defensible
+combined headline: **"~430 issues/PRs filed across ~25 projects; 700+ confirmed
+findings; 116 CPython artifacts labelled `type-crash`."**
 
 ---
 
 ## 2. Own-vs-external split (why the raw author count is misleading)
 
-Raw `author:devdanzin` = **1078 issues + 907 PRs** (true `total_count`; the
-listable results cap at 1000). Classified:
+Raw `author:devdanzin` = **1078 issues + 907 PRs** (true `total_count`; listable
+results cap at 1000, so the earlier capped repo-histogram undercounted — use
+`total_count`, not the list). **Clean split via `-owner:devdanzin`** (the right
+filter — excludes only devdanzin-owned repos; note it does **NOT** exclude
+python/cpython, owned by `python`):
 
 | Class | Issues | PRs | Disposition |
 |---|---|---|---|
-| **OWN** (`devdanzin/*`: lafleur, labeille, fusil, *-review-toolkit, plugins, forks) | 718 | 753 | **EXCLUDE** — internal tool-dev tracking, not reported bugs |
-| **TARGET** (external bug-report projects) | 265 | 51 | **IN SCOPE** — the catalog candidates |
-| **OTHER_OSS** (general contributions) | 17 | 103 | **Mostly EXCLUDE** — features/docs, not tool-found bugs (see §5) |
+| **OWN** (`owner:devdanzin`: lafleur, labeille, fusil, *-review-toolkit, plugins, forks) | ~726 | ~753 | **EXCLUDE** (decided) — internal tool-dev tracking |
+| **External, all** (`-owner:devdanzin`, incl. CPython) | **352** | **154** | mixed — see below |
+| ├ CPython | 157 | 18 | IN SCOPE |
+| ├ non-CPython tool-target | ~160 | ~33 | IN SCOPE |
+| └ OTHER_OSS (wily 33p, mu 18p, coveragepy 11p, radon, Tuxemon…) | ~35 | ~103 | **EXCLUDE** (decided) — features/docs, not tool bugs |
 
-**TARGET external repos** (author vector, 316 artifacts):
-python/cpython **147**, pypy/pypy 29, simplejson 17, h5py 16, cereggii 15,
-bottleneck 15, python-zstandard 12, numpy 10, atom 9, kiwi 9, enaml 8, lz4 6,
-multidict 4, scipy 3, guppy3 2, bitarray 2, cython 2, memray 2, pygame-ce 2,
-+ singles (matplotlib, duckdb-python, traits, pycurl, psutil, protobuf).
+**In-scope authored ≈ 317 issues + 51 PRs ≈ 368**, + ~60 maintainer-authored cext
+⇒ **~430 filed artifacts**.
+
+**Per-repo (authored, live) with tool attribution** — note the outreach split
+(issues-only ⇒ maintainer fixed; PRs-only ⇒ we fixed directly):
+
+| Repo | Issues | PRs | Tool (corrected) |
+|---|---|---|---|
+| python/cpython | 157 | 18 | fusil 77 / lafleur 27 / crtk 17 / manual ~36 |
+| pypy/pypy | 23 | 8 | **fusil** (20 of 23; ~3 manual) — *was mis-bucketed manual* |
+| h5py/h5py | 16 | 0 | cext-review-toolkit |
+| bottleneck | 15 | 0 | cext-review-toolkit |
+| python-zstandard | 12 | 0 | cext-review-toolkit (#291–#302) |
+| cereggii | 11 | 4 | fusil-plugin (#149 + #145–148) |
+| numpy | 10 | 0 | cext-review-toolkit |
+| atom / kiwi / enaml | 9 / 9 / 8 | 0 | cext-review-toolkit (nucleic) |
+| simplejson | 8 | 9 | **review-toolkit** (2 umbrellas; 1 ft, rest cext) — *was mis-bucketed manual* |
+| lz4 | 0 | 6 | cext-review-toolkit (direct PRs) |
+| multidict | 4 | 0 | cext-review-toolkit |
+| memray | 0 | 2 | cext-review-toolkit (direct PRs) |
 
 **python/cpython labels** (147 artifacts, presentation-sliceable):
 `type-crash` **116**, interpreter-core 72, extension-modules 47, 3.14 36,
@@ -125,7 +169,8 @@ topic-JIT 33, 3.13 30, topic-free-threading 26, 3.15 14, type-bug 11, stdlib 10.
 ~55 distinct references; the actionable filed set:
 - **CPython:** OOM issues (see 3b); fusil non-OOM #153354 (wsgiref `__annotate__`),
   #132461 + fix #132462 (OrderedDict.setdefault, 2025); lafleur #145197;
-  cpython-review #146102 + #146443.
+  cpython-review #146102 + #146092→**#146124** + #148181 (⚠️ crashers-scan
+  "#146443" NOT found — verify; likely a mis-record for #146124).
 - **cereggii:** #149 umbrella issue + #145/#146/#147/#148 fix PRs (2026-07-07).
 - **Contributor-filed (credit us):** Abhi210 filing an FT `set_keys` managed-dict
   OOM assert we root-caused (under #151763). ⟵ a *maintainer-filed* case for §7 playbook.
@@ -140,25 +185,27 @@ topic-JIT 33, 3.13 30, topic-free-threading 26, 3.15 14, type-bug 11, stdlib 10.
 
 ---
 
-## 5. Ambiguity list (decisions to confirm before Phase 3)
+## 5. Decisions — resolved + remaining
 
-1. **OWN-repo issues (1471 artifacts).** Confirmed EXCLUDE (internal tracking)?
-   Proposed: yes, exclude; but *lafleur/fusil own-repo issues that document a
-   real upstream crash* may deserve a pointer. Default: exclude, no pointer.
-2. **OTHER_OSS contributions (120 artifacts: wily 33, mu 18, coveragepy 11,
-   radon 4, Tuxemon 4, icalendar, narwhals, pytest, isort…).** These are
-   **general OSS feature/doc PRs, not tool-found bugs** → propose EXCLUDE. A few
-   *might* be real bug reports (coveragepy, mypy, cinder, pytest) — flag for a
-   quick eyeball, default exclude unless a report/gist backs them.
-3. **pypy/pypy (29 artifacts) + simplejson (17).** Likely **manual** (devdanzin
-   is a long-time contributor), not tool-found. Bucket = `manual`, attempt
-   tool-attribution per report/gist evidence; default manual.
-4. **`ajaksu2` old-bpo (589 body-mentions in cpython).** The account is **not
-   searchable as `author:`** (migrated). Attribution must come from body-text +
-   local notes; most 589 are triage/nosy (EXCLUDE). Real authored-by-ajaksu2
-   bugs = a hand-filtered long-tail sub-pass.
-5. **Counting unit for the deck** — confirm we headline *artifacts filed*
-   (~370) and *confirmed findings* (600+) as **separate** numbers, never summed.
+**RESOLVED (2026-07-08, user):**
+1. **OWN-repo (`owner:devdanzin`, ~726i+753p) — EXCLUDE.** Internal tool-dev
+   tracking, no pointer.
+2. **OTHER_OSS (~35i+103p: wily, mu, coveragepy-features, radon, Tuxemon…) —
+   EXCLUDE.** General contributions, not tool-found bugs. (A quick eyeball of
+   coveragepy/mypy/cinder/pytest can promote any real bug report backed by a
+   report/gist; default exclude.)
+3. **pypy → `fusil`** (20 of 23 issues; ~3 manual) — *corrected from "manual".*
+4. **simplejson → review-toolkit** (cext, + 1 ft umbrella) — *corrected from
+   "manual".* ⇒ the "manual" bucket is now much smaller than first thought.
+
+**REMAINING (gate Phase 3, not Phase 2):**
+5. **`ajaksu2` old-bpo.** Account **not `author:`-searchable** (migrated); 589
+   body-mentions in cpython are triage-heavy. Real authored-by-ajaksu2 bugs = a
+   hand-filtered long-tail sub-pass (try fusil-era vs manual).
+6. **~36 untagged CPython issues** (157 − fusil/lafleur/crtk 121): classify
+   per-issue in Phase 3 (OOM-without-keyword, manual, or non-bug).
+7. **Deck unit framing** — headline *artifacts filed* (~430) and *confirmed
+   findings* (700+) as **separate** numbers, never summed. (Recommended; confirm.)
 
 ---
 
@@ -167,12 +214,12 @@ topic-JIT 33, 3.13 30, topic-free-threading 26, 3.15 14, type-bug 11, stdlib 10.
 | Bucket | What | Rough size | Phase-2 action |
 |---|---|---|---|
 | **INGEST** | cext 139 JSON + OOM 37 bugs | ~176 | import to `raw/`, refresh labels+state vs GitHub |
-| **AUTHOR-EXTERNAL** | TARGET author artifacts | 316 | harvest full (comments/labels/timeline), per-repo to beat the 1000 cap |
-| **MAINTAINER-FILED** | cext maintainer-authored (~60) + Abhi210 + gist-citations | ~60+ | `involves`/`mentions` + gist-id search, verify each |
+| **AUTHOR-EXTERNAL** | in-scope authored artifacts | **~317 issue + ~51 pr** | harvest full (comments/labels/timeline), **per-repo** to beat the 1000 cap |
+| **MAINTAINER-FILED** | cext maintainer-authored (~60) + Abhi210 + gist-citations | ~60+ | gist-URL/id search (**75 upstream issues cite a devdanzin gist**) + `involves` diff, verify each |
 | **LOCAL-ONLY (draft)** | h5py×3, HDF5, astropy, coveragepy, numpy | ~6 | → `drafts/`, excluded from counts |
 | **LOCAL-ONLY (no ref)** | ~30 crash dirs w/o issue number | ~30 | reconcile vs GitHub; likely unfiled or dup |
 | **BPO long-tail** | ajaksu2-era manual/fusil | TBD | hand-filtered sub-pass |
-| **OTHER_OSS** | general contributions | 120 | triage-eyeball, default EXCLUDE |
+| **OTHER_OSS** | general contributions | ~35i + ~103p | **EXCLUDE** (decided) |
 
 ---
 
@@ -180,16 +227,33 @@ topic-JIT 33, 3.13 30, topic-free-threading 26, 3.15 14, type-bug 11, stdlib 10.
 1. **Import** the 139 cext JSON into `raw/`; **refresh** each for `labels` +
    current `state` via `gh api` (they lack both). Re-harvest the 24 cext repos +
    the ~14 communicated-only extensions from GitHub live (registry is stale).
-2. **Harvest per-repo** (avoids the 1000-result cap): python/cpython author
-   issues+PRs (147), then the ~24 external target repos. Full: comments +
-   timeline + labels.
+2. **Harvest per-repo** (avoids the 1000-cap — confirmed: capped list said
+   cpython 129, truth is 157): iterate `-owner:devdanzin` external repos, full
+   (comments + timeline + labels). Start python/cpython (157i+18p), then the
+   ~24 external target repos.
 3. **OOM:** ingest the 15 filed issues + link the umbrella #151763 → 35 gists →
    bugs. Reuse OOM-00NN ids as bug ids.
-4. **Maintainer-filed sub-pass:** gist-id search per public report gist;
-   `involves`/`mentions` diff vs author; verify the ~60 cext-maintainer + Abhi210.
+4. **Maintainer-filed sub-pass:** gist-URL search (**75 upstream issues cite a
+   `gist.github.com/devdanzin` gist** — a strong vector) + per-gist-id search;
+   `involves:devdanzin -author:devdanzin` diff vs the author set to isolate the
+   ~60 cext-maintainer + Abhi210 (filter the huge 621 involves-count by hand —
+   it's mostly mention-noise).
 5. **cpython-review-toolkit + code-review-toolkit + lafleur:** harvest the named
-   issues/PRs + drafts (from the reports scan, §8).
+   issues/PRs + drafts (§8). **Verify #146443 vs #146124.**
 6. **Drafts:** stage the 6 unfiled finds into `drafts/` (excluded from counts).
+
+### Phase-2 search recipes (validated this pass)
+- **Own-repo exclusion:** `-owner:devdanzin` (clean). ⚠️ keeps python/cpython
+  (owned by `python`) — add `-repo:python/cpython` to isolate non-CPython.
+- **Per-tool attribution (lower bound):** `author:devdanzin <tool> repo:<R>
+  type:issue|pr` — validated fusil 77 / lafleur 27 / crtk 17 (CPython); cext 63
+  / ft 7 (external). Under-counts bug issues that only link a gist → combine with
+  the gist-URL vector + registry `filed_by` for the true per-tool total.
+- **True counts:** always `gh api search/issues -f q=… --jq .total_count`
+  (uncapped); the listable `gh search` caps at 1000 and undercounts.
+- **Negation is unreliable** in the search API (`-fusil`/`NOT fusil` returned 20
+  not 3) — list the set and filter locally instead.
+- **`ajaksu2`** is not `author:`-searchable — use body-text + local notes.
 
 ---
 
