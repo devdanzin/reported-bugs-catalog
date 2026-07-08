@@ -52,11 +52,14 @@ reports hold 115 findings (~9.6 avg); ~50 reports × ~14 ≈ 690.
 | fusil | 141 | 112 | 191 | 107 | 84 |
 | cext-review-toolkit | 138 | 90 | 77 | 75 | 1 |
 | cpython-review-toolkit | 55 | 40 | 91 | 47 | 44 |
-| manual | 50 | 35 | 75 | 53 | 22 |
+| manual | 59 | 44 | 75 | 53 | 22 |
 | ft-review-toolkit | 29 | 23 | 12 | 12 | 0 |
 | lafleur | 28 | 28 | 33 | 27 | 6 |
 | fusil-plugin-cereggii | 14 | 10 | 13 | 12 | 0 |
-| **TOTAL** | **455** | **338** | **490** | **333** | **157** |
+| **TOTAL** | **464** | **347** | **490** | **333** | **157** |
+
+*(manual includes 9 ancient bpo-era crash finds reported by ajaksu2=devdanzin,
+2008 — pre-tool, no fusil credit; see the timeline in `INDEX.md`.)*
 
 *(PR-artifacts include the backfilled fix/backport PRs; "distinct fixes" excludes
 backports. `related_prs` — cross-refs not machine-confirmed as the fix — are held
@@ -64,7 +67,7 @@ separately and not counted here.)*
 
 ## Headline numbers for the deck (labelled by unit)
 
-- **~455 distinct bugs** found and filed, across **~30 external projects**.
+- **~464 distinct bugs** found and filed, across **28 external projects**.
 - **828 GitHub artifacts** (338 issues + 490 PRs) — 333 distinct fixes + 157 backports.
 - **~690 cext FIX-level findings** + **4,556+ FT races** + the fuzzer crashes =
   the *findings* tier (state per campaign; do not sum across units).

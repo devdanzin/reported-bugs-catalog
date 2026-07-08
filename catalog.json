@@ -1,0 +1,387 @@
+{
+ "generated_note": "run tools/index.py to regenerate",
+ "totals": {
+  "bug_records": 484,
+  "bugs": 464,
+  "umbrellas": 20,
+  "synthetic_bugs": 35,
+  "issue_artifacts": 347,
+  "pr_artifacts": 490,
+  "distinct_fixes": 333,
+  "backports": 157,
+  "external_repos": 28
+ },
+ "by_tool": {
+  "cext-review-toolkit": {
+   "bugs": 138,
+   "issues": 90,
+   "fix_prs": 75,
+   "backports": 1,
+   "shared_fixes": 1,
+   "related_prs": 0,
+   "pr_artifacts": 77,
+   "synthetic": 0
+  },
+  "cpython-review-toolkit": {
+   "bugs": 55,
+   "issues": 40,
+   "fix_prs": 47,
+   "backports": 44,
+   "shared_fixes": 0,
+   "related_prs": 2,
+   "pr_artifacts": 91,
+   "synthetic": 13
+  },
+  "ft-review-toolkit": {
+   "bugs": 29,
+   "issues": 23,
+   "fix_prs": 12,
+   "backports": 0,
+   "shared_fixes": 0,
+   "related_prs": 6,
+   "pr_artifacts": 12,
+   "synthetic": 0
+  },
+  "fusil": {
+   "bugs": 141,
+   "issues": 112,
+   "fix_prs": 107,
+   "backports": 84,
+   "shared_fixes": 0,
+   "related_prs": 8,
+   "pr_artifacts": 191,
+   "synthetic": 22
+  },
+  "fusil-plugin-cereggii": {
+   "bugs": 14,
+   "issues": 10,
+   "fix_prs": 12,
+   "backports": 0,
+   "shared_fixes": 1,
+   "related_prs": 0,
+   "pr_artifacts": 13,
+   "synthetic": 0
+  },
+  "lafleur": {
+   "bugs": 28,
+   "issues": 28,
+   "fix_prs": 27,
+   "backports": 6,
+   "shared_fixes": 0,
+   "related_prs": 5,
+   "pr_artifacts": 33,
+   "synthetic": 0
+  },
+  "manual": {
+   "bugs": 59,
+   "issues": 44,
+   "fix_prs": 53,
+   "backports": 22,
+   "shared_fixes": 0,
+   "related_prs": 7,
+   "pr_artifacts": 75,
+   "synthetic": 0
+  }
+ },
+ "by_repo": {
+  "python/cpython": 255,
+  "pypy/pypy": 31,
+  "python-pillow/Pillow": 24,
+  "h5py/h5py": 16,
+  "GrahamDumpleton/wrapt": 15,
+  "pydata/bottleneck": 14,
+  "dpdani/cereggii": 14,
+  "numpy/numpy": 12,
+  "indygreg/python-zstandard": 12,
+  "simplejson/simplejson": 10,
+  "nucleic/kiwi": 9,
+  "nucleic/atom": 8,
+  "nucleic/enaml": 8,
+  "zopefoundation/zope.interface": 7,
+  "python-lz4/python-lz4": 6,
+  "cython/cython": 4,
+  "aio-libs/multidict": 4,
+  "python-greenlet/greenlet": 2,
+  "bloomberg/memray": 2,
+  "pygame-community/pygame-ce": 2,
+  "scipy/scipy": 2,
+  "rogerbinns/apsw": 1,
+  "ilanschnell/bitarray": 1,
+  "zhuyifei1999/guppy3": 1,
+  "python/mypy": 1,
+  "pola-rs/polars": 1,
+  "liberfa/pyerfa": 1,
+  "igraph/python-igraph": 1
+ },
+ "by_state": {
+  "open": 108,
+  "closed/fixed": 321,
+  "gisted": 18,
+  "drafted": 4,
+  "unfiled": 11,
+  "fixed-in-commit": 2
+ },
+ "by_filed_by": {
+  "self+maintainer": 146,
+  "maintainer": 114,
+  "none": 22,
+  "self": 180,
+  "self+commit": 2
+ },
+ "by_label": {
+  "type-crash": 146,
+  "interpreter-core": 109,
+  "extension-modules": 64,
+  "skip news": 60,
+  "3.14": 56,
+  "3.13": 50,
+  "type-bug": 48,
+  "awaiting review": 40,
+  "topic-JIT": 35,
+  "topic-free-threading": 32,
+  "bug": 21,
+  "stdlib": 16,
+  "3.12": 16,
+  "3.15": 15,
+  "topic-subinterpreters": 13,
+  "awaiting core review": 12,
+  "00 - Bug": 11,
+  "topic-repl": 9,
+  "fusil-fuzzer": 8,
+  "awaiting merge": 8,
+  "needs backport to 3.13": 8,
+  "docs": 7,
+  "tests": 7,
+  "release-blocker": 7,
+  "topic-importlib": 6,
+  "AtomicDict": 6,
+  "type-feature": 6,
+  "needs backport to 3.15": 5,
+  "OS-windows": 5,
+  "needs backport to 3.14": 5,
+  "stale": 5,
+  "performance": 4,
+  "DO-NOT-MERGE": 4,
+  "bot:chronographer:provided": 4,
+  "easy": 3,
+  "topic-typing": 3,
+  "topic-lazy-imports": 3,
+  "defect": 3,
+  "08 - Backport": 3,
+  "topic-SSL": 2,
+  "topic-asyncio": 2,
+  "topic-ctypes": 2,
+  "topic-C-API": 2,
+  "awaiting changes": 2,
+  "topic-XML": 2,
+  "component: numpy.random": 2,
+  "Priority: low": 2,
+  "Memory": 2,
+  "Testing": 2,
+  "C/C++": 2,
+  "enhancement": 1,
+  "topic-tkinter": 1,
+  "OS-android": 1,
+  "OS-ios": 1,
+  "topic-multiprocessing": 1,
+  "build": 1,
+  "awaiting change review": 1,
+  "invalid": 1,
+  "pending": 1,
+  "topic-sqlite3": 1,
+  "topic-unicode": 1,
+  "Code Generation": 1,
+  "threading": 1,
+  "reproducer: present": 1,
+  "free-threading": 1,
+  "crash": 1,
+  "57 - Close?": 1,
+  "component: numpy.strings": 1,
+  "sprintable - C": 1,
+  "Bug": 1,
+  "Free-threading": 1,
+  "Performance": 1,
+  "Cleanup": 1,
+  "\ud83e\udd16-assisted": 1,
+  "automerge": 1,
+  "fix": 1,
+  "python": 1,
+  "rust": 1,
+  "rect": 1,
+  "type hints": 1,
+  "scipy.special": 1,
+  "scipy.integrate": 1,
+  "scipy.linalg": 1,
+  "scipy.sparse.linalg": 1
+ },
+ "by_year": {
+  "2008": 9,
+  "2021": 1,
+  "2023": 2,
+  "2024": 83,
+  "2025": 84,
+  "2026": 250
+ },
+ "top_filers": {
+  "vstinner": 28,
+  "sobolevn": 16,
+  "neutrinoceros": 16,
+  "radarhere": 16,
+  "GrahamDumpleton": 15,
+  "Fidget-Spinner": 14,
+  "ZeroIntensity": 11,
+  "aisk": 11,
+  "picnixz": 9,
+  "lpyu001": 8,
+  "dpdani": 8,
+  "jensens": 7,
+  "Wulian233": 6,
+  "serhiy-storchaka": 5,
+  "sergey-miryanov": 5,
+  "hugovk": 5,
+  "prakashsellathurai": 4,
+  "kumaraditya303": 4,
+  "cocolato": 4,
+  "brijkapadia": 4
+ },
+ "umbrella_chains": [
+  {
+   "umbrella": "nucleic/atom#259",
+   "title": "SortedMap_new: 4 bugs \u2014 double-incref leak, PyDict_Items leak, self leak on error, unchecked PySequence_GetItem segfault",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "ilanschnell/bitarray#250",
+   "title": "Umbrella issue: bitarray C Extension Analysis Report",
+   "tool": "ft-review-toolkit"
+  },
+  {
+   "umbrella": "pydata/bottleneck#518",
+   "title": "Umbrella issue: bottleneck C Extension Analysis Report",
+   "tool": "ft-review-toolkit"
+  },
+  {
+   "umbrella": "dpdani/cereggii#149",
+   "title": "Four bugs from allocation-failure fuzzing (get_handle, reduce, __setitem__, concurrent resize)",
+   "tool": "fusil-plugin-cereggii"
+  },
+  {
+   "umbrella": "python/cpython#146102",
+   "title": "Umbrella issue: bugs found using cpython-review-toolkit",
+   "tool": "cpython-review-toolkit"
+  },
+  {
+   "umbrella": "python/cpython#146103",
+   "title": "Umbrella issue: code review reports from cpython-review-toolkit",
+   "tool": "cpython-review-toolkit"
+  },
+  {
+   "umbrella": "python/cpython#151763",
+   "title": "CPython crashes on memory-allocation failure (OOM): 35 findings  (4 dups \u2192 31 distinct)",
+   "tool": "fusil"
+  },
+  {
+   "umbrella": "duckdb/duckdb-python#408",
+   "title": "duckdb Python Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "zhuyifei1999/guppy3#51",
+   "title": "Umbrella issue: guppy3 C Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "h5py/h5py#2825",
+   "title": "Umbrella issue: h5py C Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "matplotlib/matplotlib#31424",
+   "title": "[Bug]: Umbrella issue: matplotlib C/C++ Extension Analysis Report",
+   "tool": "ft-review-toolkit"
+  },
+  {
+   "umbrella": "aio-libs/multidict#1306",
+   "title": "multidict C Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "aio-libs/multidict#1321",
+   "title": "multidict Free-Threading Analysis Report",
+   "tool": "ft-review-toolkit"
+  },
+  {
+   "umbrella": "numpy/numpy#31046",
+   "title": "BUG: NumPy C Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "protocolbuffers/protobuf#26596",
+   "title": "Umbrella issue: protobuf Python C Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "giampaolo/psutil#2792",
+   "title": "Umbrella issue: psutil C Extension Analysis Report",
+   "tool": "ft-review-toolkit"
+  },
+  {
+   "umbrella": "pycurl/pycurl#960",
+   "title": "pycurl C Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "scipy/scipy#24927",
+   "title": "BUG: umbrella issue for SciPy C Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "simplejson/simplejson#348",
+   "title": "C extension (_speedups.c) analysis: 15 bugs found",
+   "tool": "cext-review-toolkit"
+  },
+  {
+   "umbrella": "enthought/traits#1881",
+   "title": "ctraits Extension Analysis Report",
+   "tool": "cext-review-toolkit"
+  }
+ ],
+ "campaign_findings": {
+  "cext-review-toolkit": {
+   "fix_level_findings": "~690",
+   "reproduced_from_python": "215+",
+   "extensions_analyzed": 50,
+   "source": "analysis_milestone_report_6 (2026-04-22); 575 on Discourse Apr 6, 645 at M5",
+   "meaning": "cumulative sum of FIX-level findings itemized across the per-extension review reports (gisted)"
+  },
+  "ft-review-toolkit": {
+   "unique_races": "4,556+",
+   "live_crashes": "30+",
+   "extensions_ft_deep": 18,
+   "production_ready_validated": 2,
+   "source": "ft_review_toolkit_milestone_report_3 (2026-04-30)"
+  },
+  "fusil": {
+   "findings_approx": "~142 (each catalog bug = a distinct crash finding); OOM sub-campaign 37 unique",
+   "source": "catalog + cpython-oom-findings"
+  },
+  "lafleur": {
+   "findings_approx": "28 JIT crashes",
+   "source": "catalog"
+  },
+  "cpython-review-toolkit": {
+   "select_fix_bugs": 47,
+   "report_gists": 59,
+   "source": "umbrella #146102 (47 select) + #146103 (59 review-report gists)",
+   "meaning": "47 select FIX-level bugs; broader reports cover more findings"
+  },
+  "fusil-plugin-cereggii": {
+   "findings": 4,
+   "source": "catalog"
+  },
+  "manual": {
+   "findings_approx": 50,
+   "source": "catalog (devdanzin-found, no tool)"
+  }
+ }
+}

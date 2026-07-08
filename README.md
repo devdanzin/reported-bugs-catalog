@@ -33,8 +33,10 @@ INDEX.md           (Phase 4) generated human index
 ```
 
 ## Status
-Phase 1 (scoping) complete — see `SCOPING_REPORT.md`. Phase 2 (raw harvest) in
-progress. See `PROGRESS.md`.
+**Complete** (2026-07-08). **464 bugs across 28 external projects; 347 issue +
+490 PR artifacts.** See **`INDEX.md`** (generated rollups), **`FINDINGS.md`** (the
+3-unit explanation + what the "~690" number is), `catalog.json` (machine-readable),
+and `PROGRESS.md` (phase log). Regenerate: `classify → group → enrich → index`.
 
 ---
 *Catalog + tooling assembled with Claude Code (Opus 4.8).*

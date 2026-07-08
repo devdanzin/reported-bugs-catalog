@@ -131,8 +131,26 @@ neutrinoceros 16, GrahamDumpleton 15, sobolevn 6, hugovk 5…).
       formats vary so milestone tally is authoritative. **3-unit totals: 455 bugs
       / 338 issues + 490 PRs (333 fixes + 157 backports) / campaign findings ~690
       cext FIX-level + 4,556+ ft races (per-campaign, never summed).**
-- [ ] Then Phase 4 index (catalog.json + INDEX.md) — per-tool + per-label rollups,
-      umbrella impact chains, timeline; hand-verify sample.
+- [x] **Ancient bpo (ajaksu2-era) bugs added** — user surfaced 5; found 19
+      ajaksu2-*created* cpython issues (vs 589 nosy), 9 real crashes → manual
+      (2008, pre-tool), 10 features/junk excluded. `creator = 'ajaksu2'` in body
+      is the reporter signal; `sources/bpo_ajaksu2.json` override.
+
+## Phase 4 — Index & numbers  ✅ DONE (2026-07-08)
+`tools/index.py` → **`catalog.json` (machine) + `INDEX.md` (human)**. Pipeline is
+now `harvest → harvest_fixprs → classify → group → enrich → index`.
+**FINAL TOTALS: 464 bugs / 28 external repos / 347 issue-artifacts + 490
+PR-artifacts (333 fixes + 157 backports).** By tool: fusil 141, cext-review 138,
+manual 59, cpython-review 55, ft-review 29, lafleur 28, cereggii 14. filed_by:
+self 180 / self+maintainer 146 / maintainer 114 / none 22 / self+commit 2.
+Labels: type-crash 146, interpreter-core 109, topic-JIT 35, topic-free-threading
+32, fusil-fuzzer 8. Timeline: 2008=9 (bpo), 2024=83, 2025=84, 2026=250. Top
+collaborators (bots excluded): vstinner 28, sobolevn/neutrinoceros/radarhere 16,
+GrahamDumpleton 15. Hand-verified sample (OOM-0036, #146080, cereggii-78, #47903)
+vs GitHub — correct.
+
+**CATALOG COMPLETE.** Optional follow-ups: Phase 5 refresh (re-run for state
+drift), pyo3/rust-ext confirm-0, deck rendering.
 
 ## Open decisions (block Phase 3, not Phase 2) — SCOPING_REPORT §5 + §10
 - Own-repo (1471) EXCLUDE? OTHER_OSS (120) EXCLUDE? pypy/simplejson → `manual`?
