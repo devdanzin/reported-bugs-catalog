@@ -14,9 +14,13 @@
   "python/cpython#152269",
   "python/cpython#152270"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 4,
  "n_backports": 3,
  "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [
   "bf6f784d4bcd21acd471ea45b6f23c70"
  ],

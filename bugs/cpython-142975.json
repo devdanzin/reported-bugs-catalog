@@ -12,9 +12,13 @@
   "python/cpython#143156",
   "python/cpython#143175"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 2,
  "n_backports": 1,
  "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [
   "interpreter-core",

@@ -9,9 +9,15 @@
   "dpdani/cereggii#79"
  ],
  "prs": [],
+ "shared_fix_prs": [
+  "dpdani/cereggii#80"
+ ],
+ "related_prs": [],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 1,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [
   "AtomicDict"

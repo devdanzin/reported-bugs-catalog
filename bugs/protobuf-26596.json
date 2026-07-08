@@ -9,9 +9,18 @@
   "protocolbuffers/protobuf#26596"
  ],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "protocolbuffers/protobuf#26920",
+  "protocolbuffers/protobuf#26939",
+  "protocolbuffers/protobuf#27570",
+  "protocolbuffers/protobuf#28196"
+ ],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 4,
  "gists": [
   "b0eca1ded22efac92de4efe928916d46"
  ],

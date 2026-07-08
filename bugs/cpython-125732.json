@@ -1,17 +1,21 @@
 {
  "bug_id": "cpython-125732",
  "title": "gh-125666: Avoid PyREPL exiting when a null byte is in input",
- "tool": "fusil",
- "mode": "general",
+ "tool": "manual",
+ "mode": "",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [],
  "prs": [
   "python/cpython#125732"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 1,
  "n_backports": 0,
  "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [
   "topic-repl"
@@ -19,9 +23,9 @@
  "filed_by": "self",
  "filers": [],
  "status": "closed/fixed",
- "confidence": "low",
- "needs_review": true,
- "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/python__cpython/pull-125732.json"

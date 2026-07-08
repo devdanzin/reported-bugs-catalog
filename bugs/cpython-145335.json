@@ -16,9 +16,13 @@
   "python/cpython#145439",
   "python/cpython#145528"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 6,
  "n_backports": 2,
  "n_fix_prs": 4,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [
   "awaiting review",

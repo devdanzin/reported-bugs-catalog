@@ -9,9 +9,15 @@
   "h5py/h5py#2833"
  ],
  "prs": [],
+ "shared_fix_prs": [
+  "h5py/h5py#2843"
+ ],
+ "related_prs": [],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 1,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [],
  "filed_by": "self",

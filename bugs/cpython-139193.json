@@ -1,8 +1,8 @@
 {
  "bug_id": "cpython-139193",
  "title": "JIT (interpreter): running hot code with `PYTHON_LLTRACE=4` segfaults",
- "tool": "lafleur",
- "mode": "jit",
+ "tool": "manual",
+ "mode": "",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [
@@ -11,9 +11,13 @@
  "prs": [
   "python/cpython#139384"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 1,
  "n_backports": 0,
  "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [
   "interpreter-core",
@@ -26,9 +30,9 @@
   "sergey-miryanov"
  ],
  "status": "closed/fixed",
- "confidence": "low",
- "needs_review": true,
- "review_reason": "cpython-jit-crash(REVIEW)",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-139193.json",

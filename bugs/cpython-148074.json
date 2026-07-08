@@ -12,9 +12,15 @@
   "python/cpython#148075",
   "python/cpython#148095"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "python/cpython#142529"
+ ],
  "n_prs": 2,
  "n_backports": 1,
  "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 1,
  "gists": [
   "551cace22f112ef0ff4ed3fdbe54d235"
  ],

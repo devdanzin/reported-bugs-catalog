@@ -14,9 +14,13 @@
   "python/cpython#135020",
   "python/cpython#135030"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 4,
  "n_backports": 2,
  "n_fix_prs": 2,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [
   "3.13",
@@ -33,9 +37,9 @@
   "miss-islington"
  ],
  "status": "closed/fixed",
- "confidence": "low",
- "needs_review": true,
- "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-130999.json",

@@ -7,6 +7,13 @@
  "is_umbrella": false,
  "issues": [],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [
   "d5c602c29ac3881290269b444d77db3c"
  ],

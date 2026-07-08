@@ -1,8 +1,8 @@
 {
  "bug_id": "cpython-145064",
  "title": "JIT: `co != NULL` assertion failure in `*_Py_uop_frame_new`",
- "tool": "lafleur",
- "mode": "jit",
+ "tool": "manual",
+ "mode": "",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [
@@ -12,9 +12,13 @@
   "python/cpython#145078",
   "python/cpython#145100"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 2,
  "n_backports": 0,
  "n_fix_prs": 2,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [
   "awaiting review",
@@ -29,9 +33,9 @@
   "cocolato"
  ],
  "status": "closed/fixed",
- "confidence": "low",
- "needs_review": true,
- "review_reason": "cpython-jit-crash(REVIEW)",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-145064.json",

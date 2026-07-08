@@ -1,8 +1,8 @@
 {
  "bug_id": "cpython-142029",
  "title": "Assertion failures from calling `create_builtin` with invalid object",
- "tool": "fusil",
- "mode": "general",
+ "tool": "manual",
+ "mode": "",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [
@@ -12,9 +12,15 @@
   "python/cpython#142033",
   "python/cpython#142054"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "python/cpython#142365"
+ ],
  "n_prs": 2,
  "n_backports": 0,
  "n_fix_prs": 2,
+ "n_shared_fixes": 0,
+ "n_related_prs": 1,
  "gists": [],
  "labels": [
   "interpreter-core",
@@ -26,9 +32,9 @@
   "dr-carlos"
  ],
  "status": "closed/fixed",
- "confidence": "low",
- "needs_review": true,
- "review_reason": "cpython-crash-untagged(REVIEW:fusil-vs-manual)",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-142029.json",

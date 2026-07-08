@@ -103,21 +103,50 @@ def main():
     for r in rows:
         clusters[find((r["repo"], r["number"]))].append(r)
 
+    # A PR whose fix_links hit >=2 of our issues is a genuine batch fix — it never
+    # merges (would conflate bugs) but must be RECORDED on each bug it fixes.
+    def issue_fix_targets(r):
+        return [n for n in r.get("fix_links", [])
+                if (idx.get((r["repo"], n)) or {}).get("type") == "issue"]
+    shared_by_issue = collections.defaultdict(list)   # (repo,issue#) -> [pr#]
+    batch_fix_keys = set()
+    for r in rows:
+        if r["type"] != "pull":
+            continue
+        tgts = issue_fix_targets(r)
+        if len(tgts) >= 2:
+            batch_fix_keys.add((r["repo"], r["number"]))
+            for n in tgts:
+                shared_by_issue[(r["repo"], n)].append(r["number"])
+
     bugs = []
-    dropped_backfill = 0
+    absorbed = 0   # backfill/batch PRs attached to a bug as shared/related, not dropped
     for members in clusters.values():
         repo = members[0]["repo"]
-        # a backfilled fix-PR that never merged into one of our issues is a loose
-        # cross-ref (or fixes a non-catalog issue) — not a bug of ours; drop it.
-        if len(members) == 1 and members[0]["type"] == "pull" \
-                and f"{repo}#{members[0]['number']}" in backfill:
-            dropped_backfill += 1
+        # a single unmerged PR (backfilled cross-ref, or a batch fix) is NOT its own
+        # bug — it's absorbed into its origin bug's shared_fix_prs / related_prs
+        # below, so no information is lost.
+        if len(members) == 1 and members[0]["type"] == "pull" and (
+                f"{repo}#{members[0]['number']}" in backfill
+                or (repo, members[0]["number"]) in batch_fix_keys):
+            absorbed += 1
             continue
         issues = sorted([m for m in members if m["type"] == "issue"], key=lambda m: m["number"])
         prs = sorted([m for m in members if m["type"] == "pull"], key=lambda m: m["number"])
         if not (issues or prs):
             continue
         n_backports = sum(1 for m in prs if BACKPORT_TITLE.match(m["title"] or ""))
+        # shared fixes (batch-fix PRs targeting one of this bug's issues) + related
+        # PRs (backfilled cross-refs not confirmed as the fix here)
+        already = {m["number"] for m in prs}
+        shared = sorted({p for m in issues
+                         for p in shared_by_issue.get((repo, m["number"]), [])
+                         if p not in already})
+        already |= set(shared)
+        related = sorted({n for m in issues for n in m.get("links", [])
+                          if f"{repo}#{n}" in backfill
+                          and (idx.get((repo, n)) or {}).get("type") == "pull"
+                          and n not in already})
         umbrella = any(m["_umbrella"] for m in members)
         # tool comes from the highest-confidence non-'?' member — but a backfilled
         # fix-PR only INHERITS the bug's tool, so it must not determine the tool or
@@ -162,9 +191,13 @@ def main():
             "is_umbrella": umbrella,
             "issues": [f"{repo}#{m['number']}" for m in issues],
             "prs": [f"{repo}#{m['number']}" for m in prs],
+            "shared_fix_prs": [f"{repo}#{n}" for n in shared],
+            "related_prs": [f"{repo}#{n}" for n in related],
             "n_prs": len(prs),
             "n_backports": n_backports,
             "n_fix_prs": len(prs) - n_backports,
+            "n_shared_fixes": len(shared),
+            "n_related_prs": len(related),
             "gists": sorted(set(g for m in members for g in m["gists"])),
             "labels": sorted(set(l for m in members for l in m["labels"])),
             "filed_by": filed_by,
@@ -189,11 +222,20 @@ def main():
     review = [b for b in bugs if b["needs_review"]]
     total_prs = sum(b["n_prs"] for b in bugs)
     total_bp = sum(b["n_backports"] for b in bugs)
+    total_shared = sum(b["n_shared_fixes"] for b in bugs)
+    total_related = sum(b["n_related_prs"] for b in bugs)
+    # accounting: every backfill PR is either merged into a bug, a shared batch
+    # fix, or a related cross-ref — nothing is dropped.
+    merged_backfill = sum(1 for b in bugs for a in b["prs"] if a in backfill)
     print(f"{len(rows)} artifacts -> {len(bugs)} bug clusters "
-          f"(dropped {dropped_backfill} unmerged backfill PRs)")
+          f"({absorbed} single PRs absorbed as shared/related, not dropped)")
     print(f"umbrellas: {len(umb)}   needs-review bugs: {len(review)}")
-    print(f"PRs in clusters: {total_prs} ({total_bp} backports, "
-          f"{total_prs - total_bp} distinct fixes)")
+    print(f"PRs: {total_prs} in-cluster ({total_bp} backports, "
+          f"{total_prs - total_bp} distinct fixes) + {total_shared} shared batch-fixes "
+          f"+ {total_related} related cross-refs")
+    print(f"backfill accounting: {len(backfill)} backfilled = "
+          f"{merged_backfill} merged-as-fix + {total_shared} shared + "
+          f"{total_related} related (nothing dropped)")
     print("\nbugs per tool  (confirmed + tentative[review]):")
     for t in sorted(set(conf_ct) | set(rev_ct), key=lambda t: -(conf_ct[t] + rev_ct[t])):
         print(f"  {conf_ct[t]:4d} + {rev_ct[t]:<3} tentative   {t}")

@@ -9,9 +9,13 @@
   "pypy/pypy#5113"
  ],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [],
  "filed_by": "self",

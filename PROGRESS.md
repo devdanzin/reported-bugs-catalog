@@ -89,10 +89,22 @@ Merging rewritten to use precise **fix_links** (PR title `gh-<issue>` + body
 fix-PRs. **491 PRs in clusters = 334 distinct fixes + 157 backports** (backports =
 same bug, flagged `n_backports`).
 
-**Bug counts (filed-artifact + synthetic):** **fusil 153** (131+22 OOM) · cext-review
-150 · **cpython-review 57** (44+13) · lafleur 34 · ft-review 34 · manual 33 · cereggii 15.
-filed_by (clusters): **self 180 · self+maintainer 146 · maintainer 115** (self+maintainer
-= you filed the issue, a maintainer authored the fix — 146 such collaborations).
+**REVIEW QUEUE RESOLVED (user, 2026-07-08):** 26 of 27 → manual, only #130999 → fusil
+(locked as overrides). User note: found many bugs *while using* the tools, not *with*
+them, or while minimizing other repros. needs-review now 0.
+
+**DROPPED-PRs → RECOVERED (user-flagged):** the 55 unmerged backfill PRs weren't
+dropped — now attached to their origin bug. A batch-fix PR (fixes ≥2 of our issues,
+e.g. cereggii#80→#78+#79) is recorded in each bug's `shared_fix_prs`; a cross-ref
+whose fix couldn't be machine-confirmed (mostly non-CPython repos that don't use the
+`gh-<issue>`/`fixes #N` convention — multidict#1317, scipy#24752, numpy#29368,
+protobuf#27570) goes in `related_prs`. **Accounting: 425 backfilled = 370 merged fixes
++ 55 shared/related + 0 unaccounted (nothing lost).**
+
+**Bug counts (filed-artifact + synthetic), USER-VALIDATED:** cext-review 149 · **fusil
+142** (120+22 OOM) · **cpython-review 57** (44+13) · **manual 50** · ft-review 34 ·
+lafleur 28 · cereggii 15. filed_by (clusters): **self 180 · self+maintainer 146 ·
+maintainer 114**. PRs: 490 in-cluster (333 fixes + 157 backports) + 4 shared + 83 related.
 
 **#146102 clump captured (user-flagged):** the cpython-review umbrella lists **47
 select bugs**; harvested its 18 missing sub-issues/PRs (again mostly

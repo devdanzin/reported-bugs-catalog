@@ -9,9 +9,17 @@
   "numpy/numpy#28829"
  ],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "numpy/numpy#29368",
+  "numpy/numpy#30071",
+  "numpy/numpy#30076"
+ ],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 3,
  "gists": [],
  "labels": [
   "sprintable - C"

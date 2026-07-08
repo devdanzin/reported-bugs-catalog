@@ -52,6 +52,17 @@ OVERRIDES = {
     ("python/cpython", 132461): ("fusil", "general", "high", "scan:OrderedDict.setdefault"),
     ("python/cpython", 153354): ("fusil", "general", "high", "scan:wsgiref __annotate__"),
 }
+# user-confirmed review-queue decisions (2026-07-08): devdanzin found these while
+# USING the tools but not WITH them, or while minimizing other repros — all manual
+# except #130999 (fusil). #126018 was the bug that inspired reviving fusil.
+_REVIEW_MANUAL = [122353, 122398, 122461, 125732, 126018, 131878, 131936, 132470,
+                  132565, 141805, 142029, 130163, 137218, 139193, 142629, 143751,
+                  145064, 121016, 122145, 122170, 122533, 122692, 125852, 126032,
+                  145887, 30135]
+for _n in _REVIEW_MANUAL:
+    OVERRIDES[("python/cpython", _n)] = ("manual", "", "high", "user-review")
+OVERRIDES[("python/cpython", 130999)] = ("fusil", "general", "high", "user-review")
+
 FEATURE_KW = ("speed up", "support ", "teach ", "typo", "docstring", "not tested",
               "not currently tested", "missing from", "performance regression",
               "add support", "improve", "faster", "deprecat", "quadratic",

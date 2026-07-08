@@ -9,9 +9,13 @@
   "rogerbinns/apsw#609"
  ],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [
   "db96bedb4e2ec6712fc6b71191ff4bd0"
  ],

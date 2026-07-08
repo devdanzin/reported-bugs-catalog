@@ -9,9 +9,16 @@
   "simplejson/simplejson#362"
  ],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "simplejson/simplejson#366",
+  "simplejson/simplejson#367"
+ ],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 2,
  "gists": [
   "be2bea00e879ed44e273eec1a0715f00"
  ],

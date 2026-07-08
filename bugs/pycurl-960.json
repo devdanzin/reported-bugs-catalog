@@ -9,9 +9,15 @@
   "pycurl/pycurl#960"
  ],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "pycurl/pycurl#961"
+ ],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 1,
  "gists": [
   "7402dc7349ab7e27deb95093c1ddb883"
  ],

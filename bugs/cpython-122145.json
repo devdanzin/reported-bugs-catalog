@@ -12,9 +12,16 @@
   "python/cpython#122161",
   "python/cpython#124214"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "python/cpython#122126",
+  "python/cpython#124219"
+ ],
  "n_prs": 2,
  "n_backports": 1,
  "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 2,
  "gists": [],
  "labels": [
   "type-bug"
@@ -25,9 +32,9 @@
   "picnixz"
  ],
  "status": "closed/fixed",
- "confidence": "low",
- "needs_review": true,
- "review_reason": "cpython-untagged(REVIEW)",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
  "reproduced": null,
  "raw": [
   "raw/python__cpython/issue-122145.json",

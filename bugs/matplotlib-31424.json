@@ -9,9 +9,16 @@
   "matplotlib/matplotlib#31424"
  ],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "matplotlib/matplotlib#31556",
+  "matplotlib/matplotlib#31610"
+ ],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 2,
  "gists": [
   "2a79188c7a41a03b1476544c7dd775c1"
  ],

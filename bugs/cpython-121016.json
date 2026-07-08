@@ -12,9 +12,13 @@
   "python/cpython#121017",
   "python/cpython#121064"
  ],
+ "shared_fix_prs": [],
+ "related_prs": [],
  "n_prs": 2,
  "n_backports": 1,
  "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
  "gists": [],
  "labels": [
   "skip news",
@@ -25,7 +29,7 @@
  "filed_by": "self",
  "filers": [],
  "status": "closed/fixed",
- "confidence": "medium",
+ "confidence": "high",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,

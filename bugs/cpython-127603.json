@@ -9,9 +9,16 @@
   "python/cpython#127603"
  ],
  "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [
+  "python/cpython#117220",
+  "python/cpython#127605"
+ ],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 2,
  "gists": [],
  "labels": [
   "3.12",
