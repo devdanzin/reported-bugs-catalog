@@ -1,0 +1,22 @@
+{
+ "repo": "python/cpython",
+ "number": 154044,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/154044",
+ "title": "Data race + leak: descr_get_qualname lazily caches d_qualname without synchronization (free-threading)",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "type-bug",
+  "interpreter-core",
+  "topic-free-threading"
+ ],
+ "created_at": "2026-07-19T03:42:55Z",
+ "closed_at": null,
+ "body": "# Bug report\n\n### Bug description:\n\nOn a free-threaded (`--disable-gil`) build, reading `__qualname__` on the same descriptor from multiple threads is a data race on the lazily-populated cache `descr->d_qualname`. `descr_get_qualname` (`Objects/descrobject.c`) does an unsynchronized check-then-write:\n\n```c\nstatic PyObject *\ndescr_get_qualname(PyObject *self, void *Py_UNUSED(ignored))\n{\n    PyDescrObject *descr = (PyDescrObject *)self;\n    if (descr->d_qualname == NULL)\n        descr->d_qualname = calculate_qualname(descr);   // WRITE, no lock\n    return Py_XNewRef(descr->d_qualname);\n}\n```\n\nDescriptors (`method_descriptor` / `getset_descriptor` / `wrapper_descriptor`) live on their owning type, so they are shared across all threads. When two threads first read the same descriptor's `__qualname__`, both observe `d_qualname == NULL`, both call `calculate_qualname`, and both store into `descr->d_qualname` \u2014 a write/write data race on the pointer, plus a leak: the store is a plain assignment (the old value is `NULL`), so the losing thread's freshly-computed str is overwritten and never freed.\n\nThis is value-benign (the two computed qualnames are equal, and there is no double-free, so it does not crash), but it is a genuine C11 data race and a small leak on a shared object. It is the same lazy-cache-without-synchronization pattern that gh-125267 fixed for `object.__reduce_ex__`'s `objreduce` cache.\n\n### Reproducer\n\n```python\nimport threading\n\nNT = 8\n\n# Builtin C descriptors keep d_qualname == NULL until __qualname__ is first read, so each can be\n# raced exactly once. Race __qualname__ across threads on each freshly-untouched descriptor.\ndescrs = []\nfor tp in (str, bytes, list, dict, set, int, float, tuple, frozenset, bytearray):\n    for name, v in vars(tp).items():\n        if type(v).__name__ in (\"method_descriptor\", \"getset_descriptor\", \"wrapper_descriptor\"):\n            descrs.append(v)\n\n\ndef worker(descriptor, barrier):\n    barrier.wait()\n    for _ in range(20):\n        _ = descriptor.__qualname__\n\n\nfor _round in range(50):\n    for d in descrs:\n        bar = threading.Barrier(NT)\n        threads = [threading.Thread(target=worker, args=(d, bar)) for _ in range(NT)]\n        for t in threads:\n            t.start()\n        for t in threads:\n            t.join()\nprint(\"done\")\n```\n\nUnder a `--with-thread-sanitizer` free-threaded build (`PYTHON_GIL=0`, `TSAN_OPTIONS=\u2026exitcode=66\u2026`), this reports `WARNING: ThreadSanitizer: data race \u2026 in descr_get_qualname` (both sides `descr_get_qualname`, on `descr->d_qualname`) deterministically. Reproduced on both a debug and a release TSan build.\n\n### Suggested fix\n\nSerialize the lazy init \u2014 either a per-object critical section:\n\n```c\nif (descr->d_qualname == NULL) {\n    Py_BEGIN_CRITICAL_SECTION(descr);\n    if (descr->d_qualname == NULL)                       // re-check\n        descr->d_qualname = calculate_qualname(descr);\n    Py_END_CRITICAL_SECTION();\n}\nreturn Py_XNewRef(descr->d_qualname);\n```\n\nor a one-shot atomic compare-exchange (compute, `CAS(&descr->d_qualname, NULL, new)`, `Py_DECREF` the loser). The GIL build is unchanged either way. (gh-125267 took the \"initialize eagerly\" route for the analogous `objreduce` cache.)\n\n*(Found by `fusil --tsan`, a ThreadSanitizer fuzzer. Draft and reproducer by Claude Code, minimized and reviewed by hand.)*\n\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux",
+ "comments": [],
+ "timeline_refs": [],
+ "fetch_errors": null
+}

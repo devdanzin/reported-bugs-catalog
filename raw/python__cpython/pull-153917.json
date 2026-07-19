@@ -1,0 +1,80 @@
+{
+ "repo": "python/cpython",
+ "number": 153917,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/153917",
+ "title": "gh-153908: Fix datarace in itertools.count().repr()",
+ "state": "closed",
+ "state_reason": null,
+ "author": "johng",
+ "author_association": "CONTRIBUTOR",
+ "labels": [],
+ "created_at": "2026-07-18T10:43:21Z",
+ "closed_at": "2026-07-18T13:01:51Z",
+ "body": "Uses atomic load to ensure protected read to internal `cnt` variable that can be incremented on `next()`\r\n\r\n<!--\r\nThanks for your contribution!\r\nPlease read this comment in its entirety. It's quite important.\r\n\r\n# Pull Request title\r\n\r\nIt should be in the following format:\r\n\r\n```\r\ngh-NNNNNN: Summary of the changes made\r\n```\r\n\r\nWhere: gh-NNNNNN refers to the GitHub issue number.\r\n\r\nMost PRs will require an issue number. Trivial changes, like fixing a typo, do not need an issue.\r\n\r\n# Backport Pull Request title\r\n\r\nIf this is a backport PR (PR made against branches other than `main`),\r\nplease ensure that the PR title is in the following format:\r\n\r\n```\r\n[X.Y] <title from the original PR> (GH-NNNNNN)\r\n```\r\n\r\nWhere: [X.Y] is the branch name, for example: [3.13].\r\n\r\nGH-NNNNNN refers to the PR number from `main`.\r\n\r\n-->\r\n\r\n\r\n<!-- gh-issue-number: gh-153908 -->\r\n* Issue: gh-153908\r\n<!-- /gh-issue-number -->\r\n\r\nWhen using `repro_tsan_0006_count.py` as a temporary script to expose the issue we not longer have TSAN flags\r\n\r\n```\r\n\u279c  cpython git:(tsan-0006-itertools-count-repr-ft) \u2717 PYTHON_GIL=0 ./python.exe repro_tsan_0006_count.py\r\ndone (no race detected)\r\n```",
+ "comments": [
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-18T10:43:25Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/getting-started/pull-request-lifecycle/#news-entry). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "python-cla-bot[bot]",
+   "created_at": "2026-07-18T10:43:25Z",
+   "body": "All commit authors signed the Contributor License Agreement.\n\n[![CLA signed](https://img.shields.io/badge/CLA%20Signed-FAE085?style=flat-square&logo=Python)](https://cla.python.org/)<!-- CLA BOT SIGNING COMMENT DO NOT EDIT -->"
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-18T11:15:43Z",
+   "body": "Most changes to Python [require a NEWS entry](https://devguide.python.org/getting-started/pull-request-lifecycle/#news-entry). Add one using the [blurb_it](https://blurb-it.herokuapp.com) web app or the [blurb](https://pypi.org/project/blurb/) command-line tool.\n\nIf this change has little impact on Python users, wait for a maintainer to apply the `skip news` label instead.\n"
+  },
+  {
+   "author": "miss-islington-app[bot]",
+   "created_at": "2026-07-18T13:02:01Z",
+   "body": "Thanks @johng for the PR, and @ZeroIntensity for merging it \ud83c\udf2e\ud83c\udf89.. I'm working now to backport this PR to: 3.14, 3.15.\n\ud83d\udc0d\ud83c\udf52\u26cf\ud83e\udd16 "
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-18T13:02:13Z",
+   "body": "[GH-153951](https://github.com/python/cpython/pull/153951) is a backport of this pull request to the [3.15 branch](https://github.com/python/cpython/tree/3.15)."
+  },
+  {
+   "author": "bedevere-app[bot]",
+   "created_at": "2026-07-18T13:02:19Z",
+   "body": "[GH-153952](https://github.com/python/cpython/pull/153952) is a backport of this pull request to the [3.14 branch](https://github.com/python/cpython/tree/3.14)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153908",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "5200f1192428becab0c31db98e7baa97f3c3c3e2",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "950e7fbed3ef41da9c11e1adf48543dc4cd99fe3",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "536d18b1a83fa1524705312be334db4d2e7c5249",
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

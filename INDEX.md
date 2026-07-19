@@ -4,14 +4,14 @@
 
 ## Totals
 
-- **464 bugs** across **28 external projects** (35 catalog-only w/o a GitHub artifact; 20 umbrella containers excluded)
-- **347 issue-artifacts + 490 PR-artifacts** (333 distinct fixes + 157 backports)
+- **483 bugs** across **28 external projects** (47 catalog-only w/o a GitHub artifact; 21 umbrella containers excluded)
+- **354 issue-artifacts + 496 PR-artifacts** (337 distinct fixes + 159 backports)
 
 ## By tool
 
 | tool | bugs | issues | PR-artifacts | fixes | backports | synthetic |
 |---|---|---|---|---|---|---|
-| fusil | 146 | 117 | 191 | 107 | 84 | 22 |
+| fusil | 165 | 124 | 197 | 111 | 86 | 34 |
 | cext-review-toolkit | 138 | 90 | 77 | 75 | 1 | 0 |
 | cpython-review-toolkit | 55 | 40 | 91 | 47 | 44 | 13 |
 | manual | 54 | 39 | 75 | 53 | 22 | 0 |
@@ -21,9 +21,9 @@
 
 ## By filed-by (collaboration)
 
-- **self: 180** — filed by you
-- **self+maintainer: 146** — you filed the issue, a maintainer authored the fix
-- **maintainer: 114** — filed entirely by others from your reports/gists
+- **self: 195** — filed by you
+- **self+maintainer: 147** — you filed the issue, a maintainer authored the fix
+- **maintainer: 117** — filed entirely by others from your reports/gists
 - **none: 22** — gisted/drafted, not filed
 - **self+commit: 2** — you reported, fixed directly in a commit
 
@@ -31,29 +31,30 @@ Top external filers of our findings: vstinner (28), sobolevn (16), neutrinoceros
 
 ## By state
 
-- closed/fixed: 321
-- open: 108
+- closed/fixed: 322
+- open: 114
 - gisted: 18
+- reported: 12
 - unfiled: 11
 - drafted: 4
 - fixed-in-commit: 2
 
 ## By label (top 20 — sliceable, e.g. crashes)
 
-- `type-crash`: 146
-- `interpreter-core`: 109
-- `extension-modules`: 64
+- `type-crash`: 149
+- `interpreter-core`: 113
+- `extension-modules`: 67
 - `skip news`: 60
-- `3.14`: 56
+- `3.14`: 58
+- `type-bug`: 52
 - `3.13`: 50
-- `type-bug`: 48
-- `awaiting review`: 40
+- `awaiting review`: 43
+- `topic-free-threading`: 38
 - `topic-JIT`: 35
-- `topic-free-threading`: 32
 - `bug`: 21
+- `3.15`: 17
 - `stdlib`: 16
 - `3.12`: 16
-- `3.15`: 15
 - `topic-subinterpreters`: 13
 - `awaiting core review`: 12
 - `00 - Bug`: 11
@@ -63,7 +64,7 @@ Top external filers of our findings: vstinner (28), sobolevn (16), neutrinoceros
 
 ## By repo (top 20)
 
-- python/cpython: 255
+- python/cpython: 274
 - pypy/pypy: 31
 - python-pillow/Pillow: 24
 - h5py/h5py: 16
@@ -91,7 +92,7 @@ Top external filers of our findings: vstinner (28), sobolevn (16), neutrinoceros
 - 2023: 2
 - 2024: 83
 - 2025: 84
-- 2026: 250
+- 2026: 257
 
 ## Umbrella impact chains
 
@@ -102,6 +103,7 @@ Top external filers of our findings: vstinner (28), sobolevn (16), neutrinoceros
 - **python/cpython#146102** (cpython-review-toolkit) — Umbrella issue: bugs found using cpython-review-toolkit
 - **python/cpython#146103** (cpython-review-toolkit) — Umbrella issue: code review reports from cpython-review-toolkit
 - **python/cpython#151763** (fusil) — CPython crashes on memory-allocation failure (OOM): 35 findings  (4 dups → 31 di
+- **python/cpython#153852** (fusil) — Free-threading data races in CPython: 15 findings (9 new + 6 residual of existin
 - **duckdb/duckdb-python#408** (cext-review-toolkit) — duckdb Python Extension Analysis Report
 - **zhuyifei1999/guppy3#51** (cext-review-toolkit) — Umbrella issue: guppy3 C Extension Analysis Report
 - **h5py/h5py#2825** (cext-review-toolkit) — Umbrella issue: h5py C Extension Analysis Report

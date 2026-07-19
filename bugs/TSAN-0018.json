@@ -1,0 +1,43 @@
+{
+ "bug_id": "TSAN-0018",
+ "title": "Data race in `dk_nentries`",
+ "tool": "fusil",
+ "mode": "tsan",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#153881"
+ ],
+ "prs": [
+  "python/cpython#153882"
+ ],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [
+  "6b99ef6dce08ac64d8d1d379308a8f86"
+ ],
+ "labels": [
+  "awaiting review",
+  "interpreter-core",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "brijkapadia"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-153881.json",
+  "raw/python__cpython/pull-153882.json"
+ ],
+ "n_artifacts": 2
+}

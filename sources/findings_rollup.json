@@ -104,6 +104,14 @@
    "findings_approx": "~142 (each catalog bug = a distinct crash finding); OOM sub-campaign 37 unique",
    "source": "catalog + cpython-oom-findings"
   },
+  "fusil-tsan": {
+   "races_cataloged": 53,
+   "findings_filed": "15 via umbrella #153852 (9 new + 6 residual) + 4 standalone crash issues (#153809, #154043, #154044, #154130)",
+   "picked_up_by_community": "TSAN-0006 fixed (#153908, johng, PRs #153917/#153951/#153952); TSAN-0018 (#153881); TSAN-0035 (#153935); TSAN-0045 has fix PR #154108",
+   "mode": "tsan (fusil --tsan ThreadSanitizer data-race fuzzing; a mode of fusil, like --oom-fuzz)",
+   "source": "cpython-tsan-findings catalog (github.com/devdanzin/cpython-tsan-findings)",
+   "meaning": "free-threading data-race/crash campaign; DISTINCT from ft-review-toolkit (that is the C-extension FT static-review campaign). Corroboration comments on ~18 pre-existing issues are excluded (commented-not-authored)."
+  },
   "lafleur": {
    "findings_approx": "28 JIT crashes",
    "source": "catalog"

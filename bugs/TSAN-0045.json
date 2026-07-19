@@ -1,0 +1,42 @@
+{
+ "bug_id": "TSAN-0045",
+ "title": "segfault in ga_iternext: sharing a types.GenericAlias iterator across threads double-frees under free-threading",
+ "tool": "fusil",
+ "mode": "tsan",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#154043"
+ ],
+ "prs": [
+  "python/cpython#154108"
+ ],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [],
+ "labels": [
+  "awaiting review",
+  "interpreter-core",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self+maintainer",
+ "filers": [
+  "ByteFlowing1337"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-154043.json",
+  "raw/python__cpython/pull-154108.json"
+ ],
+ "n_artifacts": 2
+}

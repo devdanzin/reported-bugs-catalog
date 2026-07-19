@@ -1,0 +1,53 @@
+{
+ "bug_id": "cpython-153852",
+ "title": "Free-threading data races in CPython: 15 findings (9 new + 6 residual of existing FT work)",
+ "tool": "fusil",
+ "mode": "tsan",
+ "target_repo": "python/cpython",
+ "is_umbrella": true,
+ "issues": [
+  "python/cpython#153852"
+ ],
+ "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [
+  "0b13838fd6089e73a3f063ed8f68e733",
+  "0c3bea3347a169cb64f40873a6dcc3bd",
+  "1e787ea3420c990f4c7728048184e6a4",
+  "1ee2570ab23f267edce7236d0877a632",
+  "4ece3c7d20810f1ad33e2b204ccf33e4",
+  "6b99ef6dce08ac64d8d1d379308a8f86",
+  "6bd1bd3936235547e9c0abd8eb3cca18",
+  "91b26da5b484234d0ad93027945bcdda",
+  "987cdee793b09c28d9a337c6f91647a7",
+  "a24f57a318cf6974caa5b04d134d8fbd",
+  "c1a716a8ad7dff56554f291376eaef66",
+  "db21f2b29ab7572ce6c111b57b3cea5c",
+  "e6e667ea59d98e8a3761e3915bc58ff9",
+  "ed0c939eb845d23ca67b464d3e53ff56",
+  "f0b4f8859da46e985f23aa9cadaaa4c9"
+ ],
+ "labels": [
+  "extension-modules",
+  "interpreter-core",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-153852.json"
+ ],
+ "n_artifacts": 1
+}

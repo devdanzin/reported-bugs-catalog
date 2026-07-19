@@ -1,0 +1,45 @@
+{
+ "bug_id": "TSAN-0035",
+ "title": "Free threading: Data race on a socket's timeout",
+ "tool": "fusil",
+ "mode": "tsan",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#153935"
+ ],
+ "prs": [
+  "python/cpython#153940"
+ ],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 1,
+ "n_backports": 0,
+ "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [],
+ "labels": [
+  "3.14",
+  "3.15",
+  "3.16",
+  "awaiting review",
+  "extension-modules",
+  "topic-free-threading",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "deadlovelll"
+ ],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-153935.json",
+  "raw/python__cpython/pull-153940.json"
+ ],
+ "n_artifacts": 2
+}

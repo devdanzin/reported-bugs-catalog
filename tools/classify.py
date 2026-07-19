@@ -197,6 +197,26 @@ def load_oom_overrides():
             OVERRIDES[(repo, int(n))] = ("fusil", "oom", "high", f"oom-catalog:{b['bug_id']}")
 
 
+def load_tsan_overrides():
+    """The filed fusil --tsan (ThreadSanitizer) findings -> fusil/tsan. Covers the
+    umbrella #153852, the 3 picked-up sub-issues, and the 4 standalone crash issues.
+    Several are community-authored (johng/brijkapadia/deadlovelll), so keyword/author
+    heuristics would mislabel them; the TSan catalog is authoritative."""
+    try:
+        tsan = json.load(open(os.path.join(os.path.dirname(OUT), "tsan_findings_preview.json")))
+    except FileNotFoundError:
+        return
+    umb = tsan.get("umbrella")
+    if umb:
+        repo, n = umb.split("#")
+        OVERRIDES[(repo, int(n))] = ("fusil", "tsan", "high", "tsan-umbrella:153852")
+    for b in tsan["bugs"]:
+        ui = b.get("upstream_issue")
+        if ui:
+            repo, n = ui.split("#")
+            OVERRIDES[(repo, int(n))] = ("fusil", "tsan", "high", f"tsan-catalog:{b['bug_id']}")
+
+
 def load_crtk_overrides():
     """The cpython-review-toolkit umbrella #146102 authoritatively maps 47 bugs to
     their issue/PR. Those sub-issues rarely name the toolkit, so override them."""
@@ -238,6 +258,7 @@ def load_bpo_overrides():
 
 def main():
     load_oom_overrides()
+    load_tsan_overrides()
     load_crtk_overrides()
     load_bpo_overrides()
     rows = []

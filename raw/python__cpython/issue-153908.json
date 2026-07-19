@@ -1,0 +1,107 @@
+{
+ "repo": "python/cpython",
+ "number": 153908,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/153908",
+ "title": "tsan-006: itertoolsmodule.c: count.__repr__ plain-reads cnt",
+ "state": "closed",
+ "state_reason": "completed",
+ "author": "johng",
+ "author_association": "CONTRIBUTOR",
+ "labels": [
+  "type-bug",
+  "extension-modules",
+  "topic-free-threading",
+  "3.14",
+  "3.15",
+  "3.16"
+ ],
+ "created_at": "2026-07-18T10:30:16Z",
+ "closed_at": "2026-07-18T13:04:35Z",
+ "body": "### Bug description:\n\nFollows from https://github.com/python/cpython/issues/153852 for data race on plain read of `cnt` in `repr` \n\n> itertoolsmodule.c: count.__repr__ plain-reads cnt while count_next writes it with an atomic CAS \u2014 the writer was hardened, the reader missed\n\n```\nimport itertools\nimport threading\n\nSTOP = False\n\n\ndef advance(it):\n    while not STOP:\n        next(it)\n\n\ndef read_repr(it):\n    while not STOP:\n        repr(it)\n\n\ndef main():\n    global STOP\n    it = itertools.count()\n    threads = [threading.Thread(target=advance, args=(it,)) for _ in range(2)]\n    threads += [threading.Thread(target=read_repr, args=(it,)) for _ in range(4)]\n    for t in threads:\n        t.start()\n    # Let the race run briefly; TSan reports on the first conflicting pair.\n    threading.Event().wait(2.0)\n    STOP = True\n    for t in threads:\n        t.join()\n    print(\"done (no race detected)\")\n\n\nif __name__ == \"__main__\":\n    main()\n```\n\n```\nPYTHON_GIL=0 ./python.exe repro_tsan_0006_count.py\nSUMMARY: ThreadSanitizer: data race itertoolsmodule.c:3680 in count_repr\n==================\ndone (no race detected)\nThreadSanitizer: reported 2 warnings\n[1]    55630 abort      PYTHON_GIL=0 ./python.exe repro_tsan_0006_count.py\n```\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nMacos 26.3.2\n\n<!-- gh-linked-prs -->\n### Linked PRs\n* gh-153917\n* gh-153951\n* gh-153952\n<!-- /gh-linked-prs -->\n",
+ "comments": [
+  {
+   "author": "ZeroIntensity",
+   "created_at": "2026-07-18T13:04:35Z",
+   "body": "Backports on automerge"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-07-19T00:02:41Z",
+   "body": "After GH-153917, `itertools.count.__repr__` still data-races in **slow (big-int) mode**.\n\nThe fix hardened `count_next` (fast mode: atomic CAS on `lz->cnt`; slow mode: `count_nextlong` under `Py_BEGIN_CRITICAL_SECTION(lz)`) and the fast-mode read in `count_repr`. But `count_repr`'s slow-mode path reads `lz->long_cnt` with no synchronization \u2014 starting at the `if (lz->long_cnt == NULL)` mode check and again in the `PyUnicode_FromFormat(\"%R\", ..., lz->long_cnt)` \u2014 while `count_nextlong` does `lz->long_cnt = stepped_up` under the critical section. A critical section only serializes against other critical sections, so `count_repr` (which never takes it) still races the write. It's also a use-after-free: `count_repr` borrows `lz->long_cnt` and `repr()`s it, while `count_nextlong` replaces it and the old value returned by `next()` is later decref'd and freed.\n\nRepro on a free-threaded `--with-thread-sanitizer` build (`PYTHON_GIL=0`):\n\n```python\nimport itertools, threading\nNT = 8\nfor _ in range(3000):\n    it = itertools.count(10**18, 2)          # big-int -> slow (long_cnt) mode\n    bar = threading.Barrier(NT)\n    def work(advance, it=it, bar=bar):\n        bar.wait()\n        for _ in range(400):\n            next(it) if advance else repr(it)\n    ts = [threading.Thread(target=work, args=(i % 2 == 0,)) for i in range(NT)]\n    for t in ts: t.start()\n    for t in ts: t.join()\n```\n\nTSan reports `count_nextlong` (`lz->long_cnt = stepped_up`) vs `count_repr` (`lz->long_cnt` read). Fast-mode `count()` is clean.\n\nThe fix would mirror `count_next`'s slow path: take `Py_BEGIN_CRITICAL_SECTION(lz)` around `count_repr`'s `long_cnt` access (or read `long_cnt` atomically).\n\nShould I open a new issue for this, or is it fine to handle it here?\n"
+  },
+  {
+   "author": "johng",
+   "created_at": "2026-07-19T11:24:36Z",
+   "body": "@devdanzin I had already raised https://github.com/python/cpython/pull/153983 shortly after working on the fast mode race"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-07-19T11:35:00Z",
+   "body": "@johng Ah, sorry, missed that! Your fix fully addresses the issues described above.\n\nBTW, great work finding interesting bugs, much appreciated!"
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153917",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "5200f1192428becab0c31db98e7baa97f3c3c3e2",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153951",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153952",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153852",
+   "commit": null,
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "db14b87cbfaf0f8fbc89d6ae5c464261028e60c6",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "950e7fbed3ef41da9c11e1adf48543dc4cd99fe3",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "536d18b1a83fa1524705312be334db4d2e7c5249",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153981",
+   "commit": null,
+   "actor": "devdanzin"
+  }
+ ],
+ "fetch_errors": null
+}

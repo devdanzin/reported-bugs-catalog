@@ -1,0 +1,49 @@
+{
+ "bug_id": "TSAN-0006",
+ "title": "tsan-006: itertoolsmodule.c: count.__repr__ plain-reads cnt",
+ "tool": "fusil",
+ "mode": "tsan",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#153908"
+ ],
+ "prs": [
+  "python/cpython#153917",
+  "python/cpython#153951",
+  "python/cpython#153952"
+ ],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 3,
+ "n_backports": 2,
+ "n_fix_prs": 1,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [],
+ "labels": [
+  "3.14",
+  "3.15",
+  "3.16",
+  "extension-modules",
+  "topic-free-threading",
+  "type-bug"
+ ],
+ "filed_by": "maintainer",
+ "filers": [
+  "johng",
+  "miss-islington"
+ ],
+ "status": "closed/fixed",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-153908.json",
+  "raw/python__cpython/pull-153917.json",
+  "raw/python__cpython/pull-153951.json",
+  "raw/python__cpython/pull-153952.json"
+ ],
+ "n_artifacts": 4
+}

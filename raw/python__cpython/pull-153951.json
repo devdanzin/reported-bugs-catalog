@@ -1,0 +1,49 @@
+{
+ "repo": "python/cpython",
+ "number": 153951,
+ "type": "pull",
+ "url": "https://github.com/python/cpython/pull/153951",
+ "title": "[3.15] gh-153908: Fix data race in `itertools.count.__repr__` (GH-153917)",
+ "state": "closed",
+ "state_reason": null,
+ "author": "miss-islington",
+ "author_association": "MEMBER",
+ "labels": [],
+ "created_at": "2026-07-18T13:02:07Z",
+ "closed_at": "2026-07-18T15:18:04Z",
+ "body": "(cherry picked from commit 5200f1192428becab0c31db98e7baa97f3c3c3e2)\n\nCo-authored-by: John <me@joh.ng>\n\n<!-- gh-issue-number: gh-153908 -->\n* Issue: gh-153908\n<!-- /gh-issue-number -->\n",
+ "comments": [
+  {
+   "author": "ByteFlowing1337",
+   "created_at": "2026-07-18T14:47:29Z",
+   "body": "CI failed with `test_traceback_when_child_process_terminates_abruptly` on macOS (see #143620):\r\n```python\r\n======================================================================\r\nFAIL: test_traceback_when_child_process_terminates_abruptly (test.test_concurrent_futures.test_process_pool.ProcessPoolForkserverProcessPoolExecutorTest.test_traceback_when_child_process_terminates_abruptly)\r\n----------------------------------------------------------------------\r\nTraceback (most recent call last):\r\n  File \"/Users/runner/work/cpython/cpython/Lib/test/test_concurrent_futures/test_process_pool.py\", line 154, in test_traceback_when_child_process_terminates_abruptly\r\n    self.assertIsInstance(cause, futures.process._RemoteTraceback)\r\n    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nAssertionError: None is not an instance of <class 'concurrent.futures.process._RemoteTraceback'>\r\n```\r\ncc @ZeroIntensity "
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153908",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/pull/153917",
+   "commit": null,
+   "actor": "bedevere-app[bot]"
+  },
+  {
+   "event": "merged",
+   "source": null,
+   "commit": "536d18b1a83fa1524705312be334db4d2e7c5249",
+   "actor": "ZeroIntensity"
+  },
+  {
+   "event": "closed",
+   "source": null,
+   "commit": null,
+   "actor": "ZeroIntensity"
+  }
+ ],
+ "fetch_errors": null
+}

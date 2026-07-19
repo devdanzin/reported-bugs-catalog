@@ -21,6 +21,7 @@ BUGS = os.path.join(ROOT, "bugs")
 
 KNOWN_UMBRELLAS = {
     ("python/cpython", 151763),   # OOM umbrella
+    ("python/cpython", 153852),   # fusil --tsan free-threading-races umbrella
     ("python/cpython", 146102),   # cpython-review-toolkit umbrella
     ("dpdani/cereggii", 149),     # cereggii 4-bug umbrella
 }
@@ -52,6 +53,23 @@ def oom_map():
     return m
 
 
+def tsan_map():
+    """(repo, issue#) -> TSAN-00NN for the filed --tsan findings (the 3 picked-up
+    sub-issues + 4 standalone crash issues), so their harvested clusters get the
+    stable TSAN id instead of a repo-derived one. Mirrors oom_map()."""
+    m = {}
+    try:
+        bugs = load("tsan_findings_preview.json")["bugs"]
+    except FileNotFoundError:
+        return m
+    for b in bugs:
+        ui = b.get("upstream_issue")
+        if ui:
+            repo, n = ui.split("#")
+            m[(repo, int(n))] = b["bug_id"]
+    return m
+
+
 def is_umbrella(r):
     # Title markers + known ids ONLY. A link-count heuristic was tried and
     # dropped: normal issues that reference >=4 other issues (backports,
@@ -65,6 +83,7 @@ def main():
     rows = load("classification.json")
     idx = {(r["repo"], r["number"]): r for r in rows}
     oom = oom_map()
+    tsan = tsan_map()
 
     backfill = load_backfill()
     for r in rows:
@@ -172,6 +191,8 @@ def main():
         # bug_id
         if key in oom:
             bug_id = oom[key]
+        elif key in tsan:
+            bug_id = tsan[key]
         else:
             short = repo.split("/")[-1].lower().replace(".", "")
             bug_id = f"{short}-{primary['number']}"

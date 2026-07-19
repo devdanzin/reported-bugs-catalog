@@ -64,6 +64,38 @@ def main():
         json.dump(rec, open(os.path.join(BUGS, b["bug_id"] + ".json"), "w"), indent=1)
         added["oom"] += 1
 
+    # ---- TSan synthetics (umbrella findings with no individual issue) ----
+    # The 12 findings filed collectively in the umbrella #153852 but not split into
+    # their own sub-issue have no harvested artifact. Unlike OOM gisted synthetics,
+    # these ARE filed (via the umbrella) -> filed_by="self", status="reported".
+    try:
+        tsan = json.load(open(os.path.join(SRC, "tsan_findings_preview.json")))
+    except FileNotFoundError:
+        tsan = {"bugs": []}
+    for b in tsan["bugs"]:
+        if b.get("status") == "folded":
+            folds.append({"bug_id": b["bug_id"], "folded_into": b.get("folded_into")})
+            continue
+        if b["bug_id"] in have_ids:
+            continue  # already a harvested record (3 sub-issues + 4 standalone)
+        rec = {
+            "bug_id": b["bug_id"], "title": b.get("title"),
+            "tool": "fusil", "mode": b.get("mode") or "tsan",
+            "target_repo": "python/cpython", "is_umbrella": False,
+            "umbrella_issue": b.get("umbrella_issue"),
+            "issues": [], "prs": [], "shared_fix_prs": [], "related_prs": [],
+            "n_prs": 0, "n_backports": 0, "n_fix_prs": 0,
+            "n_shared_fixes": 0, "n_related_prs": 0,
+            "gists": [b["gist_id"]] if b.get("gist_id") else [],
+            "labels": [], "filed_by": "self", "filers": [],
+            "status": b.get("status") or "reported",
+            "confidence": "high", "needs_review": False, "review_reason": None,
+            "reproduced": None, "raw": [], "n_artifacts": 0,
+            "is_synthetic": True, "source": "tsan-catalog",
+        }
+        json.dump(rec, open(os.path.join(BUGS, b["bug_id"] + ".json"), "w"), indent=1)
+        added["tsan"] += 1
+
     # ---- crtk umbrella synthetics (rows with no harvested issue/PR) ----
     crtk = json.load(open(os.path.join(SRC, "crtk_umbrella.json")))
     for r in crtk:

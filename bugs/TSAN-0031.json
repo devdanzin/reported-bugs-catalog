@@ -1,0 +1,33 @@
+{
+ "bug_id": "TSAN-0031",
+ "title": "_elementtree.TreeBuilder: concurrent feed of one shared builder races its unsynchronized parse state (self->data / self->last / se",
+ "tool": "fusil",
+ "mode": "tsan",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "umbrella_issue": "python/cpython#153852",
+ "issues": [],
+ "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [
+  "a24f57a318cf6974caa5b04d134d8fbd"
+ ],
+ "labels": [],
+ "filed_by": "self",
+ "filers": [],
+ "status": "reported",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [],
+ "n_artifacts": 0,
+ "is_synthetic": true,
+ "source": "tsan-catalog"
+}

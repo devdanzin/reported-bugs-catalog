@@ -1,0 +1,76 @@
+{
+ "repo": "python/cpython",
+ "number": 153852,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/153852",
+ "title": "Free-threading data races in CPython: 15 findings (9 new + 6 residual of existing FT work)",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "extension-modules",
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2026-07-17T16:48:50Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nThreadSanitizer fuzzing of free-threaded CPython `main` turned up **15 data races** where a built-in object or interpreter-global state is accessed concurrently without the atomics or critical section the surrounding code (or the documentation) already assumes. Each has a minimal, stdlib-only reproducer, the raw TSan report, a root-cause analysis against current-`main` source, and a suggested fix, published as a self-contained gist (linked below).\n\nThey split into two groups: **9 are new defects**, and **6 are residuals of free-threading work that is already merged or documented** \u2014 a specific reader/field/path that a completed conversion left behind. The residuals are the lowest-risk to fix (the pattern and the fix are already in the tree next to them); the related issue/PR is named in the table.\n\nI'm filing them under one umbrella so they can be picked off individually rather than flooding the tracker. **To take one:** open a normal CPython issue or PR and drop a comment here with the link \u2014 I'll mark it in the table. If any is a duplicate or a non-bug, say so and I'll annotate it.\n\nFound with [fusil](https://github.com/devdanzin/fusil)'s `--tsan` mode (fusil originally by @vstinner). Reports and reproducers were drafted with AI assistance (Claude Code) and then reviewed and re-verified by hand \u2014 see *Disclosure*.\n\n### Reproducing\n\n- Found on `main` (3.16.0a0) on a `--disable-gil --with-thread-sanitizer` debug build. These are concurrency bugs, not tied to an exact revision.\n- Each gist ships a minimal stdlib-only `TSAN-NNNN-repro.py`. Run it on a free-threaded TSan build with `PYTHON_GIL=0`; a real race exits non-zero and prints `WARNING: ThreadSanitizer: data race`. (TSan needs ASLR reduced \u2014 e.g. `setarch -R` \u2014 and an unlimited `RLIMIT_AS`, or it runs degraded.)\n- Most are **value-benign on aligned hardware** but are genuine C-level data races (formally UB, and TSan-reported); a few carry a latent UAF/leak/crash, called out per report. All 15 reproduce in isolation with a stdlib-only script (some probabilistically \u2014 loop them; the debug-only finalization assert **TSAN-0034** hits ~44 %/run).\n\n### New free-threading defects (9)\n\nStatus legend: blank = not yet filed \u00b7 `#N` = open issue/PR \u00b7 `#N FIXED` = filed and fixed.\n\n| Report | Race | Suggested fix | Status |\n|---|---|---|---|\n| [TSAN-0001](https://gist.github.com/devdanzin/ed0c939eb845d23ca67b464d3e53ff56) | `multibytecodec.c`: `MultibyteIncrementalDecoder.getstate()`/`reset()`/`decode()` on a shared decoder race its `pending`/`pendingsize`/`state` fields \u2014 the incremental codecs have no critical sections (incl. the iso-2022/HZ face) | per-object critical sections on the incremental codec methods | |\n| [TSAN-0005](https://gist.github.com/devdanzin/4ece3c7d20810f1ad33e2b204ccf33e4) | `_decimal.c`: `Decimal.__hash__` writes its lazy hash cache (`self->hash`) with plain stores; concurrent `hash()` of a shared `Decimal` races | relaxed atomics on `self->hash` | |\n| [TSAN-0006](https://gist.github.com/devdanzin/db21f2b29ab7572ce6c111b57b3cea5c) | `itertoolsmodule.c`: `count.__repr__` plain-reads `cnt` while `count_next` writes it with an **atomic CAS** \u2014 the writer was hardened, the reader missed | `_Py_atomic_load_ssize_relaxed` in `count_repr` | #153908 FIXED |\n| [TSAN-0011](https://gist.github.com/devdanzin/0b13838fd6089e73a3f063ed8f68e733) | `sysmodule.c`: `sys.addaudithook` lazily creates `interp->audit_hooks` with **no lock**, racing `should_audit` on every audit event \u2014 **security-relevant** (PEP 578); the sibling C-level hook list is already mutex-guarded | serialize under `runtime->audit_hooks.mutex`; atomics on the pointer | |\n| [TSAN-0018](https://gist.github.com/devdanzin/6b99ef6dce08ac64d8d1d379308a8f86) | `dictobject.c`: readers of a shared dict's `dk_nentries` use plain loads while `setattr`/insert bump it atomically \u2014 including the **public `PyDict_Next` C-API** (via `_PyType_GetSubclasses`), so any extension iterating a shared dict is exposed. `LOAD_KEYS_NENTRIES` already exists at `:237` | `LOAD_KEYS_NENTRIES` at the reader sites (`_PyObject_IsInstanceDictEmpty`, `clear_lock_held`, `_PyDict_Next`) | #153881 |\n| [TSAN-0030](https://gist.github.com/devdanzin/e6e667ea59d98e8a3761e3915bc58ff9) | `instrumentation.c`: `sys.monitoring.use_tool_id()` is an unsynchronized check-then-act on the interpreter-global `monitoring_tool_names[]` \u2014 both threads pass the guard \u2192 leak + dup ownership; `free_tool_id`'s `Py_CLEAR` is a UAF/double-free. All four accessors are unlocked | lock/atomic the tool-id registry; fix all four accessors together | |\n| [TSAN-0031](https://gist.github.com/devdanzin/a24f57a318cf6974caa5b04d134d8fbd) | `_elementtree.c`: concurrent feed of one shared `TreeBuilder` races its parse state (`this`/`last`/`data`/`index`/`stack`) \u2014 the module has **zero** critical sections, yet declares `Py_MOD_GIL_NOT_USED` | `@critical_section` the whole `TreeBuilder` feed path (`start`/`data`/`end`/`comment`/`pi`/`close`) | (abandoned PR gh-145569 covered only `handle_end`) |\n| [TSAN-0035](https://gist.github.com/devdanzin/1ee2570ab23f267edce7236d0877a632) | `socketmodule.c`: `sock_timeout` is read/written with plain accesses (`gettimeout()` vs `setblocking()`) \u2014 the one per-socket scalar the module's free-threading conversion (gh-128277) missed, while the sibling `sock_fd` and `state->defaulttimeout` were made atomic. `_ssl.c` inherits it | `get/set_sock_timeout` over `_Py_atomic_{load,store}_int64_relaxed`, mirroring `sock_fd` | #153935 |\n| [TSAN-0036](https://gist.github.com/devdanzin/91b26da5b484234d0ad93027945bcdda) | `instrumentation.c`/`ceval.c`: the eval loop reads a code object's `active_monitors.tools[]` **lock-free** (`no_tools_for_local_event`, via `gen_close`) while `_Py_Instrument` replaces the struct under `LOCK_CODE` \u2014 which the eval loop never takes; lazy re-instrumentation runs with the world running | relaxed atomics on the `tools[]` bytes (matching the file's opcode discipline) | (PR gh-136994 did exactly this for the bytecode tool bytes but not `active_monitors`) |\n\n### Residuals of existing / documented free-threading work (6)\n\nThese are a reader/field/path left behind by a completed (or documented) conversion \u2014 likely best handled as a follow-up to the named issue rather than as fresh bugs.\n\n| Report | Race | Related upstream | Status |\n|---|---|---|---|\n| [TSAN-0002](https://gist.github.com/devdanzin/0c3bea3347a169cb64f40873a6dcc3bd) | `_zstd`: `ZstdCompressor.last_mode` is stored plain but read lock-free via its `Py_T_INT` member descriptor | residual of gh-133885 / gh-134289 (added locks, left `last_mode` plain) | |\n| [TSAN-0013](https://gist.github.com/devdanzin/6bd1bd3936235547e9c0abd8eb3cca18) | shared `list`: non-atomic readers (`Py_SIZE`/unpack, `stringlib_bytes_join`, `marshal`) race `list_resize`'s atomic `ob_item`/`ob_size` publish | reader-side residual of gh-129069; contract documented in gh-142519 | |\n| [TSAN-0014](https://gist.github.com/devdanzin/c1a716a8ad7dff56554f291376eaef66) | shared `list`: `list.sort()`'s in-place `binarysort` rewrite (no critical section) races a concurrent lock-free reader | sort-path residual of the gh-129069 / gh-142519 list class | |\n| [TSAN-0025](https://gist.github.com/devdanzin/f0b4f8859da46e985f23aa9cadaaa4c9) | `readline.c`: `set_auto_history()` writes the module-global `should_auto_add_history` (a plain `static int`) unsynchronized | belongs with the readline FT cleanup (gh-153291) | |\n| [TSAN-0029](https://gist.github.com/devdanzin/987cdee793b09c28d9a337c6f91647a7) | `frameobject.c`/`sysmodule.c`: `trace_trampoline` writes a running frame's `f_trace` with no critical section while the `f_trace`/`f_trace_opcodes` accessors are `@critical_section` | the legacy `settrace` path not brought under the recent frame-accessor FT hardening; gh-116738 remit | (low; needs mutating another thread's live frame) |\n| [TSAN-0034](https://gist.github.com/devdanzin/1e787ea3420c990f4c7728048184e6a4) | finalization: `handle_thread_shutdown_exception` reads `interp->threads.head` in an `assert()` **before** `_PyEval_StopTheWorld`, racing an exiting thread's `HEAD_LOCK`-held `tstate_delete_common` write | \u2014 | (debug-only: the read is inside the assert; reproduced in isolation, ~44 %/run) |\n\n### Disclosure\n\nThese findings were produced with AI assistance: fusil's `--tsan` mode generated the concurrency stress that surfaced them, and Claude Code drafted the reports and reduced the reproducers. Every reproducer was then run and re-verified by hand on the free-threaded TSan build, and every root cause was checked against current-`main` source. All 15 reproduce in isolation (some probabilistically).\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.16.0a0 free-threading build (heads/main:bcf98ddbc40, Jul 4 2026, 15:37:00) [Clang 21.1.8 (6ubuntu1)]\n\n",
+ "comments": [
+  {
+   "author": "deadlovelll",
+   "created_at": "2026-07-17T20:12:08Z",
+   "body": "hello @devdanzin, can i work on TSAN-0035?"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-07-17T20:24:48Z",
+   "body": "Sure, anyone is welcome to pick any issue. Thanks!"
+  },
+  {
+   "author": "brijkapadia",
+   "created_at": "2026-07-18T02:10:20Z",
+   "body": "Created #153881 for [TSAN-0018](https://gist.github.com/devdanzin/6b99ef6dce08ac64d8d1d379308a8f86)."
+  }
+ ],
+ "timeline_refs": [
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "71e3ddb45dca4fc68358b029996844bda7154615",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "referenced",
+   "source": null,
+   "commit": "45c5392226945a92b9a1cd1a6ed9ad0541373c30",
+   "actor": "devdanzin"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153881",
+   "commit": null,
+   "actor": "brijkapadia"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153908",
+   "commit": null,
+   "actor": "johng"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/153935",
+   "commit": null,
+   "actor": "deadlovelll"
+  },
+  {
+   "event": "cross-referenced",
+   "source": "https://github.com/python/cpython/issues/154037",
+   "commit": null,
+   "actor": "skirpichev"
+  }
+ ],
+ "fetch_errors": null
+}

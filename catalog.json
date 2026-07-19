@@ -1,14 +1,14 @@
 {
  "generated_note": "run tools/index.py to regenerate",
  "totals": {
-  "bug_records": 484,
-  "bugs": 464,
-  "umbrellas": 20,
-  "synthetic_bugs": 35,
-  "issue_artifacts": 347,
-  "pr_artifacts": 490,
-  "distinct_fixes": 333,
-  "backports": 157,
+  "bug_records": 504,
+  "bugs": 483,
+  "umbrellas": 21,
+  "synthetic_bugs": 47,
+  "issue_artifacts": 354,
+  "pr_artifacts": 496,
+  "distinct_fixes": 337,
+  "backports": 159,
   "external_repos": 28
  },
  "by_tool": {
@@ -43,14 +43,14 @@
    "synthetic": 0
   },
   "fusil": {
-   "bugs": 146,
-   "issues": 117,
-   "fix_prs": 107,
-   "backports": 84,
+   "bugs": 165,
+   "issues": 124,
+   "fix_prs": 111,
+   "backports": 86,
    "shared_fixes": 0,
    "related_prs": 8,
-   "pr_artifacts": 191,
-   "synthetic": 22
+   "pr_artifacts": 197,
+   "synthetic": 34
   },
   "fusil-plugin-cereggii": {
    "bugs": 14,
@@ -84,7 +84,7 @@
   }
  },
  "by_repo": {
-  "python/cpython": 255,
+  "python/cpython": 274,
   "pypy/pypy": 31,
   "python-pillow/Pillow": 24,
   "h5py/h5py": 16,
@@ -114,35 +114,36 @@
   "igraph/python-igraph": 1
  },
  "by_state": {
-  "open": 108,
-  "closed/fixed": 321,
+  "open": 114,
+  "closed/fixed": 322,
   "gisted": 18,
   "drafted": 4,
+  "reported": 12,
   "unfiled": 11,
   "fixed-in-commit": 2
  },
  "by_filed_by": {
-  "self+maintainer": 146,
-  "maintainer": 114,
+  "self+maintainer": 147,
+  "maintainer": 117,
   "none": 22,
-  "self": 180,
+  "self": 195,
   "self+commit": 2
  },
  "by_label": {
-  "type-crash": 146,
-  "interpreter-core": 109,
-  "extension-modules": 64,
+  "type-crash": 149,
+  "interpreter-core": 113,
+  "extension-modules": 67,
   "skip news": 60,
-  "3.14": 56,
+  "3.14": 58,
+  "type-bug": 52,
   "3.13": 50,
-  "type-bug": 48,
-  "awaiting review": 40,
+  "awaiting review": 43,
+  "topic-free-threading": 38,
   "topic-JIT": 35,
-  "topic-free-threading": 32,
   "bug": 21,
+  "3.15": 17,
   "stdlib": 16,
   "3.12": 16,
-  "3.15": 15,
   "topic-subinterpreters": 13,
   "awaiting core review": 12,
   "00 - Bug": 11,
@@ -168,6 +169,7 @@
   "topic-lazy-imports": 3,
   "defect": 3,
   "08 - Backport": 3,
+  "3.16": 2,
   "topic-SSL": 2,
   "topic-asyncio": 2,
   "topic-ctypes": 2,
@@ -220,7 +222,7 @@
   "2023": 2,
   "2024": 83,
   "2025": 84,
-  "2026": 250
+  "2026": 257
  },
  "top_filers": {
   "vstinner": 28,
@@ -236,13 +238,13 @@
   "dpdani": 8,
   "jensens": 7,
   "Wulian233": 6,
+  "brijkapadia": 5,
   "serhiy-storchaka": 5,
   "sergey-miryanov": 5,
   "hugovk": 5,
   "prakashsellathurai": 4,
   "kumaraditya303": 4,
-  "cocolato": 4,
-  "brijkapadia": 4
+  "cocolato": 4
  },
  "umbrella_chains": [
   {
@@ -278,6 +280,11 @@
   {
    "umbrella": "python/cpython#151763",
    "title": "CPython crashes on memory-allocation failure (OOM): 35 findings  (4 dups \u2192 31 distinct)",
+   "tool": "fusil"
+  },
+  {
+   "umbrella": "python/cpython#153852",
+   "title": "Free-threading data races in CPython: 15 findings (9 new + 6 residual of existing FT work)",
    "tool": "fusil"
   },
   {
@@ -364,6 +371,14 @@
   "fusil": {
    "findings_approx": "~142 (each catalog bug = a distinct crash finding); OOM sub-campaign 37 unique",
    "source": "catalog + cpython-oom-findings"
+  },
+  "fusil-tsan": {
+   "races_cataloged": 53,
+   "findings_filed": "15 via umbrella #153852 (9 new + 6 residual) + 4 standalone crash issues (#153809, #154043, #154044, #154130)",
+   "picked_up_by_community": "TSAN-0006 fixed (#153908, johng, PRs #153917/#153951/#153952); TSAN-0018 (#153881); TSAN-0035 (#153935); TSAN-0045 has fix PR #154108",
+   "mode": "tsan (fusil --tsan ThreadSanitizer data-race fuzzing; a mode of fusil, like --oom-fuzz)",
+   "source": "cpython-tsan-findings catalog (github.com/devdanzin/cpython-tsan-findings)",
+   "meaning": "free-threading data-race/crash campaign; DISTINCT from ft-review-toolkit (that is the C-extension FT static-review campaign). Corroboration comments on ~18 pre-existing issues are excluded (commented-not-authored)."
   },
   "lafleur": {
    "findings_approx": "28 JIT crashes",

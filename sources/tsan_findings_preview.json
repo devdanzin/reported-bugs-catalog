@@ -1,0 +1,215 @@
+{
+ "umbrella": "python/cpython#153852",
+ "bugs": [
+  {
+   "bug_id": "TSAN-0001",
+   "title": "cjkcodecs: MultibyteIncrementalDecoder.getstate() races with reset() on the decoder pending state",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "ed0c939eb845d23ca67b464d3e53ff56",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0002",
+   "title": "_zstd: ZstdCompressor.last_mode written plain under the lock but read lock-free via its Py_T_INT member descriptor",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "0c3bea3347a169cb64f40873a6dcc3bd",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0005",
+   "title": "_decimal: concurrent hash() of a shared Decimal races on the cached hash field (dec_hash)",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "4ece3c7d20810f1ad33e2b204ccf33e4",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0006",
+   "title": "itertools: concurrent repr() of a shared count() races count_repr's plain read of lz->cnt against count_next's atomic advance",
+   "upstream_issue": "python/cpython#153908",
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "db21f2b29ab7572ce6c111b57b3cea5c",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0011",
+   "title": "sys: addaudithook lazily creates interp->audit_hooks with no lock, racing should_audit on every audit event",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "0b13838fd6089e73a3f063ed8f68e733",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0013",
+   "title": "list: non-atomic item/size reads race list_resize's atomic publish on a shared list (Py_SIZE / bytes_join / marshal readers)",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "6bd1bd3936235547e9c0abd8eb3cca18",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0014",
+   "title": "list: concurrent list.sort() of a shared list races (binarysort rewrites the detached array with no critical section)",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "c1a716a8ad7dff56554f291376eaef66",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0018",
+   "title": "dict: readers of dk_nentries use plain loads instead of the existing LOAD_KEYS_NENTRIES macro, racing the atomic bump (object.__ge",
+   "upstream_issue": "python/cpython#153881",
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "6b99ef6dce08ac64d8d1d379308a8f86",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0025",
+   "title": "readline: set_auto_history() writes the module-global should_auto_add_history flag without synchronization",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "f0b4f8859da46e985f23aa9cadaaa4c9",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0029",
+   "title": "frameobject/sys: a running frame's f_trace is written by trace_trampoline without the frame's critical section, racing the @critic",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "987cdee793b09c28d9a337c6f91647a7",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0030",
+   "title": "sys.monitoring: concurrent use_tool_id() races on the interpreter-global tool-name registry (monitoring_use_tool_id_impl)",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "e6e667ea59d98e8a3761e3915bc58ff9",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0031",
+   "title": "_elementtree.TreeBuilder: concurrent feed of one shared builder races its unsynchronized parse state (self->data / self->last / se",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "a24f57a318cf6974caa5b04d134d8fbd",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0034",
+   "title": "interpreter finalization: handle_thread_shutdown_exception reads interp->threads.head in an assert() before _PyEval_StopTheWorld, ",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "1e787ea3420c990f4c7728048184e6a4",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0035",
+   "title": "socket: PySocketSockObject.sock_timeout is read and written with plain non-atomic accesses (gettimeout() vs setblocking()), the on",
+   "upstream_issue": "python/cpython#153935",
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "1ee2570ab23f267edce7236d0877a632",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0036",
+   "title": "sys.monitoring: the eval loop reads a code object's active_monitors.tools[] with no lock while _Py_Instrument replaces the whole s",
+   "upstream_issue": null,
+   "umbrella_issue": "python/cpython#153852",
+   "status": "reported",
+   "gist_id": "91b26da5b484234d0ad93027945bcdda",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0033",
+   "title": "TaskObj_dealloc leaves an _asyncio.Task refcount-0 while still GC-tracked across a _PyEval_StopTheWorld, aborting a concurrent gc.",
+   "upstream_issue": "python/cpython#153809",
+   "umbrella_issue": null,
+   "status": "reported",
+   "gist_id": "",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0043",
+   "title": "descriptor: descr_get_qualname lazily caches descr->d_qualname with no lock -> write/write data race + leak on a shared method/get",
+   "upstream_issue": "python/cpython#154044",
+   "umbrella_issue": null,
+   "status": "reported",
+   "gist_id": "",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0045",
+   "title": "types.GenericAlias: a shared ga_iternext (iter(list[int])) races gi->obj and Py_SETREF(gi->obj, NULL) -> data race + double-DECREF",
+   "upstream_issue": "python/cpython#154043",
+   "umbrella_issue": null,
+   "status": "reported",
+   "gist_id": "",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  },
+  {
+   "bug_id": "TSAN-0053",
+   "title": "dict: a shared dict iterator double-DECREFs di_dict in the exhaustion path -> negative refcount / use-after-free (dictiter_iternex",
+   "upstream_issue": "python/cpython#154130",
+   "umbrella_issue": null,
+   "status": "reported",
+   "gist_id": "",
+   "mode": "tsan",
+   "folded_into": null,
+   "filing_hold": false
+  }
+ ],
+ "notes": "fusil --tsan (ThreadSanitizer data-race) campaign, sibling catalog github.com/devdanzin/cpython-tsan-findings (53 races cataloged). 15 findings filed collectively in the umbrella python/cpython#153852 (9 new + 6 residual); 3 of them were picked up by community contributors as focused issues (TSAN-0006->#153908 johng/fixed, TSAN-0018->#153881 brijkapadia, TSAN-0035->#153935 deadlovelll). 4 standalone crash issues filed by devdanzin (TSAN-0033->#153809 asyncio Task, TSAN-0043->#154044 descr qualname, TSAN-0045->#154043 GenericAlias iter, TSAN-0053->#154130 dict iter). Corroboration comments on ~18 pre-existing issues (commented-not-authored) are EXCLUDED per catalog rules. Distinct from ft-review-toolkit (that is the C-extension FT static-review campaign)."
+}
