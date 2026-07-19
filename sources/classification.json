@@ -12514,6 +12514,311 @@
  },
  {
   "repo": "python/cpython",
+  "number": 153531,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/153531",
+  "title": "`sentinel()` construction races `func.__module__` reassignment in `caller()` under free-threading",
+  "state": "open",
+  "author": "devdanzin",
+  "filed_by": "self",
+  "labels": [
+   "interpreter-core",
+   "type-crash",
+   "topic-free-threading"
+  ],
+  "tool": "manual",
+  "mode": "",
+  "confidence": "high",
+  "reason": "user:manual-cc-assisted",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153297
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-153531.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153809,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/153809",
+  "title": "asyncio: TaskObj_dealloc leaves a refcount-0 Task GC-tracked, hanging or crashing the free-threaded build",
+  "state": "open",
+  "author": "devdanzin",
+  "filed_by": "self",
+  "labels": [
+   "extension-modules",
+   "type-crash",
+   "topic-free-threading"
+  ],
+  "tool": "fusil",
+  "mode": "tsan",
+  "confidence": "high",
+  "reason": "tsan-catalog:TSAN-0033",
+  "needs_review": false,
+  "gists": [
+   "df90699fe37599d5502ce39f718f6657"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   128656,
+   142556,
+   142565
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-153809.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153852,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/153852",
+  "title": "Free-threading data races in CPython: 15 findings (9 new + 6 residual of existing FT work)",
+  "state": "open",
+  "author": "devdanzin",
+  "filed_by": "self",
+  "labels": [
+   "interpreter-core",
+   "extension-modules",
+   "type-crash",
+   "topic-free-threading"
+  ],
+  "tool": "fusil",
+  "mode": "tsan",
+  "confidence": "high",
+  "reason": "tsan-umbrella:153852",
+  "needs_review": false,
+  "gists": [
+   "0b13838fd6089e73a3f063ed8f68e733",
+   "0c3bea3347a169cb64f40873a6dcc3bd",
+   "1e787ea3420c990f4c7728048184e6a4",
+   "1ee2570ab23f267edce7236d0877a632",
+   "4ece3c7d20810f1ad33e2b204ccf33e4",
+   "6b99ef6dce08ac64d8d1d379308a8f86",
+   "6bd1bd3936235547e9c0abd8eb3cca18",
+   "91b26da5b484234d0ad93027945bcdda",
+   "987cdee793b09c28d9a337c6f91647a7",
+   "a24f57a318cf6974caa5b04d134d8fbd",
+   "c1a716a8ad7dff56554f291376eaef66",
+   "db21f2b29ab7572ce6c111b57b3cea5c",
+   "e6e667ea59d98e8a3761e3915bc58ff9",
+   "ed0c939eb845d23ca67b464d3e53ff56",
+   "f0b4f8859da46e985f23aa9cadaaa4c9"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   116738,
+   128277,
+   129069,
+   133885,
+   134289,
+   136994,
+   142519,
+   145569,
+   153291,
+   153881,
+   153908,
+   153935,
+   154037
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-153852.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153881,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/153881",
+  "title": "Data race in `dk_nentries`",
+  "state": "open",
+  "author": "brijkapadia",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "interpreter-core"
+  ],
+  "tool": "fusil",
+  "mode": "tsan",
+  "confidence": "high",
+  "reason": "tsan-catalog:TSAN-0018",
+  "needs_review": false,
+  "gists": [
+   "6b99ef6dce08ac64d8d1d379308a8f86"
+  ],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153852,
+   153882
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-153881.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153908,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/153908",
+  "title": "tsan-006: itertoolsmodule.c: count.__repr__ plain-reads cnt",
+  "state": "closed",
+  "author": "johng",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "extension-modules",
+   "topic-free-threading",
+   "3.14",
+   "3.15",
+   "3.16"
+  ],
+  "tool": "fusil",
+  "mode": "tsan",
+  "confidence": "high",
+  "reason": "tsan-catalog:TSAN-0006",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153852,
+   153917,
+   153951,
+   153952,
+   153981
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-153908.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153935,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/153935",
+  "title": "Free threading: Data race on a socket's timeout",
+  "state": "open",
+  "author": "deadlovelll",
+  "filed_by": "maintainer",
+  "labels": [
+   "type-bug",
+   "extension-modules",
+   "topic-free-threading",
+   "3.14",
+   "3.15",
+   "3.16"
+  ],
+  "tool": "fusil",
+  "mode": "tsan",
+  "confidence": "high",
+  "reason": "tsan-catalog:TSAN-0035",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153852,
+   153940
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-153935.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 154043,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/154043",
+  "title": "segfault in ga_iternext: sharing a types.GenericAlias iterator across threads double-frees under free-threading",
+  "state": "open",
+  "author": "devdanzin",
+  "filed_by": "self",
+  "labels": [
+   "interpreter-core",
+   "type-crash",
+   "topic-free-threading"
+  ],
+  "tool": "fusil",
+  "mode": "tsan",
+  "confidence": "high",
+  "reason": "tsan-catalog:TSAN-0045",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   124397,
+   153298,
+   154108
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-154043.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 154044,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/154044",
+  "title": "Data race + leak: descr_get_qualname lazily caches d_qualname without synchronization (free-threading)",
+  "state": "open",
+  "author": "devdanzin",
+  "filed_by": "self",
+  "labels": [
+   "type-bug",
+   "interpreter-core",
+   "topic-free-threading"
+  ],
+  "tool": "fusil",
+  "mode": "tsan",
+  "confidence": "high",
+  "reason": "tsan-catalog:TSAN-0043",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   125267
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-154044.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 154130,
+  "type": "issue",
+  "url": "https://github.com/python/cpython/issues/154130",
+  "title": "Sharing a dict iterator across threads double-DECREFs di_dict under free-threading",
+  "state": "open",
+  "author": "devdanzin",
+  "filed_by": "self",
+  "labels": [
+   "interpreter-core",
+   "type-crash",
+   "topic-free-threading"
+  ],
+  "tool": "fusil",
+  "mode": "tsan",
+  "confidence": "high",
+  "reason": "tsan-catalog:TSAN-0053",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   112075,
+   115108,
+   120496,
+   120685,
+   124397,
+   148873
+  ],
+  "fix_links": [],
+  "raw": "raw/python__cpython/issue-154130.json"
+ },
+ {
+  "repo": "python/cpython",
   "number": 43537,
   "type": "issue",
   "url": "https://github.com/python/cpython/issues/43537",
@@ -24688,6 +24993,170 @@
    153354
   ],
   "raw": "raw/python__cpython/pull-153360.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153882,
+  "type": "pull",
+  "url": "https://github.com/python/cpython/pull/153882",
+  "title": "gh-153881: Atomically load `dk_nentries` in `_PyObject_IsInstanceDictEmpty`",
+  "state": "open",
+  "author": "brijkapadia",
+  "filed_by": "maintainer",
+  "labels": [
+   "awaiting review"
+  ],
+  "tool": "manual",
+  "mode": "",
+  "confidence": "medium",
+  "reason": "cpython-feature/docs",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153881
+  ],
+  "fix_links": [
+   153881
+  ],
+  "raw": "raw/python__cpython/pull-153882.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153917,
+  "type": "pull",
+  "url": "https://github.com/python/cpython/pull/153917",
+  "title": "gh-153908: Fix datarace in itertools.count().repr()",
+  "state": "closed",
+  "author": "johng",
+  "filed_by": "maintainer",
+  "labels": [],
+  "tool": "manual",
+  "mode": "",
+  "confidence": "medium",
+  "reason": "cpython-feature/docs",
+  "needs_review": false,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153908
+  ],
+  "fix_links": [
+   153908
+  ],
+  "raw": "raw/python__cpython/pull-153917.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153940,
+  "type": "pull",
+  "url": "https://github.com/python/cpython/pull/153940",
+  "title": "gh-153935: Fix data race on socket timeout in the free-threaded build",
+  "state": "open",
+  "author": "deadlovelll",
+  "filed_by": "maintainer",
+  "labels": [
+   "awaiting review"
+  ],
+  "tool": "manual",
+  "mode": "",
+  "confidence": "low",
+  "reason": "cpython-untagged(REVIEW)",
+  "needs_review": true,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153935
+  ],
+  "fix_links": [
+   153935
+  ],
+  "raw": "raw/python__cpython/pull-153940.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153951,
+  "type": "pull",
+  "url": "https://github.com/python/cpython/pull/153951",
+  "title": "[3.15] gh-153908: Fix data race in `itertools.count.__repr__` (GH-153917)",
+  "state": "closed",
+  "author": "miss-islington",
+  "filed_by": "maintainer",
+  "labels": [],
+  "tool": "manual",
+  "mode": "",
+  "confidence": "low",
+  "reason": "cpython-untagged(REVIEW)",
+  "needs_review": true,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153908,
+   153917
+  ],
+  "fix_links": [
+   153908
+  ],
+  "raw": "raw/python__cpython/pull-153951.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 153952,
+  "type": "pull",
+  "url": "https://github.com/python/cpython/pull/153952",
+  "title": "[3.14] gh-153908: Fix data race in `itertools.count.__repr__` (GH-153917)",
+  "state": "closed",
+  "author": "miss-islington",
+  "filed_by": "maintainer",
+  "labels": [],
+  "tool": "manual",
+  "mode": "",
+  "confidence": "low",
+  "reason": "cpython-untagged(REVIEW)",
+  "needs_review": true,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   153908,
+   153917
+  ],
+  "fix_links": [
+   153908
+  ],
+  "raw": "raw/python__cpython/pull-153952.json"
+ },
+ {
+  "repo": "python/cpython",
+  "number": 154108,
+  "type": "pull",
+  "url": "https://github.com/python/cpython/pull/154108",
+  "title": "gh-154043: Fix a data race when iterating a shared `types.GenericAlias` iterator in FT build",
+  "state": "open",
+  "author": "ByteFlowing1337",
+  "filed_by": "maintainer",
+  "labels": [
+   "awaiting review"
+  ],
+  "tool": "manual",
+  "mode": "",
+  "confidence": "low",
+  "reason": "cpython-untagged(REVIEW)",
+  "needs_review": true,
+  "gists": [],
+  "is_umbrella": null,
+  "reproduced": null,
+  "links": [
+   154043
+  ],
+  "fix_links": [
+   154043
+  ],
+  "raw": "raw/python__cpython/pull-154108.json"
  },
  {
   "repo": "python/cpython",

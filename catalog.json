@@ -1,11 +1,11 @@
 {
  "generated_note": "run tools/index.py to regenerate",
  "totals": {
-  "bug_records": 504,
-  "bugs": 483,
+  "bug_records": 505,
+  "bugs": 484,
   "umbrellas": 21,
   "synthetic_bugs": 47,
-  "issue_artifacts": 354,
+  "issue_artifacts": 355,
   "pr_artifacts": 496,
   "distinct_fixes": 337,
   "backports": 159,
@@ -18,18 +18,18 @@
    "fix_prs": 75,
    "backports": 1,
    "shared_fixes": 1,
-   "related_prs": 0,
+   "related_prs": 2,
    "pr_artifacts": 77,
    "synthetic": 0
   },
   "cpython-review-toolkit": {
-   "bugs": 55,
-   "issues": 40,
-   "fix_prs": 47,
-   "backports": 44,
+   "bugs": 54,
+   "issues": 39,
+   "fix_prs": 46,
+   "backports": 41,
    "shared_fixes": 0,
    "related_prs": 2,
-   "pr_artifacts": 91,
+   "pr_artifacts": 87,
    "synthetic": 13
   },
   "ft-review-toolkit": {
@@ -43,13 +43,13 @@
    "synthetic": 0
   },
   "fusil": {
-   "bugs": 165,
-   "issues": 124,
-   "fix_prs": 111,
-   "backports": 86,
+   "bugs": 166,
+   "issues": 125,
+   "fix_prs": 112,
+   "backports": 89,
    "shared_fixes": 0,
    "related_prs": 8,
-   "pr_artifacts": 197,
+   "pr_artifacts": 201,
    "synthetic": 34
   },
   "fusil-plugin-cereggii": {
@@ -73,8 +73,8 @@
    "synthetic": 0
   },
   "manual": {
-   "bugs": 54,
-   "issues": 39,
+   "bugs": 55,
+   "issues": 40,
    "fix_prs": 53,
    "backports": 22,
    "shared_fixes": 0,
@@ -84,7 +84,7 @@
   }
  },
  "by_repo": {
-  "python/cpython": 274,
+  "python/cpython": 275,
   "pypy/pypy": 31,
   "python-pillow/Pillow": 24,
   "h5py/h5py": 16,
@@ -114,7 +114,7 @@
   "igraph/python-igraph": 1
  },
  "by_state": {
-  "open": 114,
+  "open": 115,
   "closed/fixed": 322,
   "gisted": 18,
   "drafted": 4,
@@ -126,19 +126,19 @@
   "self+maintainer": 147,
   "maintainer": 117,
   "none": 22,
-  "self": 195,
+  "self": 196,
   "self+commit": 2
  },
  "by_label": {
-  "type-crash": 149,
-  "interpreter-core": 113,
+  "type-crash": 150,
+  "interpreter-core": 114,
   "extension-modules": 67,
   "skip news": 60,
   "3.14": 58,
   "type-bug": 52,
   "3.13": 50,
   "awaiting review": 43,
-  "topic-free-threading": 38,
+  "topic-free-threading": 39,
   "topic-JIT": 35,
   "bug": 21,
   "3.15": 17,
@@ -222,7 +222,7 @@
   "2023": 2,
   "2024": 83,
   "2025": 84,
-  "2026": 257
+  "2026": 258
  },
  "top_filers": {
   "vstinner": 28,

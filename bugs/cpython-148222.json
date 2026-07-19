@@ -1,8 +1,8 @@
 {
  "bug_id": "cpython-148222",
  "title": "genericaliasobject.c: Two NULL dereference bugs",
- "tool": "cpython-review-toolkit",
- "mode": "static-analysis",
+ "tool": "fusil",
+ "mode": "oom",
  "target_repo": "python/cpython",
  "is_umbrella": false,
  "issues": [
@@ -34,7 +34,7 @@
   "prakashsellathurai"
  ],
  "status": "closed/fixed",
- "confidence": "high",
+ "confidence": "medium",
  "needs_review": false,
  "review_reason": null,
  "reproduced": null,

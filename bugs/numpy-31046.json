@@ -10,12 +10,16 @@
  ],
  "prs": [],
  "shared_fix_prs": [],
- "related_prs": [],
+ "related_prs": [
+  "numpy/numpy#31297",
+  "numpy/numpy#31314",
+  "numpy/numpy#31336"
+ ],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
  "n_shared_fixes": 0,
- "n_related_prs": 0,
+ "n_related_prs": 3,
  "gists": [
   "ccc2d9553ca1c90ab1835362ee21a40a"
  ],

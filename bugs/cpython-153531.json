@@ -1,0 +1,36 @@
+{
+ "bug_id": "cpython-153531",
+ "title": "`sentinel()` construction races `func.__module__` reassignment in `caller()` under free-threading",
+ "tool": "manual",
+ "mode": "",
+ "target_repo": "python/cpython",
+ "is_umbrella": false,
+ "issues": [
+  "python/cpython#153531"
+ ],
+ "prs": [],
+ "shared_fix_prs": [],
+ "related_prs": [],
+ "n_prs": 0,
+ "n_backports": 0,
+ "n_fix_prs": 0,
+ "n_shared_fixes": 0,
+ "n_related_prs": 0,
+ "gists": [],
+ "labels": [
+  "interpreter-core",
+  "topic-free-threading",
+  "type-crash"
+ ],
+ "filed_by": "self",
+ "filers": [],
+ "status": "open",
+ "confidence": "high",
+ "needs_review": false,
+ "review_reason": null,
+ "reproduced": null,
+ "raw": [
+  "raw/python__cpython/issue-153531.json"
+ ],
+ "n_artifacts": 1
+}

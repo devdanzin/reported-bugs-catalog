@@ -4,24 +4,24 @@
 
 ## Totals
 
-- **483 bugs** across **28 external projects** (47 catalog-only w/o a GitHub artifact; 21 umbrella containers excluded)
-- **354 issue-artifacts + 496 PR-artifacts** (337 distinct fixes + 159 backports)
+- **484 bugs** across **28 external projects** (47 catalog-only w/o a GitHub artifact; 21 umbrella containers excluded)
+- **355 issue-artifacts + 496 PR-artifacts** (337 distinct fixes + 159 backports)
 
 ## By tool
 
 | tool | bugs | issues | PR-artifacts | fixes | backports | synthetic |
 |---|---|---|---|---|---|---|
-| fusil | 165 | 124 | 197 | 111 | 86 | 34 |
+| fusil | 166 | 125 | 201 | 112 | 89 | 34 |
 | cext-review-toolkit | 138 | 90 | 77 | 75 | 1 | 0 |
-| cpython-review-toolkit | 55 | 40 | 91 | 47 | 44 | 13 |
-| manual | 54 | 39 | 75 | 53 | 22 | 0 |
+| manual | 55 | 40 | 75 | 53 | 22 | 0 |
+| cpython-review-toolkit | 54 | 39 | 87 | 46 | 41 | 13 |
 | ft-review-toolkit | 29 | 23 | 12 | 12 | 0 | 0 |
 | lafleur | 28 | 28 | 33 | 27 | 6 | 0 |
 | fusil-plugin-cereggii | 14 | 10 | 13 | 12 | 0 | 0 |
 
 ## By filed-by (collaboration)
 
-- **self: 195** — filed by you
+- **self: 196** — filed by you
 - **self+maintainer: 147** — you filed the issue, a maintainer authored the fix
 - **maintainer: 117** — filed entirely by others from your reports/gists
 - **none: 22** — gisted/drafted, not filed
@@ -32,7 +32,7 @@ Top external filers of our findings: vstinner (28), sobolevn (16), neutrinoceros
 ## By state
 
 - closed/fixed: 322
-- open: 114
+- open: 115
 - gisted: 18
 - reported: 12
 - unfiled: 11
@@ -41,15 +41,15 @@ Top external filers of our findings: vstinner (28), sobolevn (16), neutrinoceros
 
 ## By label (top 20 — sliceable, e.g. crashes)
 
-- `type-crash`: 149
-- `interpreter-core`: 113
+- `type-crash`: 150
+- `interpreter-core`: 114
 - `extension-modules`: 67
 - `skip news`: 60
 - `3.14`: 58
 - `type-bug`: 52
 - `3.13`: 50
 - `awaiting review`: 43
-- `topic-free-threading`: 38
+- `topic-free-threading`: 39
 - `topic-JIT`: 35
 - `bug`: 21
 - `3.15`: 17
@@ -64,7 +64,7 @@ Top external filers of our findings: vstinner (28), sobolevn (16), neutrinoceros
 
 ## By repo (top 20)
 
-- python/cpython: 274
+- python/cpython: 275
 - pypy/pypy: 31
 - python-pillow/Pillow: 24
 - h5py/h5py: 16
@@ -92,7 +92,7 @@ Top external filers of our findings: vstinner (28), sobolevn (16), neutrinoceros
 - 2023: 2
 - 2024: 83
 - 2025: 84
-- 2026: 257
+- 2026: 258
 
 ## Umbrella impact chains
 

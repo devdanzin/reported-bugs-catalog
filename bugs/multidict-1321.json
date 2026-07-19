@@ -11,13 +11,14 @@
  "prs": [],
  "shared_fix_prs": [],
  "related_prs": [
-  "aio-libs/multidict#1323"
+  "aio-libs/multidict#1323",
+  "aio-libs/multidict#1328"
  ],
  "n_prs": 0,
  "n_backports": 0,
  "n_fix_prs": 0,
  "n_shared_fixes": 0,
- "n_related_prs": 1,
+ "n_related_prs": 2,
  "gists": [
   "fa00e03ef041c030660f083116a7e1b6"
  ],

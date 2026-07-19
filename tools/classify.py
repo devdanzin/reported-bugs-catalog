@@ -62,6 +62,8 @@ _REVIEW_MANUAL = [122353, 122398, 122461, 125732, 126018, 131878, 131936, 132470
 for _n in _REVIEW_MANUAL:
     OVERRIDES[("python/cpython", _n)] = ("manual", "", "high", "user-review")
 OVERRIDES[("python/cpython", 130999)] = ("fusil", "general", "high", "user-review")
+# user-confirmed 2026-07-19: manual (Claude-Code-assisted), NOT a fusil find
+OVERRIDES[("python/cpython", 153531)] = ("manual", "", "high", "user:manual-cc-assisted")
 
 FEATURE_KW = ("speed up", "support ", "teach ", "typo", "docstring", "not tested",
               "not currently tested", "missing from", "performance regression",

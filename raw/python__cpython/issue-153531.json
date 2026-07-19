@@ -1,0 +1,43 @@
+{
+ "repo": "python/cpython",
+ "number": 153531,
+ "type": "issue",
+ "url": "https://github.com/python/cpython/issues/153531",
+ "title": "`sentinel()` construction races `func.__module__` reassignment in `caller()` under free-threading",
+ "state": "open",
+ "state_reason": null,
+ "author": "devdanzin",
+ "author_association": "MEMBER",
+ "labels": [
+  "interpreter-core",
+  "type-crash",
+  "topic-free-threading"
+ ],
+ "created_at": "2026-07-10T20:38:19Z",
+ "closed_at": null,
+ "body": "# Crash report\n\n### What happened?\n\nOn a free-threaded build, constructing a PEP 661 `sentinel()` in one thread while another thread reassigns the enclosing function's `__module__` causes a heap use-after-free and SIGSEGV.\n\n`Objects/sentinelobject.c`'s `caller()` reads `func->func_module` as a borrowed reference and then `Py_NewRef`s it, with no protection against a concurrent reassignment freeing that module in the window between the read and the incref. The freed pointer is baked into the new sentinel's `self->module`; when the sentinel is later collected, `sentinel_clear`'s `Py_CLEAR(self->module)` decrefs the dangling pointer and `_Py_Dealloc` reads a freed type slot \u2192 crash.\n\n## Reproducer\n\n```python\nimport sys, threading, time\n\nclass M:\n    __slots__ = (\"payload\",)\n    def __init__(self):\n        self.payload = bytearray(128)\n\ndef make():\n    return sentinel(\"X\")          # sentinel() -> caller() reads make.__module__\n\nmake.__module__ = M()\nstop = False\n\ndef churn():                       # reassign make.__module__ rapidly\n    while not stop:\n        make.__module__ = M()\n\ndef build():                       # construct + drop sentinels\n    while not stop:\n        s = make(); del s\n\nts  = [threading.Thread(target=churn) for _ in range(4)]\nts += [threading.Thread(target=build) for _ in range(8)]\nfor t in ts: t.start()\ntime.sleep(5); stop = True\nfor t in ts: t.join()\nprint(\"survived (no crash this run)\")\n```\n\nCrashes reliably, only on a free-threaded build.\n\n## Root cause\n\n`Objects/sentinelobject.c`, `caller()` (\u2248 lines 41\u201346):\n\n```c\nPyFunctionObject *func = _PyFrame_GetFunction(f);\nassert(PyFunction_Check(func));\nPyObject *r = PyFunction_GetModule((PyObject *)func);   /* BORROWED reference */\nif (!r) {\n    assert(!PyErr_Occurred());\n    Py_RETURN_NONE;\n}\nreturn Py_NewRef(r);                                    /* increfs the borrowed ref */\n```\n\n`PyFunction_GetModule` returns a borrowed reference to `func->func_module`. Between that read and `Py_NewRef(r)`, a concurrent `func.__module__ = ...` can drop the previous module object's last reference to 0 and free it; `Py_NewRef(r)` then operates on freed memory.\n\nThe result is stored into the sentinel by `sentinel_new_impl` \u2192 `sentinel_new_with_module` (\u2248 line 59):\n\n```c\nself->module = Py_NewRef(module);   /* dangling pointer baked into the sentinel */\n```\n\nand later released by `sentinel_clear` (line 129):\n\n```c\nPy_CLEAR(self->module);             /* Py_DECREF on the dangling pointer -> UAF */\n```\n\n## Backtrace\n\nDebug free-threaded build, faulting thread:\n\n```\n#0  _Py_Dealloc (op=<freed module>) at ./Include/internal/pycore_pystate.h:339\n#1  Py_DECREF (op=<freed module>)   at ./Include/refcount.h:363\n#2  sentinel_clear (op=<sentinel>)  at Objects/sentinelobject.c:129\n#3  sentinel_dealloc (op=<freed module>) at Objects/sentinelobject.c:138\n```\n\nRelease free-threaded build (same repro), faulting thread lands one step later, in the allocator freeing the corrupted object:\n\n```\n#0  mi_free                at Objects/mimalloc/alloc.c:576\n#1  _PyObject_MiFree       at Objects/obmalloc.c:381\n#2  subtype_dealloc        at Objects/typeobject.c:2876\n#3  _Py_Dealloc            at Objects/object.c:3319\n```\n\n## Related\n\nSame borrowed-reference-under-free-threading class as **#153297** (\"double-decref in `func_set_qualname` under free-threading\") and the broader `funcobject.c` getset FT-unsafety. The shared root is that `func->func_module` (and the other function fields) can be reassigned concurrently, so any consumer that reads them borrowed and then increfs is racy on the free-threaded build. Here the unsafe consumer is `caller()` in `sentinelobject.c` rather than a `funcobject.c` getset.\n\n----\n*Found, investigated, and drafted with assistance from Claude Code (Opus 4.8).*\n\n\n### CPython versions tested on:\n\nCPython main branch\n\n### Operating systems tested on:\n\nLinux\n\n### Output from running 'python -VV' on the command line:\n\nPython 3.16.0a0 free-threading build (heads/main:bcf98ddbc40, Jul  4 2026, 15:09:31) [Clang 21.1.8 (6ubuntu1)]",
+ "comments": [
+  {
+   "author": "sobolevn",
+   "created_at": "2026-07-11T08:57:19Z",
+   "body": "Thanks for the report, I have a fix ready :)"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2026-07-11T10:40:04Z",
+   "body": "We need https://github.com/python/cpython/pull/153335 to get merged before my fix for this issue can be merged :)"
+  },
+  {
+   "author": "devdanzin",
+   "created_at": "2026-07-11T14:51:54Z",
+   "body": "Thanks @sobolevn! While confirming this, I found the same borrowed-`PyFunction_GetModule` pattern in a second copy of `caller()`: `Objects/typevarobject.c` has its own near-identical `caller()` that feeds `TypeVar` / `ParamSpec` / `TypeVarTuple` / `TypeAliasType` construction:\n\n```c\n/* Objects/typevarobject.c, caller() ~line 400 */\nPyObject *r = PyFunction_GetModule(PyStackRef_AsPyObjectBorrow(f->f_funcobj));  /* borrowed */\nif (!r) { PyErr_Clear(); Py_RETURN_NONE; }\nreturn Py_NewRef(r);                                                            /* increfs borrowed ref */\n```\n\nThe dangling module is stored as the new object's `__module__` (into its managed dict), and it faults later in `typevar_dealloc` \u2192 `PyObject_ClearManagedDict` \u2192 `clear_inline_values`. Same race, reproducible the same way (SIGSEGV on the debug FT build, but clean under `-X gil=1`):\n\n```python\nimport sys, threading, time\nfrom typing import TypeVar\nclass M:\n    __slots__ = (\"payload\",)\n    def __init__(self): self.payload = bytearray(128)\ndef make(): return TypeVar(\"X\")            # ParamSpec/TypeVarTuple/`type X = int` hit the same caller()\nmake.__module__ = M()\nstop = False\ndef churn():\n    while not stop: make.__module__ = M()\ndef build():\n    while not stop:\n        s = make(); del s\nts  = [threading.Thread(target=churn) for _ in range(4)]\nts += [threading.Thread(target=build) for _ in range(8)]\nfor t in ts: t.start()\ntime.sleep(5); stop = True\nfor t in ts: t.join()\n```\n\nThere's also a sibling in the same file \u2014 the `TypeAliasType.__module__` getter (~line 1975) does the same unprotected `Py_NewRef` on a borrowed `PyFunction_GetModule(ta->compute_value)` result (it even has a comment noting the borrowed reference), just after a `Py_END_CRITICAL_SECTION()`.\n\nDoes your pending fix here also cover the `typevarobject.c` `caller()` copy and that getter, or would you like a separate issue for them? Happy to file one if it's cleaner to track separately.\n\n*Backtraces and per-build details available if useful. Investigation and draft by Claude Code (Opus 4.8).*\n"
+  },
+  {
+   "author": "sobolevn",
+   "created_at": "2026-07-11T15:38:31Z",
+   "body": "> Does your pending fix here also cover the typevarobject.c caller() copy and that getter, or would you like a separate issue for them? \n\nYeah :)\nI also found it while greping code."
+  }
+ ],
+ "timeline_refs": [],
+ "fetch_errors": null
+}
